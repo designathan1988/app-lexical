@@ -6,7 +6,7 @@ import { ReferenceResolver } from './document/ReferenceResolver';
 import { BuilderStore } from '../builder/BuilderStore';
 import { BuilderRuntimeAdapterImpl } from '../builder/BuilderRuntimeAdapterImpl';
 import { DEFAULT_ENGINE_SETTINGS, type EngineSettings } from './EngineSettings';
-import { diagnostic, type Diagnostic } from './diagnostics';
+import { diagnostic, normalizeSpan, type Diagnostic } from './diagnostics';
 
 export interface CommandResult {
   input: string;
@@ -98,8 +98,11 @@ export class SemanticEngine {
     try {
       compile = this.compiler.compile(input, this.store.document, this.discourse);
     } catch (error) {
-      const internal = diagnostic('engine', 'ERROR', 'INTERNAL_ERROR',
-        `Falha interna: ${(error as Error).message}`);
+      const internal = normalizeSpan(
+        diagnostic('engine', 'ERROR', 'INTERNAL_ERROR',
+          `Falha interna: ${(error as Error).message}`),
+        input.length
+      );
       this.discourse.discard();
       const empty: ExecutionResult = {
         success: false,

@@ -106,11 +106,12 @@ describe('Terminação garantida (F0.2)', () => {
       expect(result!.compile.ast, `caso ${i} sem AST: ${text}`).toBeDefined();
       expect(result!.compile.plan, `caso ${i} sem plano: ${text}`).toBeDefined();
       for (const diagnostic of result!.compile.diagnostics) {
-        expect(diagnostic.start, `caso ${i} span inválido: ${text}`).toBeGreaterThanOrEqual(0);
-        expect(diagnostic.end, `caso ${i} span inválido: ${text}`).toBeLessThanOrEqual(text.length);
-        expect(diagnostic.start, `caso ${i} span invertido: ${text}`).toBeLessThanOrEqual(
-          diagnostic.end
-        );
+        const { start, end } = diagnostic;
+        expect(typeof start, `caso ${i} sem start: ${text} (${diagnostic.code})`).toBe('number');
+        expect(typeof end, `caso ${i} sem end: ${text} (${diagnostic.code})`).toBe('number');
+        expect(start!, `caso ${i} span inválido: ${text}`).toBeGreaterThanOrEqual(0);
+        expect(end!, `caso ${i} span inválido: ${text}`).toBeLessThanOrEqual(text.length);
+        expect(start!, `caso ${i} span invertido: ${text}`).toBeLessThanOrEqual(end!);
       }
 
       if (elapsed > slowest.elapsedMs) {

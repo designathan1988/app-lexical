@@ -8,7 +8,7 @@ import type { ExecutionPlan } from './planning/ExecutionPlan';
 import type { RawToken } from './lexical/RawLexer';
 import type { SemanticToken } from './parser/SemanticToken';
 import type { Diagnostic } from './diagnostics';
-import { diagnostic } from './diagnostics';
+import { diagnostic, normalizeSpan } from './diagnostics';
 
 import { RawLexer } from './lexical/RawLexer';
 import { expandContractions } from './lexical/GrammarNormalizer';
@@ -204,7 +204,7 @@ export class SemanticCompiler {
 
     const merged: ExecutionPlan = {
       ...plan,
-      diagnostics: [...prePlan, ...plan.diagnostics]
+      diagnostics: [...prePlan, ...plan.diagnostics].map((d) => normalizeSpan(d, input.length))
     };
 
     trace.plan = merged;

@@ -72,6 +72,32 @@ export interface Diagnostic {
   scores?: number[];
 }
 
+/**
+ * Normaliza o span de um diagnóstico que sai do motor.
+ *
+ * Invariante (F1.3): todo diagnóstico exposto tem `0 ≤ start ≤ end ≤
+ * input.length`. Diagnósticos sem span (ou com span fora da entrada) recebem
+ * o span do comando inteiro — nunca `undefined`.
+ */
+export function normalizeSpan(diagnostic: Diagnostic, inputLength: number): Diagnostic {
+  const { start, end } = diagnostic;
+  if (
+    typeof start === 'number' &&
+    typeof end === 'number' &&
+    start >= 0 &&
+    end >= start &&
+    end <= inputLength
+  ) {
+    return diagnostic;
+  }
+  return {
+    ...diagnostic,
+    span: { start: 0, end: inputLength },
+    start: 0,
+    end: inputLength
+  };
+}
+
 export function diagnostic(
   layer: string,
   severity: DiagnosticSeverity,
