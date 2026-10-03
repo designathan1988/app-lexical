@@ -486,7 +486,6 @@ export class DomainParser {
     // "uma caixa que tenha borda azul": a oração relativa é uma mutação da
     // entidade que está sendo criada.
     if (this.hasOperator(cursor.peek(), 'RELATIVE_HAVE')) {
-      const start = cursor.index;
       const marker = cursor.peek()!;
       cursor.consume();
       const head = this.parsePropertyHead(cursor, entity.entityConceptId);
@@ -507,20 +506,15 @@ export class DomainParser {
           throw new ParseError(bound.diagnostic.code, bound.diagnostic.message, bound.diagnostic.span);
         }
       }
-      cursor.index = start;
-      this.emit({
-        severity: 'ERROR',
-        code: 'UNSUPPORTED_OPERATION',
-        subcode: 'RELATIVE_CLAUSE',
-        message:
-          'A oração relativa "que tem …" exige uma propriedade e um valor ' +
+      // A oração relativa não pôde ser compreendida: aborta o comando sem
+      // mutação. Não há como "adiar" o marcador — reiniciar o cursor aqui
+      // fazia o laço de `parseCreate` reprocessar o mesmo token para sempre.
+      throw new ParseError(
+        'UNSUPPORTED_OPERATION',
+        'A oração relativa "que tem …" exige uma propriedade e um valor ' +
           '(por exemplo, "que tem borda azul").',
-        span: marker.span,
-        start: marker.span.start,
-        end: marker.span.end,
-        layer: 'parser'
-      });
-      return true;
+        marker.span
+      );
     }
 
     const start = cursor.index;
