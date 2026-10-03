@@ -1,0 +1,2113 @@
+{
+  "capturedAt": "2026-10-03",
+  "total": 228,
+  "forms": [
+    {
+      "form": "a",
+      "normalized": "a",
+      "lexemeId": "LEX_O",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "adiciona",
+      "normalized": "adiciona",
+      "lexemeId": "LEX_ADICIONAR",
+      "formType": "INFLECTION",
+      "morphology": null
+    },
+    {
+      "form": "adicionar",
+      "normalized": "adicionar",
+      "lexemeId": "LEX_ADICIONAR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "adicione",
+      "normalized": "adicione",
+      "lexemeId": "LEX_ADICIONAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "algum",
+      "normalized": "algum",
+      "lexemeId": "LEX_VAGUE_SOME",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "alguma",
+      "normalized": "alguma",
+      "lexemeId": "LEX_VAGUE_SOME",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "algumas",
+      "normalized": "algumas",
+      "lexemeId": "LEX_VAGUE_SOME",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "alguns",
+      "normalized": "alguns",
+      "lexemeId": "LEX_VAGUE_SOME",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "alterar",
+      "normalized": "alterar",
+      "lexemeId": "LEX_ALTERAR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "altere",
+      "normalized": "altere",
+      "lexemeId": "LEX_ALTERAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "amarela",
+      "normalized": "amarela",
+      "lexemeId": "LEX_AMARELO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "amarelas",
+      "normalized": "amarelas",
+      "lexemeId": "LEX_AMARELO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "amarelo",
+      "normalized": "amarelo",
+      "lexemeId": "LEX_AMARELO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "amarelos",
+      "normalized": "amarelos",
+      "lexemeId": "LEX_AMARELO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "antes",
+      "normalized": "antes",
+      "lexemeId": "LEX_ANTES",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "apaga",
+      "normalized": "apaga",
+      "lexemeId": "LEX_APAGAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "apagar",
+      "normalized": "apagar",
+      "lexemeId": "LEX_APAGAR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "apague",
+      "normalized": "apague",
+      "lexemeId": "LEX_APAGAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "apaguem",
+      "normalized": "apaguem",
+      "lexemeId": "LEX_APAGAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "aquela",
+      "normalized": "aquela",
+      "lexemeId": "LEX_AQUELE",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "aquelas",
+      "normalized": "aquelas",
+      "lexemeId": "LEX_AQUELE",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "aquele",
+      "normalized": "aquele",
+      "lexemeId": "LEX_AQUELE",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "aqueles",
+      "normalized": "aqueles",
+      "lexemeId": "LEX_AQUELE",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "as",
+      "normalized": "as",
+      "lexemeId": "LEX_O",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "asul",
+      "normalized": "asul",
+      "lexemeId": "LEX_AZUL",
+      "formType": "MISSPELLING",
+      "morphology": {
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "azuis",
+      "normalized": "azuis",
+      "lexemeId": "LEX_AZUL",
+      "formType": "INFLECTION",
+      "morphology": {
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "azul",
+      "normalized": "azul",
+      "lexemeId": "LEX_AZUL",
+      "formType": "CANONICAL",
+      "morphology": {
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "borda",
+      "normalized": "borda",
+      "lexemeId": "LEX_BORDA",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "bordas",
+      "normalized": "bordas",
+      "lexemeId": "LEX_BORDA",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "botão",
+      "normalized": "botao",
+      "lexemeId": "LEX_BOTAO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "botao",
+      "normalized": "botao",
+      "lexemeId": "LEX_BOTAO",
+      "formType": "COLLOQUIAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "botar",
+      "normalized": "botar",
+      "lexemeId": "LEX_BOTAR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "bote",
+      "normalized": "bote",
+      "lexemeId": "LEX_BOTAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "botões",
+      "normalized": "botoes",
+      "lexemeId": "LEX_BOTAO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "botoes",
+      "normalized": "botoes",
+      "lexemeId": "LEX_BOTAO",
+      "formType": "COLLOQUIAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "branca",
+      "normalized": "branca",
+      "lexemeId": "LEX_BRANCO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "brancas",
+      "normalized": "brancas",
+      "lexemeId": "LEX_BRANCO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "branco",
+      "normalized": "branco",
+      "lexemeId": "LEX_BRANCO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "brancos",
+      "normalized": "brancos",
+      "lexemeId": "LEX_BRANCO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "caixa",
+      "normalized": "caixa",
+      "lexemeId": "LEX_CAIXA",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "caixas",
+      "normalized": "caixas",
+      "lexemeId": "LEX_CAIXA",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "cinco",
+      "normalized": "cinco",
+      "lexemeId": "LEX_CARD_5",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "cinza",
+      "normalized": "cinza",
+      "lexemeId": "LEX_CINZA",
+      "formType": "CANONICAL",
+      "morphology": {
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "cinzas",
+      "normalized": "cinzas",
+      "lexemeId": "LEX_CINZA",
+      "formType": "INFLECTION",
+      "morphology": {
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "colocar",
+      "normalized": "colocar",
+      "lexemeId": "LEX_COLOCAR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "coloque",
+      "normalized": "coloque",
+      "lexemeId": "LEX_COLOCAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "coloquem",
+      "normalized": "coloquem",
+      "lexemeId": "LEX_COLOCAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "com",
+      "normalized": "com",
+      "lexemeId": "LEX_COM",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "container",
+      "normalized": "container",
+      "lexemeId": "LEX_CONTAINER",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "containers",
+      "normalized": "containers",
+      "lexemeId": "LEX_CONTAINER",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "conteúdo",
+      "normalized": "conteudo",
+      "lexemeId": "LEX_CONTEUDO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "conteudo",
+      "normalized": "conteudo",
+      "lexemeId": "LEX_CONTEUDO",
+      "formType": "COLLOQUIAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "cria",
+      "normalized": "cria",
+      "lexemeId": "LEX_CRIAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "criar",
+      "normalized": "criar",
+      "lexemeId": "LEX_CRIAR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "crie",
+      "normalized": "crie",
+      "lexemeId": "LEX_CRIAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "criem",
+      "normalized": "criem",
+      "lexemeId": "LEX_CRIAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "criou",
+      "normalized": "criou",
+      "lexemeId": "LEX_CRIAR",
+      "formType": "INFLECTION",
+      "morphology": null
+    },
+    {
+      "form": "de",
+      "normalized": "de",
+      "lexemeId": "LEX_DE",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "decim",
+      "normalized": "decim",
+      "lexemeId": "LEX_ORD_10",
+      "formType": "MISSPELLING",
+      "morphology": null
+    },
+    {
+      "form": "décima",
+      "normalized": "decima",
+      "lexemeId": "LEX_ORD_10",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "décimas",
+      "normalized": "decimas",
+      "lexemeId": "LEX_ORD_10",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "décimo",
+      "normalized": "decimo",
+      "lexemeId": "LEX_ORD_10",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "décimos",
+      "normalized": "decimos",
+      "lexemeId": "LEX_ORD_10",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "deixar",
+      "normalized": "deixar",
+      "lexemeId": "LEX_DEIXAR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "deixe",
+      "normalized": "deixe",
+      "lexemeId": "LEX_DEIXAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "deixem",
+      "normalized": "deixem",
+      "lexemeId": "LEX_DEIXAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "deletar",
+      "normalized": "deletar",
+      "lexemeId": "LEX_DELETAR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "delete",
+      "normalized": "delete",
+      "lexemeId": "LEX_DELETAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "dentro",
+      "normalized": "dentro",
+      "lexemeId": "LEX_DENTRO",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "depois",
+      "normalized": "depois",
+      "lexemeId": "LEX_DEPOIS",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "dez",
+      "normalized": "dez",
+      "lexemeId": "LEX_CARD_10",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "direita",
+      "normalized": "direita",
+      "lexemeId": "LEX_DIREITA",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "dois",
+      "normalized": "dois",
+      "lexemeId": "LEX_CARD_2",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "duas",
+      "normalized": "duas",
+      "lexemeId": "LEX_CARD_2",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "e",
+      "normalized": "e",
+      "lexemeId": "LEX_E",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "ela",
+      "normalized": "ela",
+      "lexemeId": "LEX_ELA",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "elas",
+      "normalized": "elas",
+      "lexemeId": "LEX_ELAS",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "ele",
+      "normalized": "ele",
+      "lexemeId": "LEX_ELE",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "eles",
+      "normalized": "eles",
+      "lexemeId": "LEX_ELES",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "esquerda",
+      "normalized": "esquerda",
+      "lexemeId": "LEX_ESQUERDA",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "essa",
+      "normalized": "essa",
+      "lexemeId": "LEX_ESSE",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "essas",
+      "normalized": "essas",
+      "lexemeId": "LEX_ESSE",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "esse",
+      "normalized": "esse",
+      "lexemeId": "LEX_ESSE",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "esses",
+      "normalized": "esses",
+      "lexemeId": "LEX_ESSE",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "esta",
+      "normalized": "esta",
+      "lexemeId": "LEX_ESTE",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "este",
+      "normalized": "este",
+      "lexemeId": "LEX_ESTE",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "exceto",
+      "normalized": "exceto",
+      "lexemeId": "LEX_EXCETO",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "exclua",
+      "normalized": "exclua",
+      "lexemeId": "LEX_EXCLUIR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "excluir",
+      "normalized": "excluir",
+      "lexemeId": "LEX_EXCLUIR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "faça",
+      "normalized": "faca",
+      "lexemeId": "LEX_FAZER",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "faca",
+      "normalized": "faca",
+      "lexemeId": "LEX_FAZER",
+      "formType": "MISSPELLING",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "fazer",
+      "normalized": "fazer",
+      "lexemeId": "LEX_FAZER",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "fundo",
+      "normalized": "fundo",
+      "lexemeId": "LEX_FUNDO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "inserir",
+      "normalized": "inserir",
+      "lexemeId": "LEX_INSERIR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "insira",
+      "normalized": "insira",
+      "lexemeId": "LEX_INSERIR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "lado",
+      "normalized": "lado",
+      "lexemeId": "LEX_LADO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "laranja",
+      "normalized": "laranja",
+      "lexemeId": "LEX_LARANJA",
+      "formType": "CANONICAL",
+      "morphology": {
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "laranjas",
+      "normalized": "laranjas",
+      "lexemeId": "LEX_LARANJA",
+      "formType": "INFLECTION",
+      "morphology": {
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "marcar",
+      "normalized": "marcar",
+      "lexemeId": "LEX_MARCAR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "marque",
+      "normalized": "marque",
+      "lexemeId": "LEX_MARCAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "menos",
+      "normalized": "menos",
+      "lexemeId": "LEX_MENOS",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "mesma",
+      "normalized": "mesma",
+      "lexemeId": "LEX_MESMO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "mesmas",
+      "normalized": "mesmas",
+      "lexemeId": "LEX_MESMO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "mesmo",
+      "normalized": "mesmo",
+      "lexemeId": "LEX_MESMO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "mesmos",
+      "normalized": "mesmos",
+      "lexemeId": "LEX_MESMO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "mova",
+      "normalized": "mova",
+      "lexemeId": "LEX_MOVER",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "movam",
+      "normalized": "movam",
+      "lexemeId": "LEX_MOVER",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "move",
+      "normalized": "move",
+      "lexemeId": "LEX_MOVER",
+      "formType": "INFLECTION",
+      "morphology": null
+    },
+    {
+      "form": "mover",
+      "normalized": "mover",
+      "lexemeId": "LEX_MOVER",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "mudar",
+      "normalized": "mudar",
+      "lexemeId": "LEX_MUDAR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "mude",
+      "normalized": "mude",
+      "lexemeId": "LEX_MUDAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "mudem",
+      "normalized": "mudem",
+      "lexemeId": "LEX_MUDAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "não",
+      "normalized": "nao",
+      "lexemeId": "LEX_NAO",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "nao",
+      "normalized": "nao",
+      "lexemeId": "LEX_NAO",
+      "formType": "COLLOQUIAL",
+      "morphology": null
+    },
+    {
+      "form": "nona",
+      "normalized": "nona",
+      "lexemeId": "LEX_ORD_9",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "nonas",
+      "normalized": "nonas",
+      "lexemeId": "LEX_ORD_9",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "nono",
+      "normalized": "nono",
+      "lexemeId": "LEX_ORD_9",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "nonos",
+      "normalized": "nonos",
+      "lexemeId": "LEX_ORD_9",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "nove",
+      "normalized": "nove",
+      "lexemeId": "LEX_CARD_9",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "o",
+      "normalized": "o",
+      "lexemeId": "LEX_O",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "oitava",
+      "normalized": "oitava",
+      "lexemeId": "LEX_ORD_8",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "oitavas",
+      "normalized": "oitavas",
+      "lexemeId": "LEX_ORD_8",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "oitavo",
+      "normalized": "oitavo",
+      "lexemeId": "LEX_ORD_8",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "oitavos",
+      "normalized": "oitavos",
+      "lexemeId": "LEX_ORD_8",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "oito",
+      "normalized": "oito",
+      "lexemeId": "LEX_CARD_8",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "os",
+      "normalized": "os",
+      "lexemeId": "LEX_O",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "outra",
+      "normalized": "outra",
+      "lexemeId": "LEX_OUTRO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "outras",
+      "normalized": "outras",
+      "lexemeId": "LEX_OUTRO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "outro",
+      "normalized": "outro",
+      "lexemeId": "LEX_OUTRO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "outros",
+      "normalized": "outros",
+      "lexemeId": "LEX_OUTRO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "para",
+      "normalized": "para",
+      "lexemeId": "LEX_PARA",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "penúltima",
+      "normalized": "penultima",
+      "lexemeId": "LEX_ORD_PENULTIMATE",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "penultima",
+      "normalized": "penultima",
+      "lexemeId": "LEX_ORD_PENULTIMATE",
+      "formType": "COLLOQUIAL",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "penúltimas",
+      "normalized": "penultimas",
+      "lexemeId": "LEX_ORD_PENULTIMATE",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "penúltimo",
+      "normalized": "penultimo",
+      "lexemeId": "LEX_ORD_PENULTIMATE",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "penultimo",
+      "normalized": "penultimo",
+      "lexemeId": "LEX_ORD_PENULTIMATE",
+      "formType": "COLLOQUIAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "penúltimos",
+      "normalized": "penultimos",
+      "lexemeId": "LEX_ORD_PENULTIMATE",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "pintar",
+      "normalized": "pintar",
+      "lexemeId": "LEX_PINTAR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "pinte",
+      "normalized": "pinte",
+      "lexemeId": "LEX_PINTAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "ponha",
+      "normalized": "ponha",
+      "lexemeId": "LEX_COLOCAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "preta",
+      "normalized": "preta",
+      "lexemeId": "LEX_PRETO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "pretas",
+      "normalized": "pretas",
+      "lexemeId": "LEX_PRETO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "preto",
+      "normalized": "preto",
+      "lexemeId": "LEX_PRETO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "pretos",
+      "normalized": "pretos",
+      "lexemeId": "LEX_PRETO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "primeira",
+      "normalized": "primeira",
+      "lexemeId": "LEX_ORD_1",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "primeiras",
+      "normalized": "primeiras",
+      "lexemeId": "LEX_ORD_1",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "primeiro",
+      "normalized": "primeiro",
+      "lexemeId": "LEX_ORD_1",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "primeiros",
+      "normalized": "primeiros",
+      "lexemeId": "LEX_ORD_1",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "quarta",
+      "normalized": "quarta",
+      "lexemeId": "LEX_ORD_4",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "quartas",
+      "normalized": "quartas",
+      "lexemeId": "LEX_ORD_4",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "quarto",
+      "normalized": "quarto",
+      "lexemeId": "LEX_ORD_4",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "quartos",
+      "normalized": "quartos",
+      "lexemeId": "LEX_ORD_4",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "quatro",
+      "normalized": "quatro",
+      "lexemeId": "LEX_CARD_4",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "quinta",
+      "normalized": "quinta",
+      "lexemeId": "LEX_ORD_5",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "quintas",
+      "normalized": "quintas",
+      "lexemeId": "LEX_ORD_5",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "quinto",
+      "normalized": "quinto",
+      "lexemeId": "LEX_ORD_5",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "quintos",
+      "normalized": "quintos",
+      "lexemeId": "LEX_ORD_5",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "redonda",
+      "normalized": "redonda",
+      "lexemeId": "LEX_REDONDO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "redondas",
+      "normalized": "redondas",
+      "lexemeId": "LEX_REDONDO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "redondo",
+      "normalized": "redondo",
+      "lexemeId": "LEX_REDONDO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "redondos",
+      "normalized": "redondos",
+      "lexemeId": "LEX_REDONDO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "remova",
+      "normalized": "remova",
+      "lexemeId": "LEX_REMOVER",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "remove",
+      "normalized": "remove",
+      "lexemeId": "LEX_REMOVER",
+      "formType": "INFLECTION",
+      "morphology": null
+    },
+    {
+      "form": "remover",
+      "normalized": "remover",
+      "lexemeId": "LEX_REMOVER",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "rótulo",
+      "normalized": "rotulo",
+      "lexemeId": "LEX_ROTULO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "rotulo",
+      "normalized": "rotulo",
+      "lexemeId": "LEX_ROTULO",
+      "formType": "COLLOQUIAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "roxa",
+      "normalized": "roxa",
+      "lexemeId": "LEX_ROXO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "roxas",
+      "normalized": "roxas",
+      "lexemeId": "LEX_ROXO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "roxo",
+      "normalized": "roxo",
+      "lexemeId": "LEX_ROXO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "roxos",
+      "normalized": "roxos",
+      "lexemeId": "LEX_ROXO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "salvo",
+      "normalized": "salvo",
+      "lexemeId": "LEX_SALVO",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "segunda",
+      "normalized": "segunda",
+      "lexemeId": "LEX_ORD_2",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "segundas",
+      "normalized": "segundas",
+      "lexemeId": "LEX_ORD_2",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "segundo",
+      "normalized": "segundo",
+      "lexemeId": "LEX_ORD_2",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "segundos",
+      "normalized": "segundos",
+      "lexemeId": "LEX_ORD_2",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "seis",
+      "normalized": "seis",
+      "lexemeId": "LEX_CARD_6",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "selecionar",
+      "normalized": "selecionar",
+      "lexemeId": "LEX_SELECIONAR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "selecione",
+      "normalized": "selecione",
+      "lexemeId": "LEX_SELECIONAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "sem",
+      "normalized": "sem",
+      "lexemeId": "LEX_SEM",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "sete",
+      "normalized": "sete",
+      "lexemeId": "LEX_CARD_7",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "setim",
+      "normalized": "setim",
+      "lexemeId": "LEX_ORD_7",
+      "formType": "MISSPELLING",
+      "morphology": null
+    },
+    {
+      "form": "sétima",
+      "normalized": "setima",
+      "lexemeId": "LEX_ORD_7",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "sétimas",
+      "normalized": "setimas",
+      "lexemeId": "LEX_ORD_7",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "sétimo",
+      "normalized": "setimo",
+      "lexemeId": "LEX_ORD_7",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "sétimos",
+      "normalized": "setimos",
+      "lexemeId": "LEX_ORD_7",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "sexta",
+      "normalized": "sexta",
+      "lexemeId": "LEX_ORD_6",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "sextas",
+      "normalized": "sextas",
+      "lexemeId": "LEX_ORD_6",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "sexto",
+      "normalized": "sexto",
+      "lexemeId": "LEX_ORD_6",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "sextos",
+      "normalized": "sextos",
+      "lexemeId": "LEX_ORD_6",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "terceira",
+      "normalized": "terceira",
+      "lexemeId": "LEX_ORD_3",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "terceiras",
+      "normalized": "terceiras",
+      "lexemeId": "LEX_ORD_3",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "terceiro",
+      "normalized": "terceiro",
+      "lexemeId": "LEX_ORD_3",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "terceiros",
+      "normalized": "terceiros",
+      "lexemeId": "LEX_ORD_3",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "texto",
+      "normalized": "texto",
+      "lexemeId": "LEX_CONTEUDO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "texto",
+      "normalized": "texto",
+      "lexemeId": "LEX_TEXTO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "textos",
+      "normalized": "textos",
+      "lexemeId": "LEX_TEXTO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "tirar",
+      "normalized": "tirar",
+      "lexemeId": "LEX_TIRAR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "tire",
+      "normalized": "tire",
+      "lexemeId": "LEX_TIRAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "toda",
+      "normalized": "toda",
+      "lexemeId": "LEX_TODO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "todas",
+      "normalized": "todas",
+      "lexemeId": "LEX_TODO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "todo",
+      "normalized": "todo",
+      "lexemeId": "LEX_TODO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "todos",
+      "normalized": "todos",
+      "lexemeId": "LEX_TODO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "três",
+      "normalized": "tres",
+      "lexemeId": "LEX_CARD_3",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "tres",
+      "normalized": "tres",
+      "lexemeId": "LEX_CARD_3",
+      "formType": "COLLOQUIAL",
+      "morphology": null
+    },
+    {
+      "form": "trocar",
+      "normalized": "trocar",
+      "lexemeId": "LEX_TROCAR",
+      "formType": "CANONICAL",
+      "morphology": null
+    },
+    {
+      "form": "troque",
+      "normalized": "troque",
+      "lexemeId": "LEX_TROCAR",
+      "formType": "INFLECTION",
+      "morphology": {
+        "mood": "IMPERATIVE"
+      }
+    },
+    {
+      "form": "última",
+      "normalized": "ultima",
+      "lexemeId": "LEX_ORD_LAST",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "ultima",
+      "normalized": "ultima",
+      "lexemeId": "LEX_ORD_LAST",
+      "formType": "COLLOQUIAL",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "últimas",
+      "normalized": "ultimas",
+      "lexemeId": "LEX_ORD_LAST",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "ultimas",
+      "normalized": "ultimas",
+      "lexemeId": "LEX_ORD_LAST",
+      "formType": "COLLOQUIAL",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "último",
+      "normalized": "ultimo",
+      "lexemeId": "LEX_ORD_LAST",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "ultimo",
+      "normalized": "ultimo",
+      "lexemeId": "LEX_ORD_LAST",
+      "formType": "COLLOQUIAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "últimos",
+      "normalized": "ultimos",
+      "lexemeId": "LEX_ORD_LAST",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "ultimos",
+      "normalized": "ultimos",
+      "lexemeId": "LEX_ORD_LAST",
+      "formType": "COLLOQUIAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "um",
+      "normalized": "um",
+      "lexemeId": "LEX_CARD_1",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "um",
+      "normalized": "um",
+      "lexemeId": "LEX_UM",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "uma",
+      "normalized": "uma",
+      "lexemeId": "LEX_CARD_1",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "uma",
+      "normalized": "uma",
+      "lexemeId": "LEX_UM",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "umas",
+      "normalized": "umas",
+      "lexemeId": "LEX_UM",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "uns",
+      "normalized": "uns",
+      "lexemeId": "LEX_UM",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "várias",
+      "normalized": "varias",
+      "lexemeId": "LEX_VAGUE_SEVERAL",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "vários",
+      "normalized": "varios",
+      "lexemeId": "LEX_VAGUE_SEVERAL",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "verde",
+      "normalized": "verde",
+      "lexemeId": "LEX_VERDE",
+      "formType": "CANONICAL",
+      "morphology": {
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "verdes",
+      "normalized": "verdes",
+      "lexemeId": "LEX_VERDE",
+      "formType": "INFLECTION",
+      "morphology": {
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "vermelha",
+      "normalized": "vermelha",
+      "lexemeId": "LEX_VERMELHO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "vermelhas",
+      "normalized": "vermelhas",
+      "lexemeId": "LEX_VERMELHO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "FEM",
+        "number": "PLURAL"
+      }
+    },
+    {
+      "form": "vermelho",
+      "normalized": "vermelho",
+      "lexemeId": "LEX_VERMELHO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    },
+    {
+      "form": "vermelhos",
+      "normalized": "vermelhos",
+      "lexemeId": "LEX_VERMELHO",
+      "formType": "INFLECTION",
+      "morphology": {
+        "gender": "MASC",
+        "number": "PLURAL"
+      }
+    }
+  ]
+}
