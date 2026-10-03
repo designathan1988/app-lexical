@@ -90,6 +90,12 @@ consciente da lista — o oráculo só encolhe).
 geração por paradigma e `morph-15`, `morph-16` e `morph-17` passaram —
 removidos da lista (28 → 25 falhas conhecidas). Nenhum esperado foi alterado.
 
+**Atualização F3 (concordância, 2026-10-03):** adjetivo com coordenação/adjunção
+(G1–G6): plural concordante distribui para todos os núcleos coordenados;
+singular vale para o núcleo mais próximo que concorda; nenhum núcleo concorda
+→ AGREEMENT_MISMATCH sem mutação. `morph-02`, `morph-03`, `morph-05` e
+`morph-06` passaram — removidos da lista (21 → 17).
+
 **Atualização F3.3.B (2026-10-03):** o segmentador de contrações/ênclise e a
 referência de grupo (`NODE_SET`) fizeram `morph-11`, `morph-12`, `morph-13` e
 `morph-14` passarem — removidos da lista (25 → 21). O esperado de `morph-14`

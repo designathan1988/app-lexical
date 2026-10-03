@@ -91,6 +91,8 @@ export interface ParserContext {
 export class DomainParser {
   private tempCounter = 0;
   private binder: PropertyBinder;
+  /** Concordância do núcleo de cada entidade recém-criada (G1–G6). */
+  private entityAgreement = new Map<TempNodeId, { gender?: GrammaticalGender; number?: GrammaticalNumber }>();
   diagnostics: Diagnostic[] = [];
   /**
    * Consumo por comando: índices globais dos tokens consumidos (invariante
@@ -497,6 +499,8 @@ export class DomainParser {
 
           const trailing = this.peekSpatial(cursor);
           if (trailing && this.isContainment(trailing.id)) cursor.consume();
+
+          if (this.distributeAdjacentMutation(cursor, entities, 'SUBORDINATED')) continue;
           continue;
         }
 
@@ -522,6 +526,7 @@ export class DomainParser {
         if (sibling) {
           entities.push(sibling);
           current = sibling;
+          if (this.distributeAdjacentMutation(cursor, entities)) continue;
           continue;
         }
 
@@ -1214,6 +1219,8 @@ export class DomainParser {
       cursor.consume();
     }
 
+    this.entityAgreement.set(tempId, { gender: head.gender, number: head.number });
+
     this.ctx.discourse.stage({
       reference: { kind: 'NEW_ENTITY', tempId },
       entityConceptId: entity.entityConceptId,
@@ -1222,6 +1229,114 @@ export class DomainParser {
     });
 
     return entity;
+  }
+
+  /**
+   * 3.G/G1–G6 — Concordância de adjetivo com coordenação/adjunção.
+   *
+   * Depois de "crie uma caixa e um botão", o adjetivo seguinte distribui:
+   *   - plural concordando com a coordenação (gênero = masc. se houver algum
+   *     masculino) → aplica a TODOS os núcleos;
+   *   - singular (ou gênero determinado) → vale só para o núcleo mais próximo
+   *     que concorda ("caixa com um botão preta" → caixa);
+   *   - nenhum núcleo concorda → AGREEMENT_MISMATCH, comando não executa.
+   */
+  private distributeAdjacentMutation(
+    cursor: SemanticCursor,
+    entities: NewEntityAst[],
+    /** COORDINATED = núcleos no mesmo nível ("X e Y"); SUBORDINATED = "X com Y". */
+    scope: 'COORDINATED' | 'SUBORDINATED' = 'COORDINATED'
+  ): boolean {
+    if (entities.length < 2) return false;
+    const token = cursor.peek();
+    if (!token) return false;
+
+    let adjective: { gender?: GrammaticalGender; number?: GrammaticalNumber } | null = null;
+    for (const candidate of token.candidates) {
+      if (candidate.pos === 'ADJECTIVE') {
+        adjective = {
+          gender: candidate.morphology?.gender,
+          number: candidate.morphology?.number
+        };
+        break;
+      }
+    }
+    if (!adjective) return false;
+
+    const genders = entities.map((e) => this.entityAgreement.get(e.tempId)?.gender);
+    const coordinationGender = genders.includes('MASC')
+      ? 'MASC'
+      : genders.includes('FEM')
+        ? 'FEM'
+        : undefined;
+
+    const targets: NewEntityAst[] = [];
+    if (scope === 'COORDINATED' && adjective.number === 'PLURAL') {
+      if (adjective.gender && coordinationGender && adjective.gender !== coordinationGender) {
+        this.emit({
+          severity: 'ERROR',
+          code: 'AGREEMENT_MISMATCH',
+          message:
+            `O adjetivo "${token.rawTokens.map((t) => t.raw).join(' ')}" ` +
+            `(${adjective.gender === 'MASC' ? 'masculino' : 'feminino'} plural) não concorda ` +
+            'com a coordenação (o plural misto é masculino).',
+          span: token.span,
+          start: token.span.start,
+          end: token.span.end,
+          layer: 'syntax'
+        });
+        throw new ParseError(
+          'AGREEMENT_MISMATCH',
+          `O adjetivo "${token.rawTokens.map((t) => t.raw).join(' ')}" não concorda com os núcleos coordenados.`,
+          token.span
+        );
+      }
+      targets.push(...entities);
+    } else {
+      for (let i = entities.length - 1; i >= 0; i--) {
+        const gender = this.entityAgreement.get(entities[i].tempId)?.gender;
+        if (!adjective.gender || !gender || adjective.gender === gender) {
+          targets.push(entities[i]);
+          break;
+        }
+      }
+      if (!targets.length) {
+        this.emit({
+          severity: 'ERROR',
+          code: 'AGREEMENT_MISMATCH',
+          message:
+            `O adjetivo "${token.rawTokens.map((t) => t.raw).join(' ')}" não concorda ` +
+            'com nenhum dos núcleos mencionados.',
+          span: token.span,
+          start: token.span.start,
+          end: token.span.end,
+          layer: 'syntax'
+        });
+        throw new ParseError(
+          'AGREEMENT_MISMATCH',
+          `O adjetivo "${token.rawTokens.map((t) => t.raw).join(' ')}" não concorda com nenhum núcleo.`,
+          token.span
+        );
+      }
+    }
+
+    // Os tokens da mutação são consumidos uma única vez: reconstrói-se a
+    // mesma mutação por núcleo a partir do mesmo checkpoint (determinístico).
+    const checkpoint = cursor.index;
+    let lastIndex = cursor.index;
+    for (const target of targets) {
+      cursor.index = checkpoint;
+      const mutations = this.parseMutations(cursor, target.entityConceptId);
+      if (mutations.length) {
+        target.mutations.push(...mutations);
+      } else {
+        cursor.index = lastIndex;
+        return false;
+      }
+      lastIndex = cursor.index;
+    }
+    cursor.index = lastIndex;
+    return true;
   }
 
   // -------------------------------------------------------------------------
