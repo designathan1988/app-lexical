@@ -181,12 +181,14 @@ export class DiscourseContext {
     lookup: NodeLookup,
     liveness: Liveness | undefined,
     gender?: GrammaticalGender,
-    number?: GrammaticalNumber
+    number?: GrammaticalNumber,
+    /** Restrição sintática adicional sobre o antecedente (ex.: Princípio B). */
+    accept: (mention: Mention) => boolean = () => true
   ): SemanticReference | null {
     const match = this.salienceMatch(lookup, liveness, (mention) => {
       if (gender && mention.gender && gender !== mention.gender) return false;
       if (number && mention.number && mention.number !== number) return false;
-      return true;
+      return accept(mention);
     });
     return match ? match.reference : null;
   }

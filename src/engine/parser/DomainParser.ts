@@ -57,6 +57,26 @@ interface EntityHead {
   span: Span;
 }
 
+interface Agreement {
+  gender?: GrammaticalGender;
+  number?: GrammaticalNumber;
+}
+
+/** Concordância de coordenação: plural; masculino se houver algum masculino. */
+function coordinationAgreement(members: Array<Agreement | undefined>): Agreement {
+  const genders = members.map((m) => m?.gender);
+  return {
+    gender: genders.includes('MASC') ? 'MASC' : genders.every((g) => g === 'FEM') ? 'FEM' : undefined,
+    number: 'PLURAL'
+  };
+}
+
+function agrees(adjective: Agreement, head: Agreement): boolean {
+  const gender = !adjective.gender || !head.gender || adjective.gender === head.gender;
+  const number = !adjective.number || !head.number || adjective.number === head.number;
+  return gender && number;
+}
+
 interface NominalPrefix {
   definiteness: 'DEFINITE' | 'INDEFINITE' | 'UNSPECIFIED';
   quantity: number | 'ALL' | 'VAGUE' | null;
@@ -111,6 +131,16 @@ export class DomainParser {
   private sceneStart: number | null = null;
   /** Reordenações feitas pelo canonicalizador, por comando (trace). */
   canonicalization: Array<{ commandIndex: number; moved: CanonicalClause['moved'] }> = [];
+  /**
+   * Perfis de concordância aceitos para um adjetivo nu no ponto atual
+   * (núcleo próprio e, em coordenação, o plural da coordenação). `null` =
+   * sem verificação (o chamador já resolveu a concordância).
+   */
+  private agreementContext: Agreement[] | null = null;
+  /** Concordância do núcleo da última referência analisada. */
+  private lastReferenceAgreement: Agreement | undefined;
+  /** Entidades que um pronome NÃO pode ter como antecedente (Princípio B). */
+  private pronounExcludedTemps = new Set<TempNodeId>();
 
   constructor(ctx: ParserContext) {
     this.ctx = ctx;
@@ -135,6 +165,39 @@ export class DomainParser {
       isNumeral: (t) =>
         this.cardinalOf(t) !== null || this.ordinalOf(t) !== null || t?.literal?.kind === 'NUMBER'
     });
+  }
+
+  /** Remove posicionamentos repetidos (mesma origem, relação e alvo). */
+  private uniquePlacements(placements: PlacementAst[]): PlacementAst[] {
+    const seen = new Set<string>();
+    return placements.filter((p) => {
+      const key = JSON.stringify([p.source, p.relationConceptId, p.target]);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+
+  /** Executa `fn` com um contexto de concordância (restaura ao final). */
+  private withAgreement<T>(profiles: Agreement[] | null, fn: () => T): T {
+    const saved = this.agreementContext;
+    this.agreementContext = profiles;
+    try {
+      return fn();
+    } finally {
+      this.agreementContext = saved;
+    }
+  }
+
+  /** Executa `fn` proibindo pronomes de se ligarem às entidades dadas. */
+  private withPronounExclusion<T>(tempIds: TempNodeId[], fn: () => T): T {
+    const saved = this.pronounExcludedTemps;
+    this.pronounExcludedTemps = new Set([...saved, ...tempIds]);
+    try {
+      return fn();
+    } finally {
+      this.pronounExcludedTemps = saved;
+    }
   }
 
   private spatialOf(token: SemanticToken | undefined): SpatialConcept | null {
@@ -675,8 +738,18 @@ export class DomainParser {
           });
           current = child;
 
+          // "com um botão dentro": o "dentro" sem alvo próprio só confirma o
+          // containment; com alvo ("dentro dela") é tratado pelo laço como
+          // relação explícita — e o posicionamento repetido é unificado.
           const trailing = this.peekSpatial(cursor);
-          if (trailing && this.isContainment(trailing.id)) cursor.consume();
+          const trailingTarget = cursor.peek(1);
+          if (
+            trailing &&
+            this.isContainment(trailing.id) &&
+            (!trailingTarget || this.isCommaToken(trailingTarget) || this.isCoordinatorAt(cursor, 1))
+          ) {
+            cursor.consume();
+          }
 
           if (this.distributeAdjacentMutation(cursor, entities, 'SUBORDINATED')) continue;
           continue;
@@ -723,7 +796,10 @@ export class DomainParser {
           );
           const before = placements.length;
           const anchor = roots[0] ?? current;
-          const next = this.parseSpatialTarget(cursor, anchor, spatial, entities, placements);
+          const next = this.withPronounExclusion(
+            roots.map((root) => root.tempId),
+            () => this.parseSpatialTarget(cursor, anchor, spatial, entities, placements)
+          );
           if (!next) break;
           const added = placements.slice(before).filter(
             (p) => p.source.kind === 'NEW_ENTITY' && p.source.tempId === anchor.tempId
@@ -743,7 +819,9 @@ export class DomainParser {
           });
           continue;
         }
-        const next = this.parseSpatialTarget(cursor, current, spatial, entities, placements);
+        const next = this.withPronounExclusion([current.tempId], () =>
+          this.parseSpatialTarget(cursor, current, spatial, entities, placements)
+        );
         if (!next) break;
         current = next;
         continue;
@@ -755,7 +833,7 @@ export class DomainParser {
       break;
     }
 
-    return { kind: 'CREATE', entities, placements, span: startSpan };
+    return { kind: 'CREATE', entities, placements: this.uniquePlacements(placements), span: startSpan };
   }
 
   /** Tenta interpretar a posição como mutação da entidade corrente. */
@@ -801,7 +879,11 @@ export class DomainParser {
     }
 
     const start = cursor.index;
-    const mutations = this.parseMutations(cursor, entity.entityConceptId);
+    // Atributo nu da entidade criada: concorda com o núcleo dela.
+    const agreement = this.entityAgreement.get(entity.tempId);
+    const mutations = this.withAgreement(agreement ? [agreement] : null, () =>
+      this.parseMutations(cursor, entity.entityConceptId)
+    );
     if (mutations.length) {
       entity.mutations.push(...mutations);
       return true;
@@ -1177,11 +1259,21 @@ export class DomainParser {
 
     try {
       const conjuncts: Conjunct[] = [];
+      const agreements: Array<Agreement | undefined> = [];
       for (;;) {
         const target = this.parseReference(cursor);
+        const own = this.lastReferenceAgreement;
         const parts = this.expandMixedSets([target]);
         const predicateStart = cursor.index;
-        const mutations = this.parseMutations(cursor, this.entityConceptOf(parts[0]));
+        // Predicativo: concorda com o próprio alvo ou, depois de uma
+        // coordenação, com o plural da coordenação ("a caixa e o botão pretos").
+        const profiles: Agreement[] = [];
+        if (own) profiles.push(own);
+        if (conjuncts.length) profiles.push(coordinationAgreement([...agreements, own]));
+        agreements.push(own);
+        const mutations = this.withAgreement(profiles.length ? profiles : null, () =>
+          this.parseMutations(cursor, this.entityConceptOf(parts[0]))
+        );
         const predicateEnd = cursor.index;
 
         if (target.kind === 'SELECTOR' && this.hasOperator(cursor.peek(), 'EXCEPT')) {
@@ -1839,7 +1931,9 @@ export class DomainParser {
 
     if (parsePropertyFilter && entityConceptId) {
       const valueSpan = cursor.peek()?.span;
-      const value = this.parseValue(cursor);
+      const value = this.withAgreement(head ? [{ gender, number }] : null, () =>
+        this.parseValue(cursor, { agreement: true })
+      );
       if (value) {
         const bound = this.binder.bind(entityConceptId, { kind: 'SET', value }, valueSpan);
         if (bound.ok && bound.mutation.kind === 'SET' && bound.mutation.propertyConceptId) {
@@ -1899,6 +1993,7 @@ export class DomainParser {
     // B3 — O span do seletor cobre o sintagma INTEIRO (determinante ao último
     // modificador): diagnósticos de referência apontam o NP, não só 'o'.
     selector.span = cursor.spanFrom(startIndex) ?? selector.span;
+    if (registerMention) this.lastReferenceAgreement = head ? { gender, number } : undefined;
 
     return selector;
   }
@@ -2014,12 +2109,19 @@ export class DomainParser {
       cursor.consume();
 
       const entry = token!.candidates.find((c) => c.pos === 'PRONOUN');
+      const excluded = this.pronounExcludedTemps;
       const resolved = this.ctx.discourse.resolvePronoun(
         this.ctx.nodeLookup,
         this.ctx.countMatches,
         entry?.morphology?.gender,
-        entry?.morphology?.number
+        entry?.morphology?.number,
+        // Princípio B: o pronome não se liga à entidade sendo posicionada.
+        (mention) => !(mention.reference.kind === 'NEW_ENTITY' && excluded.has(mention.reference.tempId))
       );
+      this.lastReferenceAgreement = {
+        gender: entry?.morphology?.gender,
+        number: entry?.morphology?.number
+      };
 
       if (!resolved) {
         throw new ParseError(
@@ -2139,7 +2241,7 @@ export class DomainParser {
 
   private parseValue(
     cursor: SemanticCursor,
-    opts: { allowText?: boolean } = {}
+    opts: { allowText?: boolean; agreement?: boolean } = {}
   ): AstValue | null {
     const token = cursor.peek();
     if (!token) return null;
@@ -2168,8 +2270,42 @@ export class DomainParser {
     });
     if (!values.length) return null;
 
-    const top = values[0];
-    const tied = values.filter((c) => Math.abs(c.score - top.score) < 0.02);
+    // Concordância nominal (restrição rígida): um adjetivo nu precisa
+    // concordar em gênero e número com algum perfil aceito no contexto.
+    let pool = values;
+    if (opts.agreement && this.agreementContext?.length) {
+      const profiles = this.agreementContext;
+      const adjectives = values.filter((c) => c.pos === 'ADJECTIVE');
+      if (adjectives.length) {
+        const agreeing = values.filter(
+          (c) =>
+            c.pos !== 'ADJECTIVE' ||
+            profiles.some((p) =>
+              agrees({ gender: c.morphology?.gender, number: c.morphology?.number }, p)
+            )
+        );
+        if (!agreeing.length) {
+          const surface = token.rawTokens.map((t) => t.raw).join(' ');
+          const message =
+            `O adjetivo "${surface}" não concorda em gênero/número com o elemento a que se ` +
+            'refere; nada foi executado.';
+          this.emit({
+            severity: 'ERROR',
+            code: 'AGREEMENT_MISMATCH',
+            message,
+            span: token.span,
+            start: token.span.start,
+            end: token.span.end,
+            layer: 'syntax'
+          });
+          throw new ParseError('AGREEMENT_MISMATCH', message, token.span);
+        }
+        pool = agreeing;
+      }
+    }
+
+    const top = pool[0];
+    const tied = pool.filter((c) => Math.abs(c.score - top.score) < 0.02);
     if (tied.length > 1 && new Set(tied.map((c) => c.conceptId)).size > 1) {
       this.emit({
         severity: 'ERROR',
@@ -2253,7 +2389,9 @@ export class DomainParser {
       ) {
         const checkpoint = cursor.index;
         cursor.consume();
-        const batch = this.parseMutations(cursor, entityConceptId);
+        // Depois de "de/para/com" a cor é complemento nominal ("pinte os
+        // botões de verde", "mude para azul"): não há concordância a exigir.
+        const batch = this.withAgreement(null, () => this.parseMutations(cursor, entityConceptId));
         if (batch.length) {
           out.push(...batch);
           continue;
@@ -2406,7 +2544,7 @@ export class DomainParser {
     }
 
     const valueStart = cursor.index;
-    const value = this.parseValue(cursor);
+    const value = this.parseValue(cursor, { agreement: true });
     if (value) {
       return [this.bindValueOnly(value, entityConceptId, cursor.spanFrom(valueStart))];
     }
