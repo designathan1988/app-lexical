@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createInitialKnowledgeBase } from '../src/knowledge/knowledgeBase';
 import { runDataset } from '../src/eval/runner';
-import { DEV_DATASET, REGRESSION_DATASET, FINAL_DATASET } from '../src/eval/loader';
+import { DEV_DATASET, REGRESSION_DATASET, FINAL_V1_DATASET } from '../src/eval/loader';
 
 /**
  * As métricas são MEDIDAS, não afirmadas. Estes testes verificam que cada
@@ -23,8 +23,8 @@ describe('Métricas por conjunto', () => {
     expect(r.endToEndSuccess).toBe(1);
   });
 
-  it('final (held-out): métricas calculadas', () => {
-    const r = runDataset(kb, FINAL_DATASET, 'final');
+  it('final-v1 (comprometido): métricas calculadas', () => {
+    const r = runDataset(kb, FINAL_V1_DATASET, 'final');
     // O conjunto final NÃO é ajustado: reportamos e exigimos o patamar.
     expect(r.endToEndSuccess).toBeGreaterThanOrEqual(0.95);
     expect(r.falsePositiveRate).toBe(0);
@@ -75,7 +75,7 @@ describe('O conjunto final não é usado para ajustar regras', () => {
         }
         if (!/\.(ts|tsx)$/.test(entry.name)) continue;
         const text = fs.readFileSync(full, 'utf8');
-        if (/data\/final\.json|FINAL_DATASET/.test(text)) offenders.push(full);
+        if (/data\/final[^/]*\.json|FINAL_V1_DATASET|FINAL_DATASET/.test(text)) offenders.push(full);
       }
     };
 

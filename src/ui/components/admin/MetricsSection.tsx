@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import type { SemanticEngine } from '../../../engine/SemanticEngine';
 import { SemanticEngine as EngineClass } from '../../../engine/SemanticEngine';
 import { runDataset, type SetReport } from '../../../eval/runner';
-import { DEV_DATASET, REGRESSION_DATASET, FINAL_DATASET, allRecords } from '../../../eval/loader';
+import { DEV_DATASET, REGRESSION_DATASET, FINAL_V1_DATASET, COMPROMISED_LABEL, allRecords } from '../../../eval/loader';
 
 interface Props {
   engine: SemanticEngine;
@@ -24,7 +24,7 @@ export function MetricsSection({ engine }: Props) {
     setReports([
       runDataset(engine.knowledgeBase, DEV_DATASET, 'dev'),
       runDataset(engine.knowledgeBase, REGRESSION_DATASET, 'regression'),
-      runDataset(engine.knowledgeBase, FINAL_DATASET, 'final (held-out)')
+      runDataset(engine.knowledgeBase, FINAL_V1_DATASET, COMPROMISED_LABEL)
     ]);
 
     const byLayer = new Map<string, LayerStat>();
@@ -170,9 +170,13 @@ export function MetricsSection({ engine }: Props) {
           </tr>
         </thead>
         <tbody>
-          {[DEV_DATASET, REGRESSION_DATASET, FINAL_DATASET].map((d) => (
-            <tr key={d.version + d.description}>
-              <td>{d.description?.split('.')[0] ?? 'conjunto'}</td>
+          {([
+            [DEV_DATASET, 'dev'],
+            [REGRESSION_DATASET, 'regression'],
+            [FINAL_V1_DATASET, COMPROMISED_LABEL]
+          ] as const).map(([d, label]) => (
+            <tr key={label}>
+              <td>{label}</td>
               <td>{d.records.length}</td>
               <td>{d.records.filter((r) => r.expectError).length}</td>
               <td>{d.records.filter((r) => r.expected.ambiguous).length}</td>

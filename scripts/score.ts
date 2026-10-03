@@ -9,7 +9,7 @@
 import { SemanticEngine } from '../src/engine/SemanticEngine';
 import { createInitialKnowledgeBase } from '../src/knowledge/knowledgeBase';
 import { runDataset, type SetReport } from '../src/eval/runner';
-import { DEV_DATASET, REGRESSION_DATASET, FINAL_DATASET } from '../src/eval/loader';
+import { DEV_DATASET, REGRESSION_DATASET, FINAL_V1_DATASET, COMPROMISED_LABEL } from '../src/eval/loader';
 
 function pct(x: number): string {
   return `${(x * 100).toFixed(1)}%`;
@@ -42,7 +42,7 @@ function main(): void {
   const reports = [
     runDataset(kb, DEV_DATASET, 'dev'),
     runDataset(kb, REGRESSION_DATASET, 'regression'),
-    runDataset(kb, FINAL_DATASET, 'final (held-out)')
+    runDataset(kb, FINAL_V1_DATASET, COMPROMISED_LABEL)
   ];
 
   if (process.argv.includes('--json')) {

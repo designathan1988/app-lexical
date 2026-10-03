@@ -5,7 +5,7 @@ import { SemanticEngine } from '../src/engine/SemanticEngine';
 import { KnowledgeBaseStore } from '../src/knowledge/KnowledgeBaseStore';
 import { createInitialKnowledgeBase } from '../src/knowledge/knowledgeBase';
 import { treeSignature } from '../src/eval/signatures';
-import { DEV_DATASET, REGRESSION_DATASET, FINAL_DATASET } from '../src/eval/loader';
+import { DEV_DATASET, REGRESSION_DATASET, FINAL_V1_DATASET } from '../src/eval/loader';
 import { runRecord } from '../src/eval/runner';
 
 function read(file: string): string {
@@ -153,7 +153,7 @@ describe('A1 — a gramática é dada, não escrita no parser', () => {
 
 describe('D6 — analyze é equivalente a execute em plano', () => {
   it('para toda frase do dataset, o plano de analyze casa com o de execute', () => {
-    const all = [...DEV_DATASET.records, ...REGRESSION_DATASET.records, ...FINAL_DATASET.records];
+    const all = [...DEV_DATASET.records, ...REGRESSION_DATASET.records, ...FINAL_V1_DATASET.records];
     const mismatches: string[] = [];
 
     for (const record of all) {
@@ -424,7 +424,7 @@ describe('A7 — dataset versionado', () => {
   it('os conjuntos têm o tamanho mínimo exigido', () => {
     expect(DEV_DATASET.records.length).toBeGreaterThanOrEqual(60);
     expect(REGRESSION_DATASET.records.length).toBeGreaterThanOrEqual(80);
-    expect(FINAL_DATASET.records.length).toBeGreaterThanOrEqual(40);
+    expect(FINAL_V1_DATASET.records.length).toBeGreaterThanOrEqual(40);
   });
 
   it('contém os 14 casos obrigatórios, as 8 variações do §36 e a sequência do §38', () => {
@@ -451,14 +451,14 @@ describe('A7 — dataset versionado', () => {
   });
 
   it('contém ao menos 25 casos negativos e 10 genuinamente ambíguos', () => {
-    const all = [...DEV_DATASET.records, ...REGRESSION_DATASET.records, ...FINAL_DATASET.records];
+    const all = [...DEV_DATASET.records, ...REGRESSION_DATASET.records, ...FINAL_V1_DATASET.records];
     expect(all.filter((r) => r.expectError).length).toBeGreaterThanOrEqual(25);
     expect(all.filter((r) => r.expected.ambiguous).length).toBeGreaterThanOrEqual(10);
   });
 
   it('cada caso cobre um dos defeitos D1–D11', () => {
     const tags = new Set(
-      [...REGRESSION_DATASET.records, ...FINAL_DATASET.records].flatMap((r) => r.tags ?? [])
+      [...REGRESSION_DATASET.records, ...FINAL_V1_DATASET.records].flatMap((r) => r.tags ?? [])
     );
     for (const defect of ['D1', 'D2', 'D3', 'D4', 'D5', 'D7', 'D8', 'D9', 'D10', 'D11']) {
       expect(tags.has(defect), `nenhum caso cobre ${defect}`).toBe(true);
@@ -466,7 +466,7 @@ describe('A7 — dataset versionado', () => {
   });
 
   it('os registros carregam o esquema versionado', () => {
-    for (const ds of [DEV_DATASET, REGRESSION_DATASET, FINAL_DATASET]) {
+    for (const ds of [DEV_DATASET, REGRESSION_DATASET, FINAL_V1_DATASET]) {
       expect(ds.version).toBeTypeOf('string');
       expect(ds.schemaVersion).toBe('1.0.0');
       for (const r of ds.records) {

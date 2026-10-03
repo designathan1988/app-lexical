@@ -6,7 +6,7 @@ import { runDataset, type SetReport } from '../../../eval/runner';
 import {
   DEV_DATASET,
   REGRESSION_DATASET,
-  FINAL_DATASET
+  FINAL_V1_DATASET
 } from '../../../eval/loader';
 import type { EvalDataset, EvalRecord } from '../../../eval/datasetSchema';
 import { runBenchmark, type BenchmarkReport } from '../../../eval/benchmark';
@@ -43,7 +43,7 @@ export function TestSection({ engine, store }: Props) {
       case 'dev':
         return DEV_DATASET;
       case 'final':
-        return FINAL_DATASET;
+        return FINAL_V1_DATASET;
       case 'negativos':
         return subset(REGRESSION_DATASET, 'negativos', (r) => r.expectError === true);
       case 'ambiguos':
@@ -88,7 +88,7 @@ export function TestSection({ engine, store }: Props) {
   const suites: Array<[Suite, string]> = [
     ['regressao', `Regressão (${REGRESSION_DATASET.records.length})`],
     ['dev', `Dev (${DEV_DATASET.records.length})`],
-    ['final', `Final held-out (${FINAL_DATASET.records.length})`],
+    ['final', `Final-v1 comprometido (${FINAL_V1_DATASET.records.length})`],
     ['negativos', `Negativos (${REGRESSION_DATASET.records.filter((r) => r.expectError).length})`],
     ['ambiguos', `Ambíguos (${REGRESSION_DATASET.records.filter((r) => r.expected.ambiguous).length})`],
     ['treinamento', `Treinamento (${store.training.length})`],

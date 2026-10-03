@@ -3,7 +3,7 @@ import { DATASET_SCHEMA_VERSION } from './datasetSchema';
 
 import devRaw from './data/dev.json';
 import regressionRaw from './data/regression.json';
-import finalRaw from './data/final.json';
+import finalV1Raw from './data/final-v1-compromised.json';
 
 function asDataset(raw: unknown, expectedName: string): EvalDataset {
   const ds = raw as EvalDataset;
@@ -25,9 +25,17 @@ function asDataset(raw: unknown, expectedName: string): EvalDataset {
 
 export const DEV_DATASET = asDataset(devRaw, 'dev');
 export const REGRESSION_DATASET = asDataset(regressionRaw, 'regression');
-export const FINAL_DATASET = asDataset(finalRaw, 'final');
 
-export const ALL_DATASETS: EvalDataset[] = [DEV_DATASET, REGRESSION_DATASET, FINAL_DATASET];
+/**
+ * Rótulo obrigatório do conjunto comprometido (F0.3): era o antigo
+ * `final.json`, regravado em 2026-10-03 11:49 depois de correções de código.
+ * Não é held-out; ver `data/CHANGES.md`.
+ */
+export const COMPROMISED_LABEL = 'final-v1 (comprometido)';
+
+export const FINAL_V1_DATASET = asDataset(finalV1Raw, 'final-v1-compromised');
+
+export const ALL_DATASETS: EvalDataset[] = [DEV_DATASET, REGRESSION_DATASET, FINAL_V1_DATASET];
 
 export function allRecords(): EvalRecord[] {
   return ALL_DATASETS.flatMap((d) => d.records);
