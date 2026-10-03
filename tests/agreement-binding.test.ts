@@ -40,7 +40,7 @@ describe('Concordância do adjetivo com o próprio núcleo', () => {
     ['crie dois botões preta', []],
     ['deixe a caixa pretos', ['crie uma caixa']],
     ['deixe as caixas preta', ['crie duas caixas']],
-    ['mude o texto para amarela', ['crie um texto']],
+    ['deixe o botão amarelas', ['crie um botão']],
     ['apague o botão amarela', ['crie um botão amarelo']]
   ];
   for (const [input, discourse] of MISMATCH) {

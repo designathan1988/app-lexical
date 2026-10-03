@@ -21,11 +21,12 @@ const ENTITIES = [
 ];
 
 const COLORS = [
-  { word: 'azul', literal: '#2563eb' },
-  { word: 'vermelho', literal: '#dc2626' },
-  { word: 'verde', literal: '#16a34a' },
-  { word: 'amarelo', literal: '#eab308' },
-  { word: 'preto', literal: '#000000' }
+  // `fem`: forma feminina — o adjetivo concorda com o núcleo (PARTE IV 3.F).
+  { word: 'azul', fem: 'azul', literal: '#2563eb' },
+  { word: 'vermelho', fem: 'vermelha', literal: '#dc2626' },
+  { word: 'verde', fem: 'verde', literal: '#16a34a' },
+  { word: 'amarelo', fem: 'amarela', literal: '#eab308' },
+  { word: 'preto', fem: 'preta', literal: '#000000' }
 ];
 
 describe('Composição — CREATE: verbos × entidades', () => {
@@ -55,7 +56,7 @@ describe('Composição — CREATE com cor', () => {
   for (const ent of ENTITIES.filter((x) => !x.plural)) {
     for (const color of COLORS) {
       cases.push([
-        `crie ${ent.article} ${ent.word} ${color.word}`,
+        `crie ${ent.article} ${ent.word} ${ent.article === 'uma' ? color.fem : color.word}`,
         color.literal,
         `${ent.word} ${color.word}`
       ]);

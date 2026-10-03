@@ -965,15 +965,19 @@
       "id": "fin-050",
       "input": "crie um botão amarela",
       "expected": {
-        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#eab308}"
+        "finalTree": "",
+        "diagnostics": [
+          "AGREEMENT_MISMATCH"
+        ]
       },
-      "expectError": false,
+      "expectError": true,
       "tags": [
         "create",
         "color",
         "gender",
-        "positive"
-      ]
+        "negative"
+      ],
+      "expectNoMutation": true
     }
   ]
 }
