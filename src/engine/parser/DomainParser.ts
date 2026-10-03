@@ -322,6 +322,37 @@ export class DomainParser {
     const negated = this.consumeOperator(cursor, 'NEGATION');
     const action = this.consumeAction(cursor);
 
+    // 3.G Tempo e modo: comando só com imperativo, infinitivo ou o presente
+    // do indicativo usado como ordem ("cria um botão"). Passado/futuro são
+    // relato, não comando: "criou um botão" → UNSUPPORTED_OPERATION.
+    if (action) {
+      const verbToken = cursor.tokens[cursor.index - 1];
+      const acceptable = verbToken?.candidates.some((c) => {
+        const mood = c.morphology?.mood;
+        if (mood === 'IMPERATIVE' || mood === 'INFINITIVE') return true;
+        return mood === 'INDICATIVE' && (c.morphology?.tense === 'PRESENT' || !c.morphology?.tense);
+      });
+      if (verbToken && verbToken.candidates.length && !acceptable) {
+        this.emit({
+          severity: 'ERROR',
+          code: 'UNSUPPORTED_OPERATION',
+          subcode: 'NOT_A_COMMAND',
+          message:
+            `"${verbToken.rawTokens.map((t) => t.raw).join(' ')}" não é um comando ` +
+            '(tempo do relato); use o imperativo.',
+          span: verbToken.span,
+          start: verbToken.span.start,
+          end: verbToken.span.end,
+          layer: 'syntax'
+        });
+        throw new ParseError(
+          'UNSUPPORTED_OPERATION',
+          `"${verbToken.rawTokens.map((t) => t.raw).join(' ')}" não é um comando; use o imperativo.`,
+          verbToken.span
+        );
+      }
+    }
+
     if (polite && !action) {
       // "quero um botão vermelho": desejo + sintagma nominal = CREATE.
       const inner = this.parseCreate(cursor, startSpan);
@@ -1951,6 +1982,31 @@ export class DomainParser {
     entityConceptId?: ConceptId
   ): AstPropertyMutation[] {
     const initialIndex = cursor.index;
+
+    // Comparativo ("mais escura"): fora do domínio de valores — recusa
+    // explicada com o span do sintagma, nunca UNKNOWN_WORD.
+    if (this.hasOperator(cursor.peek(), 'COMPARATIVE')) {
+      const marker = cursor.peek()!;
+      const end = cursor.peek(1)?.span.end ?? marker.span.end;
+      const span = { start: marker.span.start, end };
+      this.emit({
+        severity: 'ERROR',
+        code: 'UNSUPPORTED_OPERATION',
+        subcode: 'COMPARATIVE',
+        message:
+          'Comparativo ("mais/menos <adjetivo>") não é suportado: o motor não ' +
+          'calcula gradações — use um valor absoluto ("azul", "escuro" não existe).',
+        span,
+        start: span.start,
+        end: span.end,
+        layer: 'syntax'
+      });
+      throw new ParseError(
+        'UNSUPPORTED_OPERATION',
+        'Comparativo não é suportado; use um valor absoluto.',
+        span
+      );
+    }
 
     if (this.hasOperator(cursor.peek(), 'WITHOUT')) {
       const span = cursor.peek()!.span;

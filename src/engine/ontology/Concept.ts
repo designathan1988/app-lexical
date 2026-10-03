@@ -120,7 +120,9 @@ export type OperatorKind =
   /** Pedido indireto neutro: "você pode criar…", "poderia…", "por favor". */
   | 'POLITE_REQUEST'
   /** Desejo que implica criação/ação: "quero um botão", "gostaria de apagar…". */
-  | 'POLITE_DESIRE';
+  | 'POLITE_DESIRE'
+  /** Comparativo "mais/menos <adjetivo>": não suportado como mutação. */
+  | 'COMPARATIVE';
 
 export interface OperatorConcept {
   kind: 'OPERATOR';

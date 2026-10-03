@@ -90,6 +90,12 @@ consciente da lista — o oráculo só encolhe).
 geração por paradigma e `morph-15`, `morph-16` e `morph-17` passaram —
 removidos da lista (28 → 25 falhas conhecidas). Nenhum esperado foi alterado.
 
+**Atualização F3/F4 (2026-10-03):** verbo no passado/futuro deixa de ser
+comando (NOT_A_COMMAND); comparativo virou UNSUPPORTED_OPERATION com o span
+do sintagma; cores compostas (azul-claro, azul-escuro, verde-claro,
+verde-escuro, cinza-claro) entraram como valores em dados. `morph-24`,
+`morph-36` e `morph-40` passaram (10 → 7).
+
 **Atualização F3 (G7 pedido indireto, 2026-10-03):** [eu/você] + pode/
 poderia/quero/gostaria/queria + opcional "de" (e "por favor" no fim) são
 operadores gramaticais (dados) que envolvem o comando interno, registrando

@@ -267,6 +267,12 @@ export const INITIAL_CONCEPTS: Record<ConceptId, ConceptNode> = {
   C_VAL_GRAY: { kind: 'VALUE', id: 'C_VAL_GRAY', valueCategory: 'COLOR', literal: '#6b7280' },
   C_VAL_ORANGE: { kind: 'VALUE', id: 'C_VAL_ORANGE', valueCategory: 'COLOR', literal: '#f97316' },
   C_VAL_PURPLE: { kind: 'VALUE', id: 'C_VAL_PURPLE', valueCategory: 'COLOR', literal: '#a855f7' },
+  // Cores compostas (hífen preservado pelo lexer): invariáveis em gênero/número.
+  C_VAL_LIGHT_BLUE: { kind: 'VALUE', id: 'C_VAL_LIGHT_BLUE', valueCategory: 'COLOR', literal: '#93c5fd' },
+  C_VAL_DARK_BLUE: { kind: 'VALUE', id: 'C_VAL_DARK_BLUE', valueCategory: 'COLOR', literal: '#1e40af' },
+  C_VAL_LIGHT_GREEN: { kind: 'VALUE', id: 'C_VAL_LIGHT_GREEN', valueCategory: 'COLOR', literal: '#86efac' },
+  C_VAL_DARK_GREEN: { kind: 'VALUE', id: 'C_VAL_DARK_GREEN', valueCategory: 'COLOR', literal: '#15803d' },
+  C_VAL_LIGHT_GRAY: { kind: 'VALUE', id: 'C_VAL_LIGHT_GRAY', valueCategory: 'COLOR', literal: '#d1d5db' },
 
   // --- Valores de enumeração ---------------------------------------------------
 
@@ -327,6 +333,7 @@ export const INITIAL_CONCEPTS: Record<ConceptId, ConceptNode> = {
   C_OP_EU: { kind: 'OPERATOR', id: 'C_OP_EU', operator: 'SUBJECT_PRONOUN' },
   C_OP_VOCE: { kind: 'OPERATOR', id: 'C_OP_VOCE', operator: 'SUBJECT_PRONOUN' },
   C_OP_POLITE_REQUEST: { kind: 'OPERATOR', id: 'C_OP_POLITE_REQUEST', operator: 'POLITE_REQUEST' },
+  C_OP_COMPARATIVE: { kind: 'OPERATOR', id: 'C_OP_COMPARATIVE', operator: 'COMPARATIVE' },
   C_OP_POLITE_DESIRE: { kind: 'OPERATOR', id: 'C_OP_POLITE_DESIRE', operator: 'POLITE_DESIRE' },
   C_OP_DE: { kind: 'OPERATOR', id: 'C_OP_DE', operator: 'PARTITIVE' },
   C_OP_E: { kind: 'OPERATOR', id: 'C_OP_E', operator: 'COORDINATION' },
@@ -426,6 +433,12 @@ export const INITIAL_LEXEMES: Record<LexemeId, Lexeme> = {
   LEX_LARANJA: lex('LEX_LARANJA', 'laranja', 'ADJECTIVE', ['C_VAL_ORANGE'], { paradigmId: 'ADJ_INVARIANT' }),
   LEX_ROXO: lex('LEX_ROXO', 'roxo', 'ADJECTIVE', ['C_VAL_PURPLE'], { paradigmId: 'ADJ_O' }),
   LEX_REDONDO: lex('LEX_REDONDO', 'redondo', 'ADJECTIVE', ['C_VAL_ROUND'], { paradigmId: 'ADJ_O' }),
+  // Cores compostas: lexemas próprios, sem flexão (invariáveis).
+  LEX_AZUL_CLARO: lex('LEX_AZUL_CLARO', 'azul-claro', 'ADJECTIVE', ['C_VAL_LIGHT_BLUE']),
+  LEX_AZUL_ESCURO: lex('LEX_AZUL_ESCURO', 'azul-escuro', 'ADJECTIVE', ['C_VAL_DARK_BLUE']),
+  LEX_VERDE_CLARO: lex('LEX_VERDE_CLARO', 'verde-claro', 'ADJECTIVE', ['C_VAL_LIGHT_GREEN']),
+  LEX_VERDE_ESCURO: lex('LEX_VERDE_ESCURO', 'verde-escuro', 'ADJECTIVE', ['C_VAL_DARK_GREEN']),
+  LEX_CINZA_CLARO: lex('LEX_CINZA_CLARO', 'cinza-claro', 'ADJECTIVE', ['C_VAL_LIGHT_GRAY']),
 
   // Numerais — ordinais
   LEX_ORD_1: lex('LEX_ORD_1', 'primeiro', 'NUMERAL', ['C_ORD_1'], { paradigmId: 'ADJ_O' }),
@@ -459,6 +472,7 @@ export const INITIAL_LEXEMES: Record<LexemeId, Lexeme> = {
   LEX_NAO: lex('LEX_NAO', 'não', 'ADVERB', ['C_OP_NOT']),
   LEX_SEM: lex('LEX_SEM', 'sem', 'PREPOSITION', ['C_OP_WITHOUT']),
   LEX_MENOS: lex('LEX_MENOS', 'menos', 'PREPOSITION', ['C_OP_EXCEPT']),
+  LEX_MAIS: lex('LEX_MAIS', 'mais', 'ADVERB', ['C_OP_COMPARATIVE']),
   LEX_EXCETO: lex('LEX_EXCETO', 'exceto', 'PREPOSITION', ['C_OP_EXCEPT']),
   LEX_SALVO: lex('LEX_SALVO', 'salvo', 'PREPOSITION', ['C_OP_EXCEPT']),
   LEX_COM: lex('LEX_COM', 'com', 'PREPOSITION', ['C_OP_COM']),
@@ -570,6 +584,7 @@ export const INITIAL_SURFACE_FORMS: SurfaceForm[] = [
   sf('SF_NAO', 'não', 'LEX_NAO'),
   sf('SF_SEM', 'sem', 'LEX_SEM'),
   sf('SF_MENOS', 'menos', 'LEX_MENOS'),
+  sf('SF_MAIS', 'mais', 'LEX_MAIS'),
   sf('SF_EXCETO', 'exceto', 'LEX_EXCETO'),
   sf('SF_SALVO', 'salvo', 'LEX_SALVO'),
   sf('SF_COM', 'com', 'LEX_COM'),
@@ -623,6 +638,11 @@ export const INITIAL_SURFACE_FORMS: SurfaceForm[] = [
   sf('SF_DEPOIS', 'depois', 'LEX_DEPOIS'),
   sf('SF_ANTES', 'antes', 'LEX_ANTES'),
   sf('SF_LADO', 'lado', 'LEX_LADO', 'CANONICAL', { gender: M, number: S }),
+  sf('SF_AZUL_CLARO', 'azul-claro', 'LEX_AZUL_CLARO', 'CANONICAL', { number: S }),
+  sf('SF_AZUL_ESCURO', 'azul-escuro', 'LEX_AZUL_ESCURO', 'CANONICAL', { number: S }),
+  sf('SF_VERDE_CLARO', 'verde-claro', 'LEX_VERDE_CLARO', 'CANONICAL', { number: S }),
+  sf('SF_VERDE_ESCURO', 'verde-escuro', 'LEX_VERDE_ESCURO', 'CANONICAL', { number: S }),
+  sf('SF_CINZA_CLARO', 'cinza-claro', 'LEX_CINZA_CLARO', 'CANONICAL', { number: S }),
   sf('SF_DIREITA', 'direita', 'LEX_DIREITA', 'CANONICAL', { gender: F, number: S }),
   sf('SF_ESQUERDA', 'esquerda', 'LEX_ESQUERDA', 'CANONICAL', { gender: F, number: S })
 ];
