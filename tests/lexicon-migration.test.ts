@@ -35,6 +35,16 @@ const ACCEPTED_REMOVALS = new Map<string, string>([
   // continuam manuais.
 ]);
 
+/**
+ * Correções linguísticas intencionais da morfologia antiga, com motivo. A
+ * forma continua existindo e passa a exigir a morfologia CORRIGIDA (mais
+ * estrito, não mais frouxo).
+ */
+const ACCEPTED_MORPHOLOGY_CORRECTIONS = new Map<string, { to: Morphology; reason: string }>([
+  ['cinza', { to: { number: 'INVARIANT' }, reason: 'cor-substantivo invariável: "textos cinza"' }],
+  ['laranja', { to: { number: 'INVARIANT' }, reason: 'cor-substantivo invariável: "caixas laranja"' }]
+]);
+
 function morphologyCompatible(old: Morphology, current?: Morphology): boolean {
   if (!current) return false;
   if (old.gender && current.gender !== old.gender) return false;
@@ -75,10 +85,11 @@ describe('F2.2 — migração do léxico preserva as formas existentes', () => {
     for (const f of fixture.forms) {
       if (ACCEPTED_REMOVALS.has(f.form)) continue;
       if (!f.morphology || Object.keys(f.morphology).length === 0) continue;
+      const expected = ACCEPTED_MORPHOLOGY_CORRECTIONS.get(f.form)?.to ?? f.morphology;
       const readable = index
         .resolve(f.form)
         .filter((c) => c.lexeme.id === f.lexemeId)
-        .some((c) => morphologyCompatible(f.morphology!, c.morphology));
+        .some((c) => morphologyCompatible(expected, c.morphology));
       if (!readable) {
         incompatible.push(`${f.form} → ${f.lexemeId} esperava ${JSON.stringify(f.morphology)}`);
       }
