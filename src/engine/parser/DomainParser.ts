@@ -319,6 +319,10 @@ export class DomainParser {
     // é o comando de verdade, e a cortesia fica registrada.
     const polite = this.consumePoliteWrapper(cursor);
 
+    // 3.F PP_TOPIC — "dentro da caixa, crie um botão": o sintagma espacial
+    // topicalizado é o destino da entidade criada.
+    const topic = this.parseTopicPlacement(cursor, polite);
+
     const negated = this.consumeOperator(cursor, 'NEGATION');
     const action = this.consumeAction(cursor);
 
@@ -398,8 +402,62 @@ export class DomainParser {
         break;
     }
     if (polite) command.politeness = true;
+    if (topic && command.kind === 'CREATE' && command.entities.length) {
+      command.placements.push({
+        source: { kind: 'NEW_ENTITY', tempId: command.entities[0].tempId },
+        relationConceptId: topic.relationId,
+        target: topic.target,
+        span: topic.span
+      });
+    }
     this.consumeTrailingPoliteness(cursor);
     return command;
+  }
+
+  /**
+   * Sintagma preposicional topicalizado no início do comando:
+   * "dentro da caixa, crie um botão". Só consome se vier um verbo depois.
+   */
+  private parseTopicPlacement(
+    cursor: SemanticCursor,
+    polite: boolean
+  ): { relationId: ConceptId; target: SemanticReference; span: Span } | null {
+    const checkpoint = cursor.index;
+    const spatial = this.peekSpatial(cursor);
+    if (!spatial || !this.isContainment(spatial.id)) return null;
+    const startSpan = cursor.peek()!.span;
+    cursor.consume();
+    if (this.hasOperator(cursor.peek(), 'PARTITIVE')) cursor.consume();
+    if (!cursor.peek()?.candidates.length) {
+      cursor.index = checkpoint;
+      return null;
+    }
+
+    let target: SemanticReference;
+    try {
+      target = this.parseReference(cursor, undefined, true, false);
+    } catch {
+      cursor.index = checkpoint;
+      return null;
+    }
+
+    const punct = cursor.peek();
+    if (punct && punct.rawTokens.every((t) => t.type === 'PUNCT')) cursor.consume();
+
+    // Exige um verbo de comando logo em seguida.
+    const next = cursor.peek();
+    const verbNext = this.isVerbToken(next) || this.hasOperator(next, 'NEGATION');
+    if (!verbNext && !polite) {
+      cursor.index = checkpoint;
+      return null;
+    }
+
+    const end = cursor.previousSpan()?.end ?? startSpan.end;
+    return {
+      relationId: spatial.id,
+      target,
+      span: { start: startSpan.start, end }
+    };
   }
 
   /**
@@ -580,6 +638,10 @@ export class DomainParser {
     const entities: NewEntityAst[] = [];
     const placements: PlacementAst[] = [];
 
+    // "crie, dentro da caixa preta, dois botões": PP interposto entre o verbo
+    // e o objeto — o destino das entidades criadas.
+    const interposed = this.parseInterposedPlacement(cursor);
+
     const first = this.parseNewEntity(cursor);
     if (!first) {
       throw new ParseError(
@@ -660,6 +722,15 @@ export class DomainParser {
       break;
     }
 
+    if (interposed && entities.length) {
+      placements.push({
+        source: { kind: 'NEW_ENTITY', tempId: entities[0].tempId },
+        relationConceptId: interposed.relationId,
+        target: interposed.target,
+        span: interposed.span
+      });
+    }
+
     return { kind: 'CREATE', entities, placements, span: startSpan };
   }
 
@@ -713,6 +784,46 @@ export class DomainParser {
     }
     cursor.index = start;
     return false;
+  }
+
+  /**
+   * "crie, dentro da caixa preta, dois botões": PP entre vírgulas logo após o
+   * verbo de criação. Consome e devolve o destino; senão não move o cursor.
+   */
+  private parseInterposedPlacement(
+    cursor: SemanticCursor
+  ): { relationId: ConceptId; target: SemanticReference; span: Span } | null {
+    const checkpoint = cursor.index;
+    const comma = cursor.peek();
+    if (!comma || !comma.rawTokens.every((t) => t.type === 'PUNCT')) return null;
+    cursor.consume();
+
+    const spatial = this.peekSpatial(cursor);
+    if (!spatial || !this.isContainment(spatial.id)) {
+      cursor.index = checkpoint;
+      return null;
+    }
+    const startSpan = cursor.peek()!.span;
+    cursor.consume();
+    if (this.hasOperator(cursor.peek(), 'PARTITIVE')) cursor.consume();
+    if (!cursor.peek()?.candidates.length) {
+      cursor.index = checkpoint;
+      return null;
+    }
+
+    let target: SemanticReference;
+    try {
+      target = this.parseReference(cursor, undefined, true, false);
+    } catch {
+      cursor.index = checkpoint;
+      return null;
+    }
+
+    const trailing = cursor.peek();
+    if (trailing && trailing.rawTokens.every((t) => t.type === 'PUNCT')) cursor.consume();
+
+    const end = cursor.previousSpan()?.end ?? startSpan.end;
+    return { relationId: spatial.id, target, span: { start: startSpan.start, end } };
   }
 
   private parseSpatialTarget(

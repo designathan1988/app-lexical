@@ -6,23 +6,14 @@
  * que não esteja aqui, quebra a suíte. Nunca se ajusta o esperado do dataset
  * para "fazer passar".
  */
-export const KNOWN_MORPH_FAILURES = new Set([
-    'morph-09',
-  'morph-26', 'morph-27'
-]);
-// Consertados na F2 (diminutivos produtivos): morph-15, morph-16, morph-17.
-// Consertados na F3.3.B (contrações, ênclise e referência de grupo):
-// morph-11, morph-12, morph-13, morph-14.
-// Consertados na F3 (concordância de adjetivo com coordenação/adjunção):
-// morph-02, morph-03, morph-05, morph-06.
-// Consertados na F3 (definido plural = ALL; ambiguidade sem passos no plano;
-// B4 direção espacial): morph-07, morph-08, morph-35.
-// Consertados na F3 (G7 pedido indireto): morph-20, morph-21, morph-22, morph-23.
-// Consertados na F3/F4 (modo-tempo, comparativo, cor composta):
-// morph-24, morph-36, morph-40.
-// Consertados na F3 (alvo com filtro; formato canônico do seletor interno):
-// morph-25, morph-31.
-// Consertados na F4 (B5 grupo de texto + font size): morph-33, morph-34.
+export const KNOWN_MORPH_FAILURES = new Set<string>([]);
+// Histórico: F2 consertou morph-15/16/17 (diminutivos); F3.3.B, morph-11..14
+// (ênclise); F3, morph-02/03/05/06 (concordância), morph-07/08/35 (definido
+// plural, ambiguidade sem passos, direção), morph-20..23 (pedido indireto),
+// morph-24/36/40 (modo-tempo, comparativo, cor composta), morph-25/31 (alvo
+// com filtro); F4/B5, morph-33/34 (grupo de texto); PP topicalizado e MWE por
+// lema, morph-09/26/27. Todas as 40 passam — o conjunto é mantido como
+// oráculo ativo no dataset, sem falhas conhecidas.
 
 /** Falhas que não estão na lista de conhecidas. */
 export function unexpectedFailures(ids: string[]): string[] {

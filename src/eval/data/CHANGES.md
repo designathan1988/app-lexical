@@ -90,6 +90,12 @@ consciente da lista — o oráculo só encolhe).
 geração por paradigma e `morph-15`, `morph-16` e `morph-17` passaram —
 removidos da lista (28 → 25 falhas conhecidas). Nenhum esperado foi alterado.
 
+**Atualização F3/F4 (2026-10-03):** PP topicalizado ("dentro da caixa, crie um
+botão"; "crie, dentro da caixa preta, dois botões") e MWE por lema ("cores de
+fundo" casa o padrão "cor de fundo" com o lexema cor/cores, sem sentido
+ontológico, criado só para o casamento). ,  e 
+passaram: **as 40 falhas conhecidas zeraram — todo o conjunto morph passa**.
+
 **Atualização F4 (B5, 2026-10-03):** "texto" vira grupo de propriedades
 (cor do texto, conteúdo, tamanho da fonte) com C_PROP_FONT_SIZE novo; a
 leitura de grupo só vale quando a entidade aceita algum membro e o núcleo

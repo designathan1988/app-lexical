@@ -435,6 +435,8 @@ export const INITIAL_LEXEMES: Record<LexemeId, Lexeme> = {
   // Propriedades
   LEX_BORDA: lex('LEX_BORDA', 'borda', 'NOUN', ['C_PROP_GROUP_BORDER'], { paradigmId: 'N_S', gender: 'Fem' }),
   LEX_FUNDO: lex('LEX_FUNDO', 'fundo', 'NOUN', ['C_PROP_BG_COLOR'], { paradigmId: 'N_S', gender: 'Masc' }),
+  // 'cor' existe para a MWE "cor de fundo" casar por lema com "cores".
+  LEX_COR: lex('LEX_COR', 'cor', 'NOUN', [], { paradigmId: 'N_R_Z_ES', gender: 'Fem' }),
   LEX_ROTULO: lex('LEX_ROTULO', 'rótulo', 'NOUN', ['C_PROP_TEXT_CONTENT'], { paradigmId: 'N_S', gender: 'Masc' }),
   LEX_CONTEUDO: lex('LEX_CONTEUDO', 'conteúdo', 'NOUN', ['C_PROP_GROUP_TEXT'], { paradigmId: 'N_S', gender: 'Masc' }),
 

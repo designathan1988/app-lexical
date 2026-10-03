@@ -45,9 +45,15 @@ export class MultiwordTrie {
     node.entry = entry;
   }
 
+  /**
+   * Longest-match sobre os tokens. `lemmaOf` (opcional) devolve os lemas das
+   * leituras de um token: a MWE casa por lema também, tolerando flexão —
+   * "cores de fundo" casa com o padrão "cor de fundo" (3.E).
+   */
   match(
     tokens: RawToken[],
-    start: number
+    start: number,
+    lemmaOf?: (token: RawToken) => string[]
   ): { entry: MultiwordEntry; length: number } | null {
     let node = this.root;
     let best: { entry: MultiwordEntry; length: number } | null = null;
@@ -55,7 +61,17 @@ export class MultiwordTrie {
     for (let i = start; i < tokens.length; i++) {
       const token = tokens[i];
       if (token.type !== 'WORD' || !token.normalized) break;
-      const child = node.children.get(token.normalized);
+
+      let child = node.children.get(token.normalized);
+      if (!child && lemmaOf) {
+        for (const lemma of lemmaOf(token)) {
+          const byLemma = node.children.get(lemma);
+          if (byLemma) {
+            child = byLemma;
+            break;
+          }
+        }
+      }
       if (!child) break;
       node = child;
       if (node.entry) best = { entry: node.entry, length: i - start + 1 };

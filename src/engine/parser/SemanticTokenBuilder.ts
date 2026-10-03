@@ -35,7 +35,11 @@ export class SemanticTokenBuilder {
     for (let i = 0; i < tokens.length; ) {
       const token = tokens[i];
 
-      const mwe = this.trie.match(tokens, i);
+      const mwe = this.trie.match(tokens, i, (raw) =>
+        this.lexicalIndex
+          .resolve(raw.raw)
+          .map((c) => c.lexeme.lemma)
+      );
       if (mwe) {
         const rawTokens = tokens.slice(i, i + mwe.length);
         output.push({
