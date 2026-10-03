@@ -4,6 +4,7 @@ import type { BuilderRuntimeAdapter } from './BuilderRuntimeAdapter';
 import type { ExecutionPlan, ExecutableReference } from '../planning/ExecutionPlan';
 import type { Diagnostic } from '../diagnostics';
 import { diagnostic } from '../diagnostics';
+import { isTempNodeId, tempIdOf } from '../planning/TempNodes';
 
 export interface ExecutionResult {
   success: boolean;
@@ -30,7 +31,11 @@ export class ExecutionEngine {
     private adapter: BuilderRuntimeAdapter
   ) {}
 
-  execute(plan: ExecutionPlan): ExecutionResult {
+  /**
+   * @param initialTempMap temporários já materializados (simulação de várias
+   *   orações): permite executar uma continuação do plano.
+   */
+  execute(plan: ExecutionPlan, initialTempMap?: Map<TempNodeId, DocumentNodeId>): ExecutionResult {
     const mutations: string[] = [];
     const empty: Record<TempNodeId, DocumentNodeId> = {};
 
@@ -45,7 +50,7 @@ export class ExecutionEngine {
       };
     }
 
-    const tempMap = new Map<TempNodeId, DocumentNodeId>();
+    const tempMap = new Map<TempNodeId, DocumentNodeId>(initialTempMap ?? []);
     const diagnostics: Diagnostic[] = [...plan.diagnostics];
     const selectionSteps: DocumentNodeId[] = [];
 
@@ -131,11 +136,12 @@ export class ExecutionEngine {
           }
 
           case 'DELETE_NODE': {
-            const result = this.adapter.deleteNode(step.targetNodeId);
+            const targetNodeId = this.resolveNodeId(step.targetNodeId, tempMap);
+            const result = this.adapter.deleteNode(targetNodeId);
             if (!result.ok) {
               throw new RuntimeFailure(result.code, result.message, step.span, result.subcode);
             }
-            mutations.push(`DELETE_NODE ${step.targetNodeId}`);
+            mutations.push(`DELETE_NODE ${targetNodeId}`);
             break;
           }
 
@@ -146,22 +152,24 @@ export class ExecutionEngine {
               throw new RuntimeFailure('INVALID_CONTAINMENT',
                 `Relação espacial inválida ${step.relationConceptId}.`, step.span);
             }
+            const sourceNodeId = this.resolveNodeId(step.sourceNodeId, tempMap);
             const result = this.adapter.place({
-              sourceNodeId: step.sourceNodeId,
+              sourceNodeId,
               relation: relation.relation,
               targetNodeId
             });
             if (!result.ok) {
               throw new RuntimeFailure(result.code, result.message, step.span, result.subcode);
             }
-            mutations.push(`MOVE_NODE ${step.sourceNodeId} ${relation.relation} ${targetNodeId}`);
+            mutations.push(`MOVE_NODE ${sourceNodeId} ${relation.relation} ${targetNodeId}`);
             break;
           }
 
           case 'QUERY_NODE': {
-            this.adapter.inspectNode(step.targetNodeId);
-            selectionSteps.push(step.targetNodeId);
-            mutations.push(`QUERY_NODE ${step.targetNodeId}`);
+            const targetNodeId = this.resolveNodeId(step.targetNodeId, tempMap);
+            this.adapter.inspectNode(targetNodeId);
+            selectionSteps.push(targetNodeId);
+            mutations.push(`QUERY_NODE ${targetNodeId}`);
             break;
           }
         }
@@ -210,11 +218,21 @@ export class ExecutionEngine {
     return adapter.touchedNodes?.() ?? [];
   }
 
+  /** Id bruto do plano → id real (traduz `tmp:<tempId>` pelo mapa da transação). */
+  private resolveNodeId(nodeId: DocumentNodeId, tempMap: Map<TempNodeId, DocumentNodeId>): DocumentNodeId {
+    if (!isTempNodeId(nodeId)) return nodeId;
+    const resolved = tempMap.get(tempIdOf(nodeId));
+    if (!resolved) {
+      throw new RuntimeFailure('RUNTIME_MUTATION_FAILED', `O nó temporário ${tempIdOf(nodeId)} não foi criado.`);
+    }
+    return resolved;
+  }
+
   private resolveExecutableReference(
     reference: ExecutableReference,
     tempMap: Map<TempNodeId, DocumentNodeId>
   ): DocumentNodeId {
-    if (reference.kind === 'NODE') return reference.nodeId;
+    if (reference.kind === 'NODE') return this.resolveNodeId(reference.nodeId, tempMap);
 
     const resolved = tempMap.get(reference.tempId);
     if (!resolved) {

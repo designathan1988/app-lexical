@@ -5,6 +5,7 @@ import { isAncestor, preorderNodeIds } from '../document/traversal';
 import type { ExecutionPlan, ExecutableReference } from './ExecutionPlan';
 import type { Diagnostic } from '../diagnostics';
 import { diagnostic } from '../diagnostics';
+import { isTempNodeId, tempIdOf } from './TempNodes';
 
 /**
  * As affordances da ontologia são EXECUTADAS aqui, antes da mutação:
@@ -68,7 +69,7 @@ export class ConstraintValidator {
           break;
         }
         case 'MOVE_NODE': {
-          if (!this.document.nodes.has(step.sourceNodeId)) {
+          if (!this.exists(step.sourceNodeId, tempEntityTypes)) {
             diagnostics.push(
               diagnostic('validator', 'ERROR', 'TARGET_NOT_FOUND',
                 `O nó de origem ${step.sourceNodeId} não existe no documento.`, step.span)
@@ -77,7 +78,7 @@ export class ConstraintValidator {
           }
           this.validatePlacement(
             {
-              sourceRef: { kind: 'NODE', nodeId: step.sourceNodeId },
+              sourceRef: this.asReference(step.sourceNodeId),
               targetRef: step.target,
               relationConceptId: step.relationConceptId,
               span: step.span
@@ -89,7 +90,7 @@ export class ConstraintValidator {
           break;
         }
         case 'DELETE_NODE': {
-          if (!this.document.nodes.has(step.targetNodeId)) {
+          if (!this.exists(step.targetNodeId, tempEntityTypes)) {
             diagnostics.push(
               diagnostic('validator', 'ERROR', 'TARGET_NOT_FOUND',
                 `O nó ${step.targetNodeId} não existe no documento.`, step.span)
@@ -251,6 +252,19 @@ export class ConstraintValidator {
     const parentNode = this.document.nodes.get(effectiveParentId);
     if (!parentNode) return;
     this.validateContainment(childType, parentNode.entityConceptId, args.span, diagnostics);
+  }
+
+  /**
+   * O nó existe no documento ou é criado por um comando anterior da mesma
+   * frase (id `tmp:<tempId>`).
+   */
+  private exists(nodeId: DocumentNodeId, tempEntityTypes: Map<TempNodeId, ConceptId>): boolean {
+    return isTempNodeId(nodeId) ? tempEntityTypes.has(tempIdOf(nodeId)) : this.document.nodes.has(nodeId);
+  }
+
+  /** Id bruto do plano como referência (temporária, se for `tmp:`). */
+  private asReference(nodeId: DocumentNodeId): ExecutableReference {
+    return isTempNodeId(nodeId) ? { kind: 'TEMP', tempId: tempIdOf(nodeId) } : { kind: 'NODE', nodeId };
   }
 
   /** Id real do nó, quando a referência já aponta para o documento. */

@@ -12,6 +12,7 @@ import { diagnostic, normalizeSpan, dedupeDiagnostics } from './diagnostics';
 
 import { RawLexer } from './lexical/RawLexer';
 import { segmentTokens } from './lexical/Segmenter';
+import type { PlanSimulator } from './planning/TempNodes';
 import {
   Disambiguator,
   type DisambiguationRule,
@@ -66,6 +67,8 @@ export class SemanticCompiler {
   private trie: MultiwordTrie;
   private tokenBuilder: SemanticTokenBuilder;
   private disambiguator: Disambiguator;
+  /** Simulador de efeitos (injetado pelo runtime) para frases com várias orações. */
+  simulator?: PlanSimulator;
   private grammar: GrammarIndex;
   private recovery: LexicalRecovery;
   private settings: EngineSettings;
@@ -246,7 +249,8 @@ export class SemanticCompiler {
         this.makeNodeLookup(document),
         (selector) => new ReferenceResolver(document).resolveSelector(selector).length,
         layer,
-        prePlan
+        prePlan,
+        this.simulator
       );
       plan = planner.build(ast);
 

@@ -119,6 +119,19 @@ export class BuilderStore {
     return this.undoStack.map((e) => ({ label: e.label }));
   }
 
+  /**
+   * Carrega uma CÓPIA de um documento para simulação (planejamento de várias
+   * orações): os ids novos continuam a numeração existente, sem colidir.
+   */
+  loadScratch(document: DocumentModel): void {
+    this.document = structuredClone(document);
+    this.undoStack = [];
+    this.redoStack = [];
+    const numbers = [...this.document.nodes.keys()]
+      .map((id) => Number(/^node_(\d+)$/.exec(id)?.[1] ?? 0));
+    this.counter = Math.max(this.counter, 0, ...numbers);
+  }
+
   // ---- Operações primitivas -------------------------------------------------
 
   createNode(entityConceptId: ConceptId, text?: string): DocumentNodeId {

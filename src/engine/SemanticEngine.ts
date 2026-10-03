@@ -7,6 +7,7 @@ import { BuilderStore } from '../builder/BuilderStore';
 import { BuilderRuntimeAdapterImpl } from '../builder/BuilderRuntimeAdapterImpl';
 import { DEFAULT_ENGINE_SETTINGS, type EngineSettings } from './EngineSettings';
 import { diagnostic, normalizeSpan, type Diagnostic } from './diagnostics';
+import type { PlanSimulator } from './planning/TempNodes';
 
 export interface CommandResult {
   input: string;
@@ -38,9 +39,29 @@ export class SemanticEngine {
     this.execEngine = new ExecutionEngine(this.knowledgeBase.concepts, this.adapter);
   }
 
+  /**
+   * Simulação de efeitos para o planejamento de frases com várias orações: os
+   * passos são executados pelo MESMO executor e adaptador do runtime, sobre uma
+   * cópia descartável do documento — nenhuma semântica paralela à do builder.
+   */
+  private simulate: PlanSimulator = (document, steps, tempMap) => {
+    const scratch = new BuilderStore();
+    scratch.loadScratch(document);
+    const adapter = new BuilderRuntimeAdapterImpl(scratch);
+    const result = new ExecutionEngine(this.knowledgeBase.concepts, adapter).execute(
+      { steps, diagnostics: [] },
+      tempMap
+    );
+    return {
+      document: scratch.document,
+      tempMap: new Map(Object.entries(result.createdNodes)),
+      ok: result.success
+    };
+  };
+
   private buildCompiler(): SemanticCompiler {
     const kb = this.knowledgeBase;
-    return new SemanticCompiler(
+    const compiler = new SemanticCompiler(
       kb.concepts,
       kb.lexemes,
       kb.surfaceForms,
@@ -50,6 +71,8 @@ export class SemanticEngine {
       kb.defaults,
       kb.disambiguationRules ?? []
     );
+    compiler.simulator = this.simulate;
+    return compiler;
   }
 
   updateSettings(settings: EngineSettings): void {

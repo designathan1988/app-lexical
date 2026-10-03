@@ -1,4 +1,5 @@
-import type { ConceptId, TempNodeId } from '../types';
+import type { ConceptId, DocumentNodeId, TempNodeId } from '../types';
+import { tempNodeId, type PlanSimulator } from './TempNodes';
 import type { ConceptNode } from '../ontology/Concept';
 import type { DocumentModel } from '../document/DocumentModel';
 import { ReferenceResolver } from '../document/ReferenceResolver';
@@ -36,8 +37,21 @@ export class ExecutionPlanner {
     private liveness?: Liveness,
     private layerForReference = 'planner',
     /** Diagnósticos do parser, para a resolução não cascatear (B2). */
-    private priorDiagnostics: Array<{ severity: string; code?: string; start?: number; end?: number }> = []
-  ) {}
+    private priorDiagnostics: Array<{ severity: string; code?: string; start?: number; end?: number }> = [],
+    /** Simulador de efeitos para frases com várias orações (opcional). */
+    private simulator?: PlanSimulator
+  ) {
+    this.current = document;
+  }
+
+  /** Estado do documento contra o qual o comando corrente é resolvido. */
+  private current: DocumentModel;
+  /** Expansão de quantidade de TODAS as entidades criadas na frase. */
+  private groups = new Map<TempNodeId, TempNodeId[]>();
+  /** Temporário → id no documento simulado. */
+  private simTempMap = new Map<TempNodeId, DocumentNodeId>();
+  /** Id simulado → temporário (para devolver ao plano como referência temporária). */
+  private simToTemp = new Map<DocumentNodeId, TempNodeId>();
 
   private stepId(): string {
     this.stepCounter++;
@@ -46,9 +60,13 @@ export class ExecutionPlanner {
 
   build(ast: SemanticDocumentAst): ExecutionPlan {
     const plan: ExecutionPlan = { steps: [], diagnostics: [] };
-    const resolver = new ReferenceResolver(this.document);
+    this.current = this.document;
 
-    for (const command of ast.commands) {
+    ast.commands.forEach((command, index) => {
+      // Cada comando é resolvido contra o estado deixado pelos anteriores da
+      // MESMA frase ("crie três caixas e apague a segunda").
+      const resolver = new ReferenceResolver(this.current);
+      const stepsBefore = plan.steps.length;
       switch (command.kind) {
         case 'NO_OP':
           // B1 — UNKNOWN_COMMAND já foi reportado como UNKNOWN_WORD no
@@ -77,9 +95,50 @@ export class ExecutionPlanner {
           this.planQuery(command, plan, resolver);
           break;
       }
-    }
+      const produced = plan.steps.slice(stepsBefore);
+      const hasError = plan.diagnostics.some((d) => d.severity === 'ERROR');
+      if (this.simulator && index < ast.commands.length - 1 && produced.length && !hasError) {
+        this.simulateCommand(produced);
+      }
+    });
 
     return plan;
+  }
+
+  /** Aplica os passos do comando ao documento simulado. */
+  private simulateCommand(steps: ExecutionPlan['steps']): void {
+    const result = this.simulator!(this.current, steps, this.simTempMap);
+    if (!result.ok) return;
+    this.current = result.document;
+    this.simTempMap = result.tempMap;
+    for (const step of steps) {
+      if (step.kind !== 'CREATE_NODE') continue;
+      const simId = result.tempMap.get(step.tempId);
+      if (simId) this.simToTemp.set(simId, step.tempId);
+    }
+  }
+
+  /** Referência executável para um id do documento corrente. */
+  private execRef(nodeId: DocumentNodeId): ExecutableReference {
+    const temp = this.simToTemp.get(nodeId);
+    return temp ? { kind: 'TEMP', tempId: temp } : { kind: 'NODE', nodeId };
+  }
+
+  /** Id bruto para passos que o recebem diretamente (`tmp:<id>` se for novo). */
+  private rawId(nodeId: DocumentNodeId): DocumentNodeId {
+    const temp = this.simToTemp.get(nodeId);
+    return temp ? tempNodeId(temp) : nodeId;
+  }
+
+  /**
+   * Pronome que retoma uma entidade criada antes na frase ("crie uma caixa e
+   * pinte-a"): a referência NEW_ENTITY vira o(s) nó(s) simulado(s).
+   */
+  private materialize(reference: SemanticReference): SemanticReference {
+    if (reference.kind !== 'NEW_ENTITY') return reference;
+    const temps = this.groups.get(reference.tempId) ?? [reference.tempId];
+    const ids = temps.map((t) => this.simTempMap.get(t)).filter((id): id is DocumentNodeId => Boolean(id));
+    return { kind: 'NODE_SET', nodeIds: ids };
   }
 
   // ---- CREATE -------------------------------------------------------------
@@ -116,6 +175,7 @@ export class ExecutionPlanner {
     resolver: ReferenceResolver
   ): void {
     const { copies, groupMap } = this.expandEntities(command.entities);
+    for (const [tempId, ids] of groupMap) this.groups.set(tempId, ids);
 
     const originalTempIds = new Map<TempNodeId, TempNodeId>();
     for (const [original, ids] of groupMap) {
@@ -142,8 +202,8 @@ export class ExecutionPlanner {
     }
 
     for (const placement of command.placements) {
-      const sources = this.expandReference(placement.source, groupMap, resolver, plan);
-      const targets = this.expandReference(placement.target, groupMap, resolver, plan);
+      const sources = this.expandReference(placement.source, this.groups, resolver, plan);
+      const targets = this.expandReference(placement.target, this.groups, resolver, plan);
 
       if (!targets.length) {
         if (!this.resolutionAlreadyFailed(plan, 0)) {
@@ -241,7 +301,7 @@ export class ExecutionPlanner {
     plan: ExecutionPlan,
     resolver: ReferenceResolver
   ): void {
-    const nodeIds = resolver.resolve(command.target, this.resolveOptions(plan));
+    const nodeIds = resolver.resolve(this.materialize(command.target), this.resolveOptions(plan));
 
     if (!nodeIds.length) {
       if (!this.resolutionAlreadyFailed(plan, 0)) {
@@ -254,9 +314,9 @@ export class ExecutionPlanner {
     }
 
     for (const nodeId of nodeIds) {
-      const node = this.document.nodes.get(nodeId);
+      const node = this.current.nodes.get(nodeId);
       if (!node) continue;
-      this.emitMutations({ kind: 'NODE', nodeId }, node.entityConceptId, command.mutations, plan);
+      this.emitMutations(this.execRef(nodeId), node.entityConceptId, command.mutations, plan);
     }
   }
 
@@ -267,13 +327,13 @@ export class ExecutionPlanner {
     plan: ExecutionPlan,
     resolver: ReferenceResolver
   ): void {
-    const nodeIds = resolver.resolve(command.target, this.resolveOptions(plan));
+    const nodeIds = resolver.resolve(this.materialize(command.target), this.resolveOptions(plan));
 
     for (const nodeId of nodeIds) {
       plan.steps.push({
         kind: 'DELETE_NODE',
         stepId: this.stepId(),
-        targetNodeId: nodeId,
+        targetNodeId: this.rawId(nodeId),
         span: command.span
       });
     }
@@ -295,10 +355,10 @@ export class ExecutionPlanner {
     plan: ExecutionPlan,
     resolver: ReferenceResolver
   ): void {
-    const sourceIds = resolver.resolve(command.target, this.resolveOptions(plan));
+    const sourceIds = resolver.resolve(this.materialize(command.target), this.resolveOptions(plan));
     const targetRefs = this.expandReference(
-      command.placement.target,
-      new Map(),
+      this.materialize(command.placement.target),
+      this.groups,
       resolver,
       plan
     );
@@ -325,7 +385,7 @@ export class ExecutionPlanner {
       plan.steps.push({
         kind: 'MOVE_NODE',
         stepId: this.stepId(),
-        sourceNodeId,
+        sourceNodeId: this.rawId(sourceNodeId),
         relationConceptId: command.placement.relationConceptId,
         target: targetRefs[0],
         span: command.span
@@ -340,7 +400,7 @@ export class ExecutionPlanner {
     plan: ExecutionPlan,
     resolver: ReferenceResolver
   ): void {
-    const ids = resolver.resolve(command.target, this.resolveOptions(plan));
+    const ids = resolver.resolve(this.materialize(command.target), this.resolveOptions(plan));
     if (!ids.length) {
       if (!this.resolutionAlreadyFailed(plan, 0)) {
         plan.diagnostics.push(
@@ -354,7 +414,7 @@ export class ExecutionPlanner {
       plan.steps.push({
         kind: 'QUERY_NODE',
         stepId: this.stepId(),
-        targetNodeId: nodeId,
+        targetNodeId: this.rawId(nodeId),
         span: command.span
       });
     }
@@ -397,6 +457,6 @@ export class ExecutionPlanner {
 
     return resolver
       .resolve(reference, this.resolveOptions(plan))
-      .map((nodeId) => ({ kind: 'NODE', nodeId }));
+      .map((nodeId) => this.execRef(nodeId));
   }
 }
