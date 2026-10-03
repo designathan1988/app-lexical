@@ -337,8 +337,12 @@ export const INITIAL_CONCEPTS: Record<ConceptId, ConceptNode> = {
   C_SPAT_AFTER: { kind: 'SPATIAL', id: 'C_SPAT_AFTER', relation: 'AFTER' },
   C_SPAT_BEFORE: { kind: 'SPATIAL', id: 'C_SPAT_BEFORE', relation: 'BEFORE' },
   C_SPAT_BESIDE: { kind: 'SPATIAL', id: 'C_SPAT_BESIDE', relation: 'BESIDE' },
-  C_SPAT_ABOVE: { kind: 'SPATIAL', id: 'C_SPAT_ABOVE', relation: 'ABOVE', direction: 'TOPMOST' },
-  C_SPAT_BELOW: { kind: 'SPATIAL', id: 'C_SPAT_BELOW', relation: 'BELOW', direction: 'BOTTOMMOST' },
+  // Relações ("em cima de X") e direções de seletor ("o botão de cima") são
+  // conceitos distintos: misturá-los fazia o locativo virar filtro de direção.
+  C_SPAT_ABOVE: { kind: 'SPATIAL', id: 'C_SPAT_ABOVE', relation: 'ABOVE' },
+  C_SPAT_BELOW: { kind: 'SPATIAL', id: 'C_SPAT_BELOW', relation: 'BELOW' },
+  C_SPAT_TOP: { kind: 'SPATIAL', id: 'C_SPAT_TOP', relation: 'ABOVE', direction: 'TOPMOST' },
+  C_SPAT_BOTTOM: { kind: 'SPATIAL', id: 'C_SPAT_BOTTOM', relation: 'BELOW', direction: 'BOTTOMMOST' },
   C_SPAT_LEFT: { kind: 'SPATIAL', id: 'C_SPAT_LEFT', relation: 'BESIDE', direction: 'LEFTMOST' },
   C_SPAT_RIGHT: { kind: 'SPATIAL', id: 'C_SPAT_RIGHT', relation: 'BESIDE', direction: 'RIGHTMOST' },
 
@@ -748,6 +752,9 @@ export const INITIAL_MULTIWORDS: MultiwordEntry[] = [
   { id: 'MWE_BESIDE_ALT', phrase: 'do lado de', conceptId: 'C_SPAT_BESIDE' },
   { id: 'MWE_ABOVE', phrase: 'em cima de', conceptId: 'C_SPAT_ABOVE' },
   { id: 'MWE_BELOW', phrase: 'embaixo de', conceptId: 'C_SPAT_BELOW' },
+  { id: 'MWE_BESIDE_TO', phrase: 'o lado de', conceptId: 'C_SPAT_BESIDE' },
+  { id: 'MWE_TOP', phrase: 'de cima', conceptId: 'C_SPAT_TOP' },
+  { id: 'MWE_BOTTOM', phrase: 'de baixo', conceptId: 'C_SPAT_BOTTOM' },
   { id: 'MWE_RIGHT', phrase: 'da direita', conceptId: 'C_SPAT_RIGHT' },
   { id: 'MWE_LEFT', phrase: 'da esquerda', conceptId: 'C_SPAT_LEFT' },
   { id: 'MWE_MOST_RIGHT', phrase: 'mais à direita', conceptId: 'C_SPAT_RIGHT' },

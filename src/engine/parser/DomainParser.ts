@@ -37,6 +37,7 @@ import { PropertyBinder } from './PropertyBinder';
 import { entriesFor, type GrammarIndex, type GrammarEntry } from './GrammarIndex';
 import { ParseError, type Diagnostic, type Span } from '../diagnostics';
 import type { EngineSettings } from '../EngineSettings';
+import { ClauseCanonicalizer, type CanonicalClause } from '../syntax/ClauseCanonicalizer';
 
 function candidatesOfKind<K extends ConceptNode['kind']>(
   token: SemanticToken | undefined,
@@ -101,10 +102,44 @@ export class DomainParser {
    */
   consumption: Array<{ commandIndex: number; consumedTokenIndices: number[] }> = [];
   private ctx: ParserContext;
+  private canonicalizer: ClauseCanonicalizer;
+  /**
+   * Índice, no cursor do comando corrente, onde começam os sintagmas
+   * espaciais de CENA (topicalizados/interpostos e devolvidos ao fim da
+   * oração pelo canonicalizador). `null` quando não houve deslocamento.
+   */
+  private sceneStart: number | null = null;
+  /** Reordenações feitas pelo canonicalizador, por comando (trace). */
+  canonicalization: Array<{ commandIndex: number; moved: CanonicalClause['moved'] }> = [];
 
   constructor(ctx: ParserContext) {
     this.ctx = ctx;
     this.binder = new PropertyBinder(ctx.concepts);
+    this.canonicalizer = new ClauseCanonicalizer({
+      isVerb: (t) => this.isVerbToken(t),
+      isSpatialRelation: (t) => {
+        const spatial = this.spatialOf(t);
+        return Boolean(spatial && !spatial.direction);
+      },
+      isDirection: (t) => Boolean(this.spatialOf(t)?.direction),
+      hasOperator: (t, op) => this.hasOperator(t, op),
+      isEntity: (t) => candidatesOfKind(t, this.ctx.concepts, 'ENTITY').length > 0,
+      isPronoun: (t) => this.isPronounToken(t),
+      isValue: (t) =>
+        t?.literal?.kind === 'COLOR' ||
+        t?.literal?.kind === 'SIZE' ||
+        candidatesOfKind(t, this.ctx.concepts, 'VALUE').some((c) => {
+          const concept = this.ctx.concepts[c.conceptId] as ValueConcept;
+          return concept.valueCategory !== 'ORDINAL' && concept.valueCategory !== 'CARDINAL';
+        }),
+      isNumeral: (t) =>
+        this.cardinalOf(t) !== null || this.ordinalOf(t) !== null || t?.literal?.kind === 'NUMBER'
+    });
+  }
+
+  private spatialOf(token: SemanticToken | undefined): SpatialConcept | null {
+    const spatials = candidatesOfKind(token, this.ctx.concepts, 'SPATIAL');
+    return spatials.length ? (this.ctx.concepts[spatials[0].conceptId] as SpatialConcept) : null;
   }
 
   private nextTempId(): TempNodeId {
@@ -145,12 +180,17 @@ export class DomainParser {
         }
         return;
       }
-      const cursor = new SemanticCursor(group);
+      const canonical = this.canonicalizer.canonicalize(group);
+      if (canonical.moved.length) {
+        this.canonicalization.push({ commandIndex: commands.length, moved: canonical.moved });
+      }
+      this.sceneStart = canonical.sceneStart;
+      const cursor = new SemanticCursor(canonical.tokens);
       const diagnosticsBefore = this.diagnostics.length;
       try {
-        const command = this.parseCommand(cursor);
-        commands.push(command);
-        this.reportUnconsumed(cursor, command);
+        const produced = this.parseCommand(cursor);
+        commands.push(...produced);
+        this.reportUnconsumed(cursor, produced[produced.length - 1]);
       } catch (error) {
         // Comando abortado: o resto do grupo não pode sumir em silêncio —
         // salvo quando o próprio comando já emitiu o erro que o explica
@@ -244,14 +284,21 @@ export class DomainParser {
         continue;
       }
 
-      if (this.hasOperator(token, 'COORDINATION')) {
+      // "e" ou vírgula seguidos de verbo (ou de negação + verbo) iniciam um
+      // novo comando coordenado: "crie uma caixa, crie um botão".
+      if (this.hasOperator(token, 'COORDINATION') || this.isCommaToken(token)) {
         const next = tokens[i + 1];
         const afterNext = tokens[i + 2];
         const startsCommand =
           this.isVerbToken(next) ||
           (this.hasOperator(next, 'NEGATION') && this.isVerbToken(afterNext));
+        // A vírgula só separa comandos se o trecho anterior já tem verbo;
+        // antes disso ela fecha um constituinte topicalizado
+        // ("dentro da caixa, crie um botão").
+        const closesClause =
+          this.hasOperator(token, 'COORDINATION') || current.some((t) => this.isVerbToken(t));
 
-        if (startsCommand) {
+        if (startsCommand && closesClause) {
           closeGroup(token);
           continue;
         }
@@ -318,7 +365,12 @@ export class DomainParser {
   // Comando
   // -------------------------------------------------------------------------
 
-  private parseCommand(cursor: SemanticCursor): SemanticCommand {
+  /**
+   * Um grupo de tokens (já canonicalizado) produz UM OU MAIS comandos: a
+   * coordenação de argumentos ("apague a caixa e o botão") expande o verbo
+   * sobre cada objeto, com o mesmo predicado, numa única transação.
+   */
+  private parseCommand(cursor: SemanticCursor): SemanticCommand[] {
     const startSpan = cursor.peek()?.span;
 
     // G7 — Pedido indireto: "[eu] quero …", "[você] pode/poderia …",
@@ -326,22 +378,18 @@ export class DomainParser {
     // é o comando de verdade, e a cortesia fica registrada.
     const polite = this.consumePoliteWrapper(cursor);
 
-    // 3.F PP_TOPIC — "dentro da caixa, crie um botão": o sintagma espacial
-    // topicalizado é o destino da entidade criada.
-    const topic = this.parseTopicPlacement(cursor, polite);
-
     const negated = this.consumeOperator(cursor, 'NEGATION');
     const action = this.consumeAction(cursor);
 
-    // 3.G Tempo e modo: comando só com imperativo, infinitivo ou o presente
-    // do indicativo usado como ordem ("cria um botão"). Passado/futuro são
-    // relato, não comando: "criou um botão" → UNSUPPORTED_OPERATION.
+    // 3.G Tempo e modo: é ordem o imperativo e o infinitivo (este nos
+    // pedidos indiretos e nas ordens impessoais). Indicativo ("crio",
+    // "criou") e demais tempos são relato, não comando — a leitura de
+    // imperativo de formas como "cria" vem do paradigma, não de exceção.
     if (action) {
       const verbToken = cursor.tokens[cursor.index - 1];
       const acceptable = verbToken?.candidates.some((c) => {
         const mood = c.morphology?.mood;
-        if (mood === 'IMPERATIVE' || mood === 'INFINITIVE') return true;
-        return mood === 'INDICATIVE' && (c.morphology?.tense === 'PRESENT' || !c.morphology?.tense);
+        return mood === 'IMPERATIVE' || mood === 'INFINITIVE' || mood === undefined;
       });
       if (verbToken && verbToken.candidates.length && !acceptable) {
         this.emit({
@@ -372,7 +420,7 @@ export class DomainParser {
       const inner = this.parseCreate(cursor, startSpan);
       inner.politeness = true;
       this.consumeTrailingPoliteness(cursor);
-      return inner;
+      return [inner];
     }
 
     if (negated) {
@@ -383,91 +431,39 @@ export class DomainParser {
         start: startSpan?.start ?? 0,
         end: last?.span.end ?? startSpan?.end ?? 0
       };
-      return {
-        kind: 'NO_OP',
-        reason: 'NEGATED_ACTION',
-        negatedOperation: action?.operation,
-        span
-      };
+      return [
+        {
+          kind: 'NO_OP',
+          reason: 'NEGATED_ACTION',
+          negatedOperation: action?.operation,
+          span: cursor.fullSpan() ?? span
+        }
+      ];
     }
 
-    if (!action) return this.parseImplicitCommand(cursor);
+    if (!action) return [this.parseImplicitCommand(cursor)];
 
-    let command: SemanticCommand;
+    let commands: SemanticCommand[];
     switch (action.operation) {
       case 'CREATE':
-        command = this.parseCreate(cursor, startSpan);
+        commands = [this.parseCreate(cursor, startSpan)];
         break;
       case 'UPDATE':
-        command = this.parseUpdate(cursor, startSpan);
+        commands = this.parseUpdate(cursor, startSpan);
         break;
       case 'DELETE':
-        command = this.parseDelete(cursor, startSpan);
+        commands = this.parseDelete(cursor, startSpan);
         break;
       case 'MOVE':
-        command = this.parseMove(cursor, startSpan);
+        commands = this.parseMove(cursor, startSpan);
         break;
       case 'QUERY':
-        command = this.parseQuery(cursor, startSpan);
+        commands = this.parseQuery(cursor, startSpan);
         break;
     }
-    if (polite) command.politeness = true;
-    if (topic && command.kind === 'CREATE' && command.entities.length) {
-      command.placements.push({
-        source: { kind: 'NEW_ENTITY', tempId: command.entities[0].tempId },
-        relationConceptId: topic.relationId,
-        target: topic.target,
-        span: topic.span
-      });
-    }
+    if (polite) for (const command of commands) command.politeness = true;
     this.consumeTrailingPoliteness(cursor);
-    return command;
-  }
-
-  /**
-   * Sintagma preposicional topicalizado no início do comando:
-   * "dentro da caixa, crie um botão". Só consome se vier um verbo depois.
-   */
-  private parseTopicPlacement(
-    cursor: SemanticCursor,
-    polite: boolean
-  ): { relationId: ConceptId; target: SemanticReference; span: Span } | null {
-    const checkpoint = cursor.index;
-    const spatial = this.peekSpatial(cursor);
-    if (!spatial || !this.isContainment(spatial.id)) return null;
-    const startSpan = cursor.peek()!.span;
-    cursor.consume();
-    if (this.hasOperator(cursor.peek(), 'PARTITIVE')) cursor.consume();
-    if (!cursor.peek()?.candidates.length) {
-      cursor.index = checkpoint;
-      return null;
-    }
-
-    let target: SemanticReference;
-    try {
-      target = this.parseReference(cursor, undefined, true, false);
-    } catch {
-      cursor.index = checkpoint;
-      return null;
-    }
-
-    const punct = cursor.peek();
-    if (punct && punct.rawTokens.every((t) => t.type === 'PUNCT')) cursor.consume();
-
-    // Exige um verbo de comando logo em seguida.
-    const next = cursor.peek();
-    const verbNext = this.isVerbToken(next) || this.hasOperator(next, 'NEGATION');
-    if (!verbNext && !polite) {
-      cursor.index = checkpoint;
-      return null;
-    }
-
-    const end = cursor.previousSpan()?.end ?? startSpan.end;
-    return {
-      relationId: spatial.id,
-      target,
-      span: { start: startSpan.start, end }
-    };
+    return commands;
   }
 
   /**
@@ -650,10 +646,6 @@ export class DomainParser {
     const entities: NewEntityAst[] = [];
     const placements: PlacementAst[] = [];
 
-    // "crie, dentro da caixa preta, dois botões": PP interposto entre o verbo
-    // e o objeto — o destino das entidades criadas.
-    const interposed = this.parseInterposedPlacement(cursor);
-
     const first = this.parseNewEntity(cursor);
     if (!first) {
       throw new ParseError(
@@ -694,7 +686,7 @@ export class DomainParser {
         break;
       }
 
-      if (this.hasOperator(cursor.peek(), 'COORDINATION')) {
+      if (this.isCoordinatorAt(cursor)) {
         const checkpoint = cursor.index;
         cursor.consume();
         const leadingConnector =
@@ -720,8 +712,37 @@ export class DomainParser {
         break;
       }
 
+      const inScene = this.sceneStart !== null && cursor.index >= this.sceneStart;
       const spatial = this.parseSpatial(cursor);
       if (spatial) {
+        if (inScene) {
+          // Locativo de cena (topicalizado/interposto): vale para todas as
+          // entidades criadas no nível superior da oração, não só a última.
+          const roots = entities.filter(
+            (e) => !placements.some((p) => p.source.kind === 'NEW_ENTITY' && p.source.tempId === e.tempId)
+          );
+          const before = placements.length;
+          const anchor = roots[0] ?? current;
+          const next = this.parseSpatialTarget(cursor, anchor, spatial, entities, placements);
+          if (!next) break;
+          const added = placements.slice(before).filter(
+            (p) => p.source.kind === 'NEW_ENTITY' && p.source.tempId === anchor.tempId
+          );
+          // Ordem mencionada preservada: com relações que inserem logo depois
+          // do alvo, cada entidade vai depois da anterior.
+          roots.slice(1).forEach((root, i) => {
+            for (const p of added) {
+              placements.push({
+                ...p,
+                source: { kind: 'NEW_ENTITY', tempId: root.tempId },
+                target: this.insertsAfterTarget(p.relationConceptId)
+                  ? { kind: 'NEW_ENTITY', tempId: roots[i].tempId }
+                  : p.target
+              });
+            }
+          });
+          continue;
+        }
         const next = this.parseSpatialTarget(cursor, current, spatial, entities, placements);
         if (!next) break;
         current = next;
@@ -732,15 +753,6 @@ export class DomainParser {
       if (this.pushMutation(cursor, current)) continue;
 
       break;
-    }
-
-    if (interposed && entities.length) {
-      placements.push({
-        source: { kind: 'NEW_ENTITY', tempId: entities[0].tempId },
-        relationConceptId: interposed.relationId,
-        target: interposed.target,
-        span: interposed.span
-      });
     }
 
     return { kind: 'CREATE', entities, placements, span: startSpan };
@@ -798,46 +810,6 @@ export class DomainParser {
     return false;
   }
 
-  /**
-   * "crie, dentro da caixa preta, dois botões": PP entre vírgulas logo após o
-   * verbo de criação. Consome e devolve o destino; senão não move o cursor.
-   */
-  private parseInterposedPlacement(
-    cursor: SemanticCursor
-  ): { relationId: ConceptId; target: SemanticReference; span: Span } | null {
-    const checkpoint = cursor.index;
-    const comma = cursor.peek();
-    if (!comma || !comma.rawTokens.every((t) => t.type === 'PUNCT')) return null;
-    cursor.consume();
-
-    const spatial = this.peekSpatial(cursor);
-    if (!spatial || !this.isContainment(spatial.id)) {
-      cursor.index = checkpoint;
-      return null;
-    }
-    const startSpan = cursor.peek()!.span;
-    cursor.consume();
-    if (this.hasOperator(cursor.peek(), 'PARTITIVE')) cursor.consume();
-    if (!cursor.peek()?.candidates.length) {
-      cursor.index = checkpoint;
-      return null;
-    }
-
-    let target: SemanticReference;
-    try {
-      target = this.parseReference(cursor, undefined, true, false);
-    } catch {
-      cursor.index = checkpoint;
-      return null;
-    }
-
-    const trailing = cursor.peek();
-    if (trailing && trailing.rawTokens.every((t) => t.type === 'PUNCT')) cursor.consume();
-
-    const end = cursor.previousSpan()?.end ?? startSpan.end;
-    return { relationId: spatial.id, target, span: { start: startSpan.start, end } };
-  }
-
   private parseSpatialTarget(
     cursor: SemanticCursor,
     current: NewEntityAst,
@@ -846,12 +818,14 @@ export class DomainParser {
     placements: PlacementAst[]
   ): NewEntityAst | null {
     const token = cursor.peek();
+    // "caixa com um botão dentro [e …]": sem alvo próprio (fim, vírgula ou
+    // coordenação), o espacial de contenção apenas CONFIRMA o containment já
+    // estabelecido por "com".
+    const noTarget = !token || this.isCommaToken(token) || this.isCoordinatorAt(cursor);
+    if (noTarget && this.isContainment(spatial.id)) {
+      return current;
+    }
     if (!token) {
-      // "caixa com um botão dentro": o espacial final apenas CONFIRMA o
-      // containment já estabelecido pela coordenação anterior.
-      if (this.isContainment(spatial.id)) {
-        return current;
-      }
       throw new ParseError(
         'UNSUPPORTED_OPERATION',
         'A relação espacial exige um alvo.',
@@ -999,19 +973,22 @@ export class DomainParser {
    * funcionar, vale a segunda — "deixe o texto azul" é o elemento TEXT, não a
    * propriedade de conteúdo. Se nenhuma funcionar, o diagnóstico mais
    * específico (o do binder) é preservado.
+   *
+   * Objetos coordenados ("a caixa e o botão") produzem um comando por objeto;
+   * o predicado é re-analisado para o tipo de cada um.
    */
-  private parseUpdate(cursor: SemanticCursor, startSpan?: Span): UpdateCommandAst {
+  private parseUpdate(cursor: SemanticCursor, startSpan?: Span): UpdateCommandAst[] {
     const start = cursor.index;
     const diagnosticsBefore = this.diagnostics.length;
 
     const propertyAttempt = this.tryPropertyFirst(cursor, start, startSpan);
-    if (propertyAttempt.command) return propertyAttempt.command;
+    if (propertyAttempt.commands) return propertyAttempt.commands;
 
     const valueAttempt = this.tryValueFirst(cursor, start, startSpan);
-    if (valueAttempt.command) return valueAttempt.command;
+    if (valueAttempt.commands) return valueAttempt.commands;
 
     const targetAttempt = this.tryTargetFirst(cursor, start, startSpan);
-    if (targetAttempt.command) return targetAttempt.command;
+    if (targetAttempt.commands) return targetAttempt.commands;
 
     // Nenhuma leitura produziu comando: reporta a falha mais informativa.
     const specific = propertyAttempt.failure ?? targetAttempt.failure;
@@ -1031,7 +1008,7 @@ export class DomainParser {
     cursor: SemanticCursor,
     start: number,
     startSpan?: Span
-  ): { command?: UpdateCommandAst; failure?: Diagnostic } {
+  ): { commands?: UpdateCommandAst[]; failure?: Diagnostic } {
     const diagnosticsBefore = this.diagnostics.length;
     cursor.index = start;
 
@@ -1045,7 +1022,27 @@ export class DomainParser {
 
     if (this.hasOperator(cursor.peek(), 'PARTITIVE')) {
       cursor.consume();
-      const target = this.parseReference(cursor);
+      // Leitura especulativa: se "de X" não for um possuidor ("o texto de
+      // verde"), a leitura desiste sem erro e cede às outras.
+      let first: SemanticReference;
+      try {
+        first = this.parseReference(cursor);
+      } catch {
+        this.diagnostics.length = diagnosticsBefore;
+        cursor.index = start;
+        return {};
+      }
+      // Possuidor exige núcleo explícito (nome ou pronome): "de verde" sem
+      // núcleo é predicado ("pinte o texto de verde"), não elipse de possuidor.
+      if (first.kind === 'SELECTOR' && first.selector.elidedFrom) {
+        this.diagnostics.length = diagnosticsBefore;
+        cursor.index = start;
+        return {};
+      }
+      // "a cor de fundo da caixa E DO botão": possuidores coordenados.
+      const targets = this.expandMixedSets(
+        this.parseCoordinatedReferences(cursor, first, () => this.parseReference(cursor), true)
+      );
       this.skipValueConnector(cursor);
       // B3 — o span do valor é do VALOR (não do comando inteiro).
       const valueStart = cursor.index;
@@ -1057,20 +1054,28 @@ export class DomainParser {
         return {};
       }
 
-      const entityConceptId = this.entityConceptOf(target);
-      const bound = this.binder.bind(
-        entityConceptId,
-        this.propertyMutation(propHead, value, valueSpan),
-        valueSpan
-      );
-      if (!bound.ok) {
-        this.diagnostics.length = diagnosticsBefore;
-        cursor.index = start;
-        return { failure: bound.diagnostic };
+      const afterValue = cursor.index;
+      let end = afterValue;
+      const commands: UpdateCommandAst[] = [];
+      for (const target of targets) {
+        const entityConceptId = this.entityConceptOf(target);
+        const bound = this.binder.bind(
+          entityConceptId,
+          this.propertyMutation(propHead, value, valueSpan),
+          valueSpan
+        );
+        if (!bound.ok) {
+          this.diagnostics.length = diagnosticsBefore;
+          cursor.index = start;
+          return { failure: bound.diagnostic };
+        }
+        cursor.index = afterValue;
+        const chain = this.parsePropertyChain(cursor, propHead, entityConceptId);
+        end = Math.max(end, cursor.index);
+        commands.push({ kind: 'UPDATE', target, mutations: [bound.mutation, ...chain], span: startSpan });
       }
-
-      const chain = this.parsePropertyChain(cursor, propHead, entityConceptId);
-      return { command: { kind: 'UPDATE', target, mutations: [bound.mutation, ...chain], span: startSpan } };
+      cursor.index = end;
+      return { commands };
     }
 
     // "deixe o texto azul": quando o núcleo também é uma ENTIDADE ("texto"),
@@ -1105,12 +1110,14 @@ export class DomainParser {
 
     const chain = this.parsePropertyChain(cursor, propHead, undefined);
     return {
-      command: {
-        kind: 'UPDATE',
-        target: { kind: 'CURRENT_SELECTION' },
-        mutations: [bound.mutation, ...chain],
-        span: startSpan
-      }
+      commands: [
+        {
+          kind: 'UPDATE',
+          target: { kind: 'CURRENT_SELECTION' },
+          mutations: [bound.mutation, ...chain],
+          span: startSpan
+        }
+      ]
     };
   }
 
@@ -1118,7 +1125,7 @@ export class DomainParser {
     cursor: SemanticCursor,
     start: number,
     startSpan?: Span
-  ): { command?: UpdateCommandAst } {
+  ): { commands?: UpdateCommandAst[] } {
     cursor.index = start;
 
     if (
@@ -1140,7 +1147,7 @@ export class DomainParser {
     try {
       const target = this.parseReference(cursor);
       const mutation = this.bindValueOnly(value, this.entityConceptOf(target), cursor.previousSpan());
-      return { command: { kind: 'UPDATE', target, mutations: [mutation], span: startSpan } };
+      return { commands: [{ kind: 'UPDATE', target, mutations: [mutation], span: startSpan }] };
     } catch {
       this.diagnostics.length = diagnosticsBefore;
       cursor.index = start;
@@ -1148,32 +1155,78 @@ export class DomainParser {
     }
   }
 
+  /**
+   * Alvo primeiro, com coordenação: cada conjunto pode ter predicado próprio
+   * ("deixe o botão azul e o texto vermelho"); conjuntos sem predicado herdam
+   * o do conjunto seguinte ("deixe a caixa e o botão vermelhos"). O predicado
+   * é re-analisado para o tipo de cada alvo, porque o binding depende dele.
+   */
   private tryTargetFirst(
     cursor: SemanticCursor,
     start: number,
     startSpan?: Span
-  ): { command?: UpdateCommandAst; failure?: Diagnostic } {
+  ): { commands?: UpdateCommandAst[]; failure?: Diagnostic } {
     const diagnosticsBefore = this.diagnostics.length;
     cursor.index = start;
 
-    try {
-      const target = this.parseReference(cursor);
-      const mutations = this.parseMutations(cursor, this.entityConceptOf(target));
+    interface Conjunct {
+      parts: SemanticReference[];
+      first: AstPropertyMutation[];
+      predicate: { start: number; end: number } | null;
+    }
 
-      while (this.hasOperator(cursor.peek(), 'EXCEPT') && target.kind === 'SELECTOR') {
-        cursor.consume();
-        target.selector.exclusions = [
-          this.parseSelector(cursor, target.selector.entityConceptId, false)
-        ];
+    try {
+      const conjuncts: Conjunct[] = [];
+      for (;;) {
+        const target = this.parseReference(cursor);
+        const parts = this.expandMixedSets([target]);
+        const predicateStart = cursor.index;
+        const mutations = this.parseMutations(cursor, this.entityConceptOf(parts[0]));
+        const predicateEnd = cursor.index;
+
+        if (target.kind === 'SELECTOR' && this.hasOperator(cursor.peek(), 'EXCEPT')) {
+          cursor.consume();
+          target.selector.exclusions = this.parseExclusions(cursor, target.selector.entityConceptId);
+        }
+
+        conjuncts.push({
+          parts,
+          first: mutations,
+          predicate: mutations.length ? { start: predicateStart, end: predicateEnd } : null
+        });
+
+        if (this.isCoordinatorAt(cursor) && this.startsReference(cursor.peek(1))) {
+          cursor.consume();
+          continue;
+        }
+        break;
       }
 
-      if (!mutations.length) {
+      // Predicado compartilhado: herda do conjunto seguinte mais próximo.
+      for (let i = conjuncts.length - 2; i >= 0; i--) {
+        if (!conjuncts[i].predicate) conjuncts[i].predicate = conjuncts[i + 1].predicate;
+      }
+      if (conjuncts.some((c) => !c.predicate)) {
         this.diagnostics.length = diagnosticsBefore;
         cursor.index = start;
         return {};
       }
 
-      return { command: { kind: 'UPDATE', target, mutations, span: startSpan } };
+      const end = cursor.index;
+      const commands: UpdateCommandAst[] = [];
+      for (const conjunct of conjuncts) {
+        conjunct.parts.forEach((part, partIndex) => {
+          let mutations = partIndex === 0 && conjunct.first.length ? conjunct.first : null;
+          if (!mutations) {
+            const range = conjunct.predicate!;
+            cursor.index = range.start;
+            mutations = this.parseMutations(cursor, this.entityConceptOf(part));
+          }
+          commands.push({ kind: 'UPDATE', target: part, mutations, span: startSpan });
+        });
+      }
+      cursor.index = end;
+      return { commands };
     } catch (error) {
       const diagnostic = this.diagnosticFrom(error);
       this.diagnostics.length = diagnosticsBefore;
@@ -1208,27 +1261,137 @@ export class DomainParser {
   }
 
   // -------------------------------------------------------------------------
+  // Coordenação de argumentos
+  // -------------------------------------------------------------------------
+
+  private isCommaToken(token: SemanticToken | undefined): boolean {
+    return Boolean(
+      token &&
+        token.rawTokens.every((r) => r.type === 'PUNCT') &&
+        token.rawTokens.map((r) => r.raw).join('') === ','
+    );
+  }
+
+  /** O token inicia uma referência/sintagma nominal. */
+  private startsReference(token: SemanticToken | undefined): boolean {
+    if (!token) return false;
+    return (
+      this.hasOperator(token, 'DEFINITE_ARTICLE') ||
+      this.hasOperator(token, 'INDEFINITE_ARTICLE') ||
+      this.hasOperator(token, 'UNIVERSAL_QUANTIFIER') ||
+      this.hasOperator(token, 'ALTERNATIVE_DETERMINER') ||
+      this.hasOperator(token, 'PARTITIVE') ||
+      this.cardinalOf(token) !== null ||
+      this.ordinalOf(token) !== null ||
+      token.literal?.kind === 'NUMBER' ||
+      this.isPronounToken(token) ||
+      candidatesOfKind(token, this.ctx.concepts, 'ENTITY').length > 0
+    );
+  }
+
+  /** Coordenador no cursor: "e", ou vírgula seguida de início de sintagma. */
+  private isCoordinatorAt(cursor: SemanticCursor, offset = 0): boolean {
+    const token = cursor.peek(offset);
+    if (this.hasOperator(token, 'COORDINATION')) return true;
+    return this.isCommaToken(token) && this.startsReference(cursor.peek(offset + 1));
+  }
+
+  /**
+   * Referências coordenadas: "a caixa e o botão", "a caixa, o botão e o
+   * texto"; com `possessive`, o "de" repetido do possuidor ("da caixa e do
+   * botão") é parte do coordenador.
+   */
+  private parseCoordinatedReferences(
+    cursor: SemanticCursor,
+    first: SemanticReference,
+    parseNext: () => SemanticReference,
+    possessive = false
+  ): SemanticReference[] {
+    const references = [first];
+    while (this.isCoordinatorAt(cursor)) {
+      const checkpoint = cursor.index;
+      const diagnosticsBefore = this.diagnostics.length;
+      cursor.consume();
+      if (possessive && this.hasOperator(cursor.peek(), 'PARTITIVE')) cursor.consume();
+      if (!this.startsReference(cursor.peek()) || this.hasOperator(cursor.peek(), 'PARTITIVE')) {
+        cursor.index = checkpoint;
+        break;
+      }
+      try {
+        references.push(parseNext());
+      } catch {
+        this.diagnostics.length = diagnosticsBefore;
+        cursor.index = checkpoint;
+        break;
+      }
+    }
+    return references;
+  }
+
+  /** Exclusões coordenadas: "menos o primeiro e o terceiro". */
+  private parseExclusions(cursor: SemanticCursor, entityConceptId?: ConceptId): SemanticSelector[] {
+    const exclusions = [this.parseSelector(cursor, entityConceptId, false)];
+    while (this.isCoordinatorAt(cursor) && this.startsReference(cursor.peek(1))) {
+      const checkpoint = cursor.index;
+      cursor.consume();
+      try {
+        exclusions.push(this.parseSelector(cursor, entityConceptId, false));
+      } catch {
+        cursor.index = checkpoint;
+        break;
+      }
+    }
+    return exclusions;
+  }
+
+  /**
+   * Grupo pronominal de tipos mistos ("eles" = uma caixa e um botão) vira um
+   * alvo por nó: o binding de uma cor depende do tipo de cada elemento.
+   */
+  private expandMixedSets(references: SemanticReference[]): SemanticReference[] {
+    return references.flatMap((reference): SemanticReference[] => {
+      if (reference.kind !== 'NODE_SET') return [reference];
+      const types = new Set(reference.nodeIds.map((id) => this.ctx.nodeLookup(id)?.entityConceptId));
+      if (types.size <= 1) return [reference];
+      return reference.nodeIds.map((nodeId) => ({ kind: 'NODE_ID' as const, nodeId }));
+    });
+  }
+
+  /** Relações que inserem o nó logo DEPOIS do alvo (a ordem mencionada exige encadear). */
+  private insertsAfterTarget(relationConceptId: ConceptId): boolean {
+    const concept = this.ctx.concepts[relationConceptId];
+    return (
+      concept?.kind === 'SPATIAL' &&
+      (concept.relation === 'AFTER' || concept.relation === 'BESIDE' || concept.relation === 'BELOW')
+    );
+  }
+
+  // -------------------------------------------------------------------------
   // DELETE / MOVE / QUERY
   // -------------------------------------------------------------------------
 
-  private parseDelete(cursor: SemanticCursor, startSpan?: Span): DeleteCommandAst {
-    return {
-      kind: 'DELETE',
-      target: this.parseReference(cursor, undefined, true),
-      span: startSpan
-    };
+  private parseDelete(cursor: SemanticCursor, startSpan?: Span): DeleteCommandAst[] {
+    const first = this.parseReference(cursor, undefined, true);
+    const targets = this.parseCoordinatedReferences(cursor, first, () =>
+      this.parseReference(cursor, undefined, true)
+    );
+    return targets.map((target) => ({ kind: 'DELETE', target, span: startSpan }));
   }
 
-  private parseMove(cursor: SemanticCursor, startSpan?: Span): MoveCommandAst {
+  private parseMove(cursor: SemanticCursor, startSpan?: Span): MoveCommandAst[] {
     // O sintagma espacial que segue o alvo é o DESTINO, não um filtro de pai.
-    const target = this.parseReference(cursor, undefined, true, false);
+    const first = this.parseReference(cursor, undefined, true, false);
+    const targets = this.parseCoordinatedReferences(cursor, first, () =>
+      this.parseReference(cursor, undefined, true, false)
+    );
+    const last = targets[targets.length - 1];
 
     if (this.hasOperator(cursor.peek(), 'PARTITIVE')) {
       const checkpoint = cursor.index;
       cursor.consume();
       const spatial = this.parseSpatial(cursor);
-      if (spatial && this.isContainment(spatial.id) && target.kind === 'SELECTOR') {
-        target.selector.parent = this.parseSelector(cursor);
+      if (spatial && this.isContainment(spatial.id) && last.kind === 'SELECTOR') {
+        last.selector.parent = this.parseSelector(cursor);
       } else {
         cursor.index = checkpoint;
       }
@@ -1245,34 +1408,33 @@ export class DomainParser {
       );
     }
 
-    const destination = this.parseReference(
-      cursor,
-      this.entityConceptOf(target),
-      true
-    );
+    const destination = this.parseReference(cursor, this.entityConceptOf(first), true);
 
     // B8 — "dela MESMA": o reforço reflexivo é do pronome, consumido aqui.
     if (this.hasOperator(cursor.peek(), 'REFLEXIVE')) cursor.consume();
 
-    return {
+    // "mova A e B para depois da caixa": a ordem mencionada é preservada —
+    // com relações que inserem logo depois do alvo, B vai depois de A.
+    const chain = this.insertsAfterTarget(relation.id);
+    return targets.map((target, i) => ({
       kind: 'MOVE',
       target,
       placement: {
         source: target,
         relationConceptId: relation.id,
-        target: destination,
+        target: chain && i > 0 ? targets[i - 1] : destination,
         span: startSpan
       },
       span: startSpan
-    };
+    }));
   }
 
-  private parseQuery(cursor: SemanticCursor, startSpan?: Span): SemanticCommand {
-    return {
-      kind: 'QUERY',
-      target: this.parseReference(cursor, undefined, true),
-      span: startSpan
-    };
+  private parseQuery(cursor: SemanticCursor, startSpan?: Span): SemanticCommand[] {
+    const first = this.parseReference(cursor, undefined, true);
+    const targets = this.parseCoordinatedReferences(cursor, first, () =>
+      this.parseReference(cursor, undefined, true)
+    );
+    return targets.map((target) => ({ kind: 'QUERY', target, span: startSpan }));
   }
 
   // -------------------------------------------------------------------------
@@ -1308,6 +1470,11 @@ export class DomainParser {
         return reference.selector.entityConceptId;
       case 'NODE_ID':
         return this.ctx.nodeLookup(reference.nodeId)?.entityConceptId;
+      case 'NODE_SET': {
+        // Grupo pronominal ("eles"): o tipo comum, se houver um só.
+        const types = new Set(reference.nodeIds.map((id) => this.ctx.nodeLookup(id)?.entityConceptId));
+        return types.size === 1 ? [...types][0] : undefined;
+      }
       case 'NEW_ENTITY':
         return undefined;
       case 'CURRENT_SELECTION':
@@ -1717,7 +1884,7 @@ export class DomainParser {
 
     if (this.hasOperator(cursor.peek(), 'EXCEPT')) {
       cursor.consume();
-      selector.exclusions = [this.parseSelector(cursor, entityConceptId, false)];
+      selector.exclusions = this.parseExclusions(cursor, entityConceptId);
     }
 
     if (registerMention && entityConceptId) {
