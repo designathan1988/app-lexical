@@ -8,7 +8,7 @@
  */
 export const KNOWN_MORPH_FAILURES = new Set([
     'morph-09',
-  'morph-26', 'morph-27', 'morph-33', 'morph-34'
+  'morph-26', 'morph-27'
 ]);
 // Consertados na F2 (diminutivos produtivos): morph-15, morph-16, morph-17.
 // Consertados na F3.3.B (contrações, ênclise e referência de grupo):
@@ -22,6 +22,7 @@ export const KNOWN_MORPH_FAILURES = new Set([
 // morph-24, morph-36, morph-40.
 // Consertados na F3 (alvo com filtro; formato canônico do seletor interno):
 // morph-25, morph-31.
+// Consertados na F4 (B5 grupo de texto + font size): morph-33, morph-34.
 
 /** Falhas que não estão na lista de conhecidas. */
 export function unexpectedFailures(ids: string[]): string[] {

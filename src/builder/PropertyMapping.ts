@@ -11,7 +11,8 @@ export const PROPERTY_TO_CSS: Record<string, string> = {
   C_PROP_BORDER_COLOR: 'borderColor',
   C_PROP_BORDER_WIDTH: 'borderWidth',
   C_PROP_BORDER_STYLE: 'borderStyle',
-  C_PROP_PADDING: 'padding'
+  C_PROP_PADDING: 'padding',
+  C_PROP_FONT_SIZE: 'fontSize'
 };
 
 export function cssPropertyName(conceptId: ConceptId): string {

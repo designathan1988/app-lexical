@@ -135,7 +135,8 @@ export const INITIAL_CONCEPTS: Record<ConceptId, ConceptNode> = {
         'C_PROP_BORDER_WIDTH',
         'C_PROP_BORDER_STYLE',
         'C_PROP_BORDER_RADIUS',
-        'C_PROP_TEXT_CONTENT'
+        'C_PROP_TEXT_CONTENT',
+        'C_PROP_FONT_SIZE'
       ],
       defaultValueBindings: { COLOR: 'C_PROP_BG_COLOR', TEXT: 'C_PROP_TEXT_CONTENT' }
     },
@@ -161,7 +162,7 @@ export const INITIAL_CONCEPTS: Record<ConceptId, ConceptNode> = {
       canContainChildren: false,
       allowedChildConceptIds: [],
       allowedParentConceptIds: ['C_ENT_ROOT', 'C_ENT_CONTAINER'],
-      acceptedPropertyIds: ['C_PROP_TEXT_COLOR', 'C_PROP_TEXT_CONTENT'],
+      acceptedPropertyIds: ['C_PROP_TEXT_COLOR', 'C_PROP_TEXT_CONTENT', 'C_PROP_FONT_SIZE'],
       defaultValueBindings: { COLOR: 'C_PROP_TEXT_COLOR', TEXT: 'C_PROP_TEXT_CONTENT' }
     },
     rendering: {
@@ -222,6 +223,10 @@ export const INITIAL_CONCEPTS: Record<ConceptId, ConceptNode> = {
     kind: 'PROPERTY', id: 'C_PROP_TEXT_CONTENT', runtimeProperty: 'textContent',
     valueCategories: ['TEXT'], targetField: 'text'
   },
+  C_PROP_FONT_SIZE: {
+    kind: 'PROPERTY', id: 'C_PROP_FONT_SIZE', runtimeProperty: 'fontSize',
+    valueCategories: ['SIZE'], groupId: 'C_PROP_GROUP_TEXT'
+  },
   C_PROP_BORDER_COLOR: {
     kind: 'PROPERTY', id: 'C_PROP_BORDER_COLOR', runtimeProperty: 'borderColor',
     valueCategories: ['COLOR'], groupId: 'C_PROP_GROUP_BORDER'
@@ -244,6 +249,17 @@ export const INITIAL_CONCEPTS: Record<ConceptId, ConceptNode> = {
 
   // --- Grupos ----------------------------------------------------------------
 
+  C_PROP_GROUP_TEXT: {
+    kind: 'PROPERTY_GROUP',
+    id: 'C_PROP_GROUP_TEXT',
+    members: ['C_PROP_TEXT_COLOR', 'C_PROP_TEXT_CONTENT', 'C_PROP_FONT_SIZE'],
+    bindingByValueCategory: {
+      COLOR: 'C_PROP_TEXT_COLOR',
+      TEXT: 'C_PROP_TEXT_CONTENT',
+      SIZE: 'C_PROP_FONT_SIZE'
+    },
+    clearPropertyIds: ['C_PROP_TEXT_COLOR', 'C_PROP_TEXT_CONTENT', 'C_PROP_FONT_SIZE']
+  },
   C_PROP_GROUP_BORDER: {
     kind: 'PROPERTY_GROUP',
     id: 'C_PROP_GROUP_BORDER',
@@ -420,7 +436,7 @@ export const INITIAL_LEXEMES: Record<LexemeId, Lexeme> = {
   LEX_BORDA: lex('LEX_BORDA', 'borda', 'NOUN', ['C_PROP_GROUP_BORDER'], { paradigmId: 'N_S', gender: 'Fem' }),
   LEX_FUNDO: lex('LEX_FUNDO', 'fundo', 'NOUN', ['C_PROP_BG_COLOR'], { paradigmId: 'N_S', gender: 'Masc' }),
   LEX_ROTULO: lex('LEX_ROTULO', 'rótulo', 'NOUN', ['C_PROP_TEXT_CONTENT'], { paradigmId: 'N_S', gender: 'Masc' }),
-  LEX_CONTEUDO: lex('LEX_CONTEUDO', 'conteúdo', 'NOUN', ['C_PROP_TEXT_CONTENT'], { paradigmId: 'N_S', gender: 'Masc' }),
+  LEX_CONTEUDO: lex('LEX_CONTEUDO', 'conteúdo', 'NOUN', ['C_PROP_GROUP_TEXT'], { paradigmId: 'N_S', gender: 'Masc' }),
 
   // Adjetivos de cor
   LEX_AZUL: lex('LEX_AZUL', 'azul', 'ADJECTIVE', ['C_VAL_BLUE'], { paradigmId: 'ADJ_L' }),

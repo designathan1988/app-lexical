@@ -90,6 +90,11 @@ consciente da lista — o oráculo só encolhe).
 geração por paradigma e `morph-15`, `morph-16` e `morph-17` passaram —
 removidos da lista (28 → 25 falhas conhecidas). Nenhum esperado foi alterado.
 
+**Atualização F4 (B5, 2026-10-03):** "texto" vira grupo de propriedades
+(cor do texto, conteúdo, tamanho da fonte) com C_PROP_FONT_SIZE novo; a
+leitura de grupo só vale quando a entidade aceita algum membro e o núcleo
+não é entidade. `morph-33` e `morph-34` passaram (5 → 3).
+
 **Atualização F3/F4 (2026-10-03):** verbo no passado/futuro deixa de ser
 comando (NOT_A_COMMAND); comparativo virou UNSUPPORTED_OPERATION com o span
 do sintagma; cores compostas (azul-claro, azul-escuro, verde-claro,

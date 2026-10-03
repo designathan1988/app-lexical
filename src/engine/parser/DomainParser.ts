@@ -913,6 +913,7 @@ export class DomainParser {
     cursor.index = start;
 
     this.parseNominalPrefix(cursor);
+    const headToken = cursor.peek();
     const propHead = this.parsePropertyHead(cursor);
     if (!propHead) {
       cursor.index = start;
@@ -945,6 +946,16 @@ export class DomainParser {
 
       const chain = this.parsePropertyChain(cursor, propHead, entityConceptId);
       return { command: { kind: 'UPDATE', target, mutations: [bound.mutation, ...chain], span: startSpan } };
+    }
+
+    // "deixe o texto azul": quando o núcleo também é uma ENTIDADE ("texto"),
+    // a leitura de alvo ("o texto") tem prioridade sobre a de grupo de
+    // propriedades sem possuidor — a leitura de grupo fica para o caminho
+    // "texto do botão". Sem entidade alternativa, o grupo segue valendo
+    // ("deixe a borda azul").
+    if (candidatesOfKind(headToken, this.ctx.concepts, 'ENTITY').length > 0) {
+      cursor.index = start;
+      return {};
     }
 
     this.skipValueConnector(cursor);
@@ -1793,12 +1804,27 @@ export class DomainParser {
 
     const group = candidatesOfKind(token, this.ctx.concepts, 'PROPERTY_GROUP')[0];
     if (group) {
-      cursor.consume();
-      return {
-        kind: 'PROPERTY_GROUP',
-        conceptId: group.conceptId,
-        concept: this.ctx.concepts[group.conceptId] as PropertyGroupConcept
-      };
+      const groupConcept = this.ctx.concepts[group.conceptId] as PropertyGroupConcept;
+      const entity = entityConceptId ? this.ctx.concepts[entityConceptId] : undefined;
+      // O grupo só serve se a entidade aceita ALGUM de seus membros; caso
+      // contrário, o token (que também é entidade, ex.: "texto") vale como
+      // núcleo nominal — "crie uma caixa com texto" cria um TEXT filho.
+      const accepted =
+        entity?.kind !== 'ENTITY' ||
+        groupConcept.members.some((member) =>
+          entity.capabilities.acceptedPropertyIds.includes(member)
+        );
+      const couldBeEntity = candidatesOfKind(token, this.ctx.concepts, 'ENTITY').length > 0;
+
+      if (accepted || !couldBeEntity) {
+        cursor.consume();
+        return {
+          kind: 'PROPERTY_GROUP',
+          conceptId: group.conceptId,
+          concept: groupConcept
+        };
+      }
+      return null;
     }
 
     return null;
