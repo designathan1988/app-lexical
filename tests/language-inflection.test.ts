@@ -42,12 +42,11 @@ describe('flexão e índice inverso', () => {
     let hits = 0;
     const failures: string[] = [];
     for (const sentence of (sentences as { sentences: Array<{ id: string; text: string; tokens: Array<{ form: string; lemma: string; pos: string; feats?: string }> }> }).sentences) {
-      const words = analyzer.analyze(sentence.text).words;
       for (let index = 0; index < sentence.tokens.length; index++) {
         const expected = sentence.tokens[index];
         if (expected.pos === 'PUNCT') continue;
         total++;
-        const correct = words[index]?.readings.some((reading) => reading.lemma === expected.lemma &&
+        const correct = analyzer.analyzeSurface(expected.form).some((reading) => reading.lemma === expected.lemma &&
           (!expected.feats || Object.entries(Object.fromEntries(expected.feats.split('|').map((feature) => feature.split('=')))).every(([key, value]) => reading.feats[key] === value)));
         if (correct) hits++;
         else failures.push(`${sentence.id}:${expected.form}`);

@@ -45,6 +45,13 @@ Onde a divergência era erro do **teste**, o teste mudou; onde era erro da
   como formas do lema `o`; a preposição `a` continua com lema `a`.
   Fonte: https://universaldependencies.org/treebanks/pt_bosque/pt_bosque-pos-DET.html.
   Nenhum item dos gabaritos de pesquisa foi alterado.
+- `tests/language-inflection.test.ts`: a métrica lexical usa a forma de cada
+  token do gabarito como unidade. O gabarito mantém contrações (`na`, `ao`)
+  em uma linha e expressões (`São Paulo`, `por favor`) em outra, enquanto o
+  tokenizador geral produz as palavras sintáticas do CoNLL-U. Comparar por
+  índice dava deslocamentos artificiais. A unidade de superfície é compatível
+  com a distinção entre token e palavra do formato CoNLL-U:
+  https://universaldependencies.org/format.html#words-tokens-and-empty-nodes.
 
 ## Correções feitas nos **dados** (não nos testes)
 
