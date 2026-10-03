@@ -564,6 +564,20 @@
       "note": "equivalente a V_AR_CED do projeto (orthography CEDILLA_TO_C), proposto aqui para o arquivo ficar autocontido."
     },
     {
+      "id": "ADJ_EL_EIS", "pos": "ADJECTIVE", "strip": "el",
+      "cells": [ { "feats": { "Number": "Sing" }, "suffix": "el" }, { "feats": { "Number": "Plur" }, "suffix": "eis" } ],
+      "examples": ["móvel", "possível", "estável"],
+      "golden": { "lemma": "móvel", "forms": { "Number=Sing": "móvel", "Number=Plur": "móveis" } },
+      "sources": [{ "ref": "Cunha & Cintra, Nova Gramática (plural de -el átono)", "verified": false, "note": "fato padrão; página não verificada" }]
+    },
+    {
+      "id": "ADJ_IL_EIS", "pos": "ADJECTIVE", "strip": "il",
+      "cells": [ { "feats": { "Number": "Sing" }, "suffix": "il" }, { "feats": { "Number": "Plur" }, "suffix": "eis" } ],
+      "examples": ["útil", "fácil", "difícil"],
+      "golden": { "lemma": "útil", "forms": { "Number=Sing": "útil", "Number=Plur": "úteis" } },
+      "sources": [{ "ref": "Cunha & Cintra, Nova Gramática (plural de -il átono)", "verified": false, "note": "fato padrão; página não verificada" }]
+    },
+    {
       "id": "V_GUER", "pos": "VERB", "strip": "guer",
       "cells": [
         { "feats": { "VerbForm": "Inf" }, "suffix": "guer" },
