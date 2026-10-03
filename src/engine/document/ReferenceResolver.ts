@@ -39,6 +39,8 @@ export class ReferenceResolver {
         throw new Error('NEW_ENTITY references must be resolved by ExecutionPlanner');
       case 'NODE_ID':
         return this.document.nodes.has(reference.nodeId) ? [reference.nodeId] : [];
+      case 'NODE_SET':
+        return reference.nodeIds.filter((id) => this.document.nodes.has(id));
       case 'SELECTOR':
         return this.resolveSelector(reference.selector, opts);
     }

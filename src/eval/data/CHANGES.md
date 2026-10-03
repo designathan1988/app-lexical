@@ -90,11 +90,18 @@ consciente da lista — o oráculo só encolhe).
 geração por paradigma e `morph-15`, `morph-16` e `morph-17` passaram —
 removidos da lista (28 → 25 falhas conhecidas). Nenhum esperado foi alterado.
 
+**Atualização F3.3.B (2026-10-03):** o segmentador de contrações/ênclise e a
+referência de grupo (`NODE_SET`) fizeram `morph-11`, `morph-12`, `morph-13` e
+`morph-14` passarem — removidos da lista (25 → 21). O esperado de `morph-14`
+foi alterado com justificativa semântica na tabela acima.
+
 ### Alterações de esperados existentes
 
 | Data | Registro | Campo | Antes | Depois | Motivo |
 |---|---|---|---|---|---|
 | 2026-10-03 | 139 registros de dev/regression (142 leituras) | `readings[].feats` | `Mood=Imp\|VerbForm=Fin`; `Person=3\|Mood=Ind\|…` | `Number=Sing\|Person=3\|Mood=Imp\|VerbForm=Fin`; `Number=Sing\|Person=3\|Mood=Ind\|…` | Justificativa linguística independente do motor: o imperativo de 3ª pessoa ("crie", "apague") e o indicativo de 3ª pessoa ("criou") são SINGULARES e de PESSOA 3 — a anotação anterior, feita sobre a morfologia legada incompleta, omitia pessoa e número. Com a geração por paradigma a análise passou a expressar os traços completos; a expectativa foi completada para descrever a análise CORRETA, não a saída do front-end antigo. |
+
+| 2026-10-03 | `morph-14` | `expected.ast` | `MOVE sel:C_ENT_BUTTON;all C_SPAT_INSIDE sel:C_ENT_CONTAINER` | `MOVE nodes:node_1,node_2 C_SPAT_INSIDE sel:C_ENT_CONTAINER` | Justificativa semântica independente do motor: o pronome plural "os" retoma **os botões mencionados** ("crie dois botões"), não "todos os botões que casam com o seletor" — se um terceiro botão existisse no documento, ele não seria movido. A referência de grupo (`NODE_SET`) é a representação fiel dessa leitura; o seletor `all` a sobre-generalizaria. O efeito sobre a árvore (os dois botões movidos para dentro da caixa) é o mesmo. |
 
 Nenhuma outra alteração de esperado existente. As alterações acima foram
 feitas nos registros `dev-*`, `reg-*` e `morph-*` listados no commit

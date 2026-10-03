@@ -8,12 +8,14 @@
  */
 export const KNOWN_MORPH_FAILURES = new Set([
   'morph-02', 'morph-03', 'morph-05', 'morph-06', 'morph-07', 'morph-08',
-  'morph-09', 'morph-11', 'morph-12', 'morph-13', 'morph-14',
+  'morph-09',
   'morph-20', 'morph-21', 'morph-22', 'morph-23',
   'morph-24', 'morph-25', 'morph-26', 'morph-27', 'morph-31', 'morph-33',
   'morph-34', 'morph-35', 'morph-36', 'morph-40'
 ]);
 // Consertados na F2 (diminutivos produtivos): morph-15, morph-16, morph-17.
+// Consertados na F3.3.B (contrações, ênclise e referência de grupo):
+// morph-11, morph-12, morph-13, morph-14.
 
 /** Falhas que não estão na lista de conhecidas. */
 export function unexpectedFailures(ids: string[]): string[] {

@@ -38,6 +38,8 @@ function astRefSig(ref: SemanticReference): string {
       return `new:${ref.tempId}`;
     case 'NODE_ID':
       return `node:${ref.nodeId}`;
+    case 'NODE_SET':
+      return `nodes:${ref.nodeIds.join(',')}`;
     case 'CURRENT_SELECTION':
       return 'selection';
     case 'SELECTOR':

@@ -11,7 +11,7 @@ import type { Diagnostic } from './diagnostics';
 import { diagnostic, normalizeSpan, dedupeDiagnostics } from './diagnostics';
 
 import { RawLexer } from './lexical/RawLexer';
-import { expandContractions } from './lexical/GrammarNormalizer';
+import { segmentTokens } from './lexical/Segmenter';
 import { MultiwordTrie } from './lexical/MultiwordTrie';
 import { LexicalIndex } from './lexical/LexicalIndex';
 import { SemanticTokenBuilder } from './parser/SemanticTokenBuilder';
@@ -98,7 +98,7 @@ export class SemanticCompiler {
 
   lexSemanticTokens(input: string): SemanticToken[] {
     const raw = this.lexer.lex(input);
-    const grammatical = expandContractions(raw);
+    const grammatical = segmentTokens(raw).tokens;
     return this.tokenBuilder.build(grammatical);
   }
 
@@ -107,9 +107,11 @@ export class SemanticCompiler {
     input: string
   ): { raw: RawToken[]; grammatical: RawToken[]; tokens: SemanticToken[]; diagnostics: Diagnostic[] } {
     const raw = this.lexer.lex(input);
-    const grammatical = expandContractions(raw);
+    // 3.B — segmentação de contrações e clíticos (mesóclise recusada com span).
+    const segmented = segmentTokens(raw);
+    const grammatical = segmented.tokens;
     const exact = this.tokenBuilder.build(grammatical);
-    const diagnostics: Diagnostic[] = [];
+    const diagnostics: Diagnostic[] = [...segmented.diagnostics];
     const tokens = this.recovery.apply(exact, diagnostics);
     return { raw, grammatical, tokens, diagnostics };
   }

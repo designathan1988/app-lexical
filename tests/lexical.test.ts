@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { RawLexer } from '../src/engine/lexical/RawLexer';
-import { expandContractions } from '../src/engine/lexical/GrammarNormalizer';
+import { segmentTokens } from '../src/engine/lexical/Segmenter';
 import { PortuguesePhonetic } from '../src/engine/lexical/PortuguesePhonetic';
 import { MultiwordTrie } from '../src/engine/lexical/MultiwordTrie';
 import { LexicalIndex } from '../src/engine/lexical/LexicalIndex';
@@ -57,17 +57,17 @@ describe('RawLexer.lex (tokenização não destrutiva)', () => {
   });
 });
 
-describe('expandContractions', () => {
+describe('segmentTokens (contrações)', () => {
   const lexer = new RawLexer();
 
   it('expande do/da/dele/dela', () => {
-    const tokens = expandContractions(lexer.lex('da dele dela'));
+    const tokens = segmentTokens(lexer.lex('da dele dela')).tokens;
     const words = tokens.filter((t) => t.type === 'WORD').map((t) => t.raw);
     expect(words).toEqual(['de', 'a', 'de', 'ele', 'de', 'ela']);
   });
 
   it('não transforma contrações em conceitos', () => {
-    const tokens = expandContractions(lexer.lex('do'));
+    const tokens = segmentTokens(lexer.lex('do')).tokens;
     expect(tokens.map((t) => t.raw)).toEqual(['de', 'o']);
   });
 });
@@ -92,7 +92,7 @@ describe('MultiwordTrie', () => {
   it('reconhece expressões com contração expandida (cor do texto)', () => {
     const kb = createInitialKnowledgeBase();
     const trie = new MultiwordTrie(kb.multiwords);
-    const tokens = expandContractions(new RawLexer().lex('cor do texto'));
+    const tokens = segmentTokens(new RawLexer().lex('cor do texto')).tokens;
     const m = trie.match(tokens, 0)!;
     expect(m.entry.conceptId).toBe('C_PROP_TEXT_COLOR');
   });

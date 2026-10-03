@@ -18,6 +18,15 @@ export interface NodeIdRef {
   nodeId: string;
 }
 
+/**
+ * Grupo de nós citados explicitamente por uma menção plural ("os", "elas"):
+ * refere-se exatamente aos nós mencionados, não a "todos os que casam".
+ */
+export interface NodeSetRef {
+  kind: 'NODE_SET';
+  nodeIds: string[];
+}
+
 export interface SelectorRef {
   kind: 'SELECTOR';
   selector: SemanticSelector;
@@ -27,7 +36,12 @@ export interface SelectionRef {
   kind: 'CURRENT_SELECTION';
 }
 
-export type SemanticReference = NewEntityRef | NodeIdRef | SelectorRef | SelectionRef;
+export type SemanticReference =
+  | NewEntityRef
+  | NodeIdRef
+  | NodeSetRef
+  | SelectorRef
+  | SelectionRef;
 
 export interface PropertyFilter {
   propertyConceptId: ConceptId;

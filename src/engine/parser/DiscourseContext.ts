@@ -66,9 +66,22 @@ export class DiscourseContext {
   commit(tempToNode: Record<TempNodeId, DocumentNodeId>, liveness?: Liveness): void {
     for (const mention of this.staging) {
       if (mention.reference.kind === 'NEW_ENTITY') {
-        const nodeId = tempToNode[mention.reference.tempId];
-        if (!nodeId) continue;
-        mention.reference = { kind: 'NODE_ID', nodeId };
+        const tempId = mention.reference.tempId;
+        // Criação plural: a menção agrupa TODAS as instâncias do temp
+        // ("tmp_1" → "tmp_1_1", "tmp_1_2") numa referência de grupo.
+        const instanceIds = Object.entries(tempToNode)
+          .filter(([temp]) => temp.startsWith(`${tempId}_`))
+          .map(([, nodeId]) => nodeId);
+        const ids = instanceIds.length
+          ? instanceIds
+          : tempToNode[tempId]
+            ? [tempToNode[tempId]]
+            : [];
+        if (!ids.length) continue;
+        mention.reference =
+          ids.length === 1
+            ? { kind: 'NODE_ID', nodeId: ids[0] }
+            : { kind: 'NODE_SET', nodeIds: ids };
         this.mentions.push(mention);
         continue;
       }
@@ -105,6 +118,16 @@ export class DiscourseContext {
       if (mention.reference.kind === 'SELECTOR' && liveness) {
         return liveness(mention.reference.selector) > 0;
       }
+      if (mention.reference.kind === 'NODE_SET') {
+        mention.reference = {
+          kind: 'NODE_SET',
+          nodeIds: mention.reference.nodeIds.filter((id) => {
+            const node = lookup(id);
+            return node && (!mention.entityConceptId || node.entityConceptId === mention.entityConceptId);
+          })
+        };
+        return mention.reference.nodeIds.length > 0;
+      }
       return true;
     });
   }
@@ -134,6 +157,12 @@ export class DiscourseContext {
         const count = liveness(mention.reference.selector);
         // Só serve como antecedente se apontar para exatamente um elemento.
         if (count !== 1) continue;
+        return mention;
+      }
+
+      if (mention.reference.kind === 'NODE_SET') {
+        const alive = mention.reference.nodeIds.filter((id) => lookup(id));
+        if (!alive.length) continue;
         return mention;
       }
 

@@ -1,5 +1,5 @@
 import { RawLexer, type RawToken } from './RawLexer';
-import { expandContractions } from './GrammarNormalizer';
+import { segmentTokens } from './Segmenter';
 import type { MultiwordEntry } from '../types';
 
 interface TrieNode {
@@ -25,7 +25,7 @@ export class MultiwordTrie {
 
   private phraseWords(phrase: string): string[] {
     const tokens = this.lexer.lex(phrase);
-    const expanded = expandContractions(tokens);
+    const expanded = segmentTokens(tokens).tokens;
     return expanded
       .filter((t) => t.normalized)
       .map((t) => t.normalized!);

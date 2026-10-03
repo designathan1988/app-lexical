@@ -21,6 +21,16 @@ export interface RawToken {
   end: number;
   value?: string | number;
   unit?: string;
+  /**
+   * Marca de clítico (3.B): o token foi produzido pela segmentação de uma
+   * ênclise ("deixe-a" → "deixe" + "a") e deve ser analisado como pronome.
+   */
+  clitic?: {
+    pronoun: string;
+    gender?: 'Masc' | 'Fem';
+    number?: 'Sing' | 'Plur';
+    restoreInfinitiveR?: boolean;
+  };
 }
 
 export class RawLexer {

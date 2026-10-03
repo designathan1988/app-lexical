@@ -5505,7 +5505,7 @@
         "crie uma caixa"
       ],
       "expected": {
-        "ast": "MOVE sel:C_ENT_BUTTON;all C_SPAT_INSIDE sel:C_ENT_CONTAINER",
+        "ast": "MOVE nodes:node_1,node_2 C_SPAT_INSIDE sel:C_ENT_CONTAINER",
         "plan": "MOVE_NODE node_1 C_SPAT_INSIDE node:node_3\nMOVE_NODE node_2 C_SPAT_INSIDE node:node_3",
         "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}\n  C_ENT_BUTTON{}",
         "resolvedReferences": [

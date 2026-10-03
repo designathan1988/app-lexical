@@ -101,6 +101,32 @@ export class SemanticTokenBuilder {
         const lexical = this.lexicalIndex.resolve(token.raw);
         const candidates: ConceptCandidate[] = [];
 
+        // Clítico (3.B): "deixe-a" → "a" é pronome acusativo, não artigo.
+        // A leitura pronominal vem primeiro; a resolução anafórica é do
+        // discurso, não do índice.
+        if (token.clitic) {
+          const lexemeId =
+            token.clitic.gender === 'Fem'
+              ? token.clitic.number === 'Plur'
+                ? 'LEX_ELAS'
+                : 'LEX_ELA'
+              : token.clitic.number === 'Plur'
+                ? 'LEX_ELES'
+                : 'LEX_ELE';
+          candidates.push({
+            conceptId: GRAMMATICAL_CONCEPT,
+            lexemeId,
+            score: 1,
+            source: 'EXACT',
+            morphology: {
+              gender: token.clitic.gender === 'Fem' ? 'FEM' : 'MASC',
+              number: token.clitic.number === 'Plur' ? 'PLURAL' : 'SINGULAR'
+            },
+            pos: 'PRONOUN',
+            matchedForm: token.raw
+          });
+        }
+
         for (const candidate of lexical) {
           const senses = candidate.lexeme.senseConceptIds.filter((id) => this.concepts[id]);
 
