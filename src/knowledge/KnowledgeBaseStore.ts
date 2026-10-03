@@ -11,6 +11,7 @@ import {
   DEFAULT_ENGINE_SETTINGS,
   type EngineSettings
 } from '../engine/EngineSettings';
+import { migrateKnowledgeBase, describeMigration, KB_DATA_VERSION } from './migrateKnowledgeBase';
 
 export type { EngineSettings };
 export const DEFAULT_SETTINGS: EngineSettings = DEFAULT_ENGINE_SETTINGS;
@@ -37,7 +38,9 @@ export interface TrainingRecord {
   createdAt: number;
 }
 
-const STORAGE_KEY = 'lexical.knowledgeBase.v1';
+const STORAGE_KEY = 'lexical.knowledgeBase.v2';
+/** Chaves de versões anteriores, migradas na primeira abertura. */
+const LEGACY_STORAGE_KEYS = ['lexical.knowledgeBase.v1'];
 
 /** Armazenamento tolerante a falhas: nunca lança, sempre degrada com aviso. */
 interface PersistResult {
@@ -87,6 +90,8 @@ export class KnowledgeBaseStore {
   training: TrainingRecord[] = [];
   lastPersistError: string | null = null;
   lastRestoreError: string | null = null;
+  /** Relatório da migração de uma base salva antiga (exibido no painel). */
+  migrationNotice: string | null = null;
   private listeners = new Set<() => void>();
   private versionCounter = 0;
   private trainingCounter = 0;
@@ -123,12 +128,40 @@ export class KnowledgeBaseStore {
 
   // ---- Persistência ---------------------------------------------------------
 
+  /**
+   * Adota uma base vinda de fora (localStorage ou backup importado): se o
+   * formato for antigo, migra para a fábrica atual preservando as adições do
+   * usuário; sempre regenera as formas a partir dos lemas.
+   */
+  private adoptKnowledgeBase(incoming: KnowledgeBase, dataVersion?: number): KnowledgeBase {
+    if (dataVersion === KB_DATA_VERSION) {
+      this.kb = incoming;
+    } else {
+      const migrated = migrateKnowledgeBase(incoming, dataVersion ?? null);
+      this.kb = migrated.kb;
+      this.migrationNotice = describeMigration(migrated.report);
+    }
+    this.rebuildGeneratedForms();
+    return this.kb;
+  }
+
   /** Carrega o estado salvo. Retorna false se não houver nada ou falhar. */
   restore(): boolean {
-    const raw = safeGetItem(STORAGE_KEY);
+    let raw = safeGetItem(STORAGE_KEY);
+    let legacyKey: string | null = null;
+    if (!raw) {
+      for (const key of LEGACY_STORAGE_KEYS) {
+        raw = safeGetItem(key);
+        if (raw) {
+          legacyKey = key;
+          break;
+        }
+      }
+    }
     if (!raw) return false;
     try {
       const parsed = JSON.parse(raw) as {
+        dataVersion?: number;
         knowledgeBase?: KnowledgeBase;
         settings?: EngineSettings;
         versions?: KBVersion[];
@@ -136,12 +169,16 @@ export class KnowledgeBaseStore {
       };
       if (!parsed.knowledgeBase) return false;
 
-      this.kb = parsed.knowledgeBase;
+      this.kb = this.adoptKnowledgeBase(parsed.knowledgeBase, parsed.dataVersion);
       this.settings = { ...DEFAULT_SETTINGS, ...(parsed.settings ?? {}) };
       this.versions = parsed.versions ?? [];
       this.training = parsed.training ?? [];
       this.versionCounter = this.versions.length;
       this.trainingCounter = this.training.length;
+      if (this.migrationNotice || legacyKey) {
+        this.persist();
+        if (legacyKey) safeRemoveItem(legacyKey);
+      }
       return true;
     } catch (error) {
       this.lastRestoreError = `Falha ao restaurar: ${(error as Error).message}`;
@@ -159,6 +196,7 @@ export class KnowledgeBaseStore {
   private persist(): void {
     if (!this.persistEnabled) return;
     const payload = JSON.stringify({
+      dataVersion: KB_DATA_VERSION,
       knowledgeBase: this.kb,
       settings: this.settings,
       versions: this.versions,
@@ -177,6 +215,8 @@ export class KnowledgeBaseStore {
     this.versionCounter = 0;
     this.trainingCounter = 0;
     safeRemoveItem(STORAGE_KEY);
+    for (const key of LEGACY_STORAGE_KEYS) safeRemoveItem(key);
+    this.migrationNotice = null;
     this.snapshotVersion('Base de fábrica');
     this.emit();
   }
@@ -505,15 +545,22 @@ export class KnowledgeBaseStore {
   // ---- Import / Export --------------------------------------------------------
 
   exportJSON(): string {
-    return JSON.stringify({ knowledgeBase: this.kb, settings: this.settings }, null, 2);
+    return JSON.stringify(
+      { dataVersion: KB_DATA_VERSION, knowledgeBase: this.kb, settings: this.settings },
+      null,
+      2
+    );
   }
 
   importJSON(json: string): void {
-    const parsed = JSON.parse(json) as { knowledgeBase: KnowledgeBase; settings?: EngineSettings };
+    const parsed = JSON.parse(json) as {
+      dataVersion?: number;
+      knowledgeBase: KnowledgeBase;
+      settings?: EngineSettings;
+    };
     if (parsed.knowledgeBase) {
-      this.kb = parsed.knowledgeBase;
+      this.kb = this.adoptKnowledgeBase(parsed.knowledgeBase, parsed.dataVersion);
       if (parsed.settings) this.settings = { ...DEFAULT_SETTINGS, ...parsed.settings };
-      this.rebuildGeneratedForms();
       this.emit();
     }
   }

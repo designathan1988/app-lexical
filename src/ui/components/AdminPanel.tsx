@@ -67,6 +67,7 @@ export function AdminPanel({ engine, store, onChange }: Props) {
       </aside>
 
       <main className="admin-body">
+        {store.migrationNotice && <p className="ok">{store.migrationNotice}</p>}
         {tab === 'dados' && <DataSection engine={engine} store={store} onChange={bump} />}
         {tab === 'paradigmas' && <ParadigmSection engine={engine} store={store} onChange={bump} />}
         {tab === 'treinamento' && (

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import type { SemanticEngine } from '../../../engine/SemanticEngine';
 import type { KnowledgeBaseStore } from '../../../knowledge/KnowledgeBaseStore';
-import type { SurfaceForm, ConceptId, ValueCategory, PartOfSpeech } from '../../../engine/types';
+import type { SurfaceForm, ConceptId, ValueCategory, PartOfSpeech, Lexeme } from '../../../engine/types';
 import type { ConceptNode } from '../../../engine/ontology/Concept';
 
 interface Props {
@@ -92,7 +92,7 @@ export function DataSection({ engine, store, onChange }: Props) {
       <div className="entity-switch">
         {(
           [
-            ['surface', `SurfaceForms (${store.kb.surfaceForms.length})`],
+            ['surface', `Lemas e formas (${Object.keys(lexemes).length})`],
             ['lexeme', `Lexemas (${Object.keys(lexemes).length})`],
             ['concept', `Conceitos (${Object.keys(concepts).length})`],
             ['mwe', `Multiwords (${store.kb.multiwords.length})`]
@@ -109,18 +109,14 @@ export function DataSection({ engine, store, onChange }: Props) {
       {entity === 'surface' && (
         <SurfaceTable
           list={surfaceList}
-          lexemeIds={Object.keys(lexemes)}
+          lexemes={lexemes}
           onAdd={(sf) => {
             store.addSurfaceForm(sf);
-            notify(`SurfaceForm "${sf.rawText}" adicionada.`);
+            notify(`Exceção "${sf.rawText}" adicionada ao lema ${sf.lexemeId}.`);
           }}
           onRemove={(id) => {
             store.removeSurfaceForm(id);
-            notify('SurfaceForm removida.');
-          }}
-          onUpdate={(id, patch) => {
-            store.updateSurfaceForm(id, patch);
-            notify('SurfaceForm atualizada.');
+            notify('Exceção removida.');
           }}
         />
       )}
@@ -187,33 +183,105 @@ export function DataSection({ engine, store, onChange }: Props) {
   );
 }
 
+/**
+ * Léxico por LEMA: uma linha por lexema (ex.: LEX_CRIAR) com todas as suas
+ * formas — geradas pelo paradigma ou pelo próprio lema — dentro dela. Formas
+ * manuais existem só como EXCEÇÃO (erro de digitação, coloquial, abreviação,
+ * forma supletiva); o id delas é derivado do lema, nunca digitado.
+ */
 function SurfaceTable({
   list,
-  lexemeIds,
+  lexemes,
   onAdd,
-  onRemove,
-  onUpdate
+  onRemove
 }: {
   list: SurfaceForm[];
-  lexemeIds: string[];
+  lexemes: Record<string, Lexeme>;
   onAdd: (sf: SurfaceForm) => void;
   onRemove: (id: string) => void;
-  onUpdate: (id: string, patch: Partial<SurfaceForm>) => void;
 }) {
-  const [newId, setNewId] = useState('');
+  const lexemeIds = Object.keys(lexemes);
   const [newText, setNewText] = useState('');
   const [newLexeme, setNewLexeme] = useState(lexemeIds[0] ?? '');
-  const [newType, setNewType] = useState<SurfaceForm['formType']>('CANONICAL');
+  const [newType, setNewType] = useState<SurfaceForm['formType']>('MISSPELLING');
 
-  const generated = list.filter((sf) => sf.generated);
-  const manual = list.filter((sf) => !sf.generated);
+  const byLexeme = useMemo(() => {
+    const groups = new Map<string, SurfaceForm[]>();
+    for (const sf of list) {
+      const group = groups.get(sf.lexemeId) ?? [];
+      group.push(sf);
+      groups.set(sf.lexemeId, group);
+    }
+    return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b));
+  }, [list]);
+
+  const exceptions = list.filter((sf) => !sf.generated);
 
   return (
     <>
+      <h4>
+        Lemas e suas formas ({byLexeme.length} lemas · {list.length} formas)
+      </h4>
+      <p className="details">
+        Cada lema tem um único identificador; as derivações (flexões, diminutivos) são geradas
+        pelo paradigma. Para incluir uma palavra nova, cadastre o <strong>lema</strong> na aba
+        Lexemas.
+      </p>
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>ID do lema</th>
+            <th>lema</th>
+            <th>classe</th>
+            <th>paradigma</th>
+            <th>formas</th>
+          </tr>
+        </thead>
+        <tbody>
+          {byLexeme.map(([lexemeId, forms]) => {
+            const lexeme = lexemes[lexemeId];
+            const surfaces = [...new Set(forms.map((f) => f.rawText))];
+            return (
+              <tr key={lexemeId}>
+                <td><code>{lexemeId}</code></td>
+                <td>{lexeme?.lemma ?? '—'}</td>
+                <td className="details">{lexeme?.pos ?? '—'}</td>
+                <td className="details"><code>{lexeme?.paradigmId ?? 'invariável'}</code></td>
+                <td>
+                  <details>
+                    <summary>
+                      {surfaces.length} {surfaces.length === 1 ? 'forma' : 'formas'}:{' '}
+                      {surfaces.slice(0, 6).join(', ')}
+                      {surfaces.length > 6 ? ', …' : ''}
+                    </summary>
+                    <table className="data-table">
+                      <tbody>
+                        {forms.map((sf) => (
+                          <tr key={sf.id}>
+                            <td>{sf.rawText}</td>
+                            <td className="details"><code>{sf.features || '—'}</code></td>
+                            <td className="details">{sf.generated ? 'gerada' : `exceção (${sf.formType})`}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </details>
+                </td>
+              </tr>
+            );
+          })}
+          {byLexeme.length === 0 && (
+            <tr>
+              <td colSpan={5} className="details">Nenhum lema neste filtro.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+
+      <h4>Exceções fora do paradigma ({exceptions.length})</h4>
       <div className="add-row">
-        <input placeholder="ID" value={newId} onChange={(e) => setNewId(e.target.value)} />
         <input
-          placeholder="forma escrita"
+          placeholder="forma escrita (ex.: erro comum)"
           value={newText}
           onChange={(e) => setNewText(e.target.value)}
         />
@@ -228,95 +296,44 @@ function SurfaceTable({
           value={newType}
           onChange={(e) => setNewType(e.target.value as SurfaceForm['formType'])}
         >
-          {['CANONICAL', 'INFLECTION', 'COLLOQUIAL', 'MISSPELLING', 'ABBREVIATION'].map((t) => (
+          {['MISSPELLING', 'COLLOQUIAL', 'ABBREVIATION', 'INFLECTION'].map((t) => (
             <option key={t} value={t}>
-              {t}
+              {t === 'INFLECTION' ? 'INFLECTION (supletiva)' : t}
             </option>
           ))}
         </select>
         <button
           onClick={() => {
-            if (!newId || !newText || !newLexeme) return;
-            onAdd({ id: newId, rawText: newText, lexemeId: newLexeme, formType: newType });
-            setNewId('');
+            const text = newText.trim();
+            if (!text || !newLexeme) return;
+            // Id derivado do lema: nunca digitado à mão.
+            onAdd({
+              id: `${newLexeme}#${newType}:${text.toLowerCase()}`,
+              rawText: text,
+              lexemeId: newLexeme,
+              formType: newType
+            });
             setNewText('');
           }}
         >
-          Adicionar
+          Adicionar exceção
         </button>
       </div>
-
-      <h4>Formas geradas por paradigma (somente leitura)</h4>
       <table className="data-table">
         <thead>
           <tr>
             <th>forma</th>
-            <th>lexema</th>
-            <th>traços</th>
-            <th>selo</th>
-          </tr>
-        </thead>
-        <tbody>
-          {generated.map((sf) => (
-            <tr key={sf.id}>
-              <td>{sf.rawText}</td>
-              <td><code>{sf.lexemeId}</code></td>
-              <td className="details"><code>{sf.features ?? ''}</code></td>
-              <td><span className="details">gerada</span></td>
-            </tr>
-          ))}
-          {generated.length === 0 && (
-            <tr>
-              <td colSpan={4} className="details">Nenhuma forma gerada neste filtro.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-
-      <h4>Formas manuais (erro, coloquial, abreviação, sinônimo, exceção)</h4>
-      <table className="data-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>forma</th>
-            <th>lexema</th>
+            <th>lema</th>
             <th>tipo</th>
             <th>ações</th>
           </tr>
         </thead>
         <tbody>
-          {manual.map((sf) => (
+          {exceptions.map((sf) => (
             <tr key={sf.id}>
-              <td><code>{sf.id}</code></td>
               <td>{sf.rawText}</td>
-              <td>
-                <select
-                  value={sf.lexemeId}
-                  onChange={(e) => onUpdate(sf.id, { lexemeId: e.target.value })}
-                >
-                  {lexemeIds.map((id) => (
-                    <option key={id} value={id}>
-                      {id}
-                    </option>
-                  ))}
-                </select>
-              </td>
-              <td>
-                <select
-                  value={sf.formType}
-                  onChange={(e) =>
-                    onUpdate(sf.id, { formType: e.target.value as SurfaceForm['formType'] })
-                  }
-                >
-                  {['CANONICAL', 'INFLECTION', 'COLLOQUIAL', 'MISSPELLING', 'ABBREVIATION'].map(
-                    (t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    )
-                  )}
-                </select>
-              </td>
+              <td><code>{sf.lexemeId}</code></td>
+              <td className="details">{sf.formType}</td>
               <td>
                 <button className="danger" onClick={() => onRemove(sf.id)}>
                   remover
