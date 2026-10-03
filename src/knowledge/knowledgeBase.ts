@@ -312,10 +312,10 @@ export const INITIAL_CONCEPTS: Record<ConceptId, ConceptNode> = {
   C_SPAT_AFTER: { kind: 'SPATIAL', id: 'C_SPAT_AFTER', relation: 'AFTER' },
   C_SPAT_BEFORE: { kind: 'SPATIAL', id: 'C_SPAT_BEFORE', relation: 'BEFORE' },
   C_SPAT_BESIDE: { kind: 'SPATIAL', id: 'C_SPAT_BESIDE', relation: 'BESIDE' },
-  C_SPAT_ABOVE: { kind: 'SPATIAL', id: 'C_SPAT_ABOVE', relation: 'ABOVE' },
-  C_SPAT_BELOW: { kind: 'SPATIAL', id: 'C_SPAT_BELOW', relation: 'BELOW' },
-  C_SPAT_LEFT: { kind: 'SPATIAL', id: 'C_SPAT_LEFT', relation: 'BESIDE' },
-  C_SPAT_RIGHT: { kind: 'SPATIAL', id: 'C_SPAT_RIGHT', relation: 'BESIDE' },
+  C_SPAT_ABOVE: { kind: 'SPATIAL', id: 'C_SPAT_ABOVE', relation: 'ABOVE', direction: 'TOPMOST' },
+  C_SPAT_BELOW: { kind: 'SPATIAL', id: 'C_SPAT_BELOW', relation: 'BELOW', direction: 'BOTTOMMOST' },
+  C_SPAT_LEFT: { kind: 'SPATIAL', id: 'C_SPAT_LEFT', relation: 'BESIDE', direction: 'LEFTMOST' },
+  C_SPAT_RIGHT: { kind: 'SPATIAL', id: 'C_SPAT_RIGHT', relation: 'BESIDE', direction: 'RIGHTMOST' },
 
   // --- Operadores gramaticais (DADOS) -------------------------------------------
 

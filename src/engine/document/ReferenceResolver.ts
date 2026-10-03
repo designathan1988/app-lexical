@@ -211,7 +211,9 @@ export class ReferenceResolver {
       candidates: nodes.map((n) => n.id)
     });
 
-    return nodes;
+    // Ambiguidade fatal: NENHUM alvo é devolvido — o plano não pode ganhar
+    // passos para uma referência que o motor se recusa a escolher.
+    return settings?.ambiguityIsFatal ? [] : nodes;
   }
 
   private applyDirection(
@@ -228,7 +230,20 @@ export class ReferenceResolver {
           'Sem métricas de layout disponíveis, a ordem espacial cai na ordem do documento.',
         layer: opts.layer ?? 'resolver'
       });
-      return nodes;
+      // B4 — Sem rect, o eixo cai na ordem do documento: RIGHTMOST/BOTTOMMOST
+      // são o ÚLTIMO; LEFTMOST/TOPMOST são o PRIMEIRO.
+      switch (direction) {
+        case 'RIGHTMOST':
+        case 'BOTTOMMOST': {
+          const last = nodes[nodes.length - 1];
+          return last ? [last] : [];
+        }
+        case 'LEFTMOST':
+        case 'TOPMOST': {
+          const first = nodes[0];
+          return first ? [first] : [];
+        }
+      }
     }
 
     const score = (node: DocumentNode): number => {
@@ -245,6 +260,11 @@ export class ReferenceResolver {
       }
     };
 
-    return withRect.slice().sort((a, b) => score(a) - score(b));
+    const sorted = withRect.slice().sort((a, b) => score(a) - score(b));
+    // B4 — Empate no eixo (dentro da tolerância): devolve os empatados; a
+    // ambiguidade é decidida pela camada de referência, não por sorte.
+    const tolerance = opts.settings?.directionTieTolerance ?? 1;
+    const best = score(sorted[0]);
+    return sorted.filter((node) => Math.abs(score(node) - best) <= tolerance);
   }
 }

@@ -140,18 +140,22 @@ export class ExecutionPlanner {
       const targets = this.expandReference(placement.target, groupMap, resolver, plan);
 
       if (!targets.length) {
-        plan.diagnostics.push(
-          diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
-            'O alvo do posicionamento não foi encontrado no documento.', placement.span)
-        );
+        if (!this.hasAmbiguity(plan)) {
+          plan.diagnostics.push(
+            diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
+              'O alvo do posicionamento não foi encontrado no documento.', placement.span)
+          );
+        }
         continue;
       }
 
       if (!sources.length) {
-        plan.diagnostics.push(
-          diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
-            'A origem do posicionamento não foi encontrada.', placement.span)
-        );
+        if (!this.hasAmbiguity(plan)) {
+          plan.diagnostics.push(
+            diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
+              'A origem do posicionamento não foi encontrada.', placement.span)
+          );
+        }
         continue;
       }
 
@@ -234,10 +238,12 @@ export class ExecutionPlanner {
     const nodeIds = resolver.resolve(command.target, this.resolveOptions(plan));
 
     if (!nodeIds.length) {
-      plan.diagnostics.push(
-        diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
-          'O alvo da atualização não foi encontrado.', command.span)
-      );
+      if (!this.hasAmbiguity(plan)) {
+        plan.diagnostics.push(
+          diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
+            'O alvo da atualização não foi encontrado.', command.span)
+        );
+      }
       return;
     }
 
@@ -267,10 +273,12 @@ export class ExecutionPlanner {
     }
 
     if (!nodeIds.length) {
-      plan.diagnostics.push(
-        diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
-          'O alvo da exclusão não foi encontrado.', command.span)
-      );
+      if (!this.hasAmbiguity(plan)) {
+        plan.diagnostics.push(
+          diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
+            'O alvo da exclusão não foi encontrado.', command.span)
+        );
+      }
     }
   }
 
@@ -290,10 +298,12 @@ export class ExecutionPlanner {
     );
 
     if (!sourceIds.length) {
-      plan.diagnostics.push(
-        diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
-          'O elemento a mover não foi encontrado.', command.span)
-      );
+      if (!this.hasAmbiguity(plan)) {
+        plan.diagnostics.push(
+          diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
+            'O elemento a mover não foi encontrado.', command.span)
+        );
+      }
       return;
     }
 
@@ -326,10 +336,12 @@ export class ExecutionPlanner {
   ): void {
     const ids = resolver.resolve(command.target, this.resolveOptions(plan));
     if (!ids.length) {
-      plan.diagnostics.push(
-        diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
-          'Nenhum elemento corresponde à seleção pedida.', command.span)
-      );
+      if (!this.hasAmbiguity(plan)) {
+        plan.diagnostics.push(
+          diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
+            'Nenhum elemento corresponde à seleção pedida.', command.span)
+        );
+      }
       return;
     }
     for (const nodeId of ids) {
@@ -351,6 +363,12 @@ export class ExecutionPlanner {
       liveness: this.liveness,
       layer: this.layerForReference
     };
+  }
+
+
+  /** A referência deste comando já falhou com AMBIGUOUS_REFERENCE (sem cascata). */
+  private hasAmbiguity(plan: ExecutionPlan): boolean {
+    return plan.diagnostics.some((d) => d.code === 'AMBIGUOUS_REFERENCE');
   }
 
   private expandReference(

@@ -22,6 +22,19 @@ describe('A9 — relações espaciais por posição real', () => {
     );
     expect(ids).toHaveLength(1);
     expect(diagnostics.some((d) => d.code === 'ORDER_FALLBACK')).toBe(true);
+    // B4: sem rect, "da direita" é o ÚLTIMO na ordem do documento (o teste
+    // anterior esperava o primeiro — ordem do Map, não ordem do documento).
+    expect(ids[0]).toBe(Array.from(store.document.nodes.keys())[2]);
+  });
+
+  it('sem rect, "da esquerda" é o PRIMEIRO na ordem do documento', () => {
+    const store = seeded();
+    const diagnostics: Diagnostic[] = [];
+    const ids = new ReferenceResolver(store.document).resolveSelector(
+      { entityConceptId: 'C_ENT_BUTTON', direction: 'LEFTMOST', quantity: { mode: 'ONE' } },
+      { diagnostics, settings: DEFAULT_ENGINE_SETTINGS }
+    );
+    expect(ids).toHaveLength(1);
     expect(ids[0]).toBe(Array.from(store.document.nodes.keys())[0]);
   });
 

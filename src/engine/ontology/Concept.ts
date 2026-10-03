@@ -88,6 +88,11 @@ export interface SpatialConcept {
   kind: 'SPATIAL';
   id: ConceptId;
   relation: SpatialRelation;
+  /**
+   * B4 — Eixo espacial, quando o marcador nomeia uma EXTREMIDADE
+   * ("da direita" → RIGHTMOST). Ausente em relações de posicionamento.
+   */
+  direction?: 'LEFTMOST' | 'RIGHTMOST' | 'TOPMOST' | 'BOTTOMMOST';
 }
 
 /**

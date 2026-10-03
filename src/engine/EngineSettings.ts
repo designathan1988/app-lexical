@@ -26,6 +26,11 @@ export interface EngineSettings {
   ambiguityIsFatal: boolean;
   /** Após um comando bem-sucedido, a seleção passa a ser os nós afetados. */
   selectAfterCommand: boolean;
+  /**
+   * B4 — Empate no eixo espacial (em px): nós a menos desta tolerância do
+   * melhor são empatados e a referência fica ambígua.
+   */
+  directionTieTolerance: number;
 }
 
 export const DEFAULT_ENGINE_SETTINGS: EngineSettings = {
@@ -36,5 +41,6 @@ export const DEFAULT_ENGINE_SETTINGS: EngineSettings = {
   destructiveRequiresExact: true,
   ambiguityWarningEnabled: true,
   ambiguityIsFatal: true,
-  selectAfterCommand: true
+  selectAfterCommand: true,
+  directionTieTolerance: 1
 };

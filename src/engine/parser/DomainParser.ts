@@ -1391,11 +1391,16 @@ export class DomainParser {
       this.emitVagueQuantifier(startSpan);
     }
 
+    // 3.G — Número e definitude: definido plural sem numeral vale por TODOS
+    // os que casam com os filtros ("apague os botões azuis" → os dois azuis).
+    const definitePlural =
+      prefix.definiteness === 'DEFINITE' && number === 'PLURAL' && prefix.quantity === null;
+
     const selector: SemanticSelector = {
       entityConceptId,
       elidedFrom,
       quantity:
-        prefix.quantity === 'ALL'
+        prefix.quantity === 'ALL' || definitePlural
           ? { mode: 'ALL' }
           : typeof prefix.quantity === 'number'
             ? { mode: 'COUNT', count: prefix.quantity }
@@ -1423,6 +1428,15 @@ export class DomainParser {
           };
         }
       }
+    }
+
+    // B4 — Direção: "o botão da direita", "mais à esquerda", "de cima".
+    // O marcador espacial de eixo restringe o seletor ao nó extremo naquela
+    // direção (ordem do documento quando não há métricas de layout).
+    const directional = this.peekSpatial(cursor);
+    if (directional && 'direction' in directional && directional.direction) {
+      cursor.consume();
+      selector.direction = directional.direction;
     }
 
     // "o botão dentro da caixa" — containment restringe o seletor ao pai.
