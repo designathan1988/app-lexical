@@ -34,7 +34,9 @@ export class ExecutionPlanner {
     private discourse?: DiscourseContext,
     private nodeLookup?: NodeLookup,
     private liveness?: Liveness,
-    private layerForReference = 'planner'
+    private layerForReference = 'planner',
+    /** Diagnósticos do parser, para a resolução não cascatear (B2). */
+    private priorDiagnostics: Array<{ severity: string; code?: string; start?: number; end?: number }> = []
   ) {}
 
   private stepId(): string {
@@ -49,11 +51,15 @@ export class ExecutionPlanner {
     for (const command of ast.commands) {
       switch (command.kind) {
         case 'NO_OP':
-          plan.diagnostics.push(
-            diagnostic('planner', 'INFO', 'NEGATED_ACTION',
-              'A ação pedida foi explicitamente negada; nada foi executado.',
-              command.span, { subcode: command.negatedOperation })
-          );
+          // B1 — UNKNOWN_COMMAND já foi reportado como UNKNOWN_WORD no
+          // parser; não é negação e não ganha INFO de NEGATED_ACTION.
+          if (command.reason === 'NEGATED_ACTION') {
+            plan.diagnostics.push(
+              diagnostic('planner', 'INFO', 'NEGATED_ACTION',
+                'A ação pedida foi explicitamente negada; nada foi executado.',
+                command.span, { subcode: command.negatedOperation })
+            );
+          }
           break;
         case 'CREATE':
           this.planCreate(command, plan, resolver);
@@ -140,7 +146,7 @@ export class ExecutionPlanner {
       const targets = this.expandReference(placement.target, groupMap, resolver, plan);
 
       if (!targets.length) {
-        if (!this.hasAmbiguity(plan)) {
+        if (!this.resolutionAlreadyFailed(plan, 0)) {
           plan.diagnostics.push(
             diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
               'O alvo do posicionamento não foi encontrado no documento.', placement.span)
@@ -150,7 +156,7 @@ export class ExecutionPlanner {
       }
 
       if (!sources.length) {
-        if (!this.hasAmbiguity(plan)) {
+        if (!this.resolutionAlreadyFailed(plan, 0)) {
           plan.diagnostics.push(
             diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
               'A origem do posicionamento não foi encontrada.', placement.span)
@@ -238,7 +244,7 @@ export class ExecutionPlanner {
     const nodeIds = resolver.resolve(command.target, this.resolveOptions(plan));
 
     if (!nodeIds.length) {
-      if (!this.hasAmbiguity(plan)) {
+      if (!this.resolutionAlreadyFailed(plan, 0)) {
         plan.diagnostics.push(
           diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
             'O alvo da atualização não foi encontrado.', command.span)
@@ -273,7 +279,7 @@ export class ExecutionPlanner {
     }
 
     if (!nodeIds.length) {
-      if (!this.hasAmbiguity(plan)) {
+      if (!this.resolutionAlreadyFailed(plan, 0)) {
         plan.diagnostics.push(
           diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
             'O alvo da exclusão não foi encontrado.', command.span)
@@ -298,7 +304,7 @@ export class ExecutionPlanner {
     );
 
     if (!sourceIds.length) {
-      if (!this.hasAmbiguity(plan)) {
+      if (!this.resolutionAlreadyFailed(plan, 0)) {
         plan.diagnostics.push(
           diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
             'O elemento a mover não foi encontrado.', command.span)
@@ -336,7 +342,7 @@ export class ExecutionPlanner {
   ): void {
     const ids = resolver.resolve(command.target, this.resolveOptions(plan));
     if (!ids.length) {
-      if (!this.hasAmbiguity(plan)) {
+      if (!this.resolutionAlreadyFailed(plan, 0)) {
         plan.diagnostics.push(
           diagnostic('planner', 'ERROR', 'TARGET_NOT_FOUND',
             'Nenhum elemento corresponde à seleção pedida.', command.span)
@@ -361,14 +367,21 @@ export class ExecutionPlanner {
       discourse: this.discourse,
       nodeLookup: this.nodeLookup,
       liveness: this.liveness,
-      layer: this.layerForReference
+      layer: this.layerForReference,
+      priorDiagnostics: this.priorDiagnostics
     };
   }
 
 
-  /** A referência deste comando já falhou com AMBIGUOUS_REFERENCE (sem cascata). */
-  private hasAmbiguity(plan: ExecutionPlan): boolean {
-    return plan.diagnostics.some((d) => d.code === 'AMBIGUOUS_REFERENCE');
+  /**
+   * B2 — A referência deste comando já produziu um ERRO (ambígua, categórica,
+   * ordinal fora de alcance): o plano não repete um TARGET_NOT_FOUND genérico
+   * em cascata.
+   */
+  private resolutionAlreadyFailed(plan: ExecutionPlan, diagnosticsBefore: number): boolean {
+    return plan.diagnostics
+      .slice(diagnosticsBefore)
+      .some((d) => d.severity === 'ERROR');
   }
 
   private expandReference(

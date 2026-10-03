@@ -146,13 +146,19 @@ export class DomainParser {
         return;
       }
       const cursor = new SemanticCursor(group);
+      const diagnosticsBefore = this.diagnostics.length;
       try {
         const command = this.parseCommand(cursor);
         commands.push(command);
         this.reportUnconsumed(cursor, command);
       } catch (error) {
-        // Comando abortado: o resto do grupo não pode sumir em silêncio.
-        this.reportLeftovers(cursor);
+        // Comando abortado: o resto do grupo não pode sumir em silêncio —
+        // salvo quando o próprio comando já emitiu o erro que o explica
+        // (B2: um diagnóstico por problema, sem cascata).
+        const emittedOwnError = this.diagnostics
+          .slice(diagnosticsBefore)
+          .some((d) => d.severity === 'ERROR');
+        if (!emittedOwnError) this.reportLeftovers(cursor);
         throw error;
       } finally {
         // Mesmo quando o comando aborta (ParseError), os tokens que o parser
@@ -262,9 +268,10 @@ export class DomainParser {
   }
 
   private reportUnconsumed(cursor: SemanticCursor, command: SemanticCommand): void {
-    // Um NO_OP cujo span já cobre o grupo inteiro (ex.: ação negada) reportou
-    // tudo o que havia para reportar; os demais deixam sobras.
-    this.reportLeftovers(cursor, command.kind === 'NO_OP' ? command.span : undefined);
+    // NO_OP: ação negada já cobre o grupo inteiro com o INFO; palavra
+    // desconhecida já foi reportada como UNKNOWN_WORD (B1). Nada a acrescentar.
+    if (command.kind === 'NO_OP') return;
+    this.reportLeftovers(cursor);
   }
 
   /**
@@ -620,7 +627,7 @@ export class DomainParser {
         layer: 'morphology'
       });
       cursor.consume();
-      return { kind: 'NO_OP', reason: 'NEGATED_ACTION', span };
+      return { kind: 'NO_OP', reason: 'UNKNOWN_COMMAND', span };
     }
 
     throw new ParseError(
@@ -1035,8 +1042,10 @@ export class DomainParser {
       cursor.consume();
       const target = this.parseReference(cursor);
       this.skipValueConnector(cursor);
-      const valueSpan = cursor.spanFrom(start);
+      // B3 — o span do valor é do VALOR (não do comando inteiro).
+      const valueStart = cursor.index;
       const value = this.parseValue(cursor, { allowText: this.propertyAcceptsText(propHead) });
+      const valueSpan = cursor.spanFrom(valueStart);
       if (!value) {
         this.diagnostics.length = diagnosticsBefore;
         cursor.index = start;
@@ -1236,6 +1245,9 @@ export class DomainParser {
       this.entityConceptOf(target),
       true
     );
+
+    // B8 — "dela MESMA": o reforço reflexivo é do pronome, consumido aqui.
+    if (this.hasOperator(cursor.peek(), 'REFLEXIVE')) cursor.consume();
 
     return {
       kind: 'MOVE',
@@ -1587,6 +1599,7 @@ export class DomainParser {
     allowParent = true
   ): SemanticSelector {
     const startSpan = cursor.peek()?.span;
+    const startIndex = cursor.index;
     const prefix = this.parseNominalPrefix(cursor);
 
     let entityConceptId = inheritedEntityConceptId;
@@ -1671,6 +1684,7 @@ export class DomainParser {
     // direção (ordem do documento quando não há métricas de layout).
     const directional = this.peekSpatial(cursor);
     if (directional && 'direction' in directional && directional.direction) {
+      selector.directionSpan = cursor.peek()!.span;
       cursor.consume();
       selector.direction = directional.direction;
     }
@@ -1709,6 +1723,10 @@ export class DomainParser {
         number
       });
     }
+
+    // B3 — O span do seletor cobre o sintagma INTEIRO (determinante ao último
+    // modificador): diagnósticos de referência apontam o NP, não só 'o'.
+    selector.span = cursor.spanFrom(startIndex) ?? selector.span;
 
     return selector;
   }
@@ -2080,6 +2098,30 @@ export class DomainParser {
       if (this.hasOperator(cursor.peek(), 'COORDINATION')) {
         const checkpoint = cursor.index;
         cursor.consume();
+
+        // B8 — "azul e não vermelho": a negação de um valor significa que
+        // ele NÃO é aplicado; o valor positivo que veio antes permanece.
+        if (this.hasOperator(cursor.peek(), 'NEGATION')) {
+          const negStart = cursor.peek()!.span.start;
+          const negCheckpoint = cursor.index;
+          cursor.consume();
+          const negated = this.parseValue(cursor);
+          if (negated) {
+            this.emit({
+              severity: 'INFO',
+              code: 'NO_EFFECT',
+              message:
+                'Valor negado ("não …") não é aplicado; permanece o valor positivo anterior.',
+              span: { start: negStart, end: cursor.previousSpan()?.end ?? negStart },
+              start: negStart,
+              end: cursor.previousSpan()?.end ?? negStart,
+              layer: 'syntax'
+            });
+            continue;
+          }
+          cursor.index = negCheckpoint;
+        }
+
         const batch = this.parseMutations(cursor, entityConceptId);
         if (batch.length) {
           out.push(...batch);
@@ -2174,8 +2216,10 @@ export class DomainParser {
 
     const explicitProperty = this.parsePropertyHead(cursor, entityConceptId);
     if (explicitProperty) {
-      const valueSpan = cursor.spanFrom(initialIndex);
       this.skipValueConnector(cursor);
+      // O span do valor é do VALOR, não da cabeça da propriedade (B3): o
+      // diagnóstico do binder aponta o trecho que originou o problema.
+      const valueStart = cursor.index;
       const value = this.parseValue(cursor, {
         allowText: this.propertyAcceptsText(explicitProperty)
       });
@@ -2183,14 +2227,16 @@ export class DomainParser {
         cursor.index = initialIndex;
         return [];
       }
+      const valueSpan = cursor.spanFrom(valueStart);
       const first = this.bindOrThrow(explicitProperty, value, entityConceptId, valueSpan);
       const chain = this.parsePropertyChain(cursor, explicitProperty, entityConceptId);
       return [first, ...chain];
     }
 
+    const valueStart = cursor.index;
     const value = this.parseValue(cursor);
     if (value) {
-      return [this.bindValueOnly(value, entityConceptId, cursor.previousSpan())];
+      return [this.bindValueOnly(value, entityConceptId, cursor.spanFrom(valueStart))];
     }
 
     cursor.index = initialIndex;

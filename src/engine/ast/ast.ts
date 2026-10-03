@@ -57,6 +57,8 @@ export interface SemanticSelector {
   propertyFilter?: PropertyFilter;
   parent?: SemanticSelector;
   direction?: 'LEFTMOST' | 'RIGHTMOST' | 'TOPMOST' | 'BOTTOMMOST';
+  /** Span do marcador de direção ("mais à direita"), para diagnósticos. */
+  directionSpan?: Span;
   exclusions?: SemanticSelector[];
   /** Elipse: o tipo foi herdado de uma menção saliente do discurso. */
   elidedFrom?: ConceptId;
@@ -150,7 +152,7 @@ export interface QueryCommandAst {
 
 export interface NoOpCommandAst {
   kind: 'NO_OP';
-  reason: 'NEGATED_ACTION';
+  reason: 'NEGATED_ACTION' | 'UNKNOWN_COMMAND';
   negatedOperation?: string;
   /** Pedido indireto registrado ("você pode…", "quero…", "por favor"). */
   politeness?: boolean;

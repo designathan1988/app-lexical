@@ -350,6 +350,7 @@ export const INITIAL_CONCEPTS: Record<ConceptId, ConceptNode> = {
   C_OP_VOCE: { kind: 'OPERATOR', id: 'C_OP_VOCE', operator: 'SUBJECT_PRONOUN' },
   C_OP_POLITE_REQUEST: { kind: 'OPERATOR', id: 'C_OP_POLITE_REQUEST', operator: 'POLITE_REQUEST' },
   C_OP_COMPARATIVE: { kind: 'OPERATOR', id: 'C_OP_COMPARATIVE', operator: 'COMPARATIVE' },
+  C_OP_REFLEXIVE: { kind: 'OPERATOR', id: 'C_OP_REFLEXIVE', operator: 'REFLEXIVE' },
   C_OP_POLITE_DESIRE: { kind: 'OPERATOR', id: 'C_OP_POLITE_DESIRE', operator: 'POLITE_DESIRE' },
   C_OP_DE: { kind: 'OPERATOR', id: 'C_OP_DE', operator: 'PARTITIVE' },
   C_OP_E: { kind: 'OPERATOR', id: 'C_OP_E', operator: 'COORDINATION' },
@@ -514,7 +515,7 @@ export const INITIAL_LEXEMES: Record<LexemeId, Lexeme> = {
   LEX_ESSE: lex('LEX_ESSE', 'esse', 'DETERMINER', ['C_OP_DEF_ART']),
   LEX_ESTE: lex('LEX_ESTE', 'este', 'DETERMINER', ['C_OP_DEF_ART']),
   LEX_AQUELE: lex('LEX_AQUELE', 'aquele', 'DETERMINER', ['C_OP_DEF_ART']),
-  LEX_MESMO: lex('LEX_MESMO', 'mesmo', 'DETERMINER', ['C_OP_DEF_ART']),
+  LEX_MESMO: lex('LEX_MESMO', 'mesmo', 'DETERMINER', ['C_OP_DEF_ART', 'C_OP_REFLEXIVE']),
 
   // Espaciais
   LEX_DENTRO: lex('LEX_DENTRO', 'dentro', 'ADVERB', ['C_SPAT_INSIDE']),

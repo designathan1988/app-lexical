@@ -7,6 +7,10 @@ import type { EngineSettings } from '../EngineSettings';
 import type { DiscourseContext, NodeLookup, Liveness } from '../parser/DiscourseContext';
 
 export interface ResolveOptions {
+  /** Span do marcador de direção, quando houver (B3/B4). */
+  directionSpan?: { start: number; end: number };
+  /** Diagnósticos já emitidos pelo parser (B2: sem cascata no mesmo trecho). */
+  priorDiagnostics?: Array<{ severity: string; code?: string; start?: number; end?: number }>;
   diagnostics?: Diagnostic[];
   settings?: EngineSettings;
   discourse?: DiscourseContext;
@@ -83,7 +87,7 @@ export class ReferenceResolver {
     }
 
     if (selector.direction && nodes.length) {
-      nodes = this.applyDirection(nodes, selector.direction, opts);
+      nodes = this.applyDirection(nodes, selector.direction, { ...opts, directionSpan: selector.directionSpan });
     }
 
     if (selector.exclusions?.length) {
@@ -197,6 +201,18 @@ export class ReferenceResolver {
 
     if (!settings?.ambiguityWarningEnabled) return nodes;
 
+    // B2 — Não repete ambiguidade sobre um trecho que já tem erro (ex.:
+    // quantificador vago recusado no mesmo span): um problema por trecho.
+    const spanStart = selector.span?.start;
+    const priorAndCurrent = [
+      ...(opts.priorDiagnostics ?? []),
+      ...(opts.diagnostics ?? [])
+    ];
+    const alreadyReported = priorAndCurrent.some(
+      (d) => d.severity === 'ERROR' && d.start === spanStart
+    );
+    if (alreadyReported) return [];
+
     // 3. Continua ambíguo: reporta, sem escolher silenciosamente.
     opts.diagnostics?.push({
       severity: settings.ambiguityIsFatal ? 'ERROR' : 'WARNING',
@@ -223,11 +239,15 @@ export class ReferenceResolver {
   ): DocumentNode[] {
     const withRect = nodes.filter((node) => node.rect);
     if (!withRect.length) {
+      const fallbackSpan = opts.directionSpan;
       opts.diagnostics?.push({
         severity: 'INFO',
         code: 'ORDER_FALLBACK',
         message:
           'Sem métricas de layout disponíveis, a ordem espacial cai na ordem do documento.',
+        span: fallbackSpan,
+        start: fallbackSpan?.start,
+        end: fallbackSpan?.end,
         layer: opts.layer ?? 'resolver'
       });
       // B4 — Sem rect, o eixo cai na ordem do documento: RIGHTMOST/BOTTOMMOST

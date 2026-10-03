@@ -122,7 +122,9 @@ export type OperatorKind =
   /** Desejo que implica criação/ação: "quero um botão", "gostaria de apagar…". */
   | 'POLITE_DESIRE'
   /** Comparativo "mais/menos <adjetivo>": não suportado como mutação. */
-  | 'COMPARATIVE';
+  | 'COMPARATIVE'
+  /** Reforço reflexivo do pronome ("dela mesma"). */
+  | 'REFLEXIVE';
 
 export interface OperatorConcept {
   kind: 'OPERATOR';

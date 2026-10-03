@@ -218,7 +218,8 @@ export class SemanticCompiler {
         discourse,
         this.makeNodeLookup(document),
         (selector) => new ReferenceResolver(document).resolveSelector(selector).length,
-        layer
+        layer,
+        prePlan
       );
       plan = planner.build(ast);
 
