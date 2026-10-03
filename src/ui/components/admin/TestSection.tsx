@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import type { SemanticEngine } from '../../../engine/SemanticEngine';
 import { SemanticEngine as EngineClass } from '../../../engine/SemanticEngine';
 import type { KnowledgeBaseStore } from '../../../knowledge/KnowledgeBaseStore';
-import { runDataset, type SetReport } from '../../../eval/runner';
+import { runDataset, type SetReport, type MetricValue } from '../../../eval/runner';
 import {
   DEV_DATASET,
   REGRESSION_DATASET,
@@ -123,13 +123,16 @@ export function TestSection({ engine, store }: Props) {
       {report && (
         <>
           <div className="metric-cards">
-            <MetricCard label="Sucesso end-to-end" value={report.endToEndSuccess} />
-            <MetricCard label="AST exata" value={report.astExactMatch} />
-            <MetricCard label="Plano exato" value={report.planExactMatch} />
-            <MetricCard label="Attachments" value={report.entityAttachmentAccuracy} />
-            <MetricCard label="Bindings" value={report.propertyValueBindingAccuracy} />
-            <MetricCard label="Referências" value={report.referenceResolutionAccuracy} />
-            <MetricCard label="Falsos positivos" value={report.falsePositiveRate} invert />
+            <MetricCard label="Sucesso end-to-end" metric={report.metrics.endToEnd} />
+            <MetricCard label="Lexical" metric={report.metrics.lexicalAccuracy} />
+            <MetricCard label="Sentido" metric={report.metrics.senseAccuracy} />
+            <MetricCard label="Morfologia" metric={report.metrics.morphologicalAccuracy} />
+            <MetricCard label="AST exata" metric={report.metrics.astExactMatch} />
+            <MetricCard label="Plano exato" metric={report.metrics.planExactMatch} />
+            <MetricCard label="Attachments" metric={report.metrics.attachmentAccuracy} />
+            <MetricCard label="Bindings" metric={report.metrics.bindingAccuracy} />
+            <MetricCard label="Referências" metric={report.metrics.referenceAccuracy} />
+            <MetricCard label="Falsos positivos" metric={report.metrics.falsePositiveRate} invert />
           </div>
 
           <table className="data-table">
@@ -211,19 +214,34 @@ export function TestSection({ engine, store }: Props) {
 
 function MetricCard({
   label,
-  value,
+  metric,
   invert
 }: {
   label: string;
-  value: number;
+  metric: MetricValue;
   invert?: boolean;
 }) {
+  if (metric.value === null) {
+    return (
+      <div className="metric-card warn">
+        <span className="metric-label">{label}</span>
+        <span className="metric-value">n/a</span>
+        <span className="metric-label">
+          {metric.covered}/{metric.total}
+        </span>
+      </div>
+    );
+  }
+  const value = metric.value;
   const pct = (value * 100).toFixed(1);
   const good = invert ? value === 0 : value >= 0.99;
   return (
     <div className={`metric-card ${good ? 'good' : value < 0.9 && !invert ? 'bad' : 'warn'}`}>
       <span className="metric-label">{label}</span>
       <span className="metric-value">{pct}%</span>
+      <span className="metric-label">
+        {metric.covered}/{metric.total}
+      </span>
     </div>
   );
 }

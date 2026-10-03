@@ -221,7 +221,7 @@ export class SemanticCompiler {
   private toDiagnostic(error: unknown): Diagnostic {
     const candidate = error as { code?: string; message?: string; span?: { start: number; end: number } };
     if (candidate && typeof candidate.code === 'string' && candidate.code !== 'Error') {
-      return diagnostic('parser', 'ERROR', candidate.code,
+      return diagnostic('syntax', 'ERROR', candidate.code,
         candidate.message ?? String(error), candidate.span);
     }
     return diagnostic('engine', 'ERROR', 'INTERNAL_ERROR',

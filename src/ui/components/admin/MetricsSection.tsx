@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import type { SemanticEngine } from '../../../engine/SemanticEngine';
 import { SemanticEngine as EngineClass } from '../../../engine/SemanticEngine';
-import { runDataset, type SetReport } from '../../../eval/runner';
+import { runDataset, type SetReport, type MetricValue } from '../../../eval/runner';
 import { DEV_DATASET, REGRESSION_DATASET, FINAL_V1_DATASET, COMPROMISED_LABEL, allRecords } from '../../../eval/loader';
+import { VALID_LAYERS } from '../../../engine/diagnostics';
 
 interface Props {
   engine: SemanticEngine;
@@ -42,17 +43,18 @@ export function MetricsSection({ engine }: Props) {
 
   if (!reports) return <div className="admin-section">Calculando métricas…</div>;
 
-  const metricRows: Array<[string, (r: SetReport) => number, boolean, string]> = [
-    ['Lexical resolution accuracy', (r) => r.lexicalResolutionAccuracy, false, 'tokens de conteúdo resolvidos'],
-    ['Concept/sense accuracy', (r) => r.conceptSenseAccuracy, false, 'conceito correto por token'],
-    ['Entity attachment accuracy', (r) => r.entityAttachmentAccuracy, false, 'pares (fonte, relação, alvo)'],
-    ['Property/value binding accuracy', (r) => r.propertyValueBindingAccuracy, false, 'triplas (entidade, propriedade, valor)'],
-    ['Reference resolution accuracy', (r) => r.referenceResolutionAccuracy, false, 'nós resolvidos por referência'],
-    ['AST exact match', (r) => r.astExactMatch, false, 'assinatura canônica da AST'],
-    ['Execution-plan exact match', (r) => r.planExactMatch, false, 'assinatura do plano com IDs normalizados'],
-    ['End-to-end command success', (r) => r.endToEndSuccess, false, 'todas as asserções'],
-    ['False-positive rate', (r) => r.falsePositiveRate, true, 'casos que deviam falhar e mutaram'],
-    ['Ambiguity detection rate', (r) => r.ambiguityDetectionRate, false, 'casos realmente ambíguos detectados']
+  const metricRows: Array<[string, (r: SetReport) => MetricValue, boolean, string]> = [
+    ['Lexical resolution accuracy', (r) => r.metrics.lexicalAccuracy, false, 'tokens de conteúdo resolvidos'],
+    ['Concept/sense accuracy', (r) => r.metrics.senseAccuracy, false, 'conceito correto por token'],
+    ['Morphological accuracy', (r) => r.metrics.morphologicalAccuracy, false, 'lema + traços por token após desambiguação'],
+    ['Entity attachment accuracy', (r) => r.metrics.attachmentAccuracy, false, 'pares (fonte, relação, alvo)'],
+    ['Property/value binding accuracy', (r) => r.metrics.bindingAccuracy, false, 'triplas (entidade, propriedade, valor)'],
+    ['Reference resolution accuracy', (r) => r.metrics.referenceAccuracy, false, 'nós resolvidos por referência'],
+    ['AST exact match', (r) => r.metrics.astExactMatch, false, 'assinatura canônica da AST'],
+    ['Execution-plan exact match', (r) => r.metrics.planExactMatch, false, 'assinatura do plano com IDs normalizados'],
+    ['End-to-end command success', (r) => r.metrics.endToEnd, false, 'todas as asserções'],
+    ['False-positive rate', (r) => r.metrics.falsePositiveRate, true, 'casos que deviam falhar e mutaram'],
+    ['Ambiguity detection rate', (r) => r.metrics.ambiguityDetectionRate, false, 'casos realmente ambíguos detectados']
   ];
 
   return (
@@ -63,6 +65,11 @@ export function MetricsSection({ engine }: Props) {
           {reports.map((r) => `${r.name}: ${r.passed}/${r.total}`).join(' · ')}
         </span>
       </header>
+      <p className="details">
+        Cada métrica é medida apenas sobre os registros que declaram aquela expectativa; a
+        cobertura aparece entre parênteses. Sem registros com expectativa, o valor é <code>n/a</code> —
+        nunca 100%.
+      </p>
 
       <table className="metrics-table">
         <thead>
@@ -79,20 +86,27 @@ export function MetricsSection({ engine }: Props) {
             <tr key={label}>
               <td>{label}</td>
               {reports.map((r) => {
-                const value = pick(r);
-                const pct = value * 100;
-                const cls = invert
-                  ? pct === 0
-                    ? 'ok'
-                    : 'err'
-                  : pct >= 99
-                    ? 'ok'
-                    : pct >= 80
-                      ? 'warn'
-                      : 'err';
+                const metric = pick(r);
+                const value = metric.value;
+                const cls =
+                  value === null
+                    ? 'details'
+                    : invert
+                      ? value === 0
+                        ? 'ok'
+                        : 'err'
+                      : value >= 0.99
+                        ? 'ok'
+                        : value >= 0.8
+                          ? 'warn'
+                          : 'err';
                 return (
                   <td key={r.name} className={cls}>
-                    {pct.toFixed(1)}%
+                    {value === null ? 'n/a' : `${(value * 100).toFixed(1)}%`}
+                    <span className="details">
+                      {' '}
+                      ({metric.covered}/{metric.total})
+                    </span>
                   </td>
                 );
               })}
@@ -131,6 +145,10 @@ export function MetricsSection({ engine }: Props) {
       )}
 
       <h4>Diagnósticos por camada</h4>
+      <p className="details">
+        Camadas válidas do pipeline: {VALID_LAYERS.join(', ')}. Camada fora dessa lista é
+        defeito de arquitetura.
+      </p>
       <table className="data-table">
         <thead>
           <tr>
@@ -140,17 +158,25 @@ export function MetricsSection({ engine }: Props) {
           </tr>
         </thead>
         <tbody>
-          {layers.map((l) => (
-            <tr key={l.layer}>
-              <td><code>{l.layer}</code></td>
-              <td>{l.total}</td>
-              <td>
-                {Object.entries(l.byCode)
-                  .map(([code, n]) => `${code}×${n}`)
-                  .join(', ')}
-              </td>
-            </tr>
-          ))}
+          {[...layers]
+            .sort((a, b) => a.layer.localeCompare(b.layer))
+            .map((l) => {
+              const valid = (VALID_LAYERS as readonly string[]).includes(l.layer);
+              return (
+                <tr key={l.layer} className={valid ? undefined : 'row-fail'}>
+                  <td>
+                    <code>{l.layer}</code>
+                    {!valid && <span className="err"> — inválida</span>}
+                  </td>
+                  <td>{l.total}</td>
+                  <td>
+                    {Object.entries(l.byCode)
+                      .map(([code, n]) => `${code}×${n}`)
+                      .join(', ')}
+                  </td>
+                </tr>
+              );
+            })}
           {layers.length === 0 && (
             <tr>
               <td colSpan={3}>Nenhum diagnóstico emitido.</td>

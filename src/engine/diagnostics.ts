@@ -33,6 +33,30 @@ export const DIAGNOSTIC_CODES = {
   UNSUPPORTED_OPERATION: 'UNSUPPORTED_OPERATION'
 } as const;
 
+/**
+ * Camadas válidas do pipeline (IV.F). Todo diagnóstico exposto pelo motor
+ * declara a camada que o detectou; valores fora desta lista são defeito.
+ * Fases 2/3 substituem o front-end legado pelas camadas de morfologia e
+ * sintaxe; `lexer`, `segmenter`, `morphology`, `disambiguation`, `mwe` e
+ * `semantics` passam a ser emitidas a partir de então.
+ */
+export const VALID_LAYERS = [
+  'lexer',
+  'segmenter',
+  'morphology',
+  'disambiguation',
+  'mwe',
+  'syntax',
+  'semantics',
+  'binder',
+  'resolver',
+  'validator',
+  'planner',
+  'executor'
+] as const;
+
+export type DiagnosticLayer = (typeof VALID_LAYERS)[number];
+
 export type DiagnosticCode =
   | (typeof DIAGNOSTIC_CODES)[keyof typeof DIAGNOSTIC_CODES]
   // Códigos adicionais do motor (não exigidos pelo §20, mas estruturados).

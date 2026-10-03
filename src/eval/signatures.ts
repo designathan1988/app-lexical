@@ -1,4 +1,4 @@
-import type { ConceptId } from '../engine/types';
+import type { ConceptId, Morphology } from '../engine/types';
 import type { ConceptNode } from '../engine/ontology/Concept';
 import type { DocumentModel, DocumentNode } from '../engine/document/DocumentModel';
 import type { ExecutionPlan, ExecutableReference } from '../engine/planning/ExecutionPlan';
@@ -109,6 +109,49 @@ export function astSignature(ast: SemanticDocumentAst): string {
       }
     })
     .join('\n');
+}
+
+/**
+ * Assinatura canônica dos traços morfológicos de uma forma, no formato
+ * `Traço=Valor`, ordenada e separada por `|` (nome dos traços conforme
+ * Universal Dependencies; ver SCHEMA.md).
+ *
+ * Exemplo: `Gender=Fem|Number=Sing`. String vazia quando não há traços.
+ */
+const GENDER_NAMES: Record<string, string> = { MASC: 'Masc', FEM: 'Fem', NEUTER: 'Neut', INVARIANT: 'Inv' };
+const NUMBER_NAMES: Record<string, string> = { SINGULAR: 'Sing', PLURAL: 'Plur', INVARIANT: 'Inv' };
+const TENSE_NAMES: Record<string, string> = { PRESENT: 'Pres', PAST: 'Past', FUTURE: 'Fut' };
+
+export function featsSignature(m?: Morphology): string {
+  if (!m) return '';
+  const parts: string[] = [];
+  if (m.gender) parts.push(`Gender=${GENDER_NAMES[m.gender] ?? m.gender}`);
+  if (m.number) parts.push(`Number=${NUMBER_NAMES[m.number] ?? m.number}`);
+  if (m.person) parts.push(`Person=${m.person}`);
+  if (m.mood) {
+    switch (m.mood) {
+      case 'INDICATIVE':
+        parts.push('Mood=Ind', 'VerbForm=Fin');
+        break;
+      case 'SUBJUNCTIVE':
+        parts.push('Mood=Sub', 'VerbForm=Fin');
+        break;
+      case 'IMPERATIVE':
+        parts.push('Mood=Imp', 'VerbForm=Fin');
+        break;
+      case 'INFINITIVE':
+        parts.push('VerbForm=Inf');
+        break;
+      case 'GERUND':
+        parts.push('VerbForm=Ger');
+        break;
+      case 'PARTICIPLE':
+        parts.push('VerbForm=Part');
+        break;
+    }
+  }
+  if (m.tense) parts.push(`Tense=${TENSE_NAMES[m.tense] ?? m.tense}`);
+  return parts.join('|');
 }
 
 /** Assinatura canônica da árvore do documento (para comparação exata). */

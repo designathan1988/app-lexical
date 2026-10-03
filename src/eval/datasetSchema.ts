@@ -38,6 +38,21 @@ export interface ExpectedToken {
   conceptId?: string | null;
 }
 
+/**
+ * Leitura morfológica esperada de um token, após a desambiguação.
+ *
+ * `feats` usa o formato canônico de `featsSignature` (traços do Universal
+ * Dependencies, ordenados, separados por `|`), por exemplo `Gender=Fem|Number=Sing`.
+ */
+export interface ExpectedReading {
+  /** Forma escrita como aparece na frase. */
+  surface: string;
+  /** Lema do lexema correto. */
+  lemma: string;
+  /** Traços no formato canônico; `''` quando a forma não tem traços. */
+  feats: string;
+}
+
 export interface ExpectedOutcome {
   /** Assinatura canônica da AST (`astSignature`). */
   ast?: string;
@@ -57,6 +72,8 @@ export interface ExpectedOutcome {
   severities?: Record<string, 'INFO' | 'WARNING' | 'ERROR'>;
   /** Anotação lexical por token de conteúdo (base das métricas lexicais). */
   tokens?: ExpectedToken[];
+  /** Leitura morfológica esperada por token (base da métrica morfológica). */
+  readings?: ExpectedReading[];
   /** Tensão de ambiguidade: o caso é genuinamente ambíguo. */
   ambiguous?: boolean;
 }
@@ -86,3 +103,47 @@ export interface EvalDataset {
 }
 
 export const DATASET_SCHEMA_VERSION = '1.0.0';
+
+export class DatasetValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'DatasetValidationError';
+  }
+}
+
+function fail(message: string): never {
+  throw new DatasetValidationError(message);
+}
+
+/**
+ * Valida um JSON externo como `EvalDataset` (usado por `score.ts --dataset`).
+ * Lança `DatasetValidationError` com a primeira inconsistência encontrada.
+ */
+export function validateDataset(raw: unknown): EvalDataset {
+  if (!raw || typeof raw !== 'object') fail('dataset não é um objeto');
+  const ds = raw as Partial<EvalDataset>;
+  if (typeof ds.version !== 'string') fail('campo "version" ausente ou não textual');
+  if (ds.schemaVersion !== DATASET_SCHEMA_VERSION) {
+    fail(`schemaVersion ${String(ds.schemaVersion)} ≠ ${DATASET_SCHEMA_VERSION}`);
+  }
+  if (!Array.isArray(ds.records)) fail('campo "records" ausente ou não é lista');
+  const ids = new Set<string>();
+  ds.records.forEach((r, i) => {
+    if (!r || typeof r !== 'object') fail(`registro ${i} não é um objeto`);
+    if (typeof r.id !== 'string' || !r.id) fail(`registro ${i} sem "id" textual`);
+    if (typeof r.input !== 'string') fail(`registro "${r.id}" sem "input" textual`);
+    if (!r.expected || typeof r.expected !== 'object') {
+      fail(`registro "${r.id}" sem "expected"`);
+    }
+    if (ids.has(r.id)) fail(`id duplicado "${r.id}"`);
+    ids.add(r.id);
+    const num = (v: unknown, field: string) => {
+      if (v === undefined) return;
+      if (!Array.isArray(v) || v.some((x) => typeof x !== 'number')) {
+        fail(`registro "${r.id}": "${field}" deve ser lista de números`);
+      }
+    };
+    num(r.expected.resolvedReferences, 'resolvedReferences');
+  });
+  return ds as EvalDataset;
+}

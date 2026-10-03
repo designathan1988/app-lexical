@@ -1,26 +1,16 @@
 import type { EvalDataset, EvalRecord } from './datasetSchema';
-import { DATASET_SCHEMA_VERSION } from './datasetSchema';
+import { validateDataset } from './datasetSchema';
 
 import devRaw from './data/dev.json';
 import regressionRaw from './data/regression.json';
 import finalV1Raw from './data/final-v1-compromised.json';
 
 function asDataset(raw: unknown, expectedName: string): EvalDataset {
-  const ds = raw as EvalDataset;
-  if (!ds || !Array.isArray(ds.records)) {
-    throw new Error(`Dataset ${expectedName} inválido: falta "records".`);
+  try {
+    return validateDataset(raw);
+  } catch (error) {
+    throw new Error(`Dataset ${expectedName}: ${(error as Error).message}`);
   }
-  if (ds.schemaVersion !== DATASET_SCHEMA_VERSION) {
-    throw new Error(
-      `Dataset ${expectedName}: schemaVersion ${ds.schemaVersion} ≠ ${DATASET_SCHEMA_VERSION}.`
-    );
-  }
-  const ids = new Set<string>();
-  for (const r of ds.records) {
-    if (ids.has(r.id)) throw new Error(`Dataset ${expectedName}: id duplicado "${r.id}".`);
-    ids.add(r.id);
-  }
-  return ds;
 }
 
 export const DEV_DATASET = asDataset(devRaw, 'dev');

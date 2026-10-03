@@ -232,7 +232,7 @@ export class DomainParser {
       span: { start: first.span.start, end: last.span.end },
       start: first.span.start,
       end: last.span.end,
-      layer: 'parser',
+      layer: 'syntax',
       candidates: content.flatMap((t) => t.candidates.map((c) => c.conceptId))
     });
   }
@@ -341,7 +341,7 @@ export class DomainParser {
         span: token.span,
         start: token.span.start,
         end: token.span.end,
-        layer: 'parser',
+        layer: 'syntax',
         candidates: actions.map((a) => a.id)
       });
       return match;
@@ -356,7 +356,7 @@ export class DomainParser {
       span: token.span,
       start: token.span.start,
       end: token.span.end,
-      layer: 'parser',
+      layer: 'syntax',
       candidates: actions.map((a) => a.id)
     });
     return actions[0];
@@ -374,7 +374,7 @@ export class DomainParser {
         span,
         start: span.start,
         end: span.end,
-        layer: 'lexical'
+        layer: 'morphology'
       });
       cursor.consume();
       return { kind: 'NO_OP', reason: 'NEGATED_ACTION', span };
@@ -663,7 +663,7 @@ export class DomainParser {
       span: otherToken.span,
       start: otherToken.span.start,
       end: otherToken.span.end,
-      layer: 'parser',
+      layer: 'syntax',
       candidates: existing
     });
     return current;
@@ -866,7 +866,7 @@ export class DomainParser {
         span: candidate.span,
         start: candidate.span?.start,
         end: candidate.span?.end,
-        layer: 'parser'
+        layer: 'syntax'
       };
     }
     return undefined;
@@ -1119,7 +1119,7 @@ export class DomainParser {
       span,
       start: span?.start,
       end: span?.end,
-      layer: 'parser'
+      layer: 'syntax'
     });
   }
 
@@ -1196,7 +1196,7 @@ export class DomainParser {
         span: startSpan,
         start: startSpan?.start,
         end: startSpan?.end,
-        layer: 'parser',
+        layer: 'syntax',
         candidates: [salient]
       });
     }
@@ -1345,7 +1345,7 @@ export class DomainParser {
           span: marker.span,
           start: marker.span.start,
           end: marker.span.end,
-          layer: 'parser'
+          layer: 'syntax'
         });
         cursor.index = checkpoint;
         return;
@@ -1364,7 +1364,7 @@ export class DomainParser {
           span: marker.span,
           start: marker.span.start,
           end: marker.span.end,
-          layer: 'parser'
+          layer: 'syntax'
         });
         cursor.index = checkpoint;
         return;
@@ -1539,7 +1539,7 @@ export class DomainParser {
         span: token.span,
         start: token.span.start,
         end: token.span.end,
-        layer: 'parser',
+        layer: 'syntax',
         candidates: tied.map((c) => c.conceptId),
         scores: tied.map((c) => c.score)
       });

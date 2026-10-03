@@ -84,7 +84,7 @@ export class SemanticEngine {
   analyze(input: string): CompileResult {
     this.pruneDiscourse();
     const stagingBefore = this.discourse.stagedCount();
-    const result = this.compiler.compile(input, this.store.document, this.discourse, 'analyze');
+    const result = this.compiler.compile(input, this.store.document, this.discourse);
     // Desfaz qualquer menção registrada durante a análise.
     if (this.discourse.stagedCount() > stagingBefore) this.discourse.discard();
     return result;

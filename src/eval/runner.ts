@@ -1,8 +1,9 @@
 import { SemanticEngine } from '../engine/SemanticEngine';
 import type { KnowledgeBase } from '../knowledge/knowledgeBase';
-import { treeSignature, astSignature, planSignature } from './signatures';
+import { treeSignature, astSignature, planSignature, featsSignature } from './signatures';
 import { preorderNodeIds } from '../engine/document/traversal';
 import { FUNCTION_WORDS } from '../engine/parser/Grammar';
+import type { SemanticToken } from '../engine/parser/SemanticToken';
 import type {
   EvalRecord,
   EvalDataset,
@@ -15,6 +16,25 @@ import type {
 export interface RecordStageResult {
   ok: boolean;
   detail?: string;
+}
+
+export interface TokenResult {
+  surface: string;
+  expectedLexeme: string | null;
+  actualLexeme: string | null;
+  lexemeOk: boolean;
+  expectedConcept: string | null | undefined;
+  actualConcept: string | null;
+  senseOk: boolean | undefined;
+}
+
+export interface ReadingResult {
+  surface: string;
+  expectedLemma: string;
+  actualLemma: string | null;
+  expectedFeats: string;
+  actualFeats: string;
+  ok: boolean;
 }
 
 export interface RecordResult {
@@ -44,8 +64,26 @@ export interface RecordResult {
   expectedTree?: string;
   failReasons: string[];
 
-  /** Anotações lexicais, quando presentes. */
-  tokenResults?: Array<{ surface: string; expectedLexeme: string | null; actualLexeme: string | null; ok: boolean }>;
+  /** Resultado por token anotado (lexema e sentido). */
+  tokenResults?: TokenResult[];
+  /** Resultado por leitura morfológica anotada. */
+  readingResults?: ReadingResult[];
+}
+
+/**
+ * Valor de uma métrica.
+ *
+ * - `value` é a acurácia observada, ou `null` quando o conjunto não tem
+ *   NENHUM item com aquela expectativa — nunca 100% com denominador zero.
+ * - `covered` é quantos registros do conjunto têm a expectativa (cobertura).
+ * - `total` é o número de registros do conjunto.
+ */
+export interface MetricValue {
+  value: number | null;
+  covered: number;
+  total: number;
+  /** Itens avaliados (tokens, triplas, casos) dentro dos registros cobertos. */
+  items: number;
 }
 
 export interface SetReport {
@@ -53,18 +91,19 @@ export interface SetReport {
   total: number;
   passed: number;
   failed: number;
-  lexicalResolutionAccuracy: number;
-  conceptSenseAccuracy: number;
-  entityAttachmentAccuracy: number;
-  propertyValueBindingAccuracy: number;
-  referenceResolutionAccuracy: number;
-  astExactMatch: number;
-  planExactMatch: number;
-  endToEndSuccess: number;
-  falsePositiveRate: number;
-  ambiguityDetectionRate: number;
-  ambiguityCaseCount: number;
-  annotatedTokenCases: number;
+  metrics: {
+    lexicalAccuracy: MetricValue;
+    senseAccuracy: MetricValue;
+    morphologicalAccuracy: MetricValue;
+    attachmentAccuracy: MetricValue;
+    bindingAccuracy: MetricValue;
+    referenceAccuracy: MetricValue;
+    astExactMatch: MetricValue;
+    planExactMatch: MetricValue;
+    endToEnd: MetricValue;
+    falsePositiveRate: MetricValue;
+    ambiguityDetectionRate: MetricValue;
+  };
   results: RecordResult[];
   failures: RecordResult[];
 }
@@ -181,6 +220,72 @@ function expectedAttachments(
   return out.sort();
 }
 
+/** Conta quantos itens da lista esperada estão presentes na lista real. */
+function matchedItems(expected: string[], actual: string[]): number {
+  const pool = [...actual];
+  let matched = 0;
+  for (const item of expected) {
+    const idx = pool.indexOf(item);
+    if (idx >= 0) {
+      pool.splice(idx, 1);
+      matched++;
+    }
+  }
+  return matched;
+}
+
+// ---------------------------------------------------------------------------
+// Alinhamento token anotado ↔ token real
+// ---------------------------------------------------------------------------
+
+function normalizeSurface(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '');
+}
+
+/**
+ * O token real correspondente a uma anotação. Casa pela superfície
+ * normalizada (sem acento/caixa) na ordem de ocorrência.
+ */
+function findActualToken(
+  tokens: SemanticToken[],
+  surface: string,
+  used: Set<number>
+): SemanticToken | null {
+  const want = normalizeSurface(surface);
+  for (let i = 0; i < tokens.length; i++) {
+    if (used.has(i)) continue;
+    const actual = normalizeSurface(tokens[i].rawTokens.map((t) => t.raw).join(' '));
+    if (actual === want) {
+      used.add(i);
+      return tokens[i];
+    }
+  }
+  return null;
+}
+
+/**
+ * Leitura escolhida de um token.
+ *
+ * No front-end legado a escolha exposta no trace é o primeiro candidato
+ * (maior score). A Fase 3 substitui isto pela leitura desambiguada do
+ * pipeline morfossintático, mantendo a mesma interface.
+ */
+function chosenReading(token: SemanticToken | null): {
+  lexemeId: string | null;
+  conceptId: string | null;
+  lexis: SemanticToken['candidates'][number] | null;
+} {
+  const candidate = token?.candidates[0] ?? null;
+  return {
+    lexemeId: candidate?.lexemeId ?? null,
+    conceptId: candidate ? candidate.conceptId || null : null,
+    lexis: candidate
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Execução de um registro
 // ---------------------------------------------------------------------------
@@ -209,7 +314,8 @@ function emptyResult(rec: EvalRecord, reason: string): RecordResult {
     actualTree: '',
     expectedTree: rec.expected?.finalTree,
     failReasons: [reason],
-    tokenResults: undefined
+    tokenResults: undefined,
+    readingResults: undefined
   };
 }
 
@@ -289,22 +395,28 @@ function runRecordUnsafe(kb: KnowledgeBase, rec: EvalRecord): RecordResult {
   if (!planOk) failReasons.push('plano difere do esperado');
 
   const indexMap = preorderIndexMap(engine);
-  const bindingsOk = rec.expected.bindings
-    ? JSON.stringify(expectedBindings(engine, indexMap, rec.expected.bindings)) ===
-      JSON.stringify(actualBindings(engine, kb.concepts))
-    : true;
+  const expBind = rec.expected.bindings
+    ? expectedBindings(engine, indexMap, rec.expected.bindings)
+    : null;
+  const actBind = rec.expected.bindings ? actualBindings(engine, kb.concepts) : null;
+  const bindingsOk =
+    rec.expected.bindings === undefined
+      ? true
+      : expBind !== null && JSON.stringify(expBind) === JSON.stringify(actBind);
   if (!bindingsOk) {
     failReasons.push(
-      `bindings: esperado ${JSON.stringify(expectedBindings(engine, indexMap, rec.expected.bindings ?? []))} obtido ${JSON.stringify(actualBindings(engine, kb.concepts))}`
+      `bindings: esperado ${JSON.stringify(expBind)} obtido ${JSON.stringify(actBind)}`
     );
   }
 
   const expAtt = rec.expected.attachments
     ? expectedAttachments(engine, indexMap, rec.expected.attachments)
     : null;
-  const attachmentsOk = rec.expected.attachments
-    ? expAtt !== null && JSON.stringify(expAtt) === JSON.stringify(actualAttachments(engine))
-    : true;
+  const actAtt = rec.expected.attachments ? actualAttachments(engine) : null;
+  const attachmentsOk =
+    rec.expected.attachments === undefined
+      ? true
+      : expAtt !== null && JSON.stringify(expAtt) === JSON.stringify(actAtt);
   if (!attachmentsOk) failReasons.push('attachments divergem do esperado');
 
   const referencesOk = rec.expected.resolvedReferences
@@ -324,17 +436,44 @@ function runRecordUnsafe(kb: KnowledgeBase, rec: EvalRecord): RecordResult {
 
   const commandKindOk = true; // coberto por AST/plano
 
-  const tokenResults = rec.expected.tokens
+  const usedTokens = new Set<number>();
+  const tokenResults: TokenResult[] | undefined = rec.expected.tokens
     ? rec.expected.tokens.map((t) => {
-        const token = compile.trace.semanticTokens.find((st) =>
-          st.rawTokens.some((rt) => rt.raw.toLowerCase().startsWith(t.surface.toLowerCase().slice(0, 4)))
-        );
-        const actual = token?.candidates[0]?.lexemeId ?? null;
+        const token = findActualToken(compile.trace.semanticTokens, t.surface, usedTokens);
+        const chosen = chosenReading(token);
+        const lexemeOk = t.lexemeId === null ? chosen.lexemeId === null : chosen.lexemeId === t.lexemeId;
+        const senseOk =
+          t.conceptId === undefined
+            ? undefined
+            : t.conceptId === null
+              ? chosen.conceptId === null
+              : chosen.conceptId === t.conceptId;
         return {
           surface: t.surface,
           expectedLexeme: t.lexemeId,
-          actualLexeme: actual,
-          ok: t.lexemeId === null ? actual === null : actual === t.lexemeId
+          actualLexeme: chosen.lexemeId,
+          lexemeOk,
+          expectedConcept: t.conceptId,
+          actualConcept: chosen.conceptId,
+          senseOk
+        };
+      })
+    : undefined;
+
+  const readingResults: ReadingResult[] | undefined = rec.expected.readings
+    ? rec.expected.readings.map((r) => {
+        const token = findActualToken(compile.trace.semanticTokens, r.surface, new Set());
+        const chosen = chosenReading(token);
+        const lema = chosen.lexemeId ? (kb.lexemes[chosen.lexemeId]?.lemma ?? null) : null;
+        const feats = featsSignature(chosen.lexis?.morphology);
+        const ok = lema === r.lemma && feats === r.feats;
+        return {
+          surface: r.surface,
+          expectedLemma: r.lemma,
+          actualLemma: lema,
+          expectedFeats: r.feats,
+          actualFeats: feats,
+          ok
         };
       })
     : undefined;
@@ -373,7 +512,8 @@ function runRecordUnsafe(kb: KnowledgeBase, rec: EvalRecord): RecordResult {
     actualTree,
     expectedTree: rec.expected.finalTree,
     failReasons,
-    tokenResults
+    tokenResults,
+    readingResults
   };
 }
 
@@ -381,39 +521,98 @@ function runRecordUnsafe(kb: KnowledgeBase, rec: EvalRecord): RecordResult {
 // Métricas agregadas
 // ---------------------------------------------------------------------------
 
-export function ratio(num: number, den: number): number {
-  return den === 0 ? 1 : num / den;
+function metricValue(
+  matched: number,
+  items: number,
+  covered: number,
+  total: number
+): MetricValue {
+  return { value: items === 0 ? null : matched / items, covered, total, items };
+}
+
+/** @deprecated Use `MetricValue`. Mantido apenas para código legado. */
+export function ratio(num: number, den: number): number | null {
+  return den === 0 ? null : num / den;
 }
 
 export function runDataset(kb: KnowledgeBase, dataset: EvalDataset, name: string): SetReport {
   const results = dataset.records.map((r) => runRecord(kb, r));
   const total = results.length;
   const passed = results.filter((r) => r.passed).length;
+  const byId = new Map(results.map((r) => [r.id, r]));
 
-  // lexical / concept-sense (somente sobre casos anotados)
-  let tokTotal = 0;
-  let tokOk = 0;
-  let annotatedCases = 0;
+  // Lexical: só sobre registros que anotaram tokens.
+  let lexItems = 0;
+  let lexMatched = 0;
+  let lexCovered = 0;
+  let senseItems = 0;
+  let senseMatched = 0;
+  let senseCovered = 0;
+  let readItems = 0;
+  let readMatched = 0;
+  let readCovered = 0;
   for (const r of results) {
-    if (!r.tokenResults) continue;
-    annotatedCases++;
-    for (const t of r.tokenResults) {
-      tokTotal++;
-      if (t.ok) tokOk++;
+    if (r.tokenResults?.length) {
+      lexCovered++;
+      for (const t of r.tokenResults) {
+        lexItems++;
+        if (t.lexemeOk) lexMatched++;
+      }
+    }
+    const senseTokens = r.tokenResults?.filter((t) => t.senseOk !== undefined) ?? [];
+    if (senseTokens.length) {
+      senseCovered++;
+      for (const t of senseTokens) {
+        senseItems++;
+        if (t.senseOk) senseMatched++;
+      }
+    }
+    if (r.readingResults?.length) {
+      readCovered++;
+      for (const rr of r.readingResults) {
+        readItems++;
+        if (rr.ok) readMatched++;
+      }
     }
   }
 
-  const bindingsTotal = results.filter((r) => r.passed || r.bindingsOk).length;
-  const referenceCases = results.filter((r) => r.referencesOk).length;
-  // Um caso genuinamente ambíguo é considerado DETECTADO quando o motor
-  // reporta a ambiguidade em vez de escolher em silêncio — seja por referência
-  // ambígua, por sentido ambíguo, ou por operação não suportada por vagueza.
+  // Bindings e attachments: triplas esperadas presentes no resultado.
+  let bindItems = 0;
+  let bindMatched = 0;
+  let bindCovered = 0;
+  let attItems = 0;
+  let attMatched = 0;
+  let attCovered = 0;
+  for (const rec of dataset.records) {
+    const r = byId.get(rec.id);
+    if (!r) continue;
+    if (rec.expected.bindings) {
+      bindCovered++;
+      bindItems += rec.expected.bindings.length;
+      if (r.bindingsOk) bindMatched += rec.expected.bindings.length;
+    }
+    if (rec.expected.attachments) {
+      attCovered++;
+      attItems += rec.expected.attachments.length;
+      if (r.attachmentsOk) attMatched += rec.expected.attachments.length;
+    }
+  }
+
+  // Referências / AST / plano: por registro.
+  const refCov = results.filter((_, i) => dataset.records[i].expected.resolvedReferences);
+  const refOk = results.filter((r, i) => dataset.records[i].expected.resolvedReferences && r.referencesOk);
+  const astCov = results.filter((_, i) => dataset.records[i].expected.ast !== undefined);
+  const astOk = results.filter((r, i) => dataset.records[i].expected.ast !== undefined && r.astOk);
+  const planCov = results.filter((_, i) => dataset.records[i].expected.plan !== undefined);
+  const planOk = results.filter((r, i) => dataset.records[i].expected.plan !== undefined && r.planOk);
+
+  // Ambiguidade: casos marcados explicitamente como genuinamente ambíguos.
   const AMBIGUITY_CODES = ['AMBIGUOUS_REFERENCE', 'AMBIGUOUS_SENSE', 'UNSUPPORTED_OPERATION'];
   const ambiguityCases = dataset.records.filter((r) => r.expected.ambiguous);
-  const ambiguityDetected = ambiguityCases.filter((r) => {
-    const res = results.find((x) => x.id === r.id);
+  const ambiguityDetected = ambiguityCases.filter((rec) => {
+    const res = byId.get(rec.id);
     return res?.actualDiagnosticCodes.some((c) => AMBIGUITY_CODES.includes(c));
-  }).length;
+  });
 
   const negatives = results.filter((r) => r.expectError);
   const falsePositives = negatives.filter((r) => !r.actualHadError);
@@ -423,18 +622,29 @@ export function runDataset(kb: KnowledgeBase, dataset: EvalDataset, name: string
     total,
     passed,
     failed: total - passed,
-    lexicalResolutionAccuracy: ratio(tokOk, tokTotal),
-    conceptSenseAccuracy: ratio(tokOk, tokTotal),
-    entityAttachmentAccuracy: ratio(results.filter((r) => r.attachmentsOk).length, total),
-    propertyValueBindingAccuracy: ratio(bindingsTotal, total),
-    referenceResolutionAccuracy: ratio(referenceCases, total),
-    astExactMatch: ratio(results.filter((r) => r.astOk).length, total),
-    planExactMatch: ratio(results.filter((r) => r.planOk).length, total),
-    endToEndSuccess: ratio(passed, total),
-    falsePositiveRate: ratio(falsePositives.length, negatives.length),
-    ambiguityDetectionRate: ratio(ambiguityDetected, ambiguityCases.length),
-    ambiguityCaseCount: ambiguityCases.length,
-    annotatedTokenCases: annotatedCases,
+    metrics: {
+      lexicalAccuracy: metricValue(lexMatched, lexItems, lexCovered, total),
+      senseAccuracy: metricValue(senseMatched, senseItems, senseCovered, total),
+      morphologicalAccuracy: metricValue(readMatched, readItems, readCovered, total),
+      attachmentAccuracy: metricValue(attMatched, attItems, attCovered, total),
+      bindingAccuracy: metricValue(bindMatched, bindItems, bindCovered, total),
+      referenceAccuracy: metricValue(refOk.length, refCov.length, refCov.length, total),
+      astExactMatch: metricValue(astOk.length, astCov.length, astCov.length, total),
+      planExactMatch: metricValue(planOk.length, planCov.length, planCov.length, total),
+      endToEnd: metricValue(passed, total, total, total),
+      falsePositiveRate: metricValue(
+        falsePositives.length,
+        negatives.length,
+        negatives.length,
+        total
+      ),
+      ambiguityDetectionRate: metricValue(
+        ambiguityDetected.length,
+        ambiguityCases.length,
+        ambiguityCases.length,
+        total
+      )
+    },
     results,
     failures: results.filter((r) => !r.passed)
   };
@@ -454,5 +664,5 @@ export function lexicalCoverage(engine: SemanticEngine, records: EvalRecord[]): 
       if (tok.candidates.length) resolved++;
     }
   }
-  return ratio(resolved, total);
+  return ratio(resolved, total) ?? 0;
 }
