@@ -62,6 +62,10 @@ interface FuzzCase {
 describe('Terminação garantida (F0.2)', () => {
   it('"crie uma caixa que tem" termina com UNSUPPORTED_OPERATION, sem mutação', () => {
     const engine = new SemanticEngine(createInitialKnowledgeBase());
+    // Aquecimento: a 1ª compilação de um worker frio inclui JIT; o orçamento
+    // mede a frase, não a carga do processo. (O laço infinito de L1 nunca
+    // terminaria, aquecido ou não.)
+    engine.analyze('crie uma caixa');
     const before = engine.store.document.nodes.size;
     const start = performance.now();
     const result = engine.execute('crie uma caixa que tem');
