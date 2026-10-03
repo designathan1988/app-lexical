@@ -13,7 +13,7 @@ const forms: Array<[string, string, string]> = [
   ['que', 'que', 'PRON'], ['quem', 'quem', 'PRON'],
   ['onde', 'onde', 'ADV'], ['quando', 'quando', 'ADV'],
   ['qual', 'qual', 'PRON'], ['como', 'como', 'ADV'],
-  ['o', 'o', 'DET'], ['a', 'a', 'DET'], ['uma', 'um', 'DET'],
+  ['o', 'o', 'DET'], ['a', 'o', 'DET'], ['uma', 'um', 'DET'],
   ['dois', 'dois', 'NUM'], ['três', 'três', 'NUM'],
   ['de', 'de', 'ADP'], ['em', 'em', 'ADP'], ['para', 'para', 'ADP'],
   ['e', 'e', 'CCONJ'], ['ou', 'ou', 'CCONJ'], ['porque', 'porque', 'SCONJ'],

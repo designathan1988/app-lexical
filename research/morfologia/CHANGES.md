@@ -38,7 +38,16 @@ Onde a divergência era erro do **teste**, o teste mudou; onde era erro da
 | `sent-020` a `sent-024`, `sent-030` | `cop` passou a depender do **predicativo** (que é o `root`), não do verbo de ligação | Padrão UD para orações copulativas: o predicativo é a raiz e o verbo de ligação é `cop`. A anotação anterior ligava `cop` a si mesmo. |
 | `sent-033` | `Tense=3` → `Tense=Pres` | erro de digitação. |
 
+## Teste novo de classes fechadas
+
+- `tests/language-closed-class.test.ts`: a expectativa para o artigo feminino `a`
+  passou de lema `a` para lema `o`. A convenção do Bosque registra `a` e `as`
+  como formas do lema `o`; a preposição `a` continua com lema `a`.
+  Fonte: https://universaldependencies.org/treebanks/pt_bosque/pt_bosque-pos-DET.html.
+  Nenhum item dos gabaritos de pesquisa foi alterado.
+
 ## Correções feitas nos **dados** (não nos testes)
+
 
 Registradas por transparência, porque mudaram o comportamento do analisador:
 
