@@ -28,7 +28,7 @@ describe('classes fechadas e tokenização', () => {
 
   it('conserva leituras concorrentes', () => {
     expect(new Set(closedClassReadings('a').map((r) => r.upos))).toEqual(new Set(['DET', 'ADP', 'PRON']));
-    expect(new Set(closedClassReadings('que').map((r) => r.upos))).toEqual(new Set(['PRON', 'SCONJ']));
+    expect(new Set(closedClassReadings('que').map((r) => r.upos))).toEqual(new Set(['PRON', 'DET', 'SCONJ']));
   });
 
   it.each([

@@ -52,6 +52,10 @@ Onde a divergência era erro do **teste**, o teste mudou; onde era erro da
   índice dava deslocamentos artificiais. A unidade de superfície é compatível
   com a distinção entre token e palavra do formato CoNLL-U:
   https://universaldependencies.org/format.html#words-tokens-and-empty-nodes.
+- `tests/language-closed-class.test.ts`: `que` passa a admitir também `DET`
+  interrogativo, mantendo `PRON` e `SCONJ`. O Bosque registra `que` com
+  `PronType=Int` na classe `DET`:
+  https://universaldependencies.org/treebanks/pt_bosque/index.html.
 
 ## Correções feitas nos **dados** (não nos testes)
 
