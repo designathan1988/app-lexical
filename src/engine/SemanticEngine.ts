@@ -10,6 +10,13 @@ import { diagnostic, normalizeSpan, type Diagnostic } from './diagnostics';
 import type { PlanSimulator } from './planning/TempNodes';
 import { createDerivationalAnalyzer } from '../knowledge/morphology';
 import type { DerivationalAnalyzer, DerivationAnalysis } from './morphology/DerivationalAnalyzer';
+import { tokenizeSentence } from './language/Tokenizer';
+import { LexicalAnalyzer } from './language/LexicalAnalyzer';
+import { LanguageTagger } from './language/Tagger';
+import { DependencyParser } from './language/DependencyParser';
+import { ClauseAnalyzer } from './language/ClauseAnalyzer';
+import { toConllu } from './language/Conllu';
+import type { SentenceAnalysis } from './language/SentenceAnalysis';
 
 export interface CommandResult {
   input: string;
@@ -85,6 +92,24 @@ export class SemanticEngine {
   analyzeWord(word: string): DerivationAnalysis[] {
     this.derivations ??= createDerivationalAnalyzer(this.knowledgeBase.lexemes);
     return this.derivations.analyze(word);
+  }
+
+  /** Analisa uma frase do português sem executar operações no documento. */
+  analyzeSentence(text: string): SentenceAnalysis {
+    const tokenization = tokenizeSentence(text);
+    const tagger = new LanguageTagger(new LexicalAnalyzer(this.knowledgeBase.lexemes));
+    const tagged = tagger.tagForms(tokenization.words.map((word) => word.form));
+    const dependencies = new DependencyParser().parse(tagged.words);
+    const clause = new ClauseAnalyzer().analyze(tagged.words, dependencies);
+    return {
+      text,
+      words: tagged.words,
+      multiwords: tokenization.multiwords,
+      dependencies,
+      clause,
+      conllu: toConllu(text, tagged.words, dependencies, tokenization.multiwords),
+      trace: { tagging: tagged.trace, dependencies: dependencies.map((arc) => ({ id: arc.id, rule: arc.rule })) }
+    };
   }
 
   updateSettings(settings: EngineSettings): void {
