@@ -178,7 +178,8 @@ export class DiscourseContext {
       }
 
       if (mention.reference.kind === 'NODE_SET') {
-        const alive = mention.reference.nodeIds.filter((id) => lookup(id));
+        // Ids temporários: grupo criado nesta mesma frase (ainda em staging).
+        const alive = mention.reference.nodeIds.filter((id) => isTempNodeId(id) || lookup(id));
         if (!alive.length) continue;
         return mention;
       }

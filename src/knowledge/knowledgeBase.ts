@@ -451,7 +451,7 @@ export const INITIAL_LEXEMES: Record<LexemeId, Lexeme> = {
   // Adjetivos de cor
   LEX_AZUL: lex('LEX_AZUL', 'azul', 'ADJECTIVE', ['C_VAL_BLUE'], { paradigmId: 'ADJ_L' }),
   LEX_VERMELHO: lex('LEX_VERMELHO', 'vermelho', 'ADJECTIVE', ['C_VAL_RED'], { paradigmId: 'ADJ_O' }),
-  LEX_VERDE: lex('LEX_VERDE', 'verde', 'ADJECTIVE', ['C_VAL_GREEN'], { paradigmId: 'ADJ_INVARIANT' }),
+  LEX_VERDE: lex('LEX_VERDE', 'verde', 'ADJECTIVE', ['C_VAL_GREEN'], { paradigmId: 'ADJ_UNIFORM' }),
   LEX_AMARELO: lex('LEX_AMARELO', 'amarelo', 'ADJECTIVE', ['C_VAL_YELLOW'], { paradigmId: 'ADJ_O' }),
   LEX_PRETO: lex('LEX_PRETO', 'preto', 'ADJECTIVE', ['C_VAL_BLACK'], { paradigmId: 'ADJ_O', allowsDiminutive: true }),
   LEX_BRANCO: lex('LEX_BRANCO', 'branco', 'ADJECTIVE', ['C_VAL_WHITE'], { paradigmId: 'ADJ_O' }),
@@ -548,6 +548,8 @@ function sf(
 const M = 'MASC' as const;
 const F = 'FEM' as const;
 const S = 'SINGULAR' as const;
+/** Cores compostas ("verde-escuro") são invariáveis: "camisas verde-escuro". */
+const INV = 'INVARIANT' as const;
 const P = 'PLURAL' as const;
 
 /**
@@ -664,11 +666,11 @@ export const INITIAL_SURFACE_FORMS: SurfaceForm[] = [
   sf('SF_DEPOIS', 'depois', 'LEX_DEPOIS'),
   sf('SF_ANTES', 'antes', 'LEX_ANTES'),
   sf('SF_LADO', 'lado', 'LEX_LADO', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_AZUL_CLARO', 'azul-claro', 'LEX_AZUL_CLARO', 'CANONICAL', { number: S }),
-  sf('SF_AZUL_ESCURO', 'azul-escuro', 'LEX_AZUL_ESCURO', 'CANONICAL', { number: S }),
-  sf('SF_VERDE_CLARO', 'verde-claro', 'LEX_VERDE_CLARO', 'CANONICAL', { number: S }),
-  sf('SF_VERDE_ESCURO', 'verde-escuro', 'LEX_VERDE_ESCURO', 'CANONICAL', { number: S }),
-  sf('SF_CINZA_CLARO', 'cinza-claro', 'LEX_CINZA_CLARO', 'CANONICAL', { number: S }),
+  sf('SF_AZUL_CLARO', 'azul-claro', 'LEX_AZUL_CLARO', 'CANONICAL', { number: INV }),
+  sf('SF_AZUL_ESCURO', 'azul-escuro', 'LEX_AZUL_ESCURO', 'CANONICAL', { number: INV }),
+  sf('SF_VERDE_CLARO', 'verde-claro', 'LEX_VERDE_CLARO', 'CANONICAL', { number: INV }),
+  sf('SF_VERDE_ESCURO', 'verde-escuro', 'LEX_VERDE_ESCURO', 'CANONICAL', { number: INV }),
+  sf('SF_CINZA_CLARO', 'cinza-claro', 'LEX_CINZA_CLARO', 'CANONICAL', { number: INV }),
   sf('SF_DIREITA', 'direita', 'LEX_DIREITA', 'CANONICAL', { gender: F, number: S }),
   sf('SF_ESQUERDA', 'esquerda', 'LEX_ESQUERDA', 'CANONICAL', { gender: F, number: S })
 ];

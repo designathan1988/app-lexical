@@ -38,7 +38,7 @@ import { entriesFor, type GrammarIndex, type GrammarEntry } from './GrammarIndex
 import { ParseError, type Diagnostic, type Span } from '../diagnostics';
 import type { EngineSettings } from '../EngineSettings';
 import { ClauseCanonicalizer, type CanonicalClause } from '../syntax/ClauseCanonicalizer';
-import { tempNodeId } from '../planning/TempNodes';
+import { tempNodeId, isTempNodeId, tempIdOf } from '../planning/TempNodes';
 
 function candidatesOfKind<K extends ConceptNode['kind']>(
   token: SemanticToken | undefined,
@@ -73,8 +73,9 @@ function coordinationAgreement(members: Array<Agreement | undefined>): Agreement
 }
 
 function agrees(adjective: Agreement, head: Agreement): boolean {
-  const gender = !adjective.gender || !head.gender || adjective.gender === head.gender;
-  const number = !adjective.number || !head.number || adjective.number === head.number;
+  const free = (x?: string) => !x || x === 'INVARIANT';
+  const gender = free(adjective.gender) || free(head.gender) || adjective.gender === head.gender;
+  const number = free(adjective.number) || free(head.number) || adjective.number === head.number;
   return gender && number;
 }
 
@@ -140,6 +141,8 @@ export class DomainParser {
   private agreementContext: Agreement[] | null = null;
   /** Concordância do núcleo da última referência analisada. */
   private lastReferenceAgreement: Agreement | undefined;
+  /** Tipo de cada entidade criada na frase (pronome que a retoma: "pinte-a"). */
+  private tempTypes = new Map<TempNodeId, ConceptId>();
   /** Entidades que um pronome NÃO pode ter como antecedente (Princípio B). */
   private pronounExcludedTemps = new Set<TempNodeId>();
 
@@ -199,6 +202,12 @@ export class DomainParser {
       const entity = candidatesOfKind(token, this.ctx.concepts, 'ENTITY')[0];
       return entity ? { conceptId: entity.conceptId, gender: entity.morphology?.gender } : null;
     }
+  }
+
+  /** Tipo de um nó do documento ou de uma entidade criada na frase (`tmp:`). */
+  private typeOfNodeId(id: DocumentNodeId): ConceptId | undefined {
+    if (isTempNodeId(id)) return this.tempTypes.get(tempIdOf(id));
+    return this.ctx.nodeLookup(id)?.entityConceptId;
   }
 
   /** Remove posicionamentos repetidos (mesma origem, relação e alvo). */
@@ -590,10 +599,11 @@ export class DomainParser {
     cursor.consume();
     consumed = true;
 
-    // "gostaria de apagar…": o "de" do complemento é consumido como parte
-    // do wrapper apenas se NÃO houver ação logo em seguida e o token
-    // seguinte o exigir (verbo no infinitivo).
-    void desire;
+    // "por favor, crie…": a vírgula depois da cortesia inicial é dela.
+    if (this.isCommaToken(cursor.peek())) cursor.consume();
+
+    // "gostaria de apagar…" (infinitivo) ou "gostaria de uma caixa" (SN): o
+    // "de" do complemento pertence ao wrapper.
     if (this.hasOperator(cursor.peek(), 'PARTITIVE')) {
       const after = cursor.peek(1);
       const afterIsAction = candidatesOfKind(after, this.ctx.concepts, 'ACTION').length > 0;
@@ -1496,7 +1506,7 @@ export class DomainParser {
   private expandMixedSets(references: SemanticReference[]): SemanticReference[] {
     return references.flatMap((reference): SemanticReference[] => {
       if (reference.kind !== 'NODE_SET') return [reference];
-      const types = new Set(reference.nodeIds.map((id) => this.ctx.nodeLookup(id)?.entityConceptId));
+      const types = new Set(reference.nodeIds.map((id) => this.typeOfNodeId(id)));
       if (types.size <= 1) return [reference];
       return reference.nodeIds.map((nodeId) => ({ kind: 'NODE_ID' as const, nodeId }));
     });
@@ -1617,11 +1627,12 @@ export class DomainParser {
         return this.ctx.nodeLookup(reference.nodeId)?.entityConceptId;
       case 'NODE_SET': {
         // Grupo pronominal ("eles"): o tipo comum, se houver um só.
-        const types = new Set(reference.nodeIds.map((id) => this.ctx.nodeLookup(id)?.entityConceptId));
+        const types = new Set(reference.nodeIds.map((id) => this.typeOfNodeId(id)));
         return types.size === 1 ? [...types][0] : undefined;
       }
       case 'NEW_ENTITY':
-        return undefined;
+        // Entidade criada antes nesta frase ("crie uma caixa e pinte-a").
+        return this.tempTypes.get(reference.tempId);
       case 'CURRENT_SELECTION':
         return undefined;
     }
@@ -1804,6 +1815,7 @@ export class DomainParser {
     }
 
     this.entityAgreement.set(tempId, { gender: head.gender, number: head.number });
+    this.tempTypes.set(tempId, entity.entityConceptId);
 
     this.ctx.discourse.stage({
       reference: { kind: 'NEW_ENTITY', tempId },

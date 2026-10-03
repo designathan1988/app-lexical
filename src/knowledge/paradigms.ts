@@ -733,11 +733,20 @@ export function buildParadigms(): Record<ParadigmId, Paradigm> {
       cells: [cell({ Number: 'Sing' }, 'l'), cell({ Number: 'Plur' }, 'is')]
     },
     /** Uniforme em gênero com plural em -s (verde/verdes, cinza/cinzas). */
+    // Uniforme em gênero, variável em número: "verde/verdes".
+    ADJ_UNIFORM: {
+      id: 'ADJ_UNIFORM',
+      pos: 'ADJECTIVE',
+      strip: '',
+      cells: [cell({ Number: 'Sing' }, ''), cell({ Number: 'Plur' }, 's')]
+    },
     ADJ_INVARIANT: {
       id: 'ADJ_INVARIANT',
       pos: 'ADJECTIVE',
       strip: '',
-      cells: [cell({ Number: 'Sing' }, ''), cell({ Number: 'Plur' }, 's')]
+      // Cores-substantivo ("cinza", "rosa", "laranja") são invariáveis na
+      // norma ("textos cinza"); a forma com -s é aceita como variante.
+      cells: [cell({ Number: 'Inv' }, ''), cell({ Number: 'Plur' }, 's')]
     }
   };
 }
