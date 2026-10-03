@@ -1,0 +1,40 @@
+==========================================================================
+VERIFICADOR — rede gerativa do português
+==========================================================================
+
+INVENTÁRIO
+  regras de formação ................ 48
+  paradigmas propostos .............. 24
+  verbos irregulares completos ...... 31
+  particípios suplementares ......... 6
+  léxico-semente .................... 1160 (VERB 367, NOUN 407, ADJECTIVE 154, ADVERB 60, DETERMINER 22, PRONOUN 31, PREPOSITION 44, CONJUNCTION 27, NUMERAL 48)
+  molduras de argumentos ............ 422
+  tipos / funções semânticas ........ 40 / 32
+  frases anotadas ................... 80
+
+ESQUEMA E REFERÊNCIAS CRUZADAS
+  OK — nenhum erro de esquema, id duplicado ou referência quebrada.
+  AVISO: affix-rules: PAR_ES_ECER tem 3 exemplos — o padrão es-…-ecer tem pouquíssimos membros no PB (esclarecer, esmorecer, estremecer); listam-se todos os correntes.
+  AVISO: affix-rules: PAR_ES_AR tem 3 exemplos — o padrão es-…-ar tem poucos membros no PB (esfriar, esvaziar, esquentar); listam-se todos os correntes.
+
+EXEMPLOS DE REGRA REPRODUZIDOS POR generate
+  100.0% (284/284)
+
+TESTES DE DERIVAÇÃO (por categoria)
+  aglutinação      100.0% (5/5)
+  conversão        100.0% (26/26)
+  justaposição     100.0% (20/20)
+  lexicalizados    100.0% (20/20)
+  multinível       100.0% (87/87)
+  negativos        100.0% (76/76)
+  parassíntese     100.0% (32/32)
+  regressiva       100.0% (22/22)
+  sufixo           100.0% (161/161)
+  TOTAL            100.0% (449/449)
+
+TESTES DE FLEXÃO
+  100.0% (258/258)
+
+FALHAS (0)
+  nenhuma
+==========================================================================

@@ -12,1392 +12,4490 @@
   },
   "rules": [
     {
-      "id": "SUF_DOR", "process": "SUFFIX", "form": { "suffix": "dor" },
-      "input": { "pos": "VERB", "constraints": { "actional": true } },
-      "output": { "pos": "NOUN", "gender": "Masc", "inflectionParadigm": "N_OR_ORES_ORA" },
+      "id": "SUF_DOR",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "dor"
+      },
+      "input": {
+        "pos": "VERB",
+        "constraints": {
+          "actional": true
+        }
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Masc",
+        "inflectionParadigm": "N_OR_ORES_ORA"
+      },
       "stem": "VERB_ROOT",
       "allomorphy": [
-        { "when": { "verbClass": "AR" }, "stemChange": "-ar → -ador", "example": "trabalhar → trabalhador" },
-        { "when": { "verbClass": "ER" }, "stemChange": "-er → -edor", "example": "vender → vendedor" },
-        { "when": { "verbClass": "IR" }, "stemChange": "-ir → -idor", "example": "consumir → consumidor" },
-        { "when": { "verbClass": "ER", "stemEnds": "rr" }, "stemChange": "raiz + -edor", "example": "correr → corredor" },
-        { "when": { "irregular": true }, "stemChange": "raiz latina", "example": "produzir → produtor" }
+        {
+          "when": {
+            "verbClass": "AR"
+          },
+          "stemChange": "-ar → -ador",
+          "example": "trabalhar → trabalhador"
+        },
+        {
+          "when": {
+            "verbClass": "ER"
+          },
+          "stemChange": "-er → -edor",
+          "example": "vender → vendedor"
+        },
+        {
+          "when": {
+            "verbClass": "IR"
+          },
+          "stemChange": "-ir → -idor",
+          "example": "consumir → consumidor"
+        },
+        {
+          "when": {
+            "verbClass": "ER",
+            "stemEnds": "rr"
+          },
+          "stemChange": "raiz + -edor",
+          "example": "correr → corredor"
+        },
+        {
+          "when": {
+            "irregular": true
+          },
+          "stemChange": "raiz latina",
+          "example": "produzir → produtor"
+        }
       ],
-      "semantics": { "function": "AGENT_OF", "alsoPossible": ["INSTRUMENT_OF"] },
+      "semantics": {
+        "function": "AGENT_OF",
+        "alsoPossible": [
+          "INSTRUMENT_OF"
+        ]
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "vender", "derived": "vendedor" },
-        { "base": "trabalhar", "derived": "trabalhador" },
-        { "base": "jogar", "derived": "jogador" },
-        { "base": "comprar", "derived": "comprador" },
-        { "base": "cantar", "derived": "cantador" },
-        { "base": "consumir", "derived": "consumidor" },
-        { "base": "correr", "derived": "corredor" }
+        {
+          "base": "vender",
+          "derived": "vendedor"
+        },
+        {
+          "base": "trabalhar",
+          "derived": "trabalhador"
+        },
+        {
+          "base": "jogar",
+          "derived": "jogador"
+        },
+        {
+          "base": "comprar",
+          "derived": "comprador"
+        },
+        {
+          "base": "cantar",
+          "derived": "cantador"
+        },
+        {
+          "base": "consumir",
+          "derived": "consumidor"
+        },
+        {
+          "base": "correr",
+          "derived": "corredor"
+        }
       ],
       "counterExamples": [
-        { "base": "morrer", "wouldBe": "morredor", "reason": "SEMANTIC_RESTRICTION" },
-        { "base": "estar", "wouldBe": "estador", "reason": "SEMANTIC_RESTRICTION" },
-        { "base": "fazer", "wouldBe": "fazedor", "reason": "BLOCKED_BY:autor" }
+        {
+          "base": "morrer",
+          "wouldBe": "morredor",
+          "reason": "SEMANTIC_RESTRICTION"
+        },
+        {
+          "base": "estar",
+          "wouldBe": "estador",
+          "reason": "SEMANTIC_RESTRICTION"
+        },
+        {
+          "base": "fazer",
+          "wouldBe": "fazedor",
+          "reason": "BLOCKED_BY:autor"
+        }
       ],
       "sources": [
-        { "ref": "Basílio, Teoria Lexical (agente/instrumento -dor)", "verified": false, "note": "fato padrão; página não verificada" },
-        { "ref": "Cunha & Cintra, Nova Gramática (sufixos agentivos)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Basílio, Teoria Lexical (agente/instrumento -dor)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        },
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (sufixos agentivos)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_NTE", "process": "SUFFIX", "form": { "suffix": "nte" },
-      "input": { "pos": "VERB" },
-      "output": { "pos": "NOUN", "gender": "Inv", "inflectionParadigm": "N_INVARIANT" },
+      "id": "SUF_NTE",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "nte"
+      },
+      "input": {
+        "pos": "VERB"
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Inv",
+        "inflectionParadigm": "N_INVARIANT"
+      },
       "stem": "INFINITIVE_MINUS_R",
       "allomorphy": [
-        { "when": { "verbClass": "AR" }, "stemChange": "-ar → -ante", "example": "estudar → estudante" },
-        { "when": { "verbClass": "ER" }, "stemChange": "-er → -ente", "example": "vender → vendente" },
-        { "when": { "verbClass": "IR" }, "stemChange": "-ir → -inte", "example": "assistir → assistente" },
-        { "when": { "verb": "ouvir" }, "stemChange": "ouv + inte", "example": "ouvir → ouvinte" },
-        { "when": { "verb": "seguir" }, "stemChange": "segu + inte", "example": "seguir → seguinte" }
+        {
+          "when": {
+            "verbClass": "AR"
+          },
+          "stemChange": "-ar → -ante",
+          "example": "estudar → estudante"
+        },
+        {
+          "when": {
+            "verbClass": "ER"
+          },
+          "stemChange": "-er → -ente",
+          "example": "vender → vendente"
+        },
+        {
+          "when": {
+            "verbClass": "IR"
+          },
+          "stemChange": "-ir → -inte",
+          "example": "assistir → assistente"
+        },
+        {
+          "when": {
+            "verb": "ouvir"
+          },
+          "stemChange": "ouv + inte",
+          "example": "ouvir → ouvinte"
+        },
+        {
+          "when": {
+            "verb": "seguir"
+          },
+          "stemChange": "segu + inte",
+          "example": "seguir → seguinte"
+        }
       ],
-      "semantics": { "function": "AGENT_OF" },
+      "semantics": {
+        "function": "AGENT_OF"
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "estudar", "derived": "estudante" },
-        { "base": "assistir", "derived": "assistente" },
-        { "base": "ouvir", "derived": "ouvinte" },
-        { "base": "vender", "derived": "vendente" },
-        { "base": "seguir", "derived": "seguinte" }
+        {
+          "base": "estudar",
+          "derived": "estudante"
+        },
+        {
+          "base": "assistir",
+          "derived": "assistente"
+        },
+        {
+          "base": "ouvir",
+          "derived": "ouvinte"
+        },
+        {
+          "base": "vender",
+          "derived": "vendente"
+        },
+        {
+          "base": "seguir",
+          "derived": "seguinte"
+        }
       ],
       "counterExamples": [
-        { "base": "beber", "wouldBe": "bebente", "reason": "NOT_ATTESTED" },
-        { "base": "comer", "wouldBe": "comente", "reason": "NOT_ATTESTED" }
+        {
+          "base": "beber",
+          "wouldBe": "bebente",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "comer",
+          "wouldBe": "comente",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Rocha, Estruturas Morfológicas do Português (-nte)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Rocha, Estruturas Morfológicas do Português (-nte)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_CAO", "process": "SUFFIX", "form": { "suffix": "ção" },
-      "input": { "pos": "VERB" },
-      "output": { "pos": "NOUN", "gender": "Fem", "inflectionParadigm": "N_AO_OES" },
+      "id": "SUF_CAO",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "ção"
+      },
+      "input": {
+        "pos": "VERB"
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Fem",
+        "inflectionParadigm": "N_AO_OES"
+      },
       "stem": "LATINATE_STEM",
       "allomorphy": [
-        { "when": { "verbClass": "AR" }, "stemChange": "-ar → -ação", "example": "criar → criação" },
-        { "when": { "verbClass": "IR", "theme": "u" }, "stemChange": "raiz + ção (produzir → produç + ão)", "example": "produzir → produção" },
-        { "when": { "verbClass": "IR", "theme": "i" }, "stemChange": "raiz + ição/-são (decidir → decis + ão)", "example": "decidir → decisão" },
-        { "when": { "verbClass": "ER" }, "stemChange": "raiz latina + ção (absorver → absorç + ão)", "example": "absorver → absorção" },
-        { "when": { "verb": "eleger" }, "stemChange": "elei + ção", "example": "eleger → eleição" },
-        { "when": { "verb": "agir" }, "stemChange": "intera + ção", "example": "interagir → interação" },
-        { "when": { "verb": "dividir" }, "stemChange": "divis + ão", "example": "dividir → divisão" },
-        { "when": { "verb": "descrever" }, "stemChange": "descri + ção", "example": "descrever → descrição" }
+        {
+          "when": {
+            "verbClass": "AR"
+          },
+          "stemChange": "-ar → -ação",
+          "example": "criar → criação"
+        },
+        {
+          "when": {
+            "verbClass": "IR",
+            "theme": "u"
+          },
+          "stemChange": "raiz + ção (produzir → produç + ão)",
+          "example": "produzir → produção"
+        },
+        {
+          "when": {
+            "verbClass": "IR",
+            "theme": "i"
+          },
+          "stemChange": "raiz + ição/-são (decidir → decis + ão)",
+          "example": "decidir → decisão"
+        },
+        {
+          "when": {
+            "verbClass": "ER"
+          },
+          "stemChange": "raiz latina + ção (absorver → absorç + ão)",
+          "example": "absorver → absorção"
+        },
+        {
+          "when": {
+            "verb": "eleger"
+          },
+          "stemChange": "elei + ção",
+          "example": "eleger → eleição"
+        },
+        {
+          "when": {
+            "verb": "agir"
+          },
+          "stemChange": "intera + ção",
+          "example": "interagir → interação"
+        },
+        {
+          "when": {
+            "verb": "dividir"
+          },
+          "stemChange": "divis + ão",
+          "example": "dividir → divisão"
+        },
+        {
+          "when": {
+            "verb": "descrever"
+          },
+          "stemChange": "descri + ção",
+          "example": "descrever → descrição"
+        },
+        {
+          "when": {
+            "verb": "reeleger"
+          },
+          "stemChange": "reelei + ção",
+          "example": "reeleger → reeleição"
+        }
       ],
-      "semantics": { "function": "ACTION_OF", "alsoPossible": ["RESULT_OF"] },
+      "semantics": {
+        "function": "ACTION_OF",
+        "alsoPossible": [
+          "RESULT_OF"
+        ]
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "criar", "derived": "criação" },
-        { "base": "comunicar", "derived": "comunicação" },
-        { "base": "informar", "derived": "informação" },
-        { "base": "produzir", "derived": "produção" },
-        { "base": "decidir", "derived": "decisão" },
-        { "base": "dividir", "derived": "divisão" },
-        { "base": "eleger", "derived": "eleição" },
-        { "base": "absorver", "derived": "absorção" }
+        {
+          "base": "criar",
+          "derived": "criação"
+        },
+        {
+          "base": "comunicar",
+          "derived": "comunicação"
+        },
+        {
+          "base": "informar",
+          "derived": "informação"
+        },
+        {
+          "base": "produzir",
+          "derived": "produção"
+        },
+        {
+          "base": "decidir",
+          "derived": "decisão"
+        },
+        {
+          "base": "dividir",
+          "derived": "divisão"
+        },
+        {
+          "base": "eleger",
+          "derived": "eleição"
+        },
+        {
+          "base": "absorver",
+          "derived": "absorção"
+        }
       ],
       "counterExamples": [
-        { "base": "casar", "wouldBe": "casação", "reason": "BLOCKED_BY:casamento" },
-        { "base": "querer", "wouldBe": "querição", "reason": "NOT_ATTESTED" }
+        {
+          "base": "casar",
+          "wouldBe": "casação",
+          "reason": "BLOCKED_BY:casamento"
+        },
+        {
+          "base": "querer",
+          "wouldBe": "querição",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Basílio, Formação e Classes de Palavras no Português do Brasil (-ção)", "verified": false, "note": "fato padrão; página não verificada" },
-        { "ref": "Alfa (UNESP), artigo sobre -ção × -mento", "url": "https://periodicos.fclar.unesp.br/alfa/article/download/3837/3544/9435", "verified": false, "note": "URL fornecido no prompt; conteúdo não verificado nesta sessão" }
+        {
+          "ref": "Basílio, Formação e Classes de Palavras no Português do Brasil (-ção)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        },
+        {
+          "ref": "Alfa (UNESP), artigo sobre -ção × -mento",
+          "url": "https://periodicos.fclar.unesp.br/alfa/article/download/3837/3544/9435",
+          "verified": false,
+          "note": "URL fornecido no prompt; conteúdo não verificado nesta sessão"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_MENTO", "process": "SUFFIX", "form": { "suffix": "mento" },
-      "input": { "pos": "VERB" },
-      "output": { "pos": "NOUN", "gender": "Masc", "inflectionParadigm": "N_S" },
+      "id": "SUF_MENTO",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "mento"
+      },
+      "input": {
+        "pos": "VERB"
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Masc",
+        "inflectionParadigm": "N_S"
+      },
       "stem": "VERB_ROOT",
       "allomorphy": [
-        { "when": { "verbClass": "AR" }, "stemChange": "-ar → -amento", "example": "casar → casamento" },
-        { "when": { "verbClass": "ER" }, "stemChange": "-er → -imento", "example": "vencer → vencimento" },
-        { "when": { "verbClass": "IR" }, "stemChange": "-ir → -imento", "example": "sentir → sentimento" }
+        {
+          "when": {
+            "verbClass": "AR"
+          },
+          "stemChange": "-ar → -amento",
+          "example": "casar → casamento"
+        },
+        {
+          "when": {
+            "verbClass": "ER"
+          },
+          "stemChange": "-er → -imento",
+          "example": "vencer → vencimento"
+        },
+        {
+          "when": {
+            "verbClass": "IR"
+          },
+          "stemChange": "-ir → -imento",
+          "example": "sentir → sentimento"
+        }
       ],
-      "semantics": { "function": "ACTION_OF", "alsoPossible": ["RESULT_OF"] },
+      "semantics": {
+        "function": "ACTION_OF",
+        "alsoPossible": [
+          "RESULT_OF"
+        ]
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "casar", "derived": "casamento" },
-        { "base": "vencer", "derived": "vencimento" },
-        { "base": "pagar", "derived": "pagamento" },
-        { "base": "armar", "derived": "armamento" },
-        { "base": "sentir", "derived": "sentimento" },
-        { "base": "carregar", "derived": "carregamento" }
+        {
+          "base": "casar",
+          "derived": "casamento"
+        },
+        {
+          "base": "vencer",
+          "derived": "vencimento"
+        },
+        {
+          "base": "pagar",
+          "derived": "pagamento"
+        },
+        {
+          "base": "armar",
+          "derived": "armamento"
+        },
+        {
+          "base": "sentir",
+          "derived": "sentimento"
+        },
+        {
+          "base": "carregar",
+          "derived": "carregamento"
+        }
       ],
       "counterExamples": [
-        { "base": "trabalhar", "wouldBe": "trabalhamento", "reason": "BLOCKED_BY:trabalho" },
-        { "base": "fazer", "wouldBe": "fazimento", "reason": "BLOCKED_BY:feitura" },
-        { "base": "morar", "wouldBe": "moramento", "reason": "BLOCKED_BY:moradia" },
-        { "base": "beber", "wouldBe": "bebimento", "reason": "NOT_ATTESTED" },
-        { "base": "querer", "wouldBe": "querimento", "reason": "NOT_ATTESTED" }
+        {
+          "base": "trabalhar",
+          "wouldBe": "trabalhamento",
+          "reason": "BLOCKED_BY:trabalho"
+        },
+        {
+          "base": "fazer",
+          "wouldBe": "fazimento",
+          "reason": "BLOCKED_BY:feitura"
+        },
+        {
+          "base": "morar",
+          "wouldBe": "moramento",
+          "reason": "BLOCKED_BY:moradia"
+        },
+        {
+          "base": "beber",
+          "wouldBe": "bebimento",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "querer",
+          "wouldBe": "querimento",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Alfa (UNESP), -ção × -mento", "url": "https://periodicos.fclar.unesp.br/alfa/article/download/3837/3544/9435", "verified": false, "note": "URL fornecido no prompt; conteúdo não verificado nesta sessão" },
-        { "ref": "Basílio, Teoria Lexical (concorrência -ção/-mento)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Alfa (UNESP), -ção × -mento",
+          "url": "https://periodicos.fclar.unesp.br/alfa/article/download/3837/3544/9435",
+          "verified": false,
+          "note": "URL fornecido no prompt; conteúdo não verificado nesta sessão"
+        },
+        {
+          "ref": "Basílio, Teoria Lexical (concorrência -ção/-mento)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH",
       "note": "o primeiro contraexemplo documenta que casar seleciona -mento e bloqueia -ção; incluído aqui para o verificador (o bloqueio de casação é declarado em SUF_CAO)."
     },
     {
-      "id": "SUF_VEL", "process": "SUFFIX", "form": { "suffix": "vel" },
-      "input": { "pos": "VERB", "constraints": { "transitive": true } },
-      "output": { "pos": "ADJECTIVE", "inflectionParadigm": "ADJ_UNIFORM" },
+      "id": "SUF_VEL",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "vel"
+      },
+      "input": {
+        "pos": "VERB",
+        "constraints": {
+          "transitive": true
+        }
+      },
+      "output": {
+        "pos": "ADJECTIVE",
+        "inflectionParadigm": "ADJ_UNIFORM"
+      },
       "stem": "PARTICIPLE_STEM",
       "allomorphy": [
-        { "when": { "verbClass": "AR" }, "stemChange": "-ar → -ável", "example": "lavar → lavável" },
-        { "when": { "verbClass": "ER" }, "stemChange": "-er → -ível", "example": "comer → comível" },
-        { "when": { "verbClass": "IR" }, "stemChange": "-ir → -ível", "example": "dividir → divisível" },
-        { "when": { "verb": "ver" }, "stemChange": "vis + ível", "example": "ver → visível" },
-        { "when": { "verb": "ler" }, "stemChange": "leg + ível", "example": "ler → legível" },
-        { "when": { "verb": "ouvir" }, "stemChange": "aud + ível", "example": "ouvir → audível" },
-        { "when": { "verb": "reverter" }, "stemChange": "revers + ível", "example": "reverter → reversível" },
-        { "when": { "verb": "destruir" }, "stemChange": "destrut + ível", "example": "destruir → destrutível" }
+        {
+          "when": {
+            "verbClass": "AR"
+          },
+          "stemChange": "-ar → -ável",
+          "example": "lavar → lavável"
+        },
+        {
+          "when": {
+            "verbClass": "ER"
+          },
+          "stemChange": "-er → -ível",
+          "example": "comer → comível"
+        },
+        {
+          "when": {
+            "verbClass": "IR"
+          },
+          "stemChange": "-ir → -ível",
+          "example": "dividir → divisível"
+        },
+        {
+          "when": {
+            "verb": "ver"
+          },
+          "stemChange": "vis + ível",
+          "example": "ver → visível"
+        },
+        {
+          "when": {
+            "verb": "ler"
+          },
+          "stemChange": "leg + ível",
+          "example": "ler → legível"
+        },
+        {
+          "when": {
+            "verb": "ouvir"
+          },
+          "stemChange": "aud + ível",
+          "example": "ouvir → audível"
+        },
+        {
+          "when": {
+            "verb": "reverter"
+          },
+          "stemChange": "revers + ível",
+          "example": "reverter → reversível"
+        },
+        {
+          "when": {
+            "verb": "destruir"
+          },
+          "stemChange": "destrut + ível",
+          "example": "destruir → destrutível"
+        }
       ],
-      "semantics": { "function": "POSSIBLE_PASSIVE" },
+      "semantics": {
+        "function": "POSSIBLE_PASSIVE"
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "amar", "derived": "amável" },
-        { "base": "lavar", "derived": "lavável" },
-        { "base": "comer", "derived": "comível" },
-        { "base": "beber", "derived": "bebível" },
-        { "base": "vencer", "derived": "vencível" },
-        { "base": "ver", "derived": "visível" },
-        { "base": "esquecer", "derived": "esquecível" }
+        {
+          "base": "amar",
+          "derived": "amável"
+        },
+        {
+          "base": "lavar",
+          "derived": "lavável"
+        },
+        {
+          "base": "comer",
+          "derived": "comível"
+        },
+        {
+          "base": "beber",
+          "derived": "bebível"
+        },
+        {
+          "base": "vencer",
+          "derived": "vencível"
+        },
+        {
+          "base": "ver",
+          "derived": "visível"
+        },
+        {
+          "base": "esquecer",
+          "derived": "esquecível"
+        }
       ],
       "counterExamples": [
-        { "base": "morrer", "wouldBe": "morrível", "reason": "SEMANTIC_RESTRICTION" },
-        { "base": "poder", "wouldBe": "podível", "reason": "BLOCKED_BY:possível" },
-        { "base": "estar", "wouldBe": "estável", "reason": "BLOCKED_BY:estável (forma existente de outra base)" }
+        {
+          "base": "morrer",
+          "wouldBe": "morrível",
+          "reason": "SEMANTIC_RESTRICTION"
+        },
+        {
+          "base": "poder",
+          "wouldBe": "podível",
+          "reason": "BLOCKED_BY:possível"
+        },
+        {
+          "base": "estar",
+          "wouldBe": "estável",
+          "reason": "BLOCKED_BY:estável (forma existente de outra base)"
+        }
       ],
       "sources": [
-        { "ref": "Basílio, Teoria Lexical (-vel)", "verified": false, "note": "fato padrão; página não verificada" },
-        { "ref": "Sandmann, Formação de Palavras no Português Brasileiro Contemporâneo", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Basílio, Teoria Lexical (-vel)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        },
+        {
+          "ref": "Sandmann, Formação de Palavras no Português Brasileiro Contemporâneo",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_ADE", "process": "SUFFIX", "form": { "suffix": "idade" },
-      "input": { "pos": "ADJECTIVE" },
-      "output": { "pos": "NOUN", "gender": "Fem", "inflectionParadigm": "N_S" },
+      "id": "SUF_ADE",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "idade"
+      },
+      "input": {
+        "pos": "ADJECTIVE"
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Fem",
+        "inflectionParadigm": "N_S"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "stemEnds": "z" }, "stemChange": "-z → -c + idade", "example": "feliz → felicidade" },
-        { "when": { "stemEnds": "l" }, "stemChange": "radical + dade", "example": "leal → lealdade" },
-        { "when": { "monosyllabic": true }, "stemChange": "radical + dade", "example": "bom → bondade" },
-        { "when": { "stemEnds": "vel" }, "stemChange": "-vel → -bilidade", "example": "possível → possibilidade" }
+        {
+          "when": {
+            "stemEnds": "z"
+          },
+          "stemChange": "-z → -c + idade",
+          "example": "feliz → felicidade"
+        },
+        {
+          "when": {
+            "stemEnds": "l"
+          },
+          "stemChange": "radical + dade",
+          "example": "leal → lealdade"
+        },
+        {
+          "when": {
+            "monosyllabic": true
+          },
+          "stemChange": "radical + dade",
+          "example": "bom → bondade"
+        },
+        {
+          "when": {
+            "stemEnds": "vel"
+          },
+          "stemChange": "-vel → -bilidade",
+          "example": "possível → possibilidade"
+        },
+        {
+          "when": {
+            "stemEnds": "l"
+          },
+          "stemChange": "radical + idade (imoral → imoralidade)",
+          "example": "imoral → imoralidade"
+        },
+        {
+          "when": {
+            "verb": "móvel"
+          },
+          "stemChange": "móvel → mobilidade",
+          "example": "imóvel → imobilidade"
+        },
+        {
+          "when": {
+            "verb": "estável"
+          },
+          "stemChange": "estável → estabilidade",
+          "example": "estável → estabilidade"
+        }
       ],
-      "semantics": { "function": "QUALITY_OF" },
+      "semantics": {
+        "function": "QUALITY_OF"
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "feliz", "derived": "felicidade" },
-        { "base": "claro", "derived": "claridade" },
-        { "base": "útil", "derived": "utilidade" },
-        { "base": "leal", "derived": "lealdade" },
-        { "base": "bom", "derived": "bondade" },
-        { "base": "possível", "derived": "possibilidade" }
+        {
+          "base": "feliz",
+          "derived": "felicidade"
+        },
+        {
+          "base": "claro",
+          "derived": "claridade"
+        },
+        {
+          "base": "útil",
+          "derived": "utilidade"
+        },
+        {
+          "base": "leal",
+          "derived": "lealdade"
+        },
+        {
+          "base": "bom",
+          "derived": "bondade"
+        },
+        {
+          "base": "possível",
+          "derived": "possibilidade"
+        }
       ],
       "counterExamples": [
-        { "base": "triste", "wouldBe": "tristidade", "reason": "BLOCKED_BY:tristeza" },
-        { "base": "alto", "wouldBe": "altidade", "reason": "BLOCKED_BY:altura" },
-        { "base": "belo", "wouldBe": "belidade", "reason": "BLOCKED_BY:beleza" }
+        {
+          "base": "triste",
+          "wouldBe": "tristidade",
+          "reason": "BLOCKED_BY:tristeza"
+        },
+        {
+          "base": "alto",
+          "wouldBe": "altidade",
+          "reason": "BLOCKED_BY:altura"
+        },
+        {
+          "base": "belo",
+          "wouldBe": "belidade",
+          "reason": "BLOCKED_BY:beleza"
+        }
       ],
       "sources": [
-        { "ref": "Cunha & Cintra, Nova Gramática (-idade)", "verified": false, "note": "fato padrão; página não verificada" },
-        { "ref": "Basílio, Teoria Lexical (bloqueio por forma concorrente)", "verified": false, "note": "conceito de Aronoff; página não verificada" },
-        { "ref": "Aronoff, Word Formation in Generative Grammar", "url": "https://mitwpl.mit.edu/catalog/aron01/", "verified": false, "note": "URL fornecido no prompt; conceito de bloqueio citado, conteúdo não verificado nesta sessão" }
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (-idade)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        },
+        {
+          "ref": "Basílio, Teoria Lexical (bloqueio por forma concorrente)",
+          "verified": false,
+          "note": "conceito de Aronoff; página não verificada"
+        },
+        {
+          "ref": "Aronoff, Word Formation in Generative Grammar",
+          "url": "https://mitwpl.mit.edu/catalog/aron01/",
+          "verified": false,
+          "note": "URL fornecido no prompt; conceito de bloqueio citado, conteúdo não verificado nesta sessão"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_EZ", "process": "SUFFIX", "form": { "suffix": "eza" },
-      "input": { "pos": "ADJECTIVE" },
-      "output": { "pos": "NOUN", "gender": "Fem", "inflectionParadigm": "N_S" },
+      "id": "SUF_EZ",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "eza"
+      },
+      "input": {
+        "pos": "ADJECTIVE"
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Fem",
+        "inflectionParadigm": "N_S"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + eza", "example": "triste → tristeza" },
-        { "when": { "stemEnds": "c" }, "stemChange": "radical + ez", "example": "escasso → escassez" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + eza",
+          "example": "triste → tristeza"
+        },
+        {
+          "when": {
+            "stemEnds": "c"
+          },
+          "stemChange": "radical + ez",
+          "example": "escasso → escassez"
+        }
       ],
-      "semantics": { "function": "QUALITY_OF" },
+      "semantics": {
+        "function": "QUALITY_OF"
+      },
       "productivity": "MEDIUM",
       "examples": [
-        { "base": "triste", "derived": "tristeza" },
-        { "base": "duro", "derived": "dureza" },
-        { "base": "certo", "derived": "certeza" },
-        { "base": "belo", "derived": "beleza" },
-        { "base": "pobre", "derived": "pobreza" }
+        {
+          "base": "triste",
+          "derived": "tristeza"
+        },
+        {
+          "base": "duro",
+          "derived": "dureza"
+        },
+        {
+          "base": "certo",
+          "derived": "certeza"
+        },
+        {
+          "base": "belo",
+          "derived": "beleza"
+        },
+        {
+          "base": "pobre",
+          "derived": "pobreza"
+        }
       ],
       "counterExamples": [
-        { "base": "feliz", "wouldBe": "felizeza", "reason": "BLOCKED_BY:felicidade" },
-        { "base": "bom", "wouldBe": "boneza", "reason": "BLOCKED_BY:bondade" }
+        {
+          "base": "feliz",
+          "wouldBe": "felizeza",
+          "reason": "BLOCKED_BY:felicidade"
+        },
+        {
+          "base": "bom",
+          "wouldBe": "boneza",
+          "reason": "BLOCKED_BY:bondade"
+        }
       ],
       "sources": [
-        { "ref": "Rocha, Estruturas Morfológicas do Português (-eza/-ez)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Rocha, Estruturas Morfológicas do Português (-eza/-ez)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_URA", "process": "SUFFIX", "form": { "suffix": "ura" },
-      "input": { "pos": "ADJECTIVE" },
-      "output": { "pos": "NOUN", "gender": "Fem", "inflectionParadigm": "N_S" },
+      "id": "SUF_URA",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "ura"
+      },
+      "input": {
+        "pos": "ADJECTIVE"
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Fem",
+        "inflectionParadigm": "N_S"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + ura", "example": "alto → altura" },
-        { "when": { "stemEnds": "c" }, "stemChange": "c → ç + ura", "example": "doce → doçura" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + ura",
+          "example": "alto → altura"
+        },
+        {
+          "when": {
+            "stemEnds": "c"
+          },
+          "stemChange": "c → ç + ura",
+          "example": "doce → doçura"
+        }
       ],
-      "semantics": { "function": "QUALITY_OF" },
+      "semantics": {
+        "function": "QUALITY_OF"
+      },
       "productivity": "MEDIUM",
       "examples": [
-        { "base": "doce", "derived": "doçura" },
-        { "base": "alto", "derived": "altura" },
-        { "base": "branco", "derived": "brancura" },
-        { "base": "fresco", "derived": "frescura" },
-        { "base": "largo", "derived": "largura" },
-        { "base": "amargo", "derived": "amargura" }
+        {
+          "base": "doce",
+          "derived": "doçura"
+        },
+        {
+          "base": "alto",
+          "derived": "altura"
+        },
+        {
+          "base": "branco",
+          "derived": "brancura"
+        },
+        {
+          "base": "fresco",
+          "derived": "frescura"
+        },
+        {
+          "base": "largo",
+          "derived": "largura"
+        },
+        {
+          "base": "amargo",
+          "derived": "amargura"
+        }
       ],
       "counterExamples": [
-        { "base": "triste", "wouldBe": "tristura", "reason": "BLOCKED_BY:tristeza" },
-        { "base": "bom", "wouldBe": "bondura", "reason": "BLOCKED_BY:bondade" }
+        {
+          "base": "triste",
+          "wouldBe": "tristura",
+          "reason": "BLOCKED_BY:tristeza"
+        },
+        {
+          "base": "bom",
+          "wouldBe": "bondura",
+          "reason": "BLOCKED_BY:bondade"
+        }
       ],
       "sources": [
-        { "ref": "Bechara, Moderna Gramática Portuguesa (-ura)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Bechara, Moderna Gramática Portuguesa (-ura)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_OSO", "process": "SUFFIX", "form": { "suffix": "oso" },
-      "input": { "pos": "NOUN", "constraints": { "concrete": true } },
-      "output": { "pos": "ADJECTIVE", "inflectionParadigm": "ADJ_O" },
+      "id": "SUF_OSO",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "oso"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "ADJECTIVE"
+        ],
+        "constraints": {
+          "concrete": true
+        }
+      },
+      "output": {
+        "pos": "ADJECTIVE",
+        "inflectionParadigm": "ADJ_O"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + oso", "example": "chuva → chuvoso" },
-        { "when": { "noun": "medo" }, "stemChange": "med + roso", "example": "medo → medroso" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + oso",
+          "example": "chuva → chuvoso"
+        },
+        {
+          "when": {
+            "noun": "medo"
+          },
+          "stemChange": "med + roso",
+          "example": "medo → medroso"
+        }
       ],
-      "semantics": { "function": "FULL_OF" },
+      "semantics": {
+        "function": "FULL_OF"
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "chuva", "derived": "chuvoso" },
-        { "base": "medo", "derived": "medroso" },
-        { "base": "cheiro", "derived": "cheiroso" },
-        { "base": "gosto", "derived": "gostoso" },
-        { "base": "perigo", "derived": "perigoso" }
+        {
+          "base": "chuva",
+          "derived": "chuvoso"
+        },
+        {
+          "base": "medo",
+          "derived": "medroso"
+        },
+        {
+          "base": "cheiro",
+          "derived": "cheiroso"
+        },
+        {
+          "base": "gosto",
+          "derived": "gostoso"
+        },
+        {
+          "base": "perigo",
+          "derived": "perigoso"
+        }
       ],
       "counterExamples": [
-        { "base": "café", "wouldBe": "cafeoso", "reason": "NOT_ATTESTED" },
-        { "base": "mesa", "wouldBe": "mesoso", "reason": "NOT_ATTESTED" }
+        {
+          "base": "café",
+          "wouldBe": "cafeoso",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "mesa",
+          "wouldBe": "mesoso",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Sandmann, Formação de Palavras no Português Brasileiro Contemporâneo (-oso)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Sandmann, Formação de Palavras no Português Brasileiro Contemporâneo (-oso)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_EIRO", "process": "SUFFIX", "form": { "suffix": "eiro" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "NOUN", "gender": "Masc", "inflectionParadigm": "N_S" },
+      "id": "SUF_EIRO",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "eiro"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "ADJECTIVE"
+        ]
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Masc",
+        "inflectionParadigm": "N_S"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + eiro", "example": "carta → carteiro" },
-        { "when": { "noun": "pão" }, "stemChange": "pade + iro", "example": "pão → padeiro" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + eiro",
+          "example": "carta → carteiro"
+        },
+        {
+          "when": {
+            "noun": "pão"
+          },
+          "stemChange": "pade + iro",
+          "example": "pão → padeiro"
+        }
       ],
-      "semantics": { "function": "PROFESSION_OR_CONTAINER", "alsoPossible": ["AGENT_OF"] },
+      "semantics": {
+        "function": "PROFESSION_OR_CONTAINER",
+        "alsoPossible": [
+          "AGENT_OF"
+        ]
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "pão", "derived": "padeiro" },
-        { "base": "carta", "derived": "carteiro" },
-        { "base": "leite", "derived": "leiteiro" },
-        { "base": "porta", "derived": "porteiro" },
-        { "base": "livro", "derived": "livreiro" },
-        { "base": "Brasil", "derived": "brasileiro" }
+        {
+          "base": "pão",
+          "derived": "padeiro"
+        },
+        {
+          "base": "carta",
+          "derived": "carteiro"
+        },
+        {
+          "base": "leite",
+          "derived": "leiteiro"
+        },
+        {
+          "base": "porta",
+          "derived": "porteiro"
+        },
+        {
+          "base": "livro",
+          "derived": "livreiro"
+        },
+        {
+          "base": "Brasil",
+          "derived": "brasileiro"
+        }
       ],
       "counterExamples": [
-        { "base": "mesa", "wouldBe": "meseiro", "reason": "NOT_ATTESTED" },
-        { "base": "sol", "wouldBe": "soleiro", "reason": "NOT_ATTESTED" }
+        {
+          "base": "mesa",
+          "wouldBe": "meseiro",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "sol",
+          "wouldBe": "soleiro",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Basílio, Formação e Classes de Palavras no Português do Brasil (-eiro)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Basílio, Formação e Classes de Palavras no Português do Brasil (-eiro)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_ISTA", "process": "SUFFIX", "form": { "suffix": "ista" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "NOUN", "gender": "Inv", "inflectionParadigm": "N_INVARIANT" },
+      "id": "SUF_ISTA",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "ista"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "ADJECTIVE"
+        ]
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Inv",
+        "inflectionParadigm": "N_INVARIANT"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + ista", "example": "arte → artista" },
-        { "when": { "noun": "piano" }, "stemChange": "pian + ista", "example": "piano → pianista" },
-        { "when": { "noun": "dente" }, "stemChange": "dent + ista", "example": "dente → dentista" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + ista",
+          "example": "arte → artista"
+        },
+        {
+          "when": {
+            "noun": "piano"
+          },
+          "stemChange": "pian + ista",
+          "example": "piano → pianista"
+        },
+        {
+          "when": {
+            "noun": "dente"
+          },
+          "stemChange": "dent + ista",
+          "example": "dente → dentista"
+        }
       ],
-      "semantics": { "function": "ADHERENT" },
+      "semantics": {
+        "function": "ADHERENT"
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "arte", "derived": "artista" },
-        { "base": "jornal", "derived": "jornalista" },
-        { "base": "dente", "derived": "dentista" },
-        { "base": "futebol", "derived": "futebolista" },
-        { "base": "piano", "derived": "pianista" },
-        { "base": "capital", "derived": "capitalista" },
-        { "base": "nacional", "derived": "nacionalista" }
+        {
+          "base": "arte",
+          "derived": "artista"
+        },
+        {
+          "base": "jornal",
+          "derived": "jornalista"
+        },
+        {
+          "base": "dente",
+          "derived": "dentista"
+        },
+        {
+          "base": "futebol",
+          "derived": "futebolista"
+        },
+        {
+          "base": "piano",
+          "derived": "pianista"
+        },
+        {
+          "base": "capital",
+          "derived": "capitalista"
+        },
+        {
+          "base": "nacional",
+          "derived": "nacionalista"
+        }
       ],
       "counterExamples": [
-        { "base": "mesa", "wouldBe": "mesista", "reason": "NOT_ATTESTED" },
-        { "base": "leite", "wouldBe": "leitista", "reason": "NOT_ATTESTED" }
+        {
+          "base": "mesa",
+          "wouldBe": "mesista",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "leite",
+          "wouldBe": "leitista",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Cunha & Cintra, Nova Gramática (-ista)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (-ista)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_ISMO", "process": "SUFFIX", "form": { "suffix": "ismo" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "NOUN", "gender": "Masc", "inflectionParadigm": "N_S" },
+      "id": "SUF_ISMO",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "ismo"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "ADJECTIVE"
+        ]
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Masc",
+        "inflectionParadigm": "N_S"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + ismo", "example": "real → realismo" },
-        { "when": { "base": "feminino" }, "stemChange": "femin + ismo", "example": "feminino → feminismo" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + ismo",
+          "example": "real → realismo"
+        },
+        {
+          "when": {
+            "base": "feminino"
+          },
+          "stemChange": "femin + ismo",
+          "example": "feminino → feminismo"
+        }
       ],
-      "semantics": { "function": "DOCTRINE" },
+      "semantics": {
+        "function": "DOCTRINE"
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "real", "derived": "realismo" },
-        { "base": "social", "derived": "socialismo" },
-        { "base": "capital", "derived": "capitalismo" },
-        { "base": "feminino", "derived": "feminismo" },
-        { "base": "nacional", "derived": "nacionalismo" }
+        {
+          "base": "real",
+          "derived": "realismo"
+        },
+        {
+          "base": "social",
+          "derived": "socialismo"
+        },
+        {
+          "base": "capital",
+          "derived": "capitalismo"
+        },
+        {
+          "base": "feminino",
+          "derived": "feminismo"
+        },
+        {
+          "base": "nacional",
+          "derived": "nacionalismo"
+        }
       ],
       "counterExamples": [
-        { "base": "café", "wouldBe": "cafeísmo", "reason": "NOT_ATTESTED" },
-        { "base": "mesa", "wouldBe": "mesismo", "reason": "NOT_ATTESTED" }
+        {
+          "base": "café",
+          "wouldBe": "cafeísmo",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "mesa",
+          "wouldBe": "mesismo",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Bechara, Moderna Gramática Portuguesa (-ismo)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Bechara, Moderna Gramática Portuguesa (-ismo)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_IZAR", "process": "SUFFIX", "form": { "suffix": "izar" },
-      "input": { "pos": "ADJECTIVE" },
-      "output": { "pos": "VERB", "inflectionParadigm": "V_AR" },
+      "id": "SUF_IZAR",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "izar"
+      },
+      "input": {
+        "pos": "ADJECTIVE"
+      },
+      "output": {
+        "pos": "VERB",
+        "inflectionParadigm": "V_AR"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + izar", "example": "legal → legalizar" },
-        { "when": { "stemEnds": "al" }, "stemChange": "radical + izar (manutenção do -l-)", "example": "real → realizar" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + izar",
+          "example": "legal → legalizar"
+        },
+        {
+          "when": {
+            "stemEnds": "al"
+          },
+          "stemChange": "radical + izar (manutenção do -l-)",
+          "example": "real → realizar"
+        }
       ],
-      "semantics": { "function": "CAUSE_TO_BE" },
+      "semantics": {
+        "function": "CAUSE_TO_BE"
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "real", "derived": "realizar" },
-        { "base": "legal", "derived": "legalizar" },
-        { "base": "normal", "derived": "normalizar" },
-        { "base": "popular", "derived": "popularizar" },
-        { "base": "moderno", "derived": "modernizar" },
-        { "base": "valor", "derived": "valorizar" }
+        {
+          "base": "real",
+          "derived": "realizar"
+        },
+        {
+          "base": "legal",
+          "derived": "legalizar"
+        },
+        {
+          "base": "normal",
+          "derived": "normalizar"
+        },
+        {
+          "base": "popular",
+          "derived": "popularizar"
+        },
+        {
+          "base": "moderno",
+          "derived": "modernizar"
+        },
+        {
+          "base": "valor",
+          "derived": "valorizar"
+        }
       ],
       "counterExamples": [
-        { "base": "bom", "wouldBe": "bonizar", "reason": "BLOCKED_BY:melhorar" },
-        { "base": "triste", "wouldBe": "tristizar", "reason": "NOT_ATTESTED" }
+        {
+          "base": "bom",
+          "wouldBe": "bonizar",
+          "reason": "BLOCKED_BY:melhorar"
+        },
+        {
+          "base": "triste",
+          "wouldBe": "tristizar",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Basílio, Teoria Lexical (-izar)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Basílio, Teoria Lexical (-izar)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_IFICAR", "process": "SUFFIX", "form": { "suffix": "ificar" },
-      "input": { "pos": "ADJECTIVE" },
-      "output": { "pos": "VERB", "inflectionParadigm": "V_AR_CAR" },
+      "id": "SUF_IFICAR",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "ificar"
+      },
+      "input": {
+        "pos": "ADJECTIVE"
+      },
+      "output": {
+        "pos": "VERB",
+        "inflectionParadigm": "V_AR_CAR"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + ificar", "example": "puro → purificar" },
-        { "when": { "base": "simples" }, "stemChange": "simpl + ificar", "example": "simples → simplificar" },
-        { "when": { "stemEnds": "d" }, "stemChange": "radical + ificar", "example": "sólido → solidificar" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + ificar",
+          "example": "puro → purificar"
+        },
+        {
+          "when": {
+            "base": "simples"
+          },
+          "stemChange": "simpl + ificar",
+          "example": "simples → simplificar"
+        },
+        {
+          "when": {
+            "stemEnds": "d"
+          },
+          "stemChange": "radical + ificar",
+          "example": "sólido → solidificar"
+        }
       ],
-      "semantics": { "function": "CAUSE_TO_BE" },
+      "semantics": {
+        "function": "CAUSE_TO_BE"
+      },
       "productivity": "MEDIUM",
       "examples": [
-        { "base": "simples", "derived": "simplificar" },
-        { "base": "claro", "derived": "clarificar" },
-        { "base": "puro", "derived": "purificar" },
-        { "base": "justo", "derived": "justificar" },
-        { "base": "sólido", "derived": "solidificar" }
+        {
+          "base": "simples",
+          "derived": "simplificar"
+        },
+        {
+          "base": "claro",
+          "derived": "clarificar"
+        },
+        {
+          "base": "puro",
+          "derived": "purificar"
+        },
+        {
+          "base": "justo",
+          "derived": "justificar"
+        },
+        {
+          "base": "sólido",
+          "derived": "solidificar"
+        }
       ],
       "counterExamples": [
-        { "base": "belo", "wouldBe": "belificar", "reason": "BLOCKED_BY:embelezar" },
-        { "base": "novo", "wouldBe": "novificar", "reason": "BLOCKED_BY:renovar" }
+        {
+          "base": "belo",
+          "wouldBe": "belificar",
+          "reason": "BLOCKED_BY:embelezar"
+        },
+        {
+          "base": "novo",
+          "wouldBe": "novificar",
+          "reason": "BLOCKED_BY:renovar"
+        }
       ],
       "sources": [
-        { "ref": "Rocha, Estruturas Morfológicas do Português (-ificar)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Rocha, Estruturas Morfológicas do Português (-ificar)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_ECER", "process": "SUFFIX", "form": { "suffix": "ecer" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "VERB", "inflectionParadigm": "V_CER" },
+      "id": "SUF_ECER",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "ecer"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "ADJECTIVE"
+        ]
+      },
+      "output": {
+        "pos": "VERB",
+        "inflectionParadigm": "V_CER"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + ecer", "example": "escuro → escurecer" },
-        { "when": { "noun": "flor" }, "stemChange": "flor + escer", "example": "flor → florescer" },
-        { "when": { "noun": "pálido" }, "stemChange": "palid + ecer", "example": "pálido → palidecer" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + ecer",
+          "example": "escuro → escurecer"
+        },
+        {
+          "when": {
+            "noun": "flor"
+          },
+          "stemChange": "flor + escer",
+          "example": "flor → florescer"
+        },
+        {
+          "when": {
+            "noun": "pálido"
+          },
+          "stemChange": "palid + ecer",
+          "example": "pálido → palidecer"
+        }
       ],
-      "semantics": { "function": "BECOME" },
+      "semantics": {
+        "function": "BECOME"
+      },
       "productivity": "MEDIUM",
       "examples": [
-        { "base": "flor", "derived": "florescer" },
-        { "base": "pálido", "derived": "palidecer" },
-        { "base": "escuro", "derived": "escurecer" },
-        { "base": "alvo", "derived": "alvorecer" },
-        { "base": "maduro", "derived": "madurecer" }
+        {
+          "base": "flor",
+          "derived": "florescer"
+        },
+        {
+          "base": "pálido",
+          "derived": "palidecer"
+        },
+        {
+          "base": "escuro",
+          "derived": "escurecer"
+        },
+        {
+          "base": "alvo",
+          "derived": "alvorecer"
+        },
+        {
+          "base": "maduro",
+          "derived": "madurecer"
+        }
       ],
       "counterExamples": [
-        { "base": "café", "wouldBe": "cafecer", "reason": "NOT_ATTESTED" },
-        { "base": "feliz", "wouldBe": "felizecer", "reason": "NOT_ATTESTED" }
+        {
+          "base": "café",
+          "wouldBe": "cafecer",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "feliz",
+          "wouldBe": "felizecer",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Bechara, Moderna Gramática Portuguesa (-ecer)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Bechara, Moderna Gramática Portuguesa (-ecer)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "MEDIUM"
     },
     {
-      "id": "SUF_AL", "process": "SUFFIX", "form": { "suffix": "al" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "ADJECTIVE", "inflectionParadigm": "ADJ_UNIFORM" },
+      "id": "SUF_AL",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "al"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "ADJECTIVE"
+        ]
+      },
+      "output": {
+        "pos": "ADJECTIVE",
+        "inflectionParadigm": "ADJ_UNIFORM"
+      },
       "stem": "LATINATE_STEM",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + al", "example": "pessoa → pessoal" },
-        { "when": { "noun": "nação" }, "stemChange": "nacion + al", "example": "nação → nacional" },
-        { "when": { "noun": "comércio" }, "stemChange": "comerci + al", "example": "comércio → comercial" },
-        { "when": { "noun": "mundo" }, "stemChange": "mundi + al", "example": "mundo → mundial" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + al",
+          "example": "pessoa → pessoal"
+        },
+        {
+          "when": {
+            "noun": "nação"
+          },
+          "stemChange": "nacion + al",
+          "example": "nação → nacional"
+        },
+        {
+          "when": {
+            "noun": "comércio"
+          },
+          "stemChange": "comerci + al",
+          "example": "comércio → comercial"
+        },
+        {
+          "when": {
+            "noun": "mundo"
+          },
+          "stemChange": "mundi + al",
+          "example": "mundo → mundial"
+        }
       ],
-      "semantics": { "function": "RELATIONAL_ADJ" },
+      "semantics": {
+        "function": "RELATIONAL_ADJ"
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "nação", "derived": "nacional" },
-        { "base": "pessoa", "derived": "pessoal" },
-        { "base": "comércio", "derived": "comercial" },
-        { "base": "cultura", "derived": "cultural" },
-        { "base": "mundo", "derived": "mundial" }
+        {
+          "base": "nação",
+          "derived": "nacional"
+        },
+        {
+          "base": "pessoa",
+          "derived": "pessoal"
+        },
+        {
+          "base": "comércio",
+          "derived": "comercial"
+        },
+        {
+          "base": "cultura",
+          "derived": "cultural"
+        },
+        {
+          "base": "mundo",
+          "derived": "mundial"
+        }
       ],
       "counterExamples": [
-        { "base": "mesa", "wouldBe": "mesal", "reason": "NOT_ATTESTED" },
-        { "base": "café", "wouldBe": "cafeal", "reason": "NOT_ATTESTED" }
+        {
+          "base": "mesa",
+          "wouldBe": "mesal",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "café",
+          "wouldBe": "cafeal",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Cunha & Cintra, Nova Gramática (-al relacional)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (-al relacional)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_ICO", "process": "SUFFIX", "form": { "suffix": "ico" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "ADJECTIVE", "inflectionParadigm": "ADJ_O" },
+      "id": "SUF_ICO",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "ico"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "ADJECTIVE"
+        ]
+      },
+      "output": {
+        "pos": "ADJECTIVE",
+        "inflectionParadigm": "ADJ_O"
+      },
       "stem": "LATINATE_STEM",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + ico", "example": "cena → cênico" },
-        { "when": { "noun": "política" }, "stemChange": "polit + ico", "example": "política → político" },
-        { "when": { "noun": "história" }, "stemChange": "histor + ico", "example": "história → histórico" },
-        { "when": { "noun": "ciência" }, "stemChange": "cient + ífico", "example": "ciência → científico" },
-        { "when": { "noun": "artista" }, "stemChange": "artist + ico", "example": "artista → artístico" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + ico",
+          "example": "cena → cênico"
+        },
+        {
+          "when": {
+            "noun": "política"
+          },
+          "stemChange": "polit + ico",
+          "example": "política → político"
+        },
+        {
+          "when": {
+            "noun": "história"
+          },
+          "stemChange": "histor + ico",
+          "example": "história → histórico"
+        },
+        {
+          "when": {
+            "noun": "ciência"
+          },
+          "stemChange": "cient + ífico",
+          "example": "ciência → científico"
+        },
+        {
+          "when": {
+            "noun": "artista"
+          },
+          "stemChange": "artist + ico",
+          "example": "artista → artístico"
+        }
       ],
-      "semantics": { "function": "RELATIONAL_ADJ" },
+      "semantics": {
+        "function": "RELATIONAL_ADJ"
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "política", "derived": "político" },
-        { "base": "história", "derived": "histórico" },
-        { "base": "ciência", "derived": "científico" },
-        { "base": "cena", "derived": "cênico" },
-        { "base": "artista", "derived": "artístico" }
+        {
+          "base": "política",
+          "derived": "político"
+        },
+        {
+          "base": "história",
+          "derived": "histórico"
+        },
+        {
+          "base": "ciência",
+          "derived": "científico"
+        },
+        {
+          "base": "cena",
+          "derived": "cênico"
+        },
+        {
+          "base": "artista",
+          "derived": "artístico"
+        }
       ],
       "counterExamples": [
-        { "base": "mesa", "wouldBe": "mésico", "reason": "NOT_ATTESTED" },
-        { "base": "café", "wouldBe": "cafeico", "reason": "NOT_ATTESTED" }
+        {
+          "base": "mesa",
+          "wouldBe": "mésico",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "café",
+          "wouldBe": "cafeico",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Basílio, Formação e Classes de Palavras no Português do Brasil (-ico)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Basílio, Formação e Classes de Palavras no Português do Brasil (-ico)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_ES", "process": "SUFFIX", "form": { "suffix": "ês" },
-      "input": { "pos": "NOUN", "constraints": { "placeName": true } },
-      "output": { "pos": "ADJECTIVE", "inflectionParadigm": "ADJ_ES_ESA" },
+      "id": "SUF_ES",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "ês"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "ADJECTIVE"
+        ],
+        "constraints": {
+          "placeName": true
+        }
+      },
+      "output": {
+        "pos": "ADJECTIVE",
+        "inflectionParadigm": "ADJ_ES_ESA"
+      },
       "stem": "LATINATE_STEM",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + ês", "example": "China → chinês" },
-        { "when": { "noun": "França" }, "stemChange": "franc + ês", "example": "França → francês" },
-        { "when": { "noun": "Japão" }, "stemChange": "japon + ês", "example": "Japão → japonês" },
-        { "when": { "noun": "Portugal" }, "stemChange": "portug + uês", "example": "Portugal → português" },
-        { "when": { "noun": "Holanda" }, "stemChange": "holand + ês", "example": "Holanda → holandês" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + ês",
+          "example": "China → chinês"
+        },
+        {
+          "when": {
+            "noun": "França"
+          },
+          "stemChange": "franc + ês",
+          "example": "França → francês"
+        },
+        {
+          "when": {
+            "noun": "Japão"
+          },
+          "stemChange": "japon + ês",
+          "example": "Japão → japonês"
+        },
+        {
+          "when": {
+            "noun": "Portugal"
+          },
+          "stemChange": "portug + uês",
+          "example": "Portugal → português"
+        },
+        {
+          "when": {
+            "noun": "Holanda"
+          },
+          "stemChange": "holand + ês",
+          "example": "Holanda → holandês"
+        }
       ],
-      "semantics": { "function": "NATIONALITY_ORIGIN" },
+      "semantics": {
+        "function": "NATIONALITY_ORIGIN"
+      },
       "productivity": "MEDIUM",
       "examples": [
-        { "base": "China", "derived": "chinês" },
-        { "base": "França", "derived": "francês" },
-        { "base": "Japão", "derived": "japonês" },
-        { "base": "Portugal", "derived": "português" },
-        { "base": "Holanda", "derived": "holandês" }
+        {
+          "base": "China",
+          "derived": "chinês"
+        },
+        {
+          "base": "França",
+          "derived": "francês"
+        },
+        {
+          "base": "Japão",
+          "derived": "japonês"
+        },
+        {
+          "base": "Portugal",
+          "derived": "português"
+        },
+        {
+          "base": "Holanda",
+          "derived": "holandês"
+        }
       ],
       "counterExamples": [
-        { "base": "Brasil", "wouldBe": "brasiles", "reason": "BLOCKED_BY:brasileiro" },
-        { "base": "Brasil", "wouldBe": "brasilês", "reason": "BLOCKED_BY:brasileiro" }
+        {
+          "base": "Brasil",
+          "wouldBe": "brasiles",
+          "reason": "BLOCKED_BY:brasileiro"
+        },
+        {
+          "base": "Brasil",
+          "wouldBe": "brasilês",
+          "reason": "BLOCKED_BY:brasileiro"
+        }
       ],
       "sources": [
-        { "ref": "Cunha & Cintra, Nova Gramática (gentílicos)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (gentílicos)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_ENSE", "process": "SUFFIX", "form": { "suffix": "ense" },
-      "input": { "pos": "NOUN", "constraints": { "placeName": true } },
-      "output": { "pos": "ADJECTIVE", "inflectionParadigm": "ADJ_UNIFORM" },
+      "id": "SUF_ENSE",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "ense"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "ADJECTIVE"
+        ],
+        "constraints": {
+          "placeName": true
+        }
+      },
+      "output": {
+        "pos": "ADJECTIVE",
+        "inflectionParadigm": "ADJ_UNIFORM"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + ense", "example": "Ceará → cearense" },
-        { "when": { "noun": "Piauí" }, "stemChange": "piaui + ense", "example": "Piauí → piauiense" },
-        { "when": { "noun": "Tocantins" }, "stemChange": "tocantin + ense", "example": "Tocantins → tocantinense" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + ense",
+          "example": "Ceará → cearense"
+        },
+        {
+          "when": {
+            "noun": "Piauí"
+          },
+          "stemChange": "piaui + ense",
+          "example": "Piauí → piauiense"
+        },
+        {
+          "when": {
+            "noun": "Tocantins"
+          },
+          "stemChange": "tocantin + ense",
+          "example": "Tocantins → tocantinense"
+        }
       ],
-      "semantics": { "function": "NATIONALITY_ORIGIN" },
+      "semantics": {
+        "function": "NATIONALITY_ORIGIN"
+      },
       "productivity": "MEDIUM",
       "examples": [
-        { "base": "Ceará", "derived": "cearense" },
-        { "base": "Pará", "derived": "paraense" },
-        { "base": "Piauí", "derived": "piauiense" },
-        { "base": "Tocantins", "derived": "tocantinense" },
-        { "base": "Amapá", "derived": "amapaense" }
+        {
+          "base": "Ceará",
+          "derived": "cearense"
+        },
+        {
+          "base": "Pará",
+          "derived": "paraense"
+        },
+        {
+          "base": "Piauí",
+          "derived": "piauiense"
+        },
+        {
+          "base": "Tocantins",
+          "derived": "tocantinense"
+        },
+        {
+          "base": "Amapá",
+          "derived": "amapaense"
+        }
       ],
       "counterExamples": [
-        { "base": "São Paulo", "wouldBe": "sãopaulense", "reason": "BLOCKED_BY:paulista" },
-        { "base": "mesa", "wouldBe": "mesense", "reason": "NOT_ATTESTED" }
+        {
+          "base": "São Paulo",
+          "wouldBe": "sãopaulense",
+          "reason": "BLOCKED_BY:paulista"
+        },
+        {
+          "base": "mesa",
+          "wouldBe": "mesense",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Cunha & Cintra, Nova Gramática (gentílicos)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (gentílicos)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_ADA", "process": "SUFFIX", "form": { "suffix": "ada" },
-      "input": { "pos": "NOUN", "constraints": { "concrete": true } },
-      "output": { "pos": "NOUN", "gender": "Fem", "inflectionParadigm": "N_S" },
+      "id": "SUF_ADA",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "ada"
+      },
+      "input": {
+        "pos": "NOUN",
+        "constraints": {
+          "concrete": true
+        }
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Fem",
+        "inflectionParadigm": "N_S"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + ada", "example": "boi → boiada" },
-        { "when": { "stemEnds": "ç" }, "stemChange": "radical + ada", "example": "criança → criançada" },
-        { "when": { "noun": "carta" }, "stemChange": "carteir + ada", "example": "carta → carteirada" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + ada",
+          "example": "boi → boiada"
+        },
+        {
+          "when": {
+            "stemEnds": "ç"
+          },
+          "stemChange": "radical + ada",
+          "example": "criança → criançada"
+        },
+        {
+          "when": {
+            "noun": "carta"
+          },
+          "stemChange": "carteir + ada",
+          "example": "carta → carteirada"
+        }
       ],
-      "semantics": { "function": "COLLECTIVE", "alsoPossible": ["ACTION_OF"] },
+      "semantics": {
+        "function": "COLLECTIVE",
+        "alsoPossible": [
+          "ACTION_OF"
+        ]
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "boi", "derived": "boiada" },
-        { "base": "criança", "derived": "criançada" },
-        { "base": "menino", "derived": "meninada" },
-        { "base": "pau", "derived": "paulada" },
-        { "base": "faca", "derived": "facada" },
-        { "base": "carta", "derived": "carteirada" },
-        { "base": "papel", "derived": "papelada" }
+        {
+          "base": "boi",
+          "derived": "boiada"
+        },
+        {
+          "base": "criança",
+          "derived": "criançada"
+        },
+        {
+          "base": "menino",
+          "derived": "meninada"
+        },
+        {
+          "base": "pau",
+          "derived": "paulada"
+        },
+        {
+          "base": "faca",
+          "derived": "facada"
+        },
+        {
+          "base": "carta",
+          "derived": "carteirada"
+        },
+        {
+          "base": "papel",
+          "derived": "papelada"
+        }
       ],
       "counterExamples": [
-        { "base": "café", "wouldBe": "cafeada", "reason": "NOT_ATTESTED" },
-        { "base": "sol", "wouldBe": "solada", "reason": "NOT_ATTESTED" }
+        {
+          "base": "café",
+          "wouldBe": "cafeada",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "sol",
+          "wouldBe": "solada",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Sandmann, Formação de Palavras no Português Brasileiro Contemporâneo (-ada)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Sandmann, Formação de Palavras no Português Brasileiro Contemporâneo (-ada)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_AGEM", "process": "SUFFIX", "form": { "suffix": "agem" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "NOUN", "gender": "Fem", "inflectionParadigm": "N_M_NS" },
+      "id": "SUF_AGEM",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "agem"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "VERB"
+        ]
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Fem",
+        "inflectionParadigm": "N_M_NS"
+      },
+      "stem": "VERB_ROOT",
+      "allomorphy": [
+        {
+          "when": {
+            "verbClass": "AR"
+          },
+          "stemChange": "radical verbal + agem",
+          "example": "reciclar → reciclagem"
+        },
+        {
+          "when": {
+            "verbClass": "ER"
+          },
+          "stemChange": "radical verbal + agem",
+          "example": "vender → vendagem"
+        },
+        {
+          "when": {
+            "input": "noun"
+          },
+          "stemChange": "radical nominal + agem",
+          "example": "folha → folhagem"
+        }
+      ],
+      "semantics": {
+        "function": "COLLECTIVE",
+        "alsoPossible": [
+          "ACTION_OF"
+        ]
+      },
+      "productivity": "HIGH",
+      "examples": [
+        {
+          "base": "folha",
+          "derived": "folhagem"
+        },
+        {
+          "base": "ferro",
+          "derived": "ferragem"
+        },
+        {
+          "base": "pluma",
+          "derived": "plumagem"
+        },
+        {
+          "base": "reciclar",
+          "derived": "reciclagem"
+        },
+        {
+          "base": "pilotar",
+          "derived": "pilotagem"
+        },
+        {
+          "base": "contar",
+          "derived": "contagem"
+        },
+        {
+          "base": "desmontar",
+          "derived": "desmontagem"
+        },
+        {
+          "base": "contar",
+          "derived": "contagem"
+        },
+        {
+          "base": "pilotar",
+          "derived": "pilotagem"
+        }
+      ],
+      "counterExamples": [
+        {
+          "base": "mesa",
+          "wouldBe": "mesagem",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "café",
+          "wouldBe": "cafeagem",
+          "reason": "NOT_ATTESTED"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Bechara, Moderna Gramática Portuguesa (-agem)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "SUF_INHO",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "inho"
+      },
+      "input": {
+        "pos": "NOUN",
+        "constraints": {
+          "countable": true
+        }
+      },
+      "output": {
+        "pos": "NOUN",
+        "inflectionParadigm": "N_S"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + agem", "example": "folha → folhagem" },
-        { "when": { "input": "verb root" }, "stemChange": "radical verbal + agem", "example": "reciclar → reciclagem" }
+        {
+          "when": {
+            "endsInVowel": true
+          },
+          "stemChange": "radical + inho/inha (gênero da base)",
+          "example": "casa → casinha"
+        },
+        {
+          "when": {
+            "endsInConsonant": true
+          },
+          "stemChange": "lema + zinho/zinha",
+          "example": "flor → florzinha"
+        },
+        {
+          "when": {
+            "lemmaEnds": "ão"
+          },
+          "stemChange": "lema + zinho/zinha",
+          "example": "pão → pãozinho"
+        }
       ],
-      "semantics": { "function": "COLLECTIVE", "alsoPossible": ["ACTION_OF"] },
+      "semantics": {
+        "function": "DIMINUTIVE"
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "folha", "derived": "folhagem" },
-        { "base": "ferro", "derived": "ferragem" },
-        { "base": "pluma", "derived": "plumagem" },
-        { "base": "reciclar", "derived": "reciclagem" },
-        { "base": "pilotar", "derived": "pilotagem" },
-        { "base": "contar", "derived": "contagem" }
+        {
+          "base": "casa",
+          "derived": "casinha"
+        },
+        {
+          "base": "livro",
+          "derived": "livrinho"
+        },
+        {
+          "base": "flor",
+          "derived": "florzinha"
+        },
+        {
+          "base": "homem",
+          "derived": "homenzinho"
+        },
+        {
+          "base": "pão",
+          "derived": "pãozinho"
+        },
+        {
+          "base": "café",
+          "derived": "cafezinho"
+        }
       ],
       "counterExamples": [
-        { "base": "mesa", "wouldBe": "mesagem", "reason": "NOT_ATTESTED" },
-        { "base": "café", "wouldBe": "cafeagem", "reason": "NOT_ATTESTED" }
+        {
+          "base": "de",
+          "wouldBe": "dezinho",
+          "reason": "SEMANTIC_RESTRICTION"
+        },
+        {
+          "base": "não",
+          "wouldBe": "nãozinho",
+          "reason": "SEMANTIC_RESTRICTION"
+        }
       ],
       "sources": [
-        { "ref": "Bechara, Moderna Gramática Portuguesa (-agem)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (diminutivos)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_INHO", "process": "SUFFIX", "form": { "suffix": "inho" },
-      "input": { "pos": "NOUN", "constraints": { "countable": true } },
-      "output": { "pos": "NOUN", "inflectionParadigm": "N_S" },
+      "id": "SUF_AO_AUG",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "ão"
+      },
+      "input": {
+        "pos": "NOUN",
+        "constraints": {
+          "countable": true
+        }
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Masc",
+        "inflectionParadigm": "N_AO_OES"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "endsInVowel": true }, "stemChange": "radical + inho/inha (gênero da base)", "example": "casa → casinha" },
-        { "when": { "endsInConsonant": true }, "stemChange": "lema + zinho/zinha", "example": "flor → florzinha" },
-        { "when": { "lemmaEnds": "ão" }, "stemChange": "lema + zinho/zinha", "example": "pão → pãozinho" }
+        {
+          "when": {
+            "endsInVowel": true
+          },
+          "stemChange": "radical + rão (a→ão)",
+          "example": "casa → casarão"
+        },
+        {
+          "when": {
+            "stemEnds": "r"
+          },
+          "stemChange": "radical + rão",
+          "example": "livro → livrão"
+        },
+        {
+          "when": {
+            "stemEnds": "s/z"
+          },
+          "stemChange": "radical + eirão",
+          "example": "voz → vozeirão"
+        },
+        {
+          "when": {
+            "lemmaEnds": "m"
+          },
+          "stemChange": "lema + zarrão",
+          "example": "homem → homenzarrão"
+        },
+        {
+          "when": {
+            "noun": "dinheiro"
+          },
+          "stemChange": "dinh + eirão",
+          "example": "dinheiro → dinheirão"
+        }
       ],
-      "semantics": { "function": "DIMINUTIVE" },
+      "semantics": {
+        "function": "AUGMENTATIVE"
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "casa", "derived": "casinha" },
-        { "base": "livro", "derived": "livrinho" },
-        { "base": "flor", "derived": "florzinha" },
-        { "base": "homem", "derived": "homenzinho" },
-        { "base": "pão", "derived": "pãozinho" },
-        { "base": "café", "derived": "cafezinho" }
+        {
+          "base": "casa",
+          "derived": "casarão"
+        },
+        {
+          "base": "homem",
+          "derived": "homenzarrão"
+        },
+        {
+          "base": "voz",
+          "derived": "vozeirão"
+        },
+        {
+          "base": "dinheiro",
+          "derived": "dinheirão"
+        },
+        {
+          "base": "livro",
+          "derived": "livrão"
+        }
       ],
       "counterExamples": [
-        { "base": "de", "wouldBe": "dezinho", "reason": "SEMANTIC_RESTRICTION" },
-        { "base": "não", "wouldBe": "nãozinho", "reason": "SEMANTIC_RESTRICTION" }
+        {
+          "base": "dez",
+          "wouldBe": "dezão",
+          "reason": "SEMANTIC_RESTRICTION"
+        },
+        {
+          "base": "de",
+          "wouldBe": "deão",
+          "reason": "SEMANTIC_RESTRICTION"
+        }
       ],
       "sources": [
-        { "ref": "Cunha & Cintra, Nova Gramática (diminutivos)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (aumentativos)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "SUF_AO_AUG", "process": "SUFFIX", "form": { "suffix": "ão" },
-      "input": { "pos": "NOUN", "constraints": { "countable": true } },
-      "output": { "pos": "NOUN", "gender": "Masc", "inflectionParadigm": "N_AO_OES" },
+      "id": "SUF_MENTE",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "mente"
+      },
+      "input": {
+        "pos": "ADJECTIVE"
+      },
+      "output": {
+        "pos": "ADVERB",
+        "inflectionParadigm": null
+      },
+      "stem": "LEMMA",
+      "allomorphy": [
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "forma feminina + mente (invariável em -e/-z/-l)",
+          "example": "feliz → felizmente"
+        },
+        {
+          "when": {
+            "endsInO": true
+          },
+          "stemChange": "radical + a + mente",
+          "example": "rápido → rapidamente"
+        }
+      ],
+      "semantics": {
+        "function": "MANNER"
+      },
+      "productivity": "HIGH",
+      "examples": [
+        {
+          "base": "feliz",
+          "derived": "felizmente"
+        },
+        {
+          "base": "rápido",
+          "derived": "rapidamente"
+        },
+        {
+          "base": "claro",
+          "derived": "claramente"
+        },
+        {
+          "base": "triste",
+          "derived": "tristemente"
+        },
+        {
+          "base": "legal",
+          "derived": "legalmente"
+        },
+        {
+          "base": "real",
+          "derived": "realmente"
+        }
+      ],
+      "counterExamples": [
+        {
+          "base": "bom",
+          "wouldBe": "bommente",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "mau",
+          "wouldBe": "maumente",
+          "reason": "NOT_ATTESTED"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Bechara, Moderna Gramática Portuguesa (-mente)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
+      ],
+      "confidence": "HIGH"
+    },
+    {
+      "id": "PRE_RE",
+      "process": "PREFIX",
+      "form": {
+        "prefix": "re"
+      },
+      "input": {
+        "pos": [
+          "VERB"
+        ],
+        "constraints": {
+          "actional": true
+        }
+      },
+      "output": {},
+      "stem": "LEMMA",
+      "allomorphy": [
+        {
+          "when": {
+            "lemmaStartsVowel": true
+          },
+          "stemChange": "re + lema (sem hífen)",
+          "example": "escrever → reescrever"
+        },
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "re + lema",
+          "example": "fazer → refazer"
+        }
+      ],
+      "semantics": {
+        "function": "REPETITION"
+      },
+      "productivity": "HIGH",
+      "examples": [
+        {
+          "base": "fazer",
+          "derived": "refazer"
+        },
+        {
+          "base": "tomar",
+          "derived": "retomar"
+        },
+        {
+          "base": "ler",
+          "derived": "reler"
+        },
+        {
+          "base": "escrever",
+          "derived": "reescrever"
+        },
+        {
+          "base": "contar",
+          "derived": "recontar"
+        },
+        {
+          "base": "cair",
+          "derived": "recair"
+        }
+      ],
+      "counterExamples": [
+        {
+          "base": "ser",
+          "wouldBe": "reser",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "ter",
+          "wouldBe": "reter",
+          "reason": "BLOCKED_BY:reter (sentido lexicalizado; não é 'ter de novo')"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Basílio, Teoria Lexical (re-)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        },
+        {
+          "ref": "Aronoff, Word Formation in Generative Grammar",
+          "url": "https://mitwpl.mit.edu/catalog/aron01/",
+          "verified": false,
+          "note": "bloqueio; conteúdo não verificado nesta sessão"
+        }
+      ],
+      "confidence": "HIGH",
+      "note": "prefixo preserva a classe da base (a saída herda a entrada)"
+    },
+    {
+      "id": "PRE_DES",
+      "process": "PREFIX",
+      "form": {
+        "prefix": "des"
+      },
+      "input": {
+        "pos": [
+          "VERB",
+          "ADJECTIVE"
+        ],
+        "constraints": {
+          "reversible": true
+        }
+      },
+      "output": {},
+      "stem": "LEMMA",
+      "allomorphy": [
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "des + lema",
+          "example": "fazer → desfazer"
+        }
+      ],
+      "semantics": {
+        "function": "REVERSAL",
+        "alsoPossible": [
+          "NEGATION"
+        ]
+      },
+      "productivity": "HIGH",
+      "examples": [
+        {
+          "base": "fazer",
+          "derived": "desfazer"
+        },
+        {
+          "base": "montar",
+          "derived": "desmontar"
+        },
+        {
+          "base": "ligar",
+          "derived": "desligar"
+        },
+        {
+          "base": "cobrir",
+          "derived": "descobrir"
+        },
+        {
+          "base": "organizar",
+          "derived": "desorganizar"
+        },
+        {
+          "base": "leal",
+          "derived": "desleal"
+        }
+      ],
+      "counterExamples": [
+        {
+          "base": "criar",
+          "wouldBe": "descriar",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "amar",
+          "wouldBe": "desamar",
+          "reason": "NOT_ATTESTED"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Basílio, Teoria Lexical (des-)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
+      ],
+      "confidence": "HIGH",
+      "note": "prefixo preserva a classe da base (a saída herda a entrada)"
+    },
+    {
+      "id": "PRE_IN",
+      "process": "PREFIX",
+      "form": {
+        "prefix": "in"
+      },
+      "input": {
+        "pos": [
+          "ADJECTIVE"
+        ]
+      },
+      "output": {},
+      "stem": "LEMMA",
+      "allomorphy": [
+        {
+          "when": {
+            "lemmaStarts": "l"
+          },
+          "stemChange": "i + lema",
+          "example": "legal → ilegal"
+        },
+        {
+          "when": {
+            "lemmaStarts": "p"
+          },
+          "stemChange": "im + lema",
+          "example": "possível → impossível"
+        },
+        {
+          "when": {
+            "lemmaStarts": "b"
+          },
+          "stemChange": "im + lema",
+          "example": "bom → imbom (bloqueado)"
+        },
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "in + lema",
+          "example": "feliz → infeliz"
+        },
+        {
+          "when": {
+            "lemma": "móvel"
+          },
+          "stemChange": "im + lema",
+          "example": "móvel → imóvel"
+        },
+        {
+          "when": {
+            "lemma": "estável"
+          },
+          "stemChange": "in + lema (com elisão do e-)",
+          "example": "estável → instável"
+        }
+      ],
+      "semantics": {
+        "function": "NEGATION"
+      },
+      "productivity": "MEDIUM",
+      "examples": [
+        {
+          "base": "feliz",
+          "derived": "infeliz"
+        },
+        {
+          "base": "possível",
+          "derived": "impossível"
+        },
+        {
+          "base": "legal",
+          "derived": "ilegal"
+        },
+        {
+          "base": "capaz",
+          "derived": "incapaz"
+        },
+        {
+          "base": "moral",
+          "derived": "imoral"
+        },
+        {
+          "base": "real",
+          "derived": "irreal"
+        },
+        {
+          "base": "móvel",
+          "derived": "imóvel"
+        },
+        {
+          "base": "estável",
+          "derived": "instável"
+        }
+      ],
+      "counterExamples": [
+        {
+          "base": "bom",
+          "wouldBe": "imbom",
+          "reason": "BLOCKED_BY:mau"
+        },
+        {
+          "base": "feio",
+          "wouldBe": "infeio",
+          "reason": "NOT_ATTESTED"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (prefixos negativos)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
+      ],
+      "confidence": "HIGH",
+      "note": "prefixo preserva a classe da base (a saída herda a entrada)"
+    },
+    {
+      "id": "PRE_PRE",
+      "process": "PREFIX",
+      "form": {
+        "prefix": "pré"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "ADJECTIVE"
+        ]
+      },
+      "output": {},
+      "stem": "LEMMA",
+      "allomorphy": [
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "pré- + lema (hífen)",
+          "example": "história → pré-história"
+        }
+      ],
+      "semantics": {
+        "function": "PRIOR"
+      },
+      "productivity": "MEDIUM",
+      "examples": [
+        {
+          "base": "história",
+          "derived": "pré-história"
+        },
+        {
+          "base": "escola",
+          "derived": "pré-escola"
+        },
+        {
+          "base": "natal",
+          "derived": "pré-natal"
+        },
+        {
+          "base": "aquecimento",
+          "derived": "pré-aquecimento"
+        },
+        {
+          "base": "venda",
+          "derived": "pré-venda"
+        }
+      ],
+      "counterExamples": [
+        {
+          "base": "café",
+          "wouldBe": "pré-café",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "mesa",
+          "wouldBe": "pré-mesa",
+          "reason": "NOT_ATTESTED"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Bechara, Moderna Gramática Portuguesa (pré-)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
+      ],
+      "confidence": "HIGH",
+      "note": "prefixo preserva a classe da base (a saída herda a entrada)"
+    },
+    {
+      "id": "PRE_SUPER",
+      "process": "PREFIX",
+      "form": {
+        "prefix": "super"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "ADJECTIVE"
+        ]
+      },
+      "output": {},
+      "stem": "LEMMA",
+      "allomorphy": [
+        {
+          "when": {
+            "lemmaStartsVowel": true
+          },
+          "stemChange": "super + lema (sem hífen)",
+          "example": "aquecimento → superaquecimento"
+        },
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "super + lema (hífen diante de h)",
+          "example": "homem → super-homem"
+        }
+      ],
+      "semantics": {
+        "function": "EXCESS"
+      },
+      "productivity": "HIGH",
+      "examples": [
+        {
+          "base": "homem",
+          "derived": "super-homem"
+        },
+        {
+          "base": "mercado",
+          "derived": "supermercado"
+        },
+        {
+          "base": "aquecimento",
+          "derived": "superaquecimento"
+        },
+        {
+          "base": "produção",
+          "derived": "superprodução"
+        },
+        {
+          "base": "herói",
+          "derived": "super-herói"
+        }
+      ],
+      "counterExamples": [
+        {
+          "base": "café",
+          "wouldBe": "supercafé",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "mesa",
+          "wouldBe": "supermesa",
+          "reason": "NOT_ATTESTED"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Basílio, Teoria Lexical (super-)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
+      ],
+      "confidence": "HIGH",
+      "note": "prefixo preserva a classe da base (a saída herda a entrada)"
+    },
+    {
+      "id": "PRE_SUB",
+      "process": "PREFIX",
+      "form": {
+        "prefix": "sub"
+      },
+      "input": {
+        "pos": [
+          "NOUN"
+        ]
+      },
+      "output": {},
+      "stem": "LEMMA",
+      "allomorphy": [
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "sub + lema",
+          "example": "solo → subsolo"
+        }
+      ],
+      "semantics": {
+        "function": "SUBORDINATE"
+      },
+      "productivity": "MEDIUM",
+      "examples": [
+        {
+          "base": "solo",
+          "derived": "subsolo"
+        },
+        {
+          "base": "título",
+          "derived": "subtítulo"
+        },
+        {
+          "base": "divisão",
+          "derived": "subdivisão"
+        },
+        {
+          "base": "chefe",
+          "derived": "subchefe"
+        },
+        {
+          "base": "classe",
+          "derived": "subclasse"
+        }
+      ],
+      "counterExamples": [
+        {
+          "base": "café",
+          "wouldBe": "subcafé",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "mesa",
+          "wouldBe": "submesa",
+          "reason": "NOT_ATTESTED"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (sub-)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
+      ],
+      "confidence": "HIGH",
+      "note": "prefixo preserva a classe da base (a saída herda a entrada)"
+    },
+    {
+      "id": "PRE_INTER",
+      "process": "PREFIX",
+      "form": {
+        "prefix": "inter"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "ADJECTIVE",
+          "VERB"
+        ]
+      },
+      "output": {},
+      "stem": "LEMMA",
+      "allomorphy": [
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "inter + lema",
+          "example": "nacional → internacional"
+        }
+      ],
+      "semantics": {
+        "function": "BETWEEN"
+      },
+      "productivity": "HIGH",
+      "examples": [
+        {
+          "base": "nacional",
+          "derived": "internacional"
+        },
+        {
+          "base": "ligar",
+          "derived": "interligar"
+        },
+        {
+          "base": "câmbio",
+          "derived": "intercâmbio"
+        },
+        {
+          "base": "agir",
+          "derived": "interagir"
+        },
+        {
+          "base": "cidade",
+          "derived": "intercidades"
+        }
+      ],
+      "counterExamples": [
+        {
+          "base": "café",
+          "wouldBe": "intercafé",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "mesa",
+          "wouldBe": "intermesa",
+          "reason": "NOT_ATTESTED"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Basílio, Formação e Classes de Palavras no Português do Brasil (inter-)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
+      ],
+      "confidence": "HIGH",
+      "note": "prefixo preserva a classe da base (a saída herda a entrada)"
+    },
+    {
+      "id": "PRE_ANTI",
+      "process": "PREFIX",
+      "form": {
+        "prefix": "anti"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "ADJECTIVE"
+        ]
+      },
+      "output": {},
+      "stem": "LEMMA",
+      "allomorphy": [
+        {
+          "when": {
+            "lemmaStarts": "s"
+          },
+          "stemChange": "anti + s (sem hífen, ss diante de s+vogal)",
+          "example": "social → antissocial"
+        },
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "anti + lema (hífen diante de h/vogal)",
+          "example": "vírus → antivírus"
+        },
+        {
+          "when": {
+            "lemmaStarts": "s"
+          },
+          "stemChange": "anti + lema (ss por encontro de s)",
+          "example": "social → antissocial"
+        }
+      ],
+      "semantics": {
+        "function": "OPPOSITE"
+      },
+      "productivity": "HIGH",
+      "examples": [
+        {
+          "base": "vírus",
+          "derived": "antivírus"
+        },
+        {
+          "base": "social",
+          "derived": "antissocial"
+        },
+        {
+          "base": "inflamatório",
+          "derived": "anti-inflamatório"
+        },
+        {
+          "base": "ácido",
+          "derived": "antiácido"
+        },
+        {
+          "base": "tóxico",
+          "derived": "antitóxico"
+        },
+        {
+          "base": "capitalista",
+          "derived": "anticapitalista"
+        }
+      ],
+      "counterExamples": [
+        {
+          "base": "café",
+          "wouldBe": "anticafé",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "mesa",
+          "wouldBe": "antimesa",
+          "reason": "NOT_ATTESTED"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Bechara, Moderna Gramática Portuguesa (anti-)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
+      ],
+      "confidence": "HIGH",
+      "note": "prefixo preserva a classe da base (a saída herda a entrada)"
+    },
+    {
+      "id": "PRE_AUTO",
+      "process": "PREFIX",
+      "form": {
+        "prefix": "auto"
+      },
+      "input": {
+        "pos": [
+          "NOUN"
+        ]
+      },
+      "output": {},
+      "stem": "LEMMA",
+      "allomorphy": [
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "auto + lema (hífen diante de vogal)",
+          "example": "defesa → autodefesa"
+        },
+        {
+          "when": {
+            "lemmaStarts": "s"
+          },
+          "stemChange": "auto + ss",
+          "example": "suficiência → autossuficiência"
+        }
+      ],
+      "semantics": {
+        "function": "SELF_REFLEXIVE"
+      },
+      "productivity": "MEDIUM",
+      "examples": [
+        {
+          "base": "defesa",
+          "derived": "autodefesa"
+        },
+        {
+          "base": "controle",
+          "derived": "autocontrole"
+        },
+        {
+          "base": "estima",
+          "derived": "autoestima"
+        },
+        {
+          "base": "análise",
+          "derived": "autoanálise"
+        },
+        {
+          "base": "suficiência",
+          "derived": "autossuficiência"
+        }
+      ],
+      "counterExamples": [
+        {
+          "base": "café",
+          "wouldBe": "autocafé",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "mesa",
+          "wouldBe": "automesa",
+          "reason": "NOT_ATTESTED"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Sandmann, Formação de Palavras no Português Brasileiro Contemporâneo (auto-)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
+      ],
+      "confidence": "HIGH",
+      "note": "prefixo preserva a classe da base (a saída herda a entrada)"
+    },
+    {
+      "id": "PRE_CONTRA",
+      "process": "PREFIX",
+      "form": {
+        "prefix": "contra"
+      },
+      "input": {
+        "pos": [
+          "VERB",
+          "NOUN"
+        ]
+      },
+      "output": {},
+      "stem": "LEMMA",
+      "allomorphy": [
+        {
+          "when": {
+            "lemma": "atacar"
+          },
+          "stemChange": "contra- + lema (hífen)",
+          "example": "atacar → contra-atacar"
+        },
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "contra + lema",
+          "example": "dizer → contradizer"
+        }
+      ],
+      "semantics": {
+        "function": "AGAINST"
+      },
+      "productivity": "MEDIUM",
+      "examples": [
+        {
+          "base": "atacar",
+          "derived": "contra-atacar"
+        },
+        {
+          "base": "dizer",
+          "derived": "contradizer"
+        },
+        {
+          "base": "veneno",
+          "derived": "contraveneno"
+        },
+        {
+          "base": "mão",
+          "derived": "contramão"
+        },
+        {
+          "base": "gosto",
+          "derived": "contragosto"
+        }
+      ],
+      "counterExamples": [
+        {
+          "base": "café",
+          "wouldBe": "contracafé",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "mesa",
+          "wouldBe": "contramesa",
+          "reason": "NOT_ATTESTED"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (contra-)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
+      ],
+      "confidence": "HIGH",
+      "note": "prefixo preserva a classe da base (a saída herda a entrada)"
+    },
+    {
+      "id": "PAR_A_ECER",
+      "process": "PARASYNTHETIC",
+      "form": {
+        "prefix": "a",
+        "suffix": "ecer"
+      },
+      "input": {
+        "pos": [
+          "ADJECTIVE",
+          "NOUN"
+        ]
+      },
+      "output": {
+        "pos": "VERB",
+        "inflectionParadigm": "V_CER"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "endsInVowel": true }, "stemChange": "radical + rão (a→ão)", "example": "casa → casarão" },
-        { "when": { "stemEnds": "r" }, "stemChange": "radical + rão", "example": "livro → livrão" },
-        { "when": { "stemEnds": "s/z" }, "stemChange": "radical + eirão", "example": "voz → vozeirão" },
-        { "when": { "lemmaEnds": "m" }, "stemChange": "lema + zarrão", "example": "homem → homenzarrão" },
-        { "when": { "noun": "dinheiro" }, "stemChange": "dinh + eirão", "example": "dinheiro → dinheirão" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "a + radical + ecer",
+          "example": "maduro → amadurecer"
+        },
+        {
+          "when": {
+            "noun": "noite"
+          },
+          "stemChange": "a + noit + ecer",
+          "example": "noite → anoitecer"
+        },
+        {
+          "when": {
+            "noun": "manhã"
+          },
+          "stemChange": "a + manh + ecer",
+          "example": "manhã → amanhecer"
+        },
+        {
+          "when": {
+            "base": "quente"
+          },
+          "stemChange": "a + quec + er",
+          "example": "quente → aquecer"
+        }
       ],
-      "semantics": { "function": "AUGMENTATIVE" },
-      "productivity": "HIGH",
-      "examples": [
-        { "base": "casa", "derived": "casarão" },
-        { "base": "homem", "derived": "homenzarrão" },
-        { "base": "voz", "derived": "vozeirão" },
-        { "base": "dinheiro", "derived": "dinheirão" },
-        { "base": "livro", "derived": "livrão" }
-      ],
-      "counterExamples": [
-        { "base": "dez", "wouldBe": "dezão", "reason": "SEMANTIC_RESTRICTION" },
-        { "base": "de", "wouldBe": "deão", "reason": "SEMANTIC_RESTRICTION" }
-      ],
-      "sources": [
-        { "ref": "Cunha & Cintra, Nova Gramática (aumentativos)", "verified": false, "note": "fato padrão; página não verificada" }
-      ],
-      "confidence": "HIGH"
-    },
-    {
-      "id": "SUF_MENTE", "process": "SUFFIX", "form": { "suffix": "mente" },
-      "input": { "pos": "ADJECTIVE" },
-      "output": { "pos": "ADVERB", "inflectionParadigm": null },
-      "stem": "LEMMA",
-      "allomorphy": [
-        { "when": { "default": true }, "stemChange": "forma feminina + mente (invariável em -e/-z/-l)", "example": "feliz → felizmente" },
-        { "when": { "endsInO": true }, "stemChange": "radical + a + mente", "example": "rápido → rapidamente" }
-      ],
-      "semantics": { "function": "MANNER" },
-      "productivity": "HIGH",
-      "examples": [
-        { "base": "feliz", "derived": "felizmente" },
-        { "base": "rápido", "derived": "rapidamente" },
-        { "base": "claro", "derived": "claramente" },
-        { "base": "triste", "derived": "tristemente" },
-        { "base": "legal", "derived": "legalmente" },
-        { "base": "real", "derived": "realmente" }
-      ],
-      "counterExamples": [
-        { "base": "bom", "wouldBe": "bommente", "reason": "NOT_ATTESTED" },
-        { "base": "mau", "wouldBe": "maumente", "reason": "NOT_ATTESTED" }
-      ],
-      "sources": [
-        { "ref": "Bechara, Moderna Gramática Portuguesa (-mente)", "verified": false, "note": "fato padrão; página não verificada" }
-      ],
-      "confidence": "HIGH"
-    },
-    {
-      "id": "PRE_RE", "process": "PREFIX", "form": { "prefix": "re" },
-      "input": { "pos": "VERB", "constraints": { "actional": true } },
-      "output": { "pos": "VERB" },
-      "stem": "LEMMA",
-      "allomorphy": [
-        { "when": { "lemmaStartsVowel": true }, "stemChange": "re + lema (sem hífen)", "example": "escrever → reescrever" },
-        { "when": { "default": true }, "stemChange": "re + lema", "example": "fazer → refazer" }
-      ],
-      "semantics": { "function": "REPETITION" },
-      "productivity": "HIGH",
-      "examples": [
-        { "base": "fazer", "derived": "refazer" },
-        { "base": "tomar", "derived": "retomar" },
-        { "base": "ler", "derived": "reler" },
-        { "base": "escrever", "derived": "reescrever" },
-        { "base": "contar", "derived": "recontar" },
-        { "base": "cair", "derived": "recair" }
-      ],
-      "counterExamples": [
-        { "base": "ser", "wouldBe": "reser", "reason": "NOT_ATTESTED" },
-        { "base": "ter", "wouldBe": "reter", "reason": "BLOCKED_BY:reter (sentido lexicalizado; não é 'ter de novo')" }
-      ],
-      "sources": [
-        { "ref": "Basílio, Teoria Lexical (re-)", "verified": false, "note": "fato padrão; página não verificada" },
-        { "ref": "Aronoff, Word Formation in Generative Grammar", "url": "https://mitwpl.mit.edu/catalog/aron01/", "verified": false, "note": "bloqueio; conteúdo não verificado nesta sessão" }
-      ],
-      "confidence": "HIGH"
-    },
-    {
-      "id": "PRE_DES", "process": "PREFIX", "form": { "prefix": "des" },
-      "input": { "pos": "VERB", "constraints": { "reversible": true } },
-      "output": { "pos": "VERB" },
-      "stem": "LEMMA",
-      "allomorphy": [
-        { "when": { "default": true }, "stemChange": "des + lema", "example": "fazer → desfazer" }
-      ],
-      "semantics": { "function": "REVERSAL", "alsoPossible": ["NEGATION"] },
-      "productivity": "HIGH",
-      "examples": [
-        { "base": "fazer", "derived": "desfazer" },
-        { "base": "montar", "derived": "desmontar" },
-        { "base": "ligar", "derived": "desligar" },
-        { "base": "cobrir", "derived": "descobrir" },
-        { "base": "organizar", "derived": "desorganizar" },
-        { "base": "leal", "derived": "desleal" }
-      ],
-      "counterExamples": [
-        { "base": "criar", "wouldBe": "descriar", "reason": "NOT_ATTESTED" },
-        { "base": "amar", "wouldBe": "desamar", "reason": "NOT_ATTESTED" }
-      ],
-      "sources": [
-        { "ref": "Basílio, Teoria Lexical (des-)", "verified": false, "note": "fato padrão; página não verificada" }
-      ],
-      "confidence": "HIGH"
-    },
-    {
-      "id": "PRE_IN", "process": "PREFIX", "form": { "prefix": "in" },
-      "input": { "pos": "ADJECTIVE" },
-      "output": { "pos": "ADJECTIVE" },
-      "stem": "LEMMA",
-      "allomorphy": [
-        { "when": { "lemmaStarts": "l" }, "stemChange": "i + lema", "example": "legal → ilegal" },
-        { "when": { "lemmaStarts": "p" }, "stemChange": "im + lema", "example": "possível → impossível" },
-        { "when": { "lemmaStarts": "b" }, "stemChange": "im + lema", "example": "bom → imbom (bloqueado)" },
-        { "when": { "default": true }, "stemChange": "in + lema", "example": "feliz → infeliz" }
-      ],
-      "semantics": { "function": "NEGATION" },
+      "semantics": {
+        "function": "BECOME"
+      },
       "productivity": "MEDIUM",
       "examples": [
-        { "base": "feliz", "derived": "infeliz" },
-        { "base": "possível", "derived": "impossível" },
-        { "base": "legal", "derived": "ilegal" },
-        { "base": "capaz", "derived": "incapaz" },
-        { "base": "moral", "derived": "imoral" },
-        { "base": "real", "derived": "irreal" }
+        {
+          "base": "maduro",
+          "derived": "amadurecer"
+        },
+        {
+          "base": "podre",
+          "derived": "apodrecer"
+        },
+        {
+          "base": "noite",
+          "derived": "anoitecer"
+        },
+        {
+          "base": "manhã",
+          "derived": "amanhecer"
+        },
+        {
+          "base": "quente",
+          "derived": "aquecer"
+        }
       ],
       "counterExamples": [
-        { "base": "bom", "wouldBe": "imbom", "reason": "BLOCKED_BY:mau" },
-        { "base": "feio", "wouldBe": "infeio", "reason": "NOT_ATTESTED" }
+        {
+          "base": "belo",
+          "wouldBe": "abelecer",
+          "reason": "BLOCKED_BY:embelezar"
+        },
+        {
+          "base": "triste",
+          "wouldBe": "atristecer",
+          "reason": "BLOCKED_BY:entristecer"
+        }
       ],
       "sources": [
-        { "ref": "Cunha & Cintra, Nova Gramática (prefixos negativos)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Basílio, Teoria Lexical (parassíntese)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "PRE_PRE", "process": "PREFIX", "form": { "prefix": "pré" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "NOUN" },
-      "stem": "LEMMA",
-      "allomorphy": [
-        { "when": { "default": true }, "stemChange": "pré- + lema (hífen)", "example": "história → pré-história" }
-      ],
-      "semantics": { "function": "PRIOR" },
-      "productivity": "MEDIUM",
-      "examples": [
-        { "base": "história", "derived": "pré-história" },
-        { "base": "escola", "derived": "pré-escola" },
-        { "base": "natal", "derived": "pré-natal" },
-        { "base": "aquecimento", "derived": "pré-aquecimento" },
-        { "base": "venda", "derived": "pré-venda" }
-      ],
-      "counterExamples": [
-        { "base": "café", "wouldBe": "pré-café", "reason": "NOT_ATTESTED" },
-        { "base": "mesa", "wouldBe": "pré-mesa", "reason": "NOT_ATTESTED" }
-      ],
-      "sources": [
-        { "ref": "Bechara, Moderna Gramática Portuguesa (pré-)", "verified": false, "note": "fato padrão; página não verificada" }
-      ],
-      "confidence": "HIGH"
-    },
-    {
-      "id": "PRE_SUPER", "process": "PREFIX", "form": { "prefix": "super" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "NOUN" },
-      "stem": "LEMMA",
-      "allomorphy": [
-        { "when": { "lemmaStartsVowel": true }, "stemChange": "super + lema (sem hífen)", "example": "aquecimento → superaquecimento" },
-        { "when": { "default": true }, "stemChange": "super + lema (hífen diante de h)", "example": "homem → super-homem" }
-      ],
-      "semantics": { "function": "EXCESS" },
-      "productivity": "HIGH",
-      "examples": [
-        { "base": "homem", "derived": "super-homem" },
-        { "base": "mercado", "derived": "supermercado" },
-        { "base": "aquecimento", "derived": "superaquecimento" },
-        { "base": "produção", "derived": "superprodução" },
-        { "base": "herói", "derived": "super-herói" }
-      ],
-      "counterExamples": [
-        { "base": "café", "wouldBe": "supercafé", "reason": "NOT_ATTESTED" },
-        { "base": "mesa", "wouldBe": "supermesa", "reason": "NOT_ATTESTED" }
-      ],
-      "sources": [
-        { "ref": "Basílio, Teoria Lexical (super-)", "verified": false, "note": "fato padrão; página não verificada" }
-      ],
-      "confidence": "HIGH"
-    },
-    {
-      "id": "PRE_SUB", "process": "PREFIX", "form": { "prefix": "sub" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "NOUN" },
-      "stem": "LEMMA",
-      "allomorphy": [
-        { "when": { "default": true }, "stemChange": "sub + lema", "example": "solo → subsolo" }
-      ],
-      "semantics": { "function": "SUBORDINATE" },
-      "productivity": "MEDIUM",
-      "examples": [
-        { "base": "solo", "derived": "subsolo" },
-        { "base": "título", "derived": "subtítulo" },
-        { "base": "divisão", "derived": "subdivisão" },
-        { "base": "chefe", "derived": "subchefe" },
-        { "base": "classe", "derived": "subclasse" }
-      ],
-      "counterExamples": [
-        { "base": "café", "wouldBe": "subcafé", "reason": "NOT_ATTESTED" },
-        { "base": "mesa", "wouldBe": "submesa", "reason": "NOT_ATTESTED" }
-      ],
-      "sources": [
-        { "ref": "Cunha & Cintra, Nova Gramática (sub-)", "verified": false, "note": "fato padrão; página não verificada" }
-      ],
-      "confidence": "HIGH"
-    },
-    {
-      "id": "PRE_INTER", "process": "PREFIX", "form": { "prefix": "inter" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "NOUN" },
-      "stem": "LEMMA",
-      "allomorphy": [
-        { "when": { "default": true }, "stemChange": "inter + lema", "example": "nacional → internacional" }
-      ],
-      "semantics": { "function": "BETWEEN" },
-      "productivity": "HIGH",
-      "examples": [
-        { "base": "nacional", "derived": "internacional" },
-        { "base": "ligar", "derived": "interligar" },
-        { "base": "câmbio", "derived": "intercâmbio" },
-        { "base": "agir", "derived": "interagir" },
-        { "base": "cidade", "derived": "intercidades" }
-      ],
-      "counterExamples": [
-        { "base": "café", "wouldBe": "intercafé", "reason": "NOT_ATTESTED" },
-        { "base": "mesa", "wouldBe": "intermesa", "reason": "NOT_ATTESTED" }
-      ],
-      "sources": [
-        { "ref": "Basílio, Formação e Classes de Palavras no Português do Brasil (inter-)", "verified": false, "note": "fato padrão; página não verificada" }
-      ],
-      "confidence": "HIGH"
-    },
-    {
-      "id": "PRE_ANTI", "process": "PREFIX", "form": { "prefix": "anti" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "NOUN" },
-      "stem": "LEMMA",
-      "allomorphy": [
-        { "when": { "lemmaStarts": "s" }, "stemChange": "anti + s (sem hífen, ss diante de s+vogal)", "example": "social → antissocial" },
-        { "when": { "default": true }, "stemChange": "anti + lema (hífen diante de h/vogal)", "example": "vírus → antivírus" }
-      ],
-      "semantics": { "function": "OPPOSITE" },
-      "productivity": "HIGH",
-      "examples": [
-        { "base": "vírus", "derived": "antivírus" },
-        { "base": "social", "derived": "antissocial" },
-        { "base": "inflamatório", "derived": "anti-inflamatório" },
-        { "base": "ácido", "derived": "antiácido" },
-        { "base": "tóxico", "derived": "antitóxico" },
-        { "base": "capitalista", "derived": "anticapitalista" }
-      ],
-      "counterExamples": [
-        { "base": "café", "wouldBe": "anticafé", "reason": "NOT_ATTESTED" },
-        { "base": "mesa", "wouldBe": "antimesa", "reason": "NOT_ATTESTED" }
-      ],
-      "sources": [
-        { "ref": "Bechara, Moderna Gramática Portuguesa (anti-)", "verified": false, "note": "fato padrão; página não verificada" }
-      ],
-      "confidence": "HIGH"
-    },
-    {
-      "id": "PRE_AUTO", "process": "PREFIX", "form": { "prefix": "auto" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "NOUN" },
-      "stem": "LEMMA",
-      "allomorphy": [
-        { "when": { "default": true }, "stemChange": "auto + lema (hífen diante de vogal)", "example": "defesa → autodefesa" },
-        { "when": { "lemmaStarts": "s" }, "stemChange": "auto + ss", "example": "suficiência → autossuficiência" }
-      ],
-      "semantics": { "function": "SELF_REFLEXIVE" },
-      "productivity": "MEDIUM",
-      "examples": [
-        { "base": "defesa", "derived": "autodefesa" },
-        { "base": "controle", "derived": "autocontrole" },
-        { "base": "estima", "derived": "autoestima" },
-        { "base": "análise", "derived": "autoanálise" },
-        { "base": "suficiência", "derived": "autossuficiência" }
-      ],
-      "counterExamples": [
-        { "base": "café", "wouldBe": "autocafé", "reason": "NOT_ATTESTED" },
-        { "base": "mesa", "wouldBe": "automesa", "reason": "NOT_ATTESTED" }
-      ],
-      "sources": [
-        { "ref": "Sandmann, Formação de Palavras no Português Brasileiro Contemporâneo (auto-)", "verified": false, "note": "fato padrão; página não verificada" }
-      ],
-      "confidence": "HIGH"
-    },
-    {
-      "id": "PRE_CONTRA", "process": "PREFIX", "form": { "prefix": "contra" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "NOUN" },
-      "stem": "LEMMA",
-      "allomorphy": [
-        { "when": { "lemmaStartsVowel": true }, "stemChange": "contra- + lema (hífen)", "example": "atacar → contra-atacar" },
-        { "when": { "default": true }, "stemChange": "contra + lema", "example": "dizer → contradizer" }
-      ],
-      "semantics": { "function": "AGAINST" },
-      "productivity": "MEDIUM",
-      "examples": [
-        { "base": "atacar", "derived": "contra-atacar" },
-        { "base": "dizer", "derived": "contradizer" },
-        { "base": "veneno", "derived": "contraveneno" },
-        { "base": "mão", "derived": "contramão" },
-        { "base": "gosto", "derived": "contragosto" }
-      ],
-      "counterExamples": [
-        { "base": "café", "wouldBe": "contracafé", "reason": "NOT_ATTESTED" },
-        { "base": "mesa", "wouldBe": "contramesa", "reason": "NOT_ATTESTED" }
-      ],
-      "sources": [
-        { "ref": "Cunha & Cintra, Nova Gramática (contra-)", "verified": false, "note": "fato padrão; página não verificada" }
-      ],
-      "confidence": "HIGH"
-    },
-    {
-      "id": "PAR_A_ECER", "process": "PARASYNTHETIC", "form": { "prefix": "a", "suffix": "ecer" },
-      "input": { "pos": "ADJECTIVE" },
-      "output": { "pos": "VERB", "inflectionParadigm": "V_CER" },
+      "id": "PAR_EN_ECER",
+      "process": "PARASYNTHETIC",
+      "form": {
+        "prefix": "en",
+        "suffix": "ecer"
+      },
+      "input": {
+        "pos": [
+          "ADJECTIVE"
+        ]
+      },
+      "output": {
+        "pos": "VERB",
+        "inflectionParadigm": "V_CER"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "a + radical + ecer", "example": "maduro → amadurecer" },
-        { "when": { "noun": "noite" }, "stemChange": "a + noit + ecer", "example": "noite → anoitecer" },
-        { "when": { "noun": "manhã" }, "stemChange": "a + manh + ecer", "example": "manhã → amanhecer" },
-        { "when": { "base": "quente" }, "stemChange": "a + quec + er", "example": "quente → aquecer" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "en + radical + ecer",
+          "example": "velho → envelhecer"
+        },
+        {
+          "when": {
+            "lemmaStarts": "p"
+          },
+          "stemChange": "em + radical + ecer",
+          "example": "pobre → empobrecer"
+        },
+        {
+          "when": {
+            "lemmaStarts": "m"
+          },
+          "stemChange": "em + radical + ecer",
+          "example": "magro → emagrecer"
+        }
       ],
-      "semantics": { "function": "BECOME" },
+      "semantics": {
+        "function": "BECOME"
+      },
       "productivity": "MEDIUM",
       "examples": [
-        { "base": "maduro", "derived": "amadurecer" },
-        { "base": "podre", "derived": "apodrecer" },
-        { "base": "noite", "derived": "anoitecer" },
-        { "base": "manhã", "derived": "amanhecer" },
-        { "base": "quente", "derived": "aquecer" }
+        {
+          "base": "velho",
+          "derived": "envelhecer"
+        },
+        {
+          "base": "triste",
+          "derived": "entristecer"
+        },
+        {
+          "base": "pobre",
+          "derived": "empobrecer"
+        },
+        {
+          "base": "rico",
+          "derived": "enriquecer"
+        },
+        {
+          "base": "duro",
+          "derived": "endurecer"
+        },
+        {
+          "base": "magro",
+          "derived": "emagrecer"
+        },
+        {
+          "base": "surdo",
+          "derived": "ensurdecer"
+        }
       ],
       "counterExamples": [
-        { "base": "belo", "wouldBe": "abelecer", "reason": "BLOCKED_BY:embelezar" },
-        { "base": "triste", "wouldBe": "atristecer", "reason": "BLOCKED_BY:entristecer" }
+        {
+          "base": "bom",
+          "wouldBe": "emboncecer",
+          "reason": "BLOCKED_BY:melhorar"
+        },
+        {
+          "base": "rápido",
+          "wouldBe": "enrapidecer",
+          "reason": "BLOCKED_BY:acelerar"
+        }
       ],
       "sources": [
-        { "ref": "Basílio, Teoria Lexical (parassíntese)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Basílio, Teoria Lexical (parassíntese)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "PAR_EN_ECER", "process": "PARASYNTHETIC", "form": { "prefix": "en", "suffix": "ecer" },
-      "input": { "pos": "ADJECTIVE" },
-      "output": { "pos": "VERB", "inflectionParadigm": "V_CER" },
+      "id": "PAR_ES_ECER",
+      "process": "PARASYNTHETIC",
+      "form": {
+        "prefix": "es",
+        "suffix": "ecer"
+      },
+      "input": {
+        "pos": [
+          "ADJECTIVE"
+        ]
+      },
+      "output": {
+        "pos": "VERB",
+        "inflectionParadigm": "V_CER"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "en + radical + ecer", "example": "velho → envelhecer" },
-        { "when": { "lemmaStarts": "p" }, "stemChange": "em + radical + ecer", "example": "pobre → empobrecer" },
-        { "when": { "lemmaStarts": "m" }, "stemChange": "em + radical + ecer", "example": "magro → emagrecer" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "es + radical + ecer",
+          "example": "claro → esclarecer"
+        },
+        {
+          "when": {
+            "base": "morno"
+          },
+          "stemChange": "es + mor + ecer",
+          "example": "morno → esmorecer"
+        }
       ],
-      "semantics": { "function": "BECOME" },
-      "productivity": "MEDIUM",
-      "examples": [
-        { "base": "velho", "derived": "envelhecer" },
-        { "base": "triste", "derived": "entristecer" },
-        { "base": "pobre", "derived": "empobrecer" },
-        { "base": "rico", "derived": "enriquecer" },
-        { "base": "duro", "derived": "endurecer" },
-        { "base": "magro", "derived": "emagrecer" },
-        { "base": "surdo", "derived": "ensurdecer" }
-      ],
-      "counterExamples": [
-        { "base": "bom", "wouldBe": "emboncecer", "reason": "BLOCKED_BY:melhorar" },
-        { "base": "rápido", "wouldBe": "enrapidecer", "reason": "BLOCKED_BY:acelerar" }
-      ],
-      "sources": [
-        { "ref": "Basílio, Teoria Lexical (parassíntese)", "verified": false, "note": "fato padrão; página não verificada" }
-      ],
-      "confidence": "HIGH"
-    },
-    {
-      "id": "PAR_ES_ECER", "process": "PARASYNTHETIC", "form": { "prefix": "es", "suffix": "ecer" },
-      "input": { "pos": "ADJECTIVE" },
-      "output": { "pos": "VERB", "inflectionParadigm": "V_CER" },
-      "stem": "MINUS_FINAL_VOWEL",
-      "allomorphy": [
-        { "when": { "default": true }, "stemChange": "es + radical + ecer", "example": "claro → esclarecer" },
-        { "when": { "base": "morno" }, "stemChange": "es + mor + ecer", "example": "morno → esmorecer" }
-      ],
-      "semantics": { "function": "BECOME" },
+      "semantics": {
+        "function": "BECOME"
+      },
       "productivity": "LOW",
       "examples": [
-        { "base": "claro", "derived": "esclarecer" },
-        { "base": "morno", "derived": "esmorecer" }
+        {
+          "base": "claro",
+          "derived": "esclarecer"
+        },
+        {
+          "base": "morno",
+          "derived": "esmorecer"
+        },
+        {
+          "base": "tremer",
+          "derived": "estremecer"
+        }
       ],
       "counterExamples": [
-        { "base": "frio", "wouldBe": "esfriecer", "reason": "BLOCKED_BY:esfriar" },
-        { "base": "quente", "wouldBe": "esquentecer", "reason": "BLOCKED_BY:esquentar" }
+        {
+          "base": "frio",
+          "wouldBe": "esfriecer",
+          "reason": "BLOCKED_BY:esfriar"
+        },
+        {
+          "base": "quente",
+          "wouldBe": "esquentecer",
+          "reason": "BLOCKED_BY:esquentar"
+        }
       ],
       "sources": [
-        { "ref": "Basílio, Teoria Lexical (parassíntese)", "verified": false, "note": "padrão pouco produtivo; página não verificada" }
+        {
+          "ref": "Basílio, Teoria Lexical (parassíntese)",
+          "verified": false,
+          "note": "padrão pouco produtivo; página não verificada"
+        }
       ],
       "confidence": "MEDIUM",
-      "note": "es-…-ecer tem pouquíssimos membros (esclarecer, esmorecer); a produtividade é baixa."
+      "note": "es-…-ecer tem pouquíssimos membros (esclarecer, esmorecer); a produtividade é baixa.",
+      "exampleCountJustified": "o padrão es-…-ecer tem pouquíssimos membros no PB (esclarecer, esmorecer, estremecer); listam-se todos os correntes."
     },
     {
-      "id": "PAR_A_AR", "process": "PARASYNTHETIC", "form": { "prefix": "a", "suffix": "ar" },
-      "input": { "pos": "ADJECTIVE" },
-      "output": { "pos": "VERB", "inflectionParadigm": "V_AR" },
+      "id": "PAR_A_AR",
+      "process": "PARASYNTHETIC",
+      "form": {
+        "prefix": "a",
+        "suffix": "ar"
+      },
+      "input": {
+        "pos": [
+          "ADJECTIVE",
+          "NOUN"
+        ]
+      },
+      "output": {
+        "pos": "VERB",
+        "inflectionParadigm": "V_AR"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "a + radical + ar", "example": "fino → afinar" },
-        { "when": { "stemEnds": "c" }, "stemChange": "a + radical + çar (c→ç)", "example": "doce → adoçar" },
-        { "when": { "base": "próximo" }, "stemChange": "a + proxim + ar", "example": "próximo → aproximar" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "a + radical + ar",
+          "example": "fino → afinar"
+        },
+        {
+          "when": {
+            "stemEnds": "c"
+          },
+          "stemChange": "a + radical + çar (c→ç)",
+          "example": "doce → adoçar"
+        },
+        {
+          "when": {
+            "base": "próximo"
+          },
+          "stemChange": "a + proxim + ar",
+          "example": "próximo → aproximar"
+        }
       ],
-      "semantics": { "function": "CAUSE_TO_BE" },
+      "semantics": {
+        "function": "CAUSE_TO_BE",
+        "alsoPossible": [
+          "BECOME"
+        ]
+      },
       "productivity": "MEDIUM",
       "examples": [
-        { "base": "doce", "derived": "adoçar" },
-        { "base": "fino", "derived": "afinar" },
-        { "base": "baixo", "derived": "abaixar" },
-        { "base": "claro", "derived": "aclarar" },
-        { "base": "fundo", "derived": "afundar" },
-        { "base": "largo", "derived": "alargar" },
-        { "base": "longo", "derived": "alongar" },
-        { "base": "calmo", "derived": "acalmar" },
-        { "base": "próximo", "derived": "aproximar" }
+        {
+          "base": "doce",
+          "derived": "adoçar"
+        },
+        {
+          "base": "fino",
+          "derived": "afinar"
+        },
+        {
+          "base": "baixo",
+          "derived": "abaixar"
+        },
+        {
+          "base": "claro",
+          "derived": "aclarar"
+        },
+        {
+          "base": "fundo",
+          "derived": "afundar"
+        },
+        {
+          "base": "largo",
+          "derived": "alargar"
+        },
+        {
+          "base": "longo",
+          "derived": "alongar"
+        },
+        {
+          "base": "calmo",
+          "derived": "acalmar"
+        },
+        {
+          "base": "próximo",
+          "derived": "aproximar"
+        }
       ],
       "counterExamples": [
-        { "base": "triste", "wouldBe": "atristar", "reason": "BLOCKED_BY:entristecer" },
-        { "base": "doce", "wouldBe": "adocar", "reason": "NOT_ATTESTED" }
+        {
+          "base": "triste",
+          "wouldBe": "atristar",
+          "reason": "BLOCKED_BY:entristecer"
+        },
+        {
+          "base": "doce",
+          "wouldBe": "adocar",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Basílio, Teoria Lexical (parassíntese)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Basílio, Teoria Lexical (parassíntese)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "PAR_EN_AR", "process": "PARASYNTHETIC", "form": { "prefix": "en", "suffix": "ar" },
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "VERB", "inflectionParadigm": "V_AR" },
+      "id": "PAR_EN_AR",
+      "process": "PARASYNTHETIC",
+      "form": {
+        "prefix": "en",
+        "suffix": "ar"
+      },
+      "input": {
+        "pos": [
+          "NOUN",
+          "ADJECTIVE"
+        ]
+      },
+      "output": {
+        "pos": "VERB",
+        "inflectionParadigm": "V_AR"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "en + radical + ar", "example": "gordo → engordar" },
-        { "when": { "lemmaStarts": "b" }, "stemChange": "em + radical + ar", "example": "barco → embarcar" },
-        { "when": { "base": "raiz" }, "stemChange": "en + raiz + ar", "example": "raiz → enraizar" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "en + radical + ar",
+          "example": "gordo → engordar"
+        },
+        {
+          "when": {
+            "lemmaStarts": "b"
+          },
+          "stemChange": "em + radical + ar",
+          "example": "barco → embarcar"
+        },
+        {
+          "when": {
+            "base": "raiz"
+          },
+          "stemChange": "en + raiz + ar",
+          "example": "raiz → enraizar"
+        }
       ],
-      "semantics": { "function": "CAUSE_TO_BE" },
+      "semantics": {
+        "function": "CAUSE_TO_BE",
+        "alsoPossible": [
+          "BECOME"
+        ]
+      },
       "productivity": "MEDIUM",
       "examples": [
-        { "base": "gordo", "derived": "engordar" },
-        { "base": "barco", "derived": "embarcar" },
-        { "base": "lata", "derived": "enlatar" },
-        { "base": "raiz", "derived": "enraizar" },
-        { "base": "garrafa", "derived": "engarrafar" },
-        { "base": "curto", "derived": "encurtar" }
+        {
+          "base": "gordo",
+          "derived": "engordar"
+        },
+        {
+          "base": "barco",
+          "derived": "embarcar"
+        },
+        {
+          "base": "lata",
+          "derived": "enlatar"
+        },
+        {
+          "base": "raiz",
+          "derived": "enraizar"
+        },
+        {
+          "base": "garrafa",
+          "derived": "engarrafar"
+        },
+        {
+          "base": "curto",
+          "derived": "encurtar"
+        }
       ],
       "counterExamples": [
-        { "base": "limpo", "wouldBe": "enlimpar", "reason": "BLOCKED_BY:limpar" },
-        { "base": "quente", "wouldBe": "enquentar", "reason": "BLOCKED_BY:esquentar" }
+        {
+          "base": "limpo",
+          "wouldBe": "enlimpar",
+          "reason": "BLOCKED_BY:limpar"
+        },
+        {
+          "base": "quente",
+          "wouldBe": "enquentar",
+          "reason": "BLOCKED_BY:esquentar"
+        }
       ],
       "sources": [
-        { "ref": "Basílio, Teoria Lexical (parassíntese)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Basílio, Teoria Lexical (parassíntese)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "PAR_ES_AR", "process": "PARASYNTHETIC", "form": { "prefix": "es", "suffix": "ar" },
-      "input": { "pos": "ADJECTIVE" },
-      "output": { "pos": "VERB", "inflectionParadigm": "V_AR" },
+      "id": "PAR_ES_AR",
+      "process": "PARASYNTHETIC",
+      "form": {
+        "prefix": "es",
+        "suffix": "ar"
+      },
+      "input": {
+        "pos": [
+          "ADJECTIVE"
+        ]
+      },
+      "output": {
+        "pos": "VERB",
+        "inflectionParadigm": "V_AR"
+      },
       "stem": "MINUS_FINAL_VOWEL",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "es + radical + ar", "example": "frio → esfriar" },
-        { "when": { "base": "vazio" }, "stemChange": "es + vazi + ar", "example": "vazio → esvaziar" },
-        { "when": { "base": "quente" }, "stemChange": "es + quent + ar", "example": "quente → esquentar" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "es + radical + ar",
+          "example": "frio → esfriar"
+        },
+        {
+          "when": {
+            "base": "vazio"
+          },
+          "stemChange": "es + vazi + ar",
+          "example": "vazio → esvaziar"
+        },
+        {
+          "when": {
+            "base": "quente"
+          },
+          "stemChange": "es + quent + ar",
+          "example": "quente → esquentar"
+        }
       ],
-      "semantics": { "function": "CAUSE_TO_BE", "alsoPossible": ["BECOME"] },
+      "semantics": {
+        "function": "CAUSE_TO_BE",
+        "alsoPossible": [
+          "BECOME"
+        ]
+      },
       "productivity": "LOW",
       "examples": [
-        { "base": "frio", "derived": "esfriar" },
-        { "base": "vazio", "derived": "esvaziar" },
-        { "base": "quente", "derived": "esquentar" }
+        {
+          "base": "frio",
+          "derived": "esfriar"
+        },
+        {
+          "base": "vazio",
+          "derived": "esvaziar"
+        },
+        {
+          "base": "quente",
+          "derived": "esquentar"
+        }
       ],
       "counterExamples": [
-        { "base": "limpo", "wouldBe": "eslimpar", "reason": "NOT_ATTESTED" },
-        { "base": "doce", "wouldBe": "esdocar", "reason": "NOT_ATTESTED" }
+        {
+          "base": "limpo",
+          "wouldBe": "eslimpar",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "doce",
+          "wouldBe": "esdocar",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Basílio, Teoria Lexical (parassíntese)", "verified": false, "note": "padrão pouco produtivo; página não verificada" }
+        {
+          "ref": "Basílio, Teoria Lexical (parassíntese)",
+          "verified": false,
+          "note": "padrão pouco produtivo; página não verificada"
+        }
       ],
-      "confidence": "MEDIUM"
+      "confidence": "MEDIUM",
+      "exampleCountJustified": "o padrão es-…-ar tem poucos membros no PB (esfriar, esvaziar, esquentar); listam-se todos os correntes."
     },
     {
-      "id": "REG_A", "process": "REGRESSIVE", "form": { "suffix": "a" },
-      "input": { "pos": "VERB", "constraints": { "verbClass": "AR" } },
-      "output": { "pos": "NOUN", "gender": "Fem", "inflectionParadigm": "N_S" },
+      "id": "REG_A",
+      "process": "REGRESSIVE",
+      "form": {
+        "suffix": "a"
+      },
+      "input": {
+        "pos": "VERB",
+        "constraints": {
+          "verbClass": "AR"
+        }
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Fem",
+        "inflectionParadigm": "N_S"
+      },
       "stem": "VERB_ROOT",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + a", "example": "pescar → pesca" },
-        { "when": { "verb": "recair" }, "stemChange": "reca + ída", "example": "recair → recaída" },
-        { "when": { "verb": "despedir" }, "stemChange": "desped + ida", "example": "despedir → despedida" },
-        { "when": { "verb": "reescrever" }, "stemChange": "reescrit + a", "example": "reescrever → reescrita" },
-        { "when": { "verb": "recarregar" }, "stemChange": "recarg + a", "example": "recarregar → recarga" },
-        { "when": { "verb": "cair" }, "stemChange": "queda (supletiva)", "example": "cair → queda" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + a",
+          "example": "pescar → pesca"
+        },
+        {
+          "when": {
+            "verb": "recair"
+          },
+          "stemChange": "reca + ída",
+          "example": "recair → recaída"
+        },
+        {
+          "when": {
+            "verb": "despedir"
+          },
+          "stemChange": "desped + ida",
+          "example": "despedir → despedida"
+        },
+        {
+          "when": {
+            "verb": "reescrever"
+          },
+          "stemChange": "reescrit + a",
+          "example": "reescrever → reescrita"
+        },
+        {
+          "when": {
+            "verb": "recarregar"
+          },
+          "stemChange": "recarg + a",
+          "example": "recarregar → recarga"
+        },
+        {
+          "when": {
+            "verb": "cair"
+          },
+          "stemChange": "queda (supletiva)",
+          "example": "cair → queda"
+        },
+        {
+          "when": {
+            "verbClass": "AR"
+          },
+          "stemChange": "radical + ada (variante feminina)",
+          "example": "caçar → caçada"
+        },
+        {
+          "when": {
+            "verbClass": "AR"
+          },
+          "stemChange": "radical + ada (variante feminina)",
+          "example": "tomar → tomada"
+        },
+        {
+          "when": {
+            "verbClass": "AR"
+          },
+          "stemChange": "radical + ada (variante feminina)",
+          "example": "pescar → pescada"
+        },
+        {
+          "when": {
+            "verbClass": "AR"
+          },
+          "stemChange": "radical + ada (variante feminina)",
+          "example": "chegar → chegada"
+        },
+        {
+          "when": {
+            "verbClass": "IR"
+          },
+          "stemChange": "radical + ida (variante feminina)",
+          "example": "partir → partida"
+        },
+        {
+          "when": {
+            "verb": "descarregar"
+          },
+          "stemChange": "descarg + a",
+          "example": "descarregar → descarga"
+        }
       ],
-      "semantics": { "function": "ACTION_OF", "alsoPossible": ["RESULT_OF"] },
+      "semantics": {
+        "function": "ACTION_OF",
+        "alsoPossible": [
+          "RESULT_OF"
+        ]
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "pescar", "derived": "pesca" },
-        { "base": "comprar", "derived": "compra" },
-        { "base": "caçar", "derived": "caça" },
-        { "base": "trocar", "derived": "troca" },
-        { "base": "brigar", "derived": "briga" },
-        { "base": "cair", "derived": "queda" }
+        {
+          "base": "pescar",
+          "derived": "pesca"
+        },
+        {
+          "base": "comprar",
+          "derived": "compra"
+        },
+        {
+          "base": "caçar",
+          "derived": "caça"
+        },
+        {
+          "base": "trocar",
+          "derived": "troca"
+        },
+        {
+          "base": "brigar",
+          "derived": "briga"
+        },
+        {
+          "base": "cair",
+          "derived": "queda"
+        },
+        {
+          "base": "caçar",
+          "derived": "caçada"
+        },
+        {
+          "base": "tomar",
+          "derived": "tomada"
+        },
+        {
+          "base": "pescar",
+          "derived": "pescada"
+        }
       ],
       "counterExamples": [
-        { "base": "estudar", "wouldBe": "estuda", "reason": "BLOCKED_BY:estudo" },
-        { "base": "pensar", "wouldBe": "pensa", "reason": "BLOCKED_BY:pensamento" }
+        {
+          "base": "estudar",
+          "wouldBe": "estuda",
+          "reason": "BLOCKED_BY:estudo"
+        },
+        {
+          "base": "pensar",
+          "wouldBe": "pensa",
+          "reason": "BLOCKED_BY:pensamento"
+        }
       ],
       "sources": [
-        { "ref": "Basílio, Teoria Lexical (derivação regressiva)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Basílio, Teoria Lexical (derivação regressiva)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
+      ],
+      "confidence": "HIGH",
+      "note": "a variante feminina -ada/-ida (caçada, tomada, descarga) é licenciada ao lado de -a/-o/-e; os pares irregulares vão em allomorphy."
+    },
+    {
+      "id": "REG_O",
+      "process": "REGRESSIVE",
+      "form": {
+        "suffix": "o"
+      },
+      "input": {
+        "pos": "VERB",
+        "constraints": {
+          "verbClass": "AR"
+        }
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Masc",
+        "inflectionParadigm": "N_S"
+      },
+      "stem": "VERB_ROOT",
+      "allomorphy": [
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + o",
+          "example": "chorar → choro"
+        }
+      ],
+      "semantics": {
+        "function": "ACTION_OF",
+        "alsoPossible": [
+          "RESULT_OF"
+        ]
+      },
+      "productivity": "HIGH",
+      "examples": [
+        {
+          "base": "chorar",
+          "derived": "choro"
+        },
+        {
+          "base": "usar",
+          "derived": "uso"
+        },
+        {
+          "base": "gastar",
+          "derived": "gasto"
+        },
+        {
+          "base": "descansar",
+          "derived": "descanso"
+        },
+        {
+          "base": "errar",
+          "derived": "erro"
+        },
+        {
+          "base": "gritar",
+          "derived": "grito"
+        }
+      ],
+      "counterExamples": [
+        {
+          "base": "andar",
+          "wouldBe": "ando",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "dançar",
+          "wouldBe": "danço",
+          "reason": "NOT_ATTESTED"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Basílio, Teoria Lexical (derivação regressiva)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "REG_O", "process": "REGRESSIVE", "form": { "suffix": "o" },
-      "input": { "pos": "VERB", "constraints": { "verbClass": "AR" } },
-      "output": { "pos": "NOUN", "gender": "Masc", "inflectionParadigm": "N_S" },
+      "id": "REG_E",
+      "process": "REGRESSIVE",
+      "form": {
+        "suffix": "e"
+      },
+      "input": {
+        "pos": "VERB"
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Masc",
+        "inflectionParadigm": "N_S"
+      },
       "stem": "VERB_ROOT",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + o", "example": "chorar → choro" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "radical + e (c→qu, ç→c)",
+          "example": "atacar → ataque"
+        },
+        {
+          "when": {
+            "verb": "tocar"
+          },
+          "stemChange": "toqu + e",
+          "example": "tocar → toque"
+        },
+        {
+          "when": {
+            "verb": "alcançar"
+          },
+          "stemChange": "alcanc + e",
+          "example": "alcançar → alcance"
+        }
       ],
-      "semantics": { "function": "ACTION_OF", "alsoPossible": ["RESULT_OF"] },
+      "semantics": {
+        "function": "ACTION_OF",
+        "alsoPossible": [
+          "RESULT_OF"
+        ]
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "chorar", "derived": "choro" },
-        { "base": "usar", "derived": "uso" },
-        { "base": "gastar", "derived": "gasto" },
-        { "base": "descansar", "derived": "descanso" },
-        { "base": "errar", "derived": "erro" },
-        { "base": "gritar", "derived": "grito" }
+        {
+          "base": "atacar",
+          "derived": "ataque"
+        },
+        {
+          "base": "cortar",
+          "derived": "corte"
+        },
+        {
+          "base": "tocar",
+          "derived": "toque"
+        },
+        {
+          "base": "alcançar",
+          "derived": "alcance"
+        },
+        {
+          "base": "combater",
+          "derived": "combate"
+        }
       ],
       "counterExamples": [
-        { "base": "andar", "wouldBe": "ando", "reason": "NOT_ATTESTED" },
-        { "base": "dançar", "wouldBe": "danço", "reason": "NOT_ATTESTED" }
+        {
+          "base": "fechar",
+          "wouldBe": "feche",
+          "reason": "BLOCKED_BY:fecho"
+        },
+        {
+          "base": "amar",
+          "wouldBe": "ame",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Basílio, Teoria Lexical (derivação regressiva)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Basílio, Teoria Lexical (derivação regressiva)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "REG_E", "process": "REGRESSIVE", "form": { "suffix": "e" },
-      "input": { "pos": "VERB" },
-      "output": { "pos": "NOUN", "gender": "Masc", "inflectionParadigm": "N_S" },
-      "stem": "VERB_ROOT",
-      "allomorphy": [
-        { "when": { "default": true }, "stemChange": "radical + e (c→qu, ç→c)", "example": "atacar → ataque" },
-        { "when": { "verb": "tocar" }, "stemChange": "toqu + e", "example": "tocar → toque" },
-        { "when": { "verb": "alcançar" }, "stemChange": "alcanc + e", "example": "alcançar → alcance" }
-      ],
-      "semantics": { "function": "ACTION_OF", "alsoPossible": ["RESULT_OF"] },
-      "productivity": "HIGH",
-      "examples": [
-        { "base": "atacar", "derived": "ataque" },
-        { "base": "cortar", "derived": "corte" },
-        { "base": "tocar", "derived": "toque" },
-        { "base": "alcançar", "derived": "alcance" },
-        { "base": "combater", "derived": "combate" }
-      ],
-      "counterExamples": [
-        { "base": "fechar", "wouldBe": "feche", "reason": "BLOCKED_BY:fecho" },
-        { "base": "amar", "wouldBe": "ame", "reason": "NOT_ATTESTED" }
-      ],
-      "sources": [
-        { "ref": "Basílio, Teoria Lexical (derivação regressiva)", "verified": false, "note": "fato padrão; página não verificada" }
-      ],
-      "confidence": "HIGH"
-    },
-    {
-      "id": "CONV_INF_NOUN", "process": "CONVERSION", "form": {},
-      "input": { "pos": "VERB" },
-      "output": { "pos": "NOUN", "gender": "Masc", "inflectionParadigm": "N_INVARIANT" },
+      "id": "CONV_INF_NOUN",
+      "process": "CONVERSION",
+      "form": {},
+      "input": {
+        "pos": "VERB"
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Masc",
+        "inflectionParadigm": "N_INVARIANT"
+      },
       "stem": "LEMMA",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "infinitivo usado como nome", "example": "jantar → o jantar" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "infinitivo usado como nome",
+          "example": "jantar → o jantar"
+        }
       ],
-      "semantics": { "function": "CONVERSION" },
+      "semantics": {
+        "function": "CONVERSION"
+      },
       "productivity": "MEDIUM",
       "examples": [
-        { "base": "jantar", "derived": "jantar" },
-        { "base": "dever", "derived": "dever" },
-        { "base": "poder", "derived": "poder" },
-        { "base": "ser", "derived": "ser" },
-        { "base": "saber", "derived": "saber" },
-        { "base": "olhar", "derived": "olhar" }
+        {
+          "base": "jantar",
+          "derived": "jantar"
+        },
+        {
+          "base": "dever",
+          "derived": "dever"
+        },
+        {
+          "base": "poder",
+          "derived": "poder"
+        },
+        {
+          "base": "ser",
+          "derived": "ser"
+        },
+        {
+          "base": "saber",
+          "derived": "saber"
+        },
+        {
+          "base": "olhar",
+          "derived": "olhar"
+        }
       ],
       "counterExamples": [
-        { "base": "trabalhar", "wouldBe": "trabalhar", "reason": "BLOCKED_BY:trabalho" },
-        { "base": "dormir", "wouldBe": "dormir", "reason": "BLOCKED_BY:sono" }
+        {
+          "base": "trabalhar",
+          "wouldBe": "trabalhar",
+          "reason": "BLOCKED_BY:trabalho"
+        },
+        {
+          "base": "dormir",
+          "wouldBe": "dormir",
+          "reason": "BLOCKED_BY:sono"
+        }
       ],
       "sources": [
-        { "ref": "Bechara, Moderna Gramática Portuguesa (substantivação do infinitivo)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Bechara, Moderna Gramática Portuguesa (substantivação do infinitivo)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "CONV_ADJ_NOUN", "process": "CONVERSION", "form": {},
-      "input": { "pos": "ADJECTIVE" },
-      "output": { "pos": "NOUN" },
+      "id": "CONV_ADJ_NOUN",
+      "process": "CONVERSION",
+      "form": {},
+      "input": {
+        "pos": "ADJECTIVE"
+      },
+      "output": {
+        "pos": "NOUN"
+      },
       "stem": "LEMMA",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "adjetivo usado como nome (com artigo)", "example": "rico → o rico" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "adjetivo usado como nome (com artigo)",
+          "example": "rico → o rico"
+        }
       ],
-      "semantics": { "function": "CONVERSION" },
+      "semantics": {
+        "function": "CONVERSION"
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "rico", "derived": "rico" },
-        { "base": "jovem", "derived": "jovem" },
-        { "base": "bonito", "derived": "bonito" },
-        { "base": "doce", "derived": "doce" },
-        { "base": "pobre", "derived": "pobre" },
-        { "base": "velho", "derived": "velho" }
+        {
+          "base": "rico",
+          "derived": "rico"
+        },
+        {
+          "base": "jovem",
+          "derived": "jovem"
+        },
+        {
+          "base": "bonito",
+          "derived": "bonito"
+        },
+        {
+          "base": "doce",
+          "derived": "doce"
+        },
+        {
+          "base": "pobre",
+          "derived": "pobre"
+        },
+        {
+          "base": "velho",
+          "derived": "velho"
+        }
       ],
       "counterExamples": [
-        { "base": "útil", "wouldBe": "útil", "reason": "SEMANTIC_RESTRICTION" },
-        { "base": "feliz", "wouldBe": "feliz", "reason": "SEMANTIC_RESTRICTION" }
+        {
+          "base": "útil",
+          "wouldBe": "útil",
+          "reason": "SEMANTIC_RESTRICTION"
+        },
+        {
+          "base": "feliz",
+          "wouldBe": "feliz",
+          "reason": "SEMANTIC_RESTRICTION"
+        }
       ],
       "sources": [
-        { "ref": "Cunha & Cintra, Nova Gramática (substantivação)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (substantivação)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "CONV_PART_ADJ", "process": "CONVERSION", "form": {},
-      "input": { "pos": "VERB" },
-      "output": { "pos": "ADJECTIVE", "inflectionParadigm": "ADJ_O" },
+      "id": "CONV_PART_ADJ",
+      "process": "CONVERSION",
+      "form": {},
+      "input": {
+        "pos": "VERB"
+      },
+      "output": {
+        "pos": "ADJECTIVE",
+        "inflectionParadigm": "ADJ_O"
+      },
       "stem": "PARTICIPLE_STEM",
       "allomorphy": [
-        { "when": { "verbClass": "AR" }, "stemChange": "radical + ado", "example": "fechar → fechado" },
-        { "when": { "verbClass": "ER" }, "stemChange": "radical + ido", "example": "vender → vendido" },
-        { "when": { "participleIrregular": true }, "stemChange": "forma irregular do particípio", "example": "abrir → aberto" }
+        {
+          "when": {
+            "verbClass": "AR"
+          },
+          "stemChange": "radical + ado",
+          "example": "fechar → fechado"
+        },
+        {
+          "when": {
+            "verbClass": "ER"
+          },
+          "stemChange": "radical + ido",
+          "example": "vender → vendido"
+        },
+        {
+          "when": {
+            "participleIrregular": true
+          },
+          "stemChange": "forma irregular do particípio",
+          "example": "abrir → aberto"
+        }
       ],
-      "semantics": { "function": "CONVERSION" },
+      "semantics": {
+        "function": "CONVERSION"
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "criar", "derived": "criado" },
-        { "base": "fechar", "derived": "fechado" },
-        { "base": "abrir", "derived": "aberto" },
-        { "base": "escrever", "derived": "escrito" },
-        { "base": "fazer", "derived": "feito" },
-        { "base": "limpar", "derived": "limpo" }
+        {
+          "base": "criar",
+          "derived": "criado"
+        },
+        {
+          "base": "fechar",
+          "derived": "fechado"
+        },
+        {
+          "base": "abrir",
+          "derived": "aberto"
+        },
+        {
+          "base": "escrever",
+          "derived": "escrito"
+        },
+        {
+          "base": "fazer",
+          "derived": "feito"
+        },
+        {
+          "base": "limpar",
+          "derived": "limpo"
+        }
       ],
       "counterExamples": [
-        { "base": "haver", "wouldBe": "havido", "reason": "NOT_ATTESTED" },
-        { "base": "ter", "wouldBe": "tido", "reason": "NOT_ATTESTED" }
+        {
+          "base": "haver",
+          "wouldBe": "havido",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "ter",
+          "wouldBe": "tido",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Bechara, Moderna Gramática Portuguesa (particípio adjetivado)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Bechara, Moderna Gramática Portuguesa (particípio adjetivado)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH"
     },
     {
-      "id": "COMP_JUST", "process": "COMPOUND_JUXTAPOSITION", "form": {},
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "NOUN" },
+      "id": "COMP_JUST",
+      "process": "COMPOUND_JUXTAPOSITION",
+      "form": {},
+      "input": {
+        "pos": "NOUN"
+      },
+      "output": {
+        "pos": "NOUN"
+      },
       "stem": "LEMMA",
       "allomorphy": [
-        { "when": { "firstIsVerbRoot": true }, "stemChange": "raiz verbal (3sg) + - + nome", "example": "guardar + chuva → guarda-chuva" },
-        { "when": { "default": true }, "stemChange": "nome + - + nome", "example": "couve + flor → couve-flor" }
+        {
+          "when": {
+            "firstIsVerbRoot": true
+          },
+          "stemChange": "raiz verbal (3sg) + - + nome",
+          "example": "guardar + chuva → guarda-chuva"
+        },
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "nome + - + nome",
+          "example": "couve + flor → couve-flor"
+        }
       ],
-      "semantics": { "function": "CONVERSION" },
+      "semantics": {
+        "function": "COMPOSICAO"
+      },
       "productivity": "HIGH",
       "examples": [
-        { "base": "guardar chuva", "derived": "guarda-chuva" },
-        { "base": "girar sol", "derived": "girassol" },
-        { "base": "beijar flor", "derived": "beija-flor" },
-        { "base": "couve flor", "derived": "couve-flor" },
-        { "base": "porco espinho", "derived": "porco-espinho" },
-        { "base": "arco íris", "derived": "arco-íris" },
-        { "base": "alto falante", "derived": "alto-falante" },
-        { "base": "quinta feira", "derived": "quinta-feira" },
-        { "base": "pão duro", "derived": "pão-duro" },
-        { "base": "água viva", "derived": "água-viva" }
+        {
+          "base": "guardar chuva",
+          "derived": "guarda-chuva"
+        },
+        {
+          "base": "girar sol",
+          "derived": "girassol"
+        },
+        {
+          "base": "beijar flor",
+          "derived": "beija-flor"
+        },
+        {
+          "base": "couve flor",
+          "derived": "couve-flor"
+        },
+        {
+          "base": "porco espinho",
+          "derived": "porco-espinho"
+        },
+        {
+          "base": "arco íris",
+          "derived": "arco-íris"
+        },
+        {
+          "base": "alto falante",
+          "derived": "alto-falante"
+        },
+        {
+          "base": "quinta feira",
+          "derived": "quinta-feira"
+        },
+        {
+          "base": "pão duro",
+          "derived": "pão-duro"
+        },
+        {
+          "base": "água viva",
+          "derived": "água-viva"
+        }
       ],
       "counterExamples": [
-        { "base": "chuva guarda", "wouldBe": "chuva-guarda", "reason": "NOT_ATTESTED" }
+        {
+          "base": "chuva guarda",
+          "wouldBe": "chuva-guarda",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Cunha & Cintra, Nova Gramática (composição por justaposição)", "verified": false, "note": "fato padrão; página não verificada" },
-        { "ref": "Sandmann, Formação de Palavras no Português Brasileiro Contemporâneo", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (composição por justaposição)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        },
+        {
+          "ref": "Sandmann, Formação de Palavras no Português Brasileiro Contemporâneo",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH",
       "note": "regra de flexão do composto: verb+noun e noun+noun com 2º elemento variável flexionam só o 2º elemento (guarda-chuvas, couves-flores); noun+noun sem relação de determinação flexionam ambos (porcos-espinhos)."
     },
     {
-      "id": "COMP_AGLUT", "process": "COMPOUND_AGGLUTINATION", "form": {},
-      "input": { "pos": "NOUN" },
-      "output": { "pos": "NOUN" },
+      "id": "COMP_AGLUT",
+      "process": "COMPOUND_AGGLUTINATION",
+      "form": {},
+      "input": {
+        "pos": "NOUN"
+      },
+      "output": {
+        "pos": "NOUN"
+      },
       "stem": "LEMMA",
       "allomorphy": [
-        { "when": { "default": true }, "stemChange": "fusão com perda de segmento", "example": "água + ardente → aguardente" }
+        {
+          "when": {
+            "default": true
+          },
+          "stemChange": "fusão com perda de segmento",
+          "example": "água + ardente → aguardente"
+        }
       ],
-      "semantics": { "function": "CONVERSION" },
+      "semantics": {
+        "function": "AGLUTINACAO"
+      },
       "productivity": "LOW",
       "examples": [
-        { "base": "água ardente", "derived": "aguardente" },
-        { "base": "plano alto", "derived": "planalto" },
-        { "base": "perna alta", "derived": "pernalta" },
-        { "base": "em boa hora", "derived": "embora" },
-        { "base": "filho de algo", "derived": "fidalgo" }
+        {
+          "base": "água ardente",
+          "derived": "aguardente"
+        },
+        {
+          "base": "plano alto",
+          "derived": "planalto"
+        },
+        {
+          "base": "perna alta",
+          "derived": "pernalta"
+        },
+        {
+          "base": "em boa hora",
+          "derived": "embora"
+        },
+        {
+          "base": "filho de algo",
+          "derived": "fidalgo"
+        }
       ],
       "counterExamples": [
-        { "base": "alto plano", "wouldBe": "altoplano", "reason": "NOT_ATTESTED" }
+        {
+          "base": "alto plano",
+          "wouldBe": "altoplano",
+          "reason": "NOT_ATTESTED"
+        }
       ],
       "sources": [
-        { "ref": "Cunha & Cintra, Nova Gramática (composição por aglutinação)", "verified": false, "note": "fato padrão; página não verificada" }
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (composição por aglutinação)",
+          "verified": false,
+          "note": "fato padrão; página não verificada"
+        }
       ],
       "confidence": "HIGH",
       "note": "aglutinações são lexicalizadas: cada uma é listada nos exemplos (a regra não é produtiva)."

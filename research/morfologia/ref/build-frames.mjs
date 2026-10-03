@@ -328,10 +328,6 @@ const HAND = [
     ARG1: { label: 'motivo', prefers: ['ENTIDADE'] },
     ARG2: { label: 'a quem se agradece', prefers: ['PESSOA'] }
   }, { examples: ['Eu agradeço a ajuda ao amigo.'] }),
-  f('perguntar.PERGUNTAR_2', {
-    ARG0: { label: 'quem pergunta', prefers: ['PESSOA'] },
-    ARG1: { label: 'pergunta', prefers: ['INFORMACAO'] }
-  }, { examples: ['Você pergunta muito.'] }),
   f('questionar.QUESTIONAR', {
     ARG0: { label: 'quem questiona', prefers: ['PESSOA'] },
     ARG1: { label: 'o que é questionado', prefers: ['INFORMACAO'] }

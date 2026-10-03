@@ -3,266 +3,2541 @@
   "schemaVersion": "1.0.0",
   "description": "Testes de flexão (gold): forma → lema e traços (lemmatize) e lema + paradigma + traços → forma (inflect), cobrindo os paradigmas propostos (inflection-paradigms-proposed.json) e os verbos irregulares (irregular-verbs.json). Chave de traços no formato canônico do projeto.",
   "tests": [
-    {"id":"inf-001","op":"inflect","lemma":"homem","paradigm":"N_M_NS","features":"Number=Plur","expected":{"form":"homens"}},
-    {"id":"inf-002","op":"lemmatize","form":"homens","expected":{"lemma":"homem","features":"Number=Plur"}},
-    {"id":"inf-003","op":"inflect","lemma":"item","paradigm":"N_M_NS","features":"Number=Plur","expected":{"form":"itens"}},
-    {"id":"inf-004","op":"inflect","lemma":"nuvem","paradigm":"N_M_NS","features":"Number=Plur","expected":{"form":"nuvens"}},
-    {"id":"inf-005","op":"inflect","lemma":"viagem","paradigm":"N_M_NS","features":"Number=Plur","expected":{"form":"viagens"}},
-    {"id":"inf-006","op":"lemmatize","form":"viagens","expected":{"lemma":"viagem","features":"Number=Plur"}},
-    {"id":"inf-007","op":"inflect","lemma":"jovem","paradigm":"N_M_NS","features":"Number=Plur","expected":{"form":"jovens"}},
-    {"id":"inf-008","op":"inflect","lemma":"animal","paradigm":"N_AL_AIS","features":"Number=Plur","expected":{"form":"animais"}},
-    {"id":"inf-009","op":"lemmatize","form":"animais","expected":{"lemma":"animal","features":"Number=Plur"}},
-    {"id":"inf-010","op":"inflect","lemma":"jornal","paradigm":"N_AL_AIS","features":"Number=Plur","expected":{"form":"jornais"}},
-    {"id":"inf-011","op":"inflect","lemma":"canal","paradigm":"N_AL_AIS","features":"Number=Plur","expected":{"form":"canais"}},
-    {"id":"inf-012","op":"inflect","lemma":"papel","paradigm":"N_EL_EIS","features":"Number=Plur","expected":{"form":"papéis"}},
-    {"id":"inf-013","op":"lemmatize","form":"papéis","expected":{"lemma":"papel","features":"Number=Plur"}},
-    {"id":"inf-014","op":"inflect","lemma":"hotel","paradigm":"N_EL_EIS","features":"Number=Plur","expected":{"form":"hotéis"}},
-    {"id":"inf-015","op":"inflect","lemma":"anel","paradigm":"N_EL_EIS","features":"Number=Plur","expected":{"form":"anéis"}},
-    {"id":"inf-016","op":"inflect","lemma":"lençol","paradigm":"N_OL_OIS","features":"Number=Plur","expected":{"form":"lençóis"}},
-    {"id":"inf-017","op":"lemmatize","form":"lençóis","expected":{"lemma":"lençol","features":"Number=Plur"}},
-    {"id":"inf-018","op":"inflect","lemma":"anzol","paradigm":"N_OL_OIS","features":"Number=Plur","expected":{"form":"anzóis"}},
-    {"id":"inf-019","op":"inflect","lemma":"caracol","paradigm":"N_OL_OIS","features":"Number=Plur","expected":{"form":"caracóis"}},
-    {"id":"inf-020","op":"inflect","lemma":"azul","paradigm":"N_UL_UIS","features":"Number=Plur","expected":{"form":"azuis"}},
-    {"id":"inf-021","op":"lemmatize","form":"azuis","expected":{"lemma":"azul","features":"Number=Plur"}},
-    {"id":"inf-022","op":"inflect","lemma":"paul","paradigm":"N_UL_UIS","features":"Number=Plur","expected":{"form":"pauis"}},
-    {"id":"inf-023","op":"inflect","lemma":"barril","paradigm":"N_IL_IS","features":"Number=Plur","expected":{"form":"barris"}},
-    {"id":"inf-024","op":"lemmatize","form":"barris","expected":{"lemma":"barril","features":"Number=Plur"}},
-    {"id":"inf-025","op":"inflect","lemma":"funil","paradigm":"N_IL_IS","features":"Number=Plur","expected":{"form":"funis"}},
-    {"id":"inf-026","op":"inflect","lemma":"fuzil","paradigm":"N_IL_IS","features":"Number=Plur","expected":{"form":"fuzis"}},
-    {"id":"inf-027","op":"inflect","lemma":"fóssil","paradigm":"N_IL_EIS","features":"Number=Plur","expected":{"form":"fósseis"}},
-    {"id":"inf-028","op":"lemmatize","form":"fósseis","expected":{"lemma":"fóssil","features":"Number=Plur"}},
-    {"id":"inf-029","op":"inflect","lemma":"réptil","paradigm":"N_IL_EIS","features":"Number=Plur","expected":{"form":"répteis"}},
-    {"id":"inf-030","op":"inflect","lemma":"projétil","paradigm":"N_IL_EIS","features":"Number=Plur","expected":{"form":"projéteis"}},
-    {"id":"inf-031","op":"inflect","lemma":"ônibus","paradigm":"N_SX_INV","features":"Number=Plur","expected":{"form":"ônibus"}},
-    {"id":"inf-032","op":"lemmatize","form":"ônibus","expected":{"lemma":"ônibus","features":"Number=Sing"}},
-    {"id":"inf-033","op":"inflect","lemma":"lápis","paradigm":"N_SX_INV","features":"Number=Plur","expected":{"form":"lápis"}},
-    {"id":"inf-034","op":"inflect","lemma":"tórax","paradigm":"N_SX_INV","features":"Number=Plur","expected":{"form":"tórax"}},
-    {"id":"inf-035","op":"inflect","lemma":"professor","paradigm":"N_OR_ORES_ORA","features":"Number=Plur","expected":{"form":"professores"}},
-    {"id":"inf-036","op":"inflect","lemma":"professor","paradigm":"N_OR_ORES_ORA","features":"Gender=Fem|Number=Sing","expected":{"form":"professora"}},
-    {"id":"inf-037","op":"inflect","lemma":"professor","paradigm":"N_OR_ORES_ORA","features":"Gender=Fem|Number=Plur","expected":{"form":"professoras"}},
-    {"id":"inf-038","op":"lemmatize","form":"professores","expected":{"lemma":"professor","features":"Number=Plur"}},
-    {"id":"inf-039","op":"inflect","lemma":"diretor","paradigm":"N_OR_ORES_ORA","features":"Gender=Fem|Number=Sing","expected":{"form":"diretora"}},
-    {"id":"inf-040","op":"inflect","lemma":"diretor","paradigm":"N_OR_ORES_ORA","features":"Number=Plur","expected":{"form":"diretores"}},
-    {"id":"inf-041","op":"inflect","lemma":"narrador","paradigm":"N_OR_ORES_ORA","features":"Gender=Fem|Number=Sing","expected":{"form":"narradora"}},
-    {"id":"inf-042","op":"inflect","lemma":"francês","paradigm":"ADJ_ES_ESA","features":"Gender=Fem|Number=Sing","expected":{"form":"francesa"}},
-    {"id":"inf-043","op":"inflect","lemma":"francês","paradigm":"ADJ_ES_ESA","features":"Gender=Fem|Number=Plur","expected":{"form":"francesas"}},
-    {"id":"inf-044","op":"inflect","lemma":"francês","paradigm":"ADJ_ES_ESA","features":"Gender=Masc|Number=Plur","expected":{"form":"franceses"}},
-    {"id":"inf-045","op":"lemmatize","form":"francesa","expected":{"lemma":"francês","features":"Gender=Fem|Number=Sing"}},
-    {"id":"inf-046","op":"inflect","lemma":"português","paradigm":"ADJ_ES_ESA","features":"Gender=Fem|Number=Sing","expected":{"form":"portuguesa"}},
-    {"id":"inf-047","op":"inflect","lemma":"camponês","paradigm":"ADJ_ES_ESA","features":"Gender=Fem|Number=Sing","expected":{"form":"camponesa"}},
-    {"id":"inf-048","op":"inflect","lemma":"trabalhador","paradigm":"ADJ_OR_ORA","features":"Gender=Fem|Number=Sing","expected":{"form":"trabalhadora"}},
-    {"id":"inf-049","op":"inflect","lemma":"trabalhador","paradigm":"ADJ_OR_ORA","features":"Gender=Fem|Number=Plur","expected":{"form":"trabalhadoras"}},
-    {"id":"inf-050","op":"lemmatize","form":"trabalhadora","expected":{"lemma":"trabalhador","features":"Gender=Fem|Number=Sing"}},
-    {"id":"inf-051","op":"inflect","lemma":"encantador","paradigm":"ADJ_OR_ORA","features":"Gender=Fem|Number=Sing","expected":{"form":"encantadora"}},
-    {"id":"inf-052","op":"inflect","lemma":"vendedor","paradigm":"ADJ_OR_ORA","features":"Gender=Fem|Number=Sing","expected":{"form":"vendedora"}},
-    {"id":"inf-053","op":"inflect","lemma":"são","paradigm":"ADJ_AO_A","features":"Gender=Fem|Number=Sing","expected":{"form":"sã"}},
-    {"id":"inf-054","op":"inflect","lemma":"são","paradigm":"ADJ_AO_A","features":"Gender=Masc|Number=Plur","expected":{"form":"sãos"}},
-    {"id":"inf-055","op":"inflect","lemma":"são","paradigm":"ADJ_AO_A","features":"Gender=Fem|Number=Plur","expected":{"form":"sãs"}},
-    {"id":"inf-056","op":"lemmatize","form":"sã","expected":{"lemma":"são","features":"Gender=Fem|Number=Sing"}},
-    {"id":"inf-057","op":"inflect","lemma":"cristão","paradigm":"ADJ_AO_A","features":"Gender=Fem|Number=Sing","expected":{"form":"cristã"}},
-    {"id":"inf-058","op":"inflect","lemma":"cristão","paradigm":"ADJ_AO_A","features":"Gender=Masc|Number=Plur","expected":{"form":"cristãos"}},
-    {"id":"inf-059","op":"inflect","lemma":"vão","paradigm":"ADJ_AO_A","features":"Gender=Fem|Number=Sing","expected":{"form":"vã"}},
-    {"id":"inf-060","op":"inflect","lemma":"brigão","paradigm":"ADJ_AO_ONA","features":"Gender=Fem|Number=Sing","expected":{"form":"brigona"}},
-    {"id":"inf-061","op":"inflect","lemma":"brigão","paradigm":"ADJ_AO_ONA","features":"Gender=Masc|Number=Plur","expected":{"form":"brigões"}},
-    {"id":"inf-062","op":"inflect","lemma":"brigão","paradigm":"ADJ_AO_ONA","features":"Gender=Fem|Number=Plur","expected":{"form":"brigonas"}},
-    {"id":"inf-063","op":"lemmatize","form":"brigona","expected":{"lemma":"brigão","features":"Gender=Fem|Number=Sing"}},
-    {"id":"inf-064","op":"inflect","lemma":"chorão","paradigm":"ADJ_AO_ONA","features":"Gender=Fem|Number=Sing","expected":{"form":"chorona"}},
-    {"id":"inf-065","op":"inflect","lemma":"comilão","paradigm":"ADJ_AO_ONA","features":"Gender=Fem|Number=Sing","expected":{"form":"comilona"}},
-
-    {"id":"inf-100","op":"inflect","lemma":"passear","paradigm":"V_EAR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"passeio"}},
-    {"id":"inf-101","op":"inflect","lemma":"passear","paradigm":"V_EAR","features":"Number=Sing|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"passeias"}},
-    {"id":"inf-102","op":"inflect","lemma":"passear","paradigm":"V_EAR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"passeia"}},
-    {"id":"inf-103","op":"inflect","lemma":"passear","paradigm":"V_EAR","features":"Number=Plur|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"passeamos"}},
-    {"id":"inf-104","op":"inflect","lemma":"passear","paradigm":"V_EAR","features":"Number=Plur|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"passeais"}},
-    {"id":"inf-105","op":"inflect","lemma":"passear","paradigm":"V_EAR","features":"Number=Plur|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"passeiam"}},
-    {"id":"inf-106","op":"lemmatize","form":"passeio","expected":{"lemma":"passear","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-107","op":"inflect","lemma":"passear","paradigm":"V_EAR","features":"Number=Sing|Person=3|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"passeie"}},
-    {"id":"inf-108","op":"inflect","lemma":"anunciar","paradigm":"V_IAR_REG","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"anuncio"}},
-    {"id":"inf-109","op":"inflect","lemma":"anunciar","paradigm":"V_IAR_REG","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"anuncia"}},
-    {"id":"inf-110","op":"lemmatize","form":"anuncio","expected":{"lemma":"anunciar","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-111","op":"inflect","lemma":"copiar","paradigm":"V_IAR_REG","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"copio"}},
-    {"id":"inf-112","op":"inflect","lemma":"premiar","paradigm":"V_IAR_REG","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"premio"}},
-    {"id":"inf-113","op":"inflect","lemma":"odiar","paradigm":"V_ODIAR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"odeio"}},
-    {"id":"inf-114","op":"inflect","lemma":"odiar","paradigm":"V_ODIAR","features":"Number=Sing|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"odeias"}},
-    {"id":"inf-115","op":"inflect","lemma":"odiar","paradigm":"V_ODIAR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"odeia"}},
-    {"id":"inf-116","op":"inflect","lemma":"odiar","paradigm":"V_ODIAR","features":"Number=Plur|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"odiamos"}},
-    {"id":"inf-117","op":"inflect","lemma":"odiar","paradigm":"V_ODIAR","features":"Number=Plur|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"odiais"}},
-    {"id":"inf-118","op":"inflect","lemma":"odiar","paradigm":"V_ODIAR","features":"Number=Plur|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"odeiam"}},
-    {"id":"inf-119","op":"lemmatize","form":"odeio","expected":{"lemma":"odiar","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-120","op":"inflect","lemma":"mediar","paradigm":"V_ODIAR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"medeio"}},
-    {"id":"inf-121","op":"inflect","lemma":"ansiar","paradigm":"V_ODIAR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"anseio"}},
-    {"id":"inf-122","op":"inflect","lemma":"contribuir","paradigm":"V_UIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"contribuo"}},
-    {"id":"inf-123","op":"inflect","lemma":"contribuir","paradigm":"V_UIR","features":"Number=Sing|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"contribuis"}},
-    {"id":"inf-124","op":"inflect","lemma":"contribuir","paradigm":"V_UIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"contribui"}},
-    {"id":"inf-125","op":"inflect","lemma":"contribuir","paradigm":"V_UIR","features":"Number=Plur|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"contribuímos"}},
-    {"id":"inf-126","op":"inflect","lemma":"contribuir","paradigm":"V_UIR","features":"Number=Plur|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"contribuís"}},
-    {"id":"inf-127","op":"inflect","lemma":"contribuir","paradigm":"V_UIR","features":"Number=Plur|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"contribuem"}},
-    {"id":"inf-128","op":"lemmatize","form":"contribuem","expected":{"lemma":"contribuir","features":"Number=Plur|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-129","op":"inflect","lemma":"construir","paradigm":"V_UIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"constrói"}},
-    {"id":"inf-130","op":"inflect","lemma":"construir","paradigm":"V_UIR","features":"Number=Plur|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"constroem"}},
-    {"id":"inf-131","op":"inflect","lemma":"eleger","paradigm":"V_GER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"elejo"}},
-    {"id":"inf-132","op":"inflect","lemma":"eleger","paradigm":"V_GER","features":"Number=Sing|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"eleges"}},
-    {"id":"inf-133","op":"inflect","lemma":"eleger","paradigm":"V_GER","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"elege"}},
-    {"id":"inf-134","op":"inflect","lemma":"eleger","paradigm":"V_GER","features":"Number=Sing|Person=3|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"eleja"}},
-    {"id":"inf-135","op":"lemmatize","form":"elejo","expected":{"lemma":"eleger","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-136","op":"inflect","lemma":"proteger","paradigm":"V_GER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"protejo"}},
-    {"id":"inf-137","op":"inflect","lemma":"dirigir","paradigm":"V_GIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"dirijo"}},
-    {"id":"inf-138","op":"inflect","lemma":"dirigir","paradigm":"V_GIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"dirige"}},
-    {"id":"inf-139","op":"lemmatize","form":"dirijo","expected":{"lemma":"dirigir","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-140","op":"inflect","lemma":"agir","paradigm":"V_GIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"ajo"}},
-    {"id":"inf-141","op":"inflect","lemma":"exigir","paradigm":"V_GIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"exijo"}},
-    {"id":"inf-142","op":"inflect","lemma":"conhecer","paradigm":"V_CER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"conheço"}},
-    {"id":"inf-143","op":"inflect","lemma":"conhecer","paradigm":"V_CER","features":"Number=Sing|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"conheces"}},
-    {"id":"inf-144","op":"inflect","lemma":"conhecer","paradigm":"V_CER","features":"Number=Sing|Person=3|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"conheça"}},
-    {"id":"inf-145","op":"lemmatize","form":"conheço","expected":{"lemma":"conhecer","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-146","op":"inflect","lemma":"vencer","paradigm":"V_CER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"venço"}},
-    {"id":"inf-147","op":"inflect","lemma":"descer","paradigm":"V_CER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"desço"}},
-    {"id":"inf-148","op":"inflect","lemma":"começar","paradigm":"V_CAR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"começo"}},
-    {"id":"inf-149","op":"inflect","lemma":"começar","paradigm":"V_CAR","features":"Number=Sing|Person=3|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"comece"}},
-    {"id":"inf-150","op":"lemmatize","form":"comece","expected":{"lemma":"começar","features":"Number=Sing|Person=3|Mood=Sub|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-151","op":"inflect","lemma":"caçar","paradigm":"V_CAR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"caço"}},
-    {"id":"inf-152","op":"inflect","lemma":"dançar","paradigm":"V_CAR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"danço"}},
-    {"id":"inf-153","op":"inflect","lemma":"erguer","paradigm":"V_GUER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"ergo"}},
-    {"id":"inf-154","op":"inflect","lemma":"erguer","paradigm":"V_GUER","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"ergue"}},
-    {"id":"inf-155","op":"inflect","lemma":"erguer","paradigm":"V_GUER","features":"Number=Sing|Person=3|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"erga"}},
-
-    {"id":"inf-200","op":"inflect","lemma":"haver","paradigm":"V_HAVER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"hei"}},
-    {"id":"inf-201","op":"inflect","lemma":"haver","paradigm":"V_HAVER","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"houve"}},
-    {"id":"inf-202","op":"inflect","lemma":"haver","paradigm":"V_HAVER","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"haja"}},
-    {"id":"inf-203","op":"lemmatize","form":"houve","expected":{"lemma":"haver","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past"}},
-    {"id":"inf-204","op":"inflect","lemma":"vir","paradigm":"V_VIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"venho"}},
-    {"id":"inf-205","op":"inflect","lemma":"vir","paradigm":"V_VIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"veio"}},
-    {"id":"inf-206","op":"inflect","lemma":"vir","paradigm":"V_VIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"venha"}},
-    {"id":"inf-207","op":"lemmatize","form":"venho","expected":{"lemma":"vir","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-208","op":"inflect","lemma":"dizer","paradigm":"V_DIZER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"digo"}},
-    {"id":"inf-209","op":"inflect","lemma":"dizer","paradigm":"V_DIZER","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"disse"}},
-    {"id":"inf-210","op":"inflect","lemma":"dizer","paradigm":"V_DIZER","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"diga"}},
-    {"id":"inf-211","op":"lemmatize","form":"disse","expected":{"lemma":"dizer","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past"}},
-    {"id":"inf-212","op":"inflect","lemma":"saber","paradigm":"V_SABER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"sei"}},
-    {"id":"inf-213","op":"inflect","lemma":"saber","paradigm":"V_SABER","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"soube"}},
-    {"id":"inf-214","op":"inflect","lemma":"saber","paradigm":"V_SABER","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"saiba"}},
-    {"id":"inf-215","op":"inflect","lemma":"ver","paradigm":"V_VER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"vejo"}},
-    {"id":"inf-216","op":"inflect","lemma":"ver","paradigm":"V_VER","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"viu"}},
-    {"id":"inf-217","op":"inflect","lemma":"ver","paradigm":"V_VER","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"veja"}},
-    {"id":"inf-218","op":"lemmatize","form":"vejo","expected":{"lemma":"ver","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-219","op":"inflect","lemma":"dar","paradigm":"V_DAR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"dou"}},
-    {"id":"inf-220","op":"inflect","lemma":"dar","paradigm":"V_DAR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"deu"}},
-    {"id":"inf-221","op":"inflect","lemma":"dar","paradigm":"V_DAR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"dê"}},
-    {"id":"inf-222","op":"lemmatize","form":"dou","expected":{"lemma":"dar","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-223","op":"inflect","lemma":"ler","paradigm":"V_LER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"leio"}},
-    {"id":"inf-224","op":"inflect","lemma":"ler","paradigm":"V_LER","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"leu"}},
-    {"id":"inf-225","op":"inflect","lemma":"ler","paradigm":"V_LER","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"leia"}},
-    {"id":"inf-226","op":"inflect","lemma":"crer","paradigm":"V_CRER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"creio"}},
-    {"id":"inf-227","op":"inflect","lemma":"crer","paradigm":"V_CRER","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"creu"}},
-    {"id":"inf-228","op":"inflect","lemma":"crer","paradigm":"V_CRER","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"creia"}},
-    {"id":"inf-229","op":"lemmatize","form":"creio","expected":{"lemma":"crer","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-230","op":"inflect","lemma":"ouvir","paradigm":"V_OUVIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"ouço"}},
-    {"id":"inf-231","op":"inflect","lemma":"ouvir","paradigm":"V_OUVIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"ouviu"}},
-    {"id":"inf-232","op":"inflect","lemma":"ouvir","paradigm":"V_OUVIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"ouça"}},
-    {"id":"inf-233","op":"inflect","lemma":"pedir","paradigm":"V_PEDIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"peço"}},
-    {"id":"inf-234","op":"inflect","lemma":"pedir","paradigm":"V_PEDIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"pediu"}},
-    {"id":"inf-235","op":"inflect","lemma":"pedir","paradigm":"V_PEDIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"peça"}},
-    {"id":"inf-236","op":"lemmatize","form":"peço","expected":{"lemma":"pedir","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-237","op":"inflect","lemma":"medir","paradigm":"V_MEDIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"meço"}},
-    {"id":"inf-238","op":"inflect","lemma":"medir","paradigm":"V_MEDIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"mediu"}},
-    {"id":"inf-239","op":"inflect","lemma":"medir","paradigm":"V_MEDIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"meça"}},
-    {"id":"inf-240","op":"inflect","lemma":"dormir","paradigm":"V_DORMIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"durmo"}},
-    {"id":"inf-241","op":"inflect","lemma":"dormir","paradigm":"V_DORMIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"dormiu"}},
-    {"id":"inf-242","op":"inflect","lemma":"dormir","paradigm":"V_DORMIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"durma"}},
-    {"id":"inf-243","op":"lemmatize","form":"durmo","expected":{"lemma":"dormir","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-244","op":"inflect","lemma":"sair","paradigm":"V_SAIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"saio"}},
-    {"id":"inf-245","op":"inflect","lemma":"sair","paradigm":"V_SAIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"saiu"}},
-    {"id":"inf-246","op":"inflect","lemma":"sair","paradigm":"V_SAIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"saia"}},
-    {"id":"inf-247","op":"inflect","lemma":"cair","paradigm":"V_CAIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"caio"}},
-    {"id":"inf-248","op":"inflect","lemma":"cair","paradigm":"V_CAIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"caiu"}},
-    {"id":"inf-249","op":"inflect","lemma":"cair","paradigm":"V_CAIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"caia"}},
-    {"id":"inf-250","op":"lemmatize","form":"caio","expected":{"lemma":"cair","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-251","op":"inflect","lemma":"caber","paradigm":"V_CABER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"caibo"}},
-    {"id":"inf-252","op":"inflect","lemma":"caber","paradigm":"V_CABER","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"coube"}},
-    {"id":"inf-253","op":"inflect","lemma":"caber","paradigm":"V_CABER","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"caiba"}},
-    {"id":"inf-254","op":"lemmatize","form":"coube","expected":{"lemma":"caber","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past"}},
-    {"id":"inf-255","op":"inflect","lemma":"valer","paradigm":"V_VALER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"valho"}},
-    {"id":"inf-256","op":"inflect","lemma":"valer","paradigm":"V_VALER","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"valeu"}},
-    {"id":"inf-257","op":"inflect","lemma":"valer","paradigm":"V_VALER","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"valha"}},
-    {"id":"inf-258","op":"inflect","lemma":"perder","paradigm":"V_PERDER","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"perco"}},
-    {"id":"inf-259","op":"inflect","lemma":"perder","paradigm":"V_PERDER","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"perdeu"}},
-    {"id":"inf-260","op":"inflect","lemma":"perder","paradigm":"V_PERDER","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"perca"}},
-    {"id":"inf-261","op":"lemmatize","form":"perco","expected":{"lemma":"perder","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-262","op":"inflect","lemma":"seguir","paradigm":"V_SEGUIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"sigo"}},
-    {"id":"inf-263","op":"inflect","lemma":"seguir","paradigm":"V_SEGUIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"seguiu"}},
-    {"id":"inf-264","op":"inflect","lemma":"seguir","paradigm":"V_SEGUIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"siga"}},
-    {"id":"inf-265","op":"inflect","lemma":"sentir","paradigm":"V_SENTIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"sinto"}},
-    {"id":"inf-266","op":"inflect","lemma":"sentir","paradigm":"V_SENTIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"sentiu"}},
-    {"id":"inf-267","op":"inflect","lemma":"sentir","paradigm":"V_SENTIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"sinta"}},
-    {"id":"inf-268","op":"lemmatize","form":"sinto","expected":{"lemma":"sentir","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-269","op":"inflect","lemma":"servir","paradigm":"V_SERVIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"sirvo"}},
-    {"id":"inf-270","op":"inflect","lemma":"servir","paradigm":"V_SERVIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"serviu"}},
-    {"id":"inf-271","op":"inflect","lemma":"servir","paradigm":"V_SERVIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"sirva"}},
-    {"id":"inf-272","op":"inflect","lemma":"subir","paradigm":"V_SUBIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"subo"}},
-    {"id":"inf-273","op":"inflect","lemma":"subir","paradigm":"V_SUBIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"subiu"}},
-    {"id":"inf-274","op":"inflect","lemma":"subir","paradigm":"V_SUBIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"suba"}},
-    {"id":"inf-275","op":"lemmatize","form":"subo","expected":{"lemma":"subir","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-276","op":"inflect","lemma":"fugir","paradigm":"V_FUGIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"fujo"}},
-    {"id":"inf-277","op":"inflect","lemma":"fugir","paradigm":"V_FUGIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"fugiu"}},
-    {"id":"inf-278","op":"inflect","lemma":"fugir","paradigm":"V_FUGIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"fuja"}},
-    {"id":"inf-279","op":"inflect","lemma":"rir","paradigm":"V_RIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"rio"}},
-    {"id":"inf-280","op":"inflect","lemma":"rir","paradigm":"V_RIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"riu"}},
-    {"id":"inf-281","op":"inflect","lemma":"rir","paradigm":"V_RIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"ria"}},
-    {"id":"inf-282","op":"lemmatize","form":"rio","expected":{"lemma":"rir","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-283","op":"inflect","lemma":"construir","paradigm":"V_CONSTRUIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"construo"}},
-    {"id":"inf-284","op":"inflect","lemma":"construir","paradigm":"V_CONSTRUIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"construiu"}},
-    {"id":"inf-285","op":"inflect","lemma":"construir","paradigm":"V_CONSTRUIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"construa"}},
-    {"id":"inf-286","op":"inflect","lemma":"destruir","paradigm":"V_DESTRUIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"destruo"}},
-    {"id":"inf-287","op":"inflect","lemma":"destruir","paradigm":"V_DESTRUIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"destruiu"}},
-    {"id":"inf-288","op":"inflect","lemma":"destruir","paradigm":"V_DESTRUIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"destrua"}},
-    {"id":"inf-289","op":"lemmatize","form":"destruiu","expected":{"lemma":"destruir","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past"}},
-    {"id":"inf-290","op":"inflect","lemma":"conseguir","paradigm":"V_CONSEGUIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"consigo"}},
-    {"id":"inf-291","op":"inflect","lemma":"conseguir","paradigm":"V_CONSEGUIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"conseguiu"}},
-    {"id":"inf-292","op":"inflect","lemma":"conseguir","paradigm":"V_CONSEGUIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"consiga"}},
-    {"id":"inf-293","op":"lemmatize","form":"consigo","expected":{"lemma":"conseguir","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-294","op":"inflect","lemma":"preferir","paradigm":"V_PREFERIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"prefiro"}},
-    {"id":"inf-295","op":"inflect","lemma":"preferir","paradigm":"V_PREFERIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"preferiu"}},
-    {"id":"inf-296","op":"inflect","lemma":"preferir","paradigm":"V_PREFERIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"prefira"}},
-    {"id":"inf-297","op":"inflect","lemma":"mentir","paradigm":"V_MENTIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"minto"}},
-    {"id":"inf-298","op":"inflect","lemma":"mentir","paradigm":"V_MENTIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"mentiu"}},
-    {"id":"inf-299","op":"inflect","lemma":"mentir","paradigm":"V_MENTIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"minta"}},
-    {"id":"inf-300","op":"lemmatize","form":"minto","expected":{"lemma":"mentir","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-301","op":"inflect","lemma":"cobrir","paradigm":"V_COBRIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"cubro"}},
-    {"id":"inf-302","op":"inflect","lemma":"cobrir","paradigm":"V_COBRIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"cobriu"}},
-    {"id":"inf-303","op":"inflect","lemma":"cobrir","paradigm":"V_COBRIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"cubra"}},
-    {"id":"inf-304","op":"inflect","lemma":"descobrir","paradigm":"V_DESCOBRIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"descubro"}},
-    {"id":"inf-305","op":"inflect","lemma":"descobrir","paradigm":"V_DESCOBRIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"descobriu"}},
-    {"id":"inf-306","op":"inflect","lemma":"descobrir","paradigm":"V_DESCOBRIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"descubra"}},
-    {"id":"inf-307","op":"lemmatize","form":"descubro","expected":{"lemma":"descobrir","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"}},
-    {"id":"inf-308","op":"inflect","lemma":"abrir","paradigm":"V_ABRIR","features":"Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres","expected":{"form":"abro"}},
-    {"id":"inf-309","op":"inflect","lemma":"abrir","paradigm":"V_ABRIR","features":"Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past","expected":{"form":"abriu"}},
-    {"id":"inf-310","op":"inflect","lemma":"abrir","paradigm":"V_ABRIR","features":"Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres","expected":{"form":"abra"}},
-
-    {"id":"inf-400","op":"inflect","lemma":"abrir","paradigm":"V_ABRIR","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"aberto"}},
-    {"id":"inf-401","op":"inflect","lemma":"abrir","paradigm":"V_ABRIR","features":"Gender=Fem|Number=Sing|VerbForm=Part","expected":{"form":"aberta"}},
-    {"id":"inf-402","op":"lemmatize","form":"aberto","expected":{"lemma":"abrir","features":"Gender=Masc|Number=Sing|VerbForm=Part"}},
-    {"id":"inf-403","op":"inflect","lemma":"escrever","paradigm":"V_ESCREVER_IRR","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"escrito"}},
-    {"id":"inf-404","op":"inflect","lemma":"escrever","paradigm":"V_ESCREVER_IRR","features":"Gender=Fem|Number=Sing|VerbForm=Part","expected":{"form":"escrita"}},
-    {"id":"inf-405","op":"inflect","lemma":"fazer","paradigm":"V_FAZER","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"feito"}},
-    {"id":"inf-406","op":"inflect","lemma":"fazer","paradigm":"V_FAZER","features":"Gender=Fem|Number=Sing|VerbForm=Part","expected":{"form":"feita"}},
-    {"id":"inf-407","op":"lemmatize","form":"feito","expected":{"lemma":"fazer","features":"Gender=Masc|Number=Sing|VerbForm=Part"}},
-    {"id":"inf-408","op":"inflect","lemma":"pôr","paradigm":"V_POR","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"posto"}},
-    {"id":"inf-409","op":"inflect","lemma":"pôr","paradigm":"V_POR","features":"Gender=Fem|Number=Sing|VerbForm=Part","expected":{"form":"posta"}},
-    {"id":"inf-410","op":"inflect","lemma":"ver","paradigm":"V_VER","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"visto"}},
-    {"id":"inf-411","op":"inflect","lemma":"ver","paradigm":"V_VER","features":"Gender=Fem|Number=Sing|VerbForm=Part","expected":{"form":"vista"}},
-    {"id":"inf-412","op":"lemmatize","form":"visto","expected":{"lemma":"ver","features":"Gender=Masc|Number=Sing|VerbForm=Part"}},
-    {"id":"inf-413","op":"inflect","lemma":"dizer","paradigm":"V_DIZER","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"dito"}},
-    {"id":"inf-414","op":"inflect","lemma":"dizer","paradigm":"V_DIZER","features":"Gender=Fem|Number=Sing|VerbForm=Part","expected":{"form":"dita"}},
-    {"id":"inf-415","op":"inflect","lemma":"pagar","paradigm":"V_PAGAR_IRR","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"pago"}},
-    {"id":"inf-416","op":"inflect","lemma":"pagar","paradigm":"V_PAGAR_IRR","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"pagado"}},
-    {"id":"inf-417","op":"lemmatize","form":"pago","expected":{"lemma":"pagar","features":"Gender=Masc|Number=Sing|VerbForm=Part"}},
-    {"id":"inf-418","op":"inflect","lemma":"aceitar","paradigm":"V_ACEITAR_IRR","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"aceito"}},
-    {"id":"inf-419","op":"inflect","lemma":"aceitar","paradigm":"V_ACEITAR_IRR","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"aceitado"}},
-    {"id":"inf-420","op":"inflect","lemma":"entregar","paradigm":"V_ENTREGAR_IRR","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"entregue"}},
-    {"id":"inf-421","op":"inflect","lemma":"entregar","paradigm":"V_ENTREGAR_IRR","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"entregado"}},
-    {"id":"inf-422","op":"inflect","lemma":"cobrir","paradigm":"V_COBRIR","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"coberto"}},
-    {"id":"inf-423","op":"inflect","lemma":"descobrir","paradigm":"V_DESCOBRIR","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"descoberto"}},
-    {"id":"inf-424","op":"inflect","lemma":"vir","paradigm":"V_VIR","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"vindo"}},
-    {"id":"inf-425","op":"inflect","lemma":"dar","paradigm":"V_DAR","features":"Gender=Masc|Number=Sing|VerbForm=Part","expected":{"form":"dado"}}
+    {
+      "id": "inf-001",
+      "op": "inflect",
+      "lemma": "homem",
+      "paradigm": "N_M_NS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "homens"
+      }
+    },
+    {
+      "id": "inf-002",
+      "op": "lemmatize",
+      "form": "homens",
+      "expected": {
+        "lemma": "homem",
+        "features": "Number=Plur"
+      }
+    },
+    {
+      "id": "inf-003",
+      "op": "inflect",
+      "lemma": "item",
+      "paradigm": "N_M_NS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "itens"
+      }
+    },
+    {
+      "id": "inf-004",
+      "op": "inflect",
+      "lemma": "nuvem",
+      "paradigm": "N_M_NS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "nuvens"
+      }
+    },
+    {
+      "id": "inf-005",
+      "op": "inflect",
+      "lemma": "viagem",
+      "paradigm": "N_M_NS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "viagens"
+      }
+    },
+    {
+      "id": "inf-006",
+      "op": "lemmatize",
+      "form": "viagens",
+      "expected": {
+        "lemma": "viagem",
+        "features": "Number=Plur"
+      }
+    },
+    {
+      "id": "inf-007",
+      "op": "inflect",
+      "lemma": "jovem",
+      "paradigm": "N_M_NS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "jovens"
+      }
+    },
+    {
+      "id": "inf-008",
+      "op": "inflect",
+      "lemma": "animal",
+      "paradigm": "N_AL_AIS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "animais"
+      }
+    },
+    {
+      "id": "inf-009",
+      "op": "lemmatize",
+      "form": "animais",
+      "expected": {
+        "lemma": "animal",
+        "features": "Number=Plur"
+      }
+    },
+    {
+      "id": "inf-010",
+      "op": "inflect",
+      "lemma": "jornal",
+      "paradigm": "N_AL_AIS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "jornais"
+      }
+    },
+    {
+      "id": "inf-011",
+      "op": "inflect",
+      "lemma": "canal",
+      "paradigm": "N_AL_AIS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "canais"
+      }
+    },
+    {
+      "id": "inf-012",
+      "op": "inflect",
+      "lemma": "papel",
+      "paradigm": "N_EL_EIS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "papéis"
+      }
+    },
+    {
+      "id": "inf-013",
+      "op": "lemmatize",
+      "form": "papéis",
+      "expected": {
+        "lemma": "papel",
+        "features": "Number=Plur"
+      }
+    },
+    {
+      "id": "inf-014",
+      "op": "inflect",
+      "lemma": "hotel",
+      "paradigm": "N_EL_EIS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "hotéis"
+      }
+    },
+    {
+      "id": "inf-015",
+      "op": "inflect",
+      "lemma": "anel",
+      "paradigm": "N_EL_EIS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "anéis"
+      }
+    },
+    {
+      "id": "inf-016",
+      "op": "inflect",
+      "lemma": "lençol",
+      "paradigm": "N_OL_OIS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "lençóis"
+      }
+    },
+    {
+      "id": "inf-017",
+      "op": "lemmatize",
+      "form": "lençóis",
+      "expected": {
+        "lemma": "lençol",
+        "features": "Number=Plur"
+      }
+    },
+    {
+      "id": "inf-018",
+      "op": "inflect",
+      "lemma": "anzol",
+      "paradigm": "N_OL_OIS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "anzóis"
+      }
+    },
+    {
+      "id": "inf-019",
+      "op": "inflect",
+      "lemma": "caracol",
+      "paradigm": "N_OL_OIS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "caracóis"
+      }
+    },
+    {
+      "id": "inf-020",
+      "op": "inflect",
+      "lemma": "azul",
+      "paradigm": "N_UL_UIS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "azuis"
+      }
+    },
+    {
+      "id": "inf-021",
+      "op": "lemmatize",
+      "form": "azuis",
+      "expected": {
+        "lemma": "azul",
+        "features": "Number=Plur"
+      }
+    },
+    {
+      "id": "inf-022",
+      "op": "inflect",
+      "lemma": "paul",
+      "paradigm": "N_UL_UIS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "pauis"
+      }
+    },
+    {
+      "id": "inf-023",
+      "op": "inflect",
+      "lemma": "barril",
+      "paradigm": "N_IL_IS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "barris"
+      }
+    },
+    {
+      "id": "inf-024",
+      "op": "lemmatize",
+      "form": "barris",
+      "expected": {
+        "lemma": "barril",
+        "features": "Number=Plur"
+      }
+    },
+    {
+      "id": "inf-025",
+      "op": "inflect",
+      "lemma": "funil",
+      "paradigm": "N_IL_IS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "funis"
+      }
+    },
+    {
+      "id": "inf-026",
+      "op": "inflect",
+      "lemma": "fuzil",
+      "paradigm": "N_IL_IS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "fuzis"
+      }
+    },
+    {
+      "id": "inf-027",
+      "op": "inflect",
+      "lemma": "fóssil",
+      "paradigm": "N_IL_EIS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "fósseis"
+      }
+    },
+    {
+      "id": "inf-028",
+      "op": "lemmatize",
+      "form": "fósseis",
+      "expected": {
+        "lemma": "fóssil",
+        "features": "Number=Plur"
+      }
+    },
+    {
+      "id": "inf-029",
+      "op": "inflect",
+      "lemma": "réptil",
+      "paradigm": "N_IL_EIS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "répteis"
+      }
+    },
+    {
+      "id": "inf-030",
+      "op": "inflect",
+      "lemma": "projétil",
+      "paradigm": "N_IL_EIS",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "projéteis"
+      }
+    },
+    {
+      "id": "inf-031",
+      "op": "inflect",
+      "lemma": "ônibus",
+      "paradigm": "N_SX_INV",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "ônibus"
+      }
+    },
+    {
+      "id": "inf-032",
+      "op": "lemmatize",
+      "form": "ônibus",
+      "expected": {
+        "lemma": "ônibus",
+        "features": "Number=Sing"
+      }
+    },
+    {
+      "id": "inf-033",
+      "op": "inflect",
+      "lemma": "lápis",
+      "paradigm": "N_SX_INV",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "lápis"
+      }
+    },
+    {
+      "id": "inf-034",
+      "op": "inflect",
+      "lemma": "tórax",
+      "paradigm": "N_SX_INV",
+      "features": "Number=Plur",
+      "expected": {
+        "form": "tórax"
+      }
+    },
+    {
+      "id": "inf-035",
+      "op": "inflect",
+      "lemma": "professor",
+      "paradigm": "N_OR_ORES_ORA",
+      "features": "Gender=Masc|Number=Plur",
+      "expected": {
+        "form": "professores"
+      }
+    },
+    {
+      "id": "inf-036",
+      "op": "inflect",
+      "lemma": "professor",
+      "paradigm": "N_OR_ORES_ORA",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "professora"
+      }
+    },
+    {
+      "id": "inf-037",
+      "op": "inflect",
+      "lemma": "professor",
+      "paradigm": "N_OR_ORES_ORA",
+      "features": "Gender=Fem|Number=Plur",
+      "expected": {
+        "form": "professoras"
+      }
+    },
+    {
+      "id": "inf-038",
+      "op": "lemmatize",
+      "form": "professores",
+      "expected": {
+        "lemma": "professor",
+        "features": "Gender=Masc|Number=Plur"
+      }
+    },
+    {
+      "id": "inf-039",
+      "op": "inflect",
+      "lemma": "diretor",
+      "paradigm": "N_OR_ORES_ORA",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "diretora"
+      }
+    },
+    {
+      "id": "inf-040",
+      "op": "inflect",
+      "lemma": "diretor",
+      "paradigm": "N_OR_ORES_ORA",
+      "features": "Gender=Masc|Number=Plur",
+      "expected": {
+        "form": "diretores"
+      }
+    },
+    {
+      "id": "inf-041",
+      "op": "inflect",
+      "lemma": "narrador",
+      "paradigm": "N_OR_ORES_ORA",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "narradora"
+      }
+    },
+    {
+      "id": "inf-042",
+      "op": "inflect",
+      "lemma": "francês",
+      "paradigm": "ADJ_ES_ESA",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "francesa"
+      }
+    },
+    {
+      "id": "inf-043",
+      "op": "inflect",
+      "lemma": "francês",
+      "paradigm": "ADJ_ES_ESA",
+      "features": "Gender=Fem|Number=Plur",
+      "expected": {
+        "form": "francesas"
+      }
+    },
+    {
+      "id": "inf-044",
+      "op": "inflect",
+      "lemma": "francês",
+      "paradigm": "ADJ_ES_ESA",
+      "features": "Gender=Masc|Number=Plur",
+      "expected": {
+        "form": "franceses"
+      }
+    },
+    {
+      "id": "inf-045",
+      "op": "lemmatize",
+      "form": "francesa",
+      "expected": {
+        "lemma": "francês",
+        "features": "Gender=Fem|Number=Sing"
+      }
+    },
+    {
+      "id": "inf-046",
+      "op": "inflect",
+      "lemma": "português",
+      "paradigm": "ADJ_ES_ESA",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "portuguesa"
+      }
+    },
+    {
+      "id": "inf-047",
+      "op": "inflect",
+      "lemma": "camponês",
+      "paradigm": "ADJ_ES_ESA",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "camponesa"
+      }
+    },
+    {
+      "id": "inf-048",
+      "op": "inflect",
+      "lemma": "trabalhador",
+      "paradigm": "ADJ_OR_ORA",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "trabalhadora"
+      }
+    },
+    {
+      "id": "inf-049",
+      "op": "inflect",
+      "lemma": "trabalhador",
+      "paradigm": "ADJ_OR_ORA",
+      "features": "Gender=Fem|Number=Plur",
+      "expected": {
+        "form": "trabalhadoras"
+      }
+    },
+    {
+      "id": "inf-050",
+      "op": "lemmatize",
+      "form": "trabalhadora",
+      "expected": {
+        "lemma": "trabalhador",
+        "features": "Gender=Fem|Number=Sing"
+      }
+    },
+    {
+      "id": "inf-051",
+      "op": "inflect",
+      "lemma": "encantador",
+      "paradigm": "ADJ_OR_ORA",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "encantadora"
+      }
+    },
+    {
+      "id": "inf-052",
+      "op": "inflect",
+      "lemma": "vendedor",
+      "paradigm": "ADJ_OR_ORA",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "vendedora"
+      }
+    },
+    {
+      "id": "inf-053",
+      "op": "inflect",
+      "lemma": "são",
+      "paradigm": "ADJ_AO_A",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "sã"
+      }
+    },
+    {
+      "id": "inf-054",
+      "op": "inflect",
+      "lemma": "são",
+      "paradigm": "ADJ_AO_A",
+      "features": "Gender=Masc|Number=Plur",
+      "expected": {
+        "form": "sãos"
+      }
+    },
+    {
+      "id": "inf-055",
+      "op": "inflect",
+      "lemma": "são",
+      "paradigm": "ADJ_AO_A",
+      "features": "Gender=Fem|Number=Plur",
+      "expected": {
+        "form": "sãs"
+      }
+    },
+    {
+      "id": "inf-056",
+      "op": "lemmatize",
+      "form": "sã",
+      "expected": {
+        "lemma": "são",
+        "features": "Gender=Fem|Number=Sing"
+      }
+    },
+    {
+      "id": "inf-057",
+      "op": "inflect",
+      "lemma": "cristão",
+      "paradigm": "ADJ_AO_A",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "cristã"
+      }
+    },
+    {
+      "id": "inf-058",
+      "op": "inflect",
+      "lemma": "cristão",
+      "paradigm": "ADJ_AO_A",
+      "features": "Gender=Masc|Number=Plur",
+      "expected": {
+        "form": "cristãos"
+      }
+    },
+    {
+      "id": "inf-059",
+      "op": "inflect",
+      "lemma": "vão",
+      "paradigm": "ADJ_AO_A",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "vã"
+      }
+    },
+    {
+      "id": "inf-060",
+      "op": "inflect",
+      "lemma": "brigão",
+      "paradigm": "ADJ_AO_ONA",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "brigona"
+      }
+    },
+    {
+      "id": "inf-061",
+      "op": "inflect",
+      "lemma": "brigão",
+      "paradigm": "ADJ_AO_ONA",
+      "features": "Gender=Masc|Number=Plur",
+      "expected": {
+        "form": "brigões"
+      }
+    },
+    {
+      "id": "inf-062",
+      "op": "inflect",
+      "lemma": "brigão",
+      "paradigm": "ADJ_AO_ONA",
+      "features": "Gender=Fem|Number=Plur",
+      "expected": {
+        "form": "brigonas"
+      }
+    },
+    {
+      "id": "inf-063",
+      "op": "lemmatize",
+      "form": "brigona",
+      "expected": {
+        "lemma": "brigão",
+        "features": "Gender=Fem|Number=Sing"
+      }
+    },
+    {
+      "id": "inf-064",
+      "op": "inflect",
+      "lemma": "chorão",
+      "paradigm": "ADJ_AO_ONA",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "chorona"
+      }
+    },
+    {
+      "id": "inf-065",
+      "op": "inflect",
+      "lemma": "comilão",
+      "paradigm": "ADJ_AO_ONA",
+      "features": "Gender=Fem|Number=Sing",
+      "expected": {
+        "form": "comilona"
+      }
+    },
+    {
+      "id": "inf-100",
+      "op": "inflect",
+      "lemma": "passear",
+      "paradigm": "V_EAR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "passeio"
+      }
+    },
+    {
+      "id": "inf-101",
+      "op": "inflect",
+      "lemma": "passear",
+      "paradigm": "V_EAR",
+      "features": "Number=Sing|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "passeias"
+      }
+    },
+    {
+      "id": "inf-102",
+      "op": "inflect",
+      "lemma": "passear",
+      "paradigm": "V_EAR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "passeia"
+      }
+    },
+    {
+      "id": "inf-103",
+      "op": "inflect",
+      "lemma": "passear",
+      "paradigm": "V_EAR",
+      "features": "Number=Plur|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "passeamos"
+      }
+    },
+    {
+      "id": "inf-104",
+      "op": "inflect",
+      "lemma": "passear",
+      "paradigm": "V_EAR",
+      "features": "Number=Plur|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "passeais"
+      }
+    },
+    {
+      "id": "inf-105",
+      "op": "inflect",
+      "lemma": "passear",
+      "paradigm": "V_EAR",
+      "features": "Number=Plur|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "passeiam"
+      }
+    },
+    {
+      "id": "inf-106",
+      "op": "lemmatize",
+      "form": "passeio",
+      "expected": {
+        "lemma": "passear",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-107",
+      "op": "inflect",
+      "lemma": "passear",
+      "paradigm": "V_EAR",
+      "features": "Number=Sing|Person=3|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "passeie"
+      }
+    },
+    {
+      "id": "inf-108",
+      "op": "inflect",
+      "lemma": "anunciar",
+      "paradigm": "V_IAR_REG",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "anuncio"
+      }
+    },
+    {
+      "id": "inf-109",
+      "op": "inflect",
+      "lemma": "anunciar",
+      "paradigm": "V_IAR_REG",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "anuncia"
+      }
+    },
+    {
+      "id": "inf-110",
+      "op": "lemmatize",
+      "form": "anuncio",
+      "expected": {
+        "lemma": "anunciar",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-111",
+      "op": "inflect",
+      "lemma": "copiar",
+      "paradigm": "V_IAR_REG",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "copio"
+      }
+    },
+    {
+      "id": "inf-112",
+      "op": "inflect",
+      "lemma": "premiar",
+      "paradigm": "V_IAR_REG",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "premio"
+      }
+    },
+    {
+      "id": "inf-113",
+      "op": "inflect",
+      "lemma": "odiar",
+      "paradigm": "V_ODIAR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "odeio"
+      }
+    },
+    {
+      "id": "inf-114",
+      "op": "inflect",
+      "lemma": "odiar",
+      "paradigm": "V_ODIAR",
+      "features": "Number=Sing|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "odeias"
+      }
+    },
+    {
+      "id": "inf-115",
+      "op": "inflect",
+      "lemma": "odiar",
+      "paradigm": "V_ODIAR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "odeia"
+      }
+    },
+    {
+      "id": "inf-116",
+      "op": "inflect",
+      "lemma": "odiar",
+      "paradigm": "V_ODIAR",
+      "features": "Number=Plur|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "odiamos"
+      }
+    },
+    {
+      "id": "inf-117",
+      "op": "inflect",
+      "lemma": "odiar",
+      "paradigm": "V_ODIAR",
+      "features": "Number=Plur|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "odiais"
+      }
+    },
+    {
+      "id": "inf-118",
+      "op": "inflect",
+      "lemma": "odiar",
+      "paradigm": "V_ODIAR",
+      "features": "Number=Plur|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "odeiam"
+      }
+    },
+    {
+      "id": "inf-119",
+      "op": "lemmatize",
+      "form": "odeio",
+      "expected": {
+        "lemma": "odiar",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-120",
+      "op": "inflect",
+      "lemma": "mediar",
+      "paradigm": "V_ODIAR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "medeio"
+      }
+    },
+    {
+      "id": "inf-121",
+      "op": "inflect",
+      "lemma": "ansiar",
+      "paradigm": "V_ODIAR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "anseio"
+      }
+    },
+    {
+      "id": "inf-122",
+      "op": "inflect",
+      "lemma": "contribuir",
+      "paradigm": "V_UIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "contribuo"
+      }
+    },
+    {
+      "id": "inf-123",
+      "op": "inflect",
+      "lemma": "contribuir",
+      "paradigm": "V_UIR",
+      "features": "Number=Sing|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "contribuis"
+      }
+    },
+    {
+      "id": "inf-124",
+      "op": "inflect",
+      "lemma": "contribuir",
+      "paradigm": "V_UIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "contribui"
+      }
+    },
+    {
+      "id": "inf-125",
+      "op": "inflect",
+      "lemma": "contribuir",
+      "paradigm": "V_UIR",
+      "features": "Number=Plur|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "contribuímos"
+      }
+    },
+    {
+      "id": "inf-126",
+      "op": "inflect",
+      "lemma": "contribuir",
+      "paradigm": "V_UIR",
+      "features": "Number=Plur|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "contribuís"
+      }
+    },
+    {
+      "id": "inf-127",
+      "op": "inflect",
+      "lemma": "contribuir",
+      "paradigm": "V_UIR",
+      "features": "Number=Plur|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "contribuem"
+      }
+    },
+    {
+      "id": "inf-128",
+      "op": "lemmatize",
+      "form": "contribuem",
+      "expected": {
+        "lemma": "contribuir",
+        "features": "Number=Plur|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-129",
+      "op": "inflect",
+      "lemma": "construir",
+      "paradigm": "V_CONSTRUIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "constrói"
+      }
+    },
+    {
+      "id": "inf-130",
+      "op": "inflect",
+      "lemma": "construir",
+      "paradigm": "V_CONSTRUIR",
+      "features": "Number=Plur|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "constroem"
+      }
+    },
+    {
+      "id": "inf-131",
+      "op": "inflect",
+      "lemma": "eleger",
+      "paradigm": "V_GER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "elejo"
+      }
+    },
+    {
+      "id": "inf-132",
+      "op": "inflect",
+      "lemma": "eleger",
+      "paradigm": "V_GER",
+      "features": "Number=Sing|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "eleges"
+      }
+    },
+    {
+      "id": "inf-133",
+      "op": "inflect",
+      "lemma": "eleger",
+      "paradigm": "V_GER",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "elege"
+      }
+    },
+    {
+      "id": "inf-134",
+      "op": "inflect",
+      "lemma": "eleger",
+      "paradigm": "V_GER",
+      "features": "Number=Sing|Person=3|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "eleja"
+      }
+    },
+    {
+      "id": "inf-135",
+      "op": "lemmatize",
+      "form": "elejo",
+      "expected": {
+        "lemma": "eleger",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-136",
+      "op": "inflect",
+      "lemma": "proteger",
+      "paradigm": "V_GER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "protejo"
+      }
+    },
+    {
+      "id": "inf-137",
+      "op": "inflect",
+      "lemma": "dirigir",
+      "paradigm": "V_GIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "dirijo"
+      }
+    },
+    {
+      "id": "inf-138",
+      "op": "inflect",
+      "lemma": "dirigir",
+      "paradigm": "V_GIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "dirige"
+      }
+    },
+    {
+      "id": "inf-139",
+      "op": "lemmatize",
+      "form": "dirijo",
+      "expected": {
+        "lemma": "dirigir",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-140",
+      "op": "inflect",
+      "lemma": "agir",
+      "paradigm": "V_GIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "ajo"
+      }
+    },
+    {
+      "id": "inf-141",
+      "op": "inflect",
+      "lemma": "exigir",
+      "paradigm": "V_GIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "exijo"
+      }
+    },
+    {
+      "id": "inf-142",
+      "op": "inflect",
+      "lemma": "conhecer",
+      "paradigm": "V_CER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "conheço"
+      }
+    },
+    {
+      "id": "inf-143",
+      "op": "inflect",
+      "lemma": "conhecer",
+      "paradigm": "V_CER",
+      "features": "Number=Sing|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "conheces"
+      }
+    },
+    {
+      "id": "inf-144",
+      "op": "inflect",
+      "lemma": "conhecer",
+      "paradigm": "V_CER",
+      "features": "Number=Sing|Person=3|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "conheça"
+      }
+    },
+    {
+      "id": "inf-145",
+      "op": "lemmatize",
+      "form": "conheço",
+      "expected": {
+        "lemma": "conhecer",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-146",
+      "op": "inflect",
+      "lemma": "vencer",
+      "paradigm": "V_CER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "venço"
+      }
+    },
+    {
+      "id": "inf-147",
+      "op": "inflect",
+      "lemma": "descer",
+      "paradigm": "V_CER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "desço"
+      }
+    },
+    {
+      "id": "inf-148",
+      "op": "inflect",
+      "lemma": "começar",
+      "paradigm": "V_CAR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "começo"
+      }
+    },
+    {
+      "id": "inf-149",
+      "op": "inflect",
+      "lemma": "começar",
+      "paradigm": "V_CAR",
+      "features": "Number=Sing|Person=3|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "comece"
+      }
+    },
+    {
+      "id": "inf-150",
+      "op": "lemmatize",
+      "form": "comece",
+      "expected": {
+        "lemma": "começar",
+        "features": "Number=Sing|Person=3|Mood=Sub|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-151",
+      "op": "inflect",
+      "lemma": "caçar",
+      "paradigm": "V_CAR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "caço"
+      }
+    },
+    {
+      "id": "inf-152",
+      "op": "inflect",
+      "lemma": "dançar",
+      "paradigm": "V_CAR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "danço"
+      }
+    },
+    {
+      "id": "inf-153",
+      "op": "inflect",
+      "lemma": "erguer",
+      "paradigm": "V_GUER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "ergo"
+      }
+    },
+    {
+      "id": "inf-154",
+      "op": "inflect",
+      "lemma": "erguer",
+      "paradigm": "V_GUER",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "ergue"
+      }
+    },
+    {
+      "id": "inf-155",
+      "op": "inflect",
+      "lemma": "erguer",
+      "paradigm": "V_GUER",
+      "features": "Number=Sing|Person=3|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "erga"
+      }
+    },
+    {
+      "id": "inf-200",
+      "op": "inflect",
+      "lemma": "haver",
+      "paradigm": "V_HAVER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "hei"
+      }
+    },
+    {
+      "id": "inf-201",
+      "op": "inflect",
+      "lemma": "haver",
+      "paradigm": "V_HAVER",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "houve"
+      }
+    },
+    {
+      "id": "inf-202",
+      "op": "inflect",
+      "lemma": "haver",
+      "paradigm": "V_HAVER",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "haja"
+      }
+    },
+    {
+      "id": "inf-203",
+      "op": "lemmatize",
+      "form": "houve",
+      "expected": {
+        "lemma": "haver",
+        "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past"
+      }
+    },
+    {
+      "id": "inf-204",
+      "op": "inflect",
+      "lemma": "vir",
+      "paradigm": "V_VIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "venho"
+      }
+    },
+    {
+      "id": "inf-205",
+      "op": "inflect",
+      "lemma": "vir",
+      "paradigm": "V_VIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "veio"
+      }
+    },
+    {
+      "id": "inf-206",
+      "op": "inflect",
+      "lemma": "vir",
+      "paradigm": "V_VIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "venha"
+      }
+    },
+    {
+      "id": "inf-207",
+      "op": "lemmatize",
+      "form": "venho",
+      "expected": {
+        "lemma": "vir",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-208",
+      "op": "inflect",
+      "lemma": "dizer",
+      "paradigm": "V_DIZER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "digo"
+      }
+    },
+    {
+      "id": "inf-209",
+      "op": "inflect",
+      "lemma": "dizer",
+      "paradigm": "V_DIZER",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "disse"
+      }
+    },
+    {
+      "id": "inf-210",
+      "op": "inflect",
+      "lemma": "dizer",
+      "paradigm": "V_DIZER",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "diga"
+      }
+    },
+    {
+      "id": "inf-211",
+      "op": "lemmatize",
+      "form": "disse",
+      "expected": {
+        "lemma": "dizer",
+        "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past"
+      }
+    },
+    {
+      "id": "inf-212",
+      "op": "inflect",
+      "lemma": "saber",
+      "paradigm": "V_SABER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "sei"
+      }
+    },
+    {
+      "id": "inf-213",
+      "op": "inflect",
+      "lemma": "saber",
+      "paradigm": "V_SABER",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "soube"
+      }
+    },
+    {
+      "id": "inf-214",
+      "op": "inflect",
+      "lemma": "saber",
+      "paradigm": "V_SABER",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "saiba"
+      }
+    },
+    {
+      "id": "inf-215",
+      "op": "inflect",
+      "lemma": "ver",
+      "paradigm": "V_VER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "vejo"
+      }
+    },
+    {
+      "id": "inf-216",
+      "op": "inflect",
+      "lemma": "ver",
+      "paradigm": "V_VER",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "viu"
+      }
+    },
+    {
+      "id": "inf-217",
+      "op": "inflect",
+      "lemma": "ver",
+      "paradigm": "V_VER",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "veja"
+      }
+    },
+    {
+      "id": "inf-218",
+      "op": "lemmatize",
+      "form": "vejo",
+      "expected": {
+        "lemma": "ver",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-219",
+      "op": "inflect",
+      "lemma": "dar",
+      "paradigm": "V_DAR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "dou"
+      }
+    },
+    {
+      "id": "inf-220",
+      "op": "inflect",
+      "lemma": "dar",
+      "paradigm": "V_DAR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "deu"
+      }
+    },
+    {
+      "id": "inf-221",
+      "op": "inflect",
+      "lemma": "dar",
+      "paradigm": "V_DAR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "dê"
+      }
+    },
+    {
+      "id": "inf-222",
+      "op": "lemmatize",
+      "form": "dou",
+      "expected": {
+        "lemma": "dar",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-223",
+      "op": "inflect",
+      "lemma": "ler",
+      "paradigm": "V_LER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "leio"
+      }
+    },
+    {
+      "id": "inf-224",
+      "op": "inflect",
+      "lemma": "ler",
+      "paradigm": "V_LER",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "leu"
+      }
+    },
+    {
+      "id": "inf-225",
+      "op": "inflect",
+      "lemma": "ler",
+      "paradigm": "V_LER",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "leia"
+      }
+    },
+    {
+      "id": "inf-226",
+      "op": "inflect",
+      "lemma": "crer",
+      "paradigm": "V_CRER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "creio"
+      }
+    },
+    {
+      "id": "inf-227",
+      "op": "inflect",
+      "lemma": "crer",
+      "paradigm": "V_CRER",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "creu"
+      }
+    },
+    {
+      "id": "inf-228",
+      "op": "inflect",
+      "lemma": "crer",
+      "paradigm": "V_CRER",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "creia"
+      }
+    },
+    {
+      "id": "inf-229",
+      "op": "lemmatize",
+      "form": "creio",
+      "expected": {
+        "lemma": "crer",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-230",
+      "op": "inflect",
+      "lemma": "ouvir",
+      "paradigm": "V_OUVIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "ouço"
+      }
+    },
+    {
+      "id": "inf-231",
+      "op": "inflect",
+      "lemma": "ouvir",
+      "paradigm": "V_OUVIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "ouviu"
+      }
+    },
+    {
+      "id": "inf-232",
+      "op": "inflect",
+      "lemma": "ouvir",
+      "paradigm": "V_OUVIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "ouça"
+      }
+    },
+    {
+      "id": "inf-233",
+      "op": "inflect",
+      "lemma": "pedir",
+      "paradigm": "V_PEDIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "peço"
+      }
+    },
+    {
+      "id": "inf-234",
+      "op": "inflect",
+      "lemma": "pedir",
+      "paradigm": "V_PEDIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "pediu"
+      }
+    },
+    {
+      "id": "inf-235",
+      "op": "inflect",
+      "lemma": "pedir",
+      "paradigm": "V_PEDIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "peça"
+      }
+    },
+    {
+      "id": "inf-236",
+      "op": "lemmatize",
+      "form": "peço",
+      "expected": {
+        "lemma": "pedir",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-237",
+      "op": "inflect",
+      "lemma": "medir",
+      "paradigm": "V_MEDIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "meço"
+      }
+    },
+    {
+      "id": "inf-238",
+      "op": "inflect",
+      "lemma": "medir",
+      "paradigm": "V_MEDIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "mediu"
+      }
+    },
+    {
+      "id": "inf-239",
+      "op": "inflect",
+      "lemma": "medir",
+      "paradigm": "V_MEDIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "meça"
+      }
+    },
+    {
+      "id": "inf-240",
+      "op": "inflect",
+      "lemma": "dormir",
+      "paradigm": "V_DORMIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "durmo"
+      }
+    },
+    {
+      "id": "inf-241",
+      "op": "inflect",
+      "lemma": "dormir",
+      "paradigm": "V_DORMIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "dormiu"
+      }
+    },
+    {
+      "id": "inf-242",
+      "op": "inflect",
+      "lemma": "dormir",
+      "paradigm": "V_DORMIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "durma"
+      }
+    },
+    {
+      "id": "inf-243",
+      "op": "lemmatize",
+      "form": "durmo",
+      "expected": {
+        "lemma": "dormir",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-244",
+      "op": "inflect",
+      "lemma": "sair",
+      "paradigm": "V_SAIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "saio"
+      }
+    },
+    {
+      "id": "inf-245",
+      "op": "inflect",
+      "lemma": "sair",
+      "paradigm": "V_SAIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "saiu"
+      }
+    },
+    {
+      "id": "inf-246",
+      "op": "inflect",
+      "lemma": "sair",
+      "paradigm": "V_SAIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "saia"
+      }
+    },
+    {
+      "id": "inf-247",
+      "op": "inflect",
+      "lemma": "cair",
+      "paradigm": "V_CAIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "caio"
+      }
+    },
+    {
+      "id": "inf-248",
+      "op": "inflect",
+      "lemma": "cair",
+      "paradigm": "V_CAIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "caiu"
+      }
+    },
+    {
+      "id": "inf-249",
+      "op": "inflect",
+      "lemma": "cair",
+      "paradigm": "V_CAIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "caia"
+      }
+    },
+    {
+      "id": "inf-250",
+      "op": "lemmatize",
+      "form": "caio",
+      "expected": {
+        "lemma": "cair",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-251",
+      "op": "inflect",
+      "lemma": "caber",
+      "paradigm": "V_CABER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "caibo"
+      }
+    },
+    {
+      "id": "inf-252",
+      "op": "inflect",
+      "lemma": "caber",
+      "paradigm": "V_CABER",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "coube"
+      }
+    },
+    {
+      "id": "inf-253",
+      "op": "inflect",
+      "lemma": "caber",
+      "paradigm": "V_CABER",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "caiba"
+      }
+    },
+    {
+      "id": "inf-254",
+      "op": "lemmatize",
+      "form": "coube",
+      "expected": {
+        "lemma": "caber",
+        "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past"
+      }
+    },
+    {
+      "id": "inf-255",
+      "op": "inflect",
+      "lemma": "valer",
+      "paradigm": "V_VALER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "valho"
+      }
+    },
+    {
+      "id": "inf-256",
+      "op": "inflect",
+      "lemma": "valer",
+      "paradigm": "V_VALER",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "valeu"
+      }
+    },
+    {
+      "id": "inf-257",
+      "op": "inflect",
+      "lemma": "valer",
+      "paradigm": "V_VALER",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "valha"
+      }
+    },
+    {
+      "id": "inf-258",
+      "op": "inflect",
+      "lemma": "perder",
+      "paradigm": "V_PERDER",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "perco"
+      }
+    },
+    {
+      "id": "inf-259",
+      "op": "inflect",
+      "lemma": "perder",
+      "paradigm": "V_PERDER",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "perdeu"
+      }
+    },
+    {
+      "id": "inf-260",
+      "op": "inflect",
+      "lemma": "perder",
+      "paradigm": "V_PERDER",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "perca"
+      }
+    },
+    {
+      "id": "inf-261",
+      "op": "lemmatize",
+      "form": "perco",
+      "expected": {
+        "lemma": "perder",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-262",
+      "op": "inflect",
+      "lemma": "seguir",
+      "paradigm": "V_SEGUIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "sigo"
+      }
+    },
+    {
+      "id": "inf-263",
+      "op": "inflect",
+      "lemma": "seguir",
+      "paradigm": "V_SEGUIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "seguiu"
+      }
+    },
+    {
+      "id": "inf-264",
+      "op": "inflect",
+      "lemma": "seguir",
+      "paradigm": "V_SEGUIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "siga"
+      }
+    },
+    {
+      "id": "inf-265",
+      "op": "inflect",
+      "lemma": "sentir",
+      "paradigm": "V_SENTIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "sinto"
+      }
+    },
+    {
+      "id": "inf-266",
+      "op": "inflect",
+      "lemma": "sentir",
+      "paradigm": "V_SENTIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "sentiu"
+      }
+    },
+    {
+      "id": "inf-267",
+      "op": "inflect",
+      "lemma": "sentir",
+      "paradigm": "V_SENTIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "sinta"
+      }
+    },
+    {
+      "id": "inf-268",
+      "op": "lemmatize",
+      "form": "sinto",
+      "expected": {
+        "lemma": "sentir",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-269",
+      "op": "inflect",
+      "lemma": "servir",
+      "paradigm": "V_SERVIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "sirvo"
+      }
+    },
+    {
+      "id": "inf-270",
+      "op": "inflect",
+      "lemma": "servir",
+      "paradigm": "V_SERVIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "serviu"
+      }
+    },
+    {
+      "id": "inf-271",
+      "op": "inflect",
+      "lemma": "servir",
+      "paradigm": "V_SERVIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "sirva"
+      }
+    },
+    {
+      "id": "inf-272",
+      "op": "inflect",
+      "lemma": "subir",
+      "paradigm": "V_SUBIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "subo"
+      }
+    },
+    {
+      "id": "inf-273",
+      "op": "inflect",
+      "lemma": "subir",
+      "paradigm": "V_SUBIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "subiu"
+      }
+    },
+    {
+      "id": "inf-274",
+      "op": "inflect",
+      "lemma": "subir",
+      "paradigm": "V_SUBIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "suba"
+      }
+    },
+    {
+      "id": "inf-275",
+      "op": "lemmatize",
+      "form": "subo",
+      "expected": {
+        "lemma": "subir",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-276",
+      "op": "inflect",
+      "lemma": "fugir",
+      "paradigm": "V_FUGIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "fujo"
+      }
+    },
+    {
+      "id": "inf-277",
+      "op": "inflect",
+      "lemma": "fugir",
+      "paradigm": "V_FUGIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "fugiu"
+      }
+    },
+    {
+      "id": "inf-278",
+      "op": "inflect",
+      "lemma": "fugir",
+      "paradigm": "V_FUGIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "fuja"
+      }
+    },
+    {
+      "id": "inf-279",
+      "op": "inflect",
+      "lemma": "rir",
+      "paradigm": "V_RIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "rio"
+      }
+    },
+    {
+      "id": "inf-280",
+      "op": "inflect",
+      "lemma": "rir",
+      "paradigm": "V_RIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "riu"
+      }
+    },
+    {
+      "id": "inf-281",
+      "op": "inflect",
+      "lemma": "rir",
+      "paradigm": "V_RIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "ria"
+      }
+    },
+    {
+      "id": "inf-282",
+      "op": "lemmatize",
+      "form": "rio",
+      "expected": {
+        "lemma": "rir",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-283",
+      "op": "inflect",
+      "lemma": "construir",
+      "paradigm": "V_CONSTRUIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "construo"
+      }
+    },
+    {
+      "id": "inf-284",
+      "op": "inflect",
+      "lemma": "construir",
+      "paradigm": "V_CONSTRUIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "construiu"
+      }
+    },
+    {
+      "id": "inf-285",
+      "op": "inflect",
+      "lemma": "construir",
+      "paradigm": "V_CONSTRUIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "construa"
+      }
+    },
+    {
+      "id": "inf-286",
+      "op": "inflect",
+      "lemma": "destruir",
+      "paradigm": "V_DESTRUIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "destruo"
+      }
+    },
+    {
+      "id": "inf-287",
+      "op": "inflect",
+      "lemma": "destruir",
+      "paradigm": "V_DESTRUIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "destruiu"
+      }
+    },
+    {
+      "id": "inf-288",
+      "op": "inflect",
+      "lemma": "destruir",
+      "paradigm": "V_DESTRUIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "destrua"
+      }
+    },
+    {
+      "id": "inf-289",
+      "op": "lemmatize",
+      "form": "destruiu",
+      "expected": {
+        "lemma": "destruir",
+        "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past"
+      }
+    },
+    {
+      "id": "inf-290",
+      "op": "inflect",
+      "lemma": "conseguir",
+      "paradigm": "V_CONSEGUIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "consigo"
+      }
+    },
+    {
+      "id": "inf-291",
+      "op": "inflect",
+      "lemma": "conseguir",
+      "paradigm": "V_CONSEGUIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "conseguiu"
+      }
+    },
+    {
+      "id": "inf-292",
+      "op": "inflect",
+      "lemma": "conseguir",
+      "paradigm": "V_CONSEGUIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "consiga"
+      }
+    },
+    {
+      "id": "inf-293",
+      "op": "lemmatize",
+      "form": "consigo",
+      "expected": {
+        "lemma": "conseguir",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-294",
+      "op": "inflect",
+      "lemma": "preferir",
+      "paradigm": "V_PREFERIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "prefiro"
+      }
+    },
+    {
+      "id": "inf-295",
+      "op": "inflect",
+      "lemma": "preferir",
+      "paradigm": "V_PREFERIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "preferiu"
+      }
+    },
+    {
+      "id": "inf-296",
+      "op": "inflect",
+      "lemma": "preferir",
+      "paradigm": "V_PREFERIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "prefira"
+      }
+    },
+    {
+      "id": "inf-297",
+      "op": "inflect",
+      "lemma": "mentir",
+      "paradigm": "V_MENTIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "minto"
+      }
+    },
+    {
+      "id": "inf-298",
+      "op": "inflect",
+      "lemma": "mentir",
+      "paradigm": "V_MENTIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "mentiu"
+      }
+    },
+    {
+      "id": "inf-299",
+      "op": "inflect",
+      "lemma": "mentir",
+      "paradigm": "V_MENTIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "minta"
+      }
+    },
+    {
+      "id": "inf-300",
+      "op": "lemmatize",
+      "form": "minto",
+      "expected": {
+        "lemma": "mentir",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-301",
+      "op": "inflect",
+      "lemma": "cobrir",
+      "paradigm": "V_COBRIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "cubro"
+      }
+    },
+    {
+      "id": "inf-302",
+      "op": "inflect",
+      "lemma": "cobrir",
+      "paradigm": "V_COBRIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "cobriu"
+      }
+    },
+    {
+      "id": "inf-303",
+      "op": "inflect",
+      "lemma": "cobrir",
+      "paradigm": "V_COBRIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "cubra"
+      }
+    },
+    {
+      "id": "inf-304",
+      "op": "inflect",
+      "lemma": "descobrir",
+      "paradigm": "V_DESCOBRIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "descubro"
+      }
+    },
+    {
+      "id": "inf-305",
+      "op": "inflect",
+      "lemma": "descobrir",
+      "paradigm": "V_DESCOBRIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "descobriu"
+      }
+    },
+    {
+      "id": "inf-306",
+      "op": "inflect",
+      "lemma": "descobrir",
+      "paradigm": "V_DESCOBRIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "descubra"
+      }
+    },
+    {
+      "id": "inf-307",
+      "op": "lemmatize",
+      "form": "descubro",
+      "expected": {
+        "lemma": "descobrir",
+        "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres"
+      }
+    },
+    {
+      "id": "inf-308",
+      "op": "inflect",
+      "lemma": "abrir",
+      "paradigm": "V_ABRIR",
+      "features": "Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "abro"
+      }
+    },
+    {
+      "id": "inf-309",
+      "op": "inflect",
+      "lemma": "abrir",
+      "paradigm": "V_ABRIR",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Past",
+      "expected": {
+        "form": "abriu"
+      }
+    },
+    {
+      "id": "inf-310",
+      "op": "inflect",
+      "lemma": "abrir",
+      "paradigm": "V_ABRIR",
+      "features": "Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres",
+      "expected": {
+        "form": "abra"
+      }
+    },
+    {
+      "id": "inf-400",
+      "op": "inflect",
+      "lemma": "abrir",
+      "paradigm": "V_ABRIR",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "aberto"
+      }
+    },
+    {
+      "id": "inf-401",
+      "op": "inflect",
+      "lemma": "abrir",
+      "paradigm": "V_ABRIR",
+      "features": "Gender=Fem|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "aberta"
+      }
+    },
+    {
+      "id": "inf-402",
+      "op": "lemmatize",
+      "form": "aberto",
+      "expected": {
+        "lemma": "abrir",
+        "features": "Gender=Masc|Number=Sing|VerbForm=Part"
+      }
+    },
+    {
+      "id": "inf-403",
+      "op": "inflect",
+      "lemma": "escrever",
+      "paradigm": "V_ESCREVER_IRR",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "escrito"
+      }
+    },
+    {
+      "id": "inf-404",
+      "op": "inflect",
+      "lemma": "escrever",
+      "paradigm": "V_ESCREVER_IRR",
+      "features": "Gender=Fem|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "escrita"
+      }
+    },
+    {
+      "id": "inf-405",
+      "op": "inflect",
+      "lemma": "fazer",
+      "paradigm": "V_FAZER",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "feito"
+      }
+    },
+    {
+      "id": "inf-406",
+      "op": "inflect",
+      "lemma": "fazer",
+      "paradigm": "V_FAZER",
+      "features": "Gender=Fem|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "feita"
+      }
+    },
+    {
+      "id": "inf-407",
+      "op": "lemmatize",
+      "form": "feito",
+      "expected": {
+        "lemma": "fazer",
+        "features": "Gender=Masc|Number=Sing|VerbForm=Part"
+      }
+    },
+    {
+      "id": "inf-408",
+      "op": "inflect",
+      "lemma": "pôr",
+      "paradigm": "V_POR",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "posto"
+      }
+    },
+    {
+      "id": "inf-409",
+      "op": "inflect",
+      "lemma": "pôr",
+      "paradigm": "V_POR",
+      "features": "Gender=Fem|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "posta"
+      }
+    },
+    {
+      "id": "inf-410",
+      "op": "inflect",
+      "lemma": "ver",
+      "paradigm": "V_VER",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "visto"
+      }
+    },
+    {
+      "id": "inf-411",
+      "op": "inflect",
+      "lemma": "ver",
+      "paradigm": "V_VER",
+      "features": "Gender=Fem|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "vista"
+      }
+    },
+    {
+      "id": "inf-412",
+      "op": "lemmatize",
+      "form": "visto",
+      "expected": {
+        "lemma": "ver",
+        "features": "Gender=Masc|Number=Sing|VerbForm=Part"
+      }
+    },
+    {
+      "id": "inf-413",
+      "op": "inflect",
+      "lemma": "dizer",
+      "paradigm": "V_DIZER",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "dito"
+      }
+    },
+    {
+      "id": "inf-414",
+      "op": "inflect",
+      "lemma": "dizer",
+      "paradigm": "V_DIZER",
+      "features": "Gender=Fem|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "dita"
+      }
+    },
+    {
+      "id": "inf-415",
+      "op": "inflect",
+      "lemma": "pagar",
+      "paradigm": "V_PAGAR_IRR",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "pago"
+      }
+    },
+    {
+      "id": "inf-416",
+      "op": "inflect",
+      "lemma": "pagar",
+      "paradigm": "V_PAGAR_IRR",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "pagado"
+      }
+    },
+    {
+      "id": "inf-417",
+      "op": "lemmatize",
+      "form": "pago",
+      "expected": {
+        "lemma": "pagar",
+        "features": "Gender=Masc|Number=Sing|VerbForm=Part"
+      }
+    },
+    {
+      "id": "inf-418",
+      "op": "inflect",
+      "lemma": "aceitar",
+      "paradigm": "V_ACEITAR_IRR",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "aceito"
+      }
+    },
+    {
+      "id": "inf-419",
+      "op": "inflect",
+      "lemma": "aceitar",
+      "paradigm": "V_ACEITAR_IRR",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "aceitado"
+      }
+    },
+    {
+      "id": "inf-420",
+      "op": "inflect",
+      "lemma": "entregar",
+      "paradigm": "V_ENTREGAR_IRR",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "entregue"
+      }
+    },
+    {
+      "id": "inf-421",
+      "op": "inflect",
+      "lemma": "entregar",
+      "paradigm": "V_ENTREGAR_IRR",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "entregado"
+      }
+    },
+    {
+      "id": "inf-422",
+      "op": "inflect",
+      "lemma": "cobrir",
+      "paradigm": "V_COBRIR",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "coberto"
+      }
+    },
+    {
+      "id": "inf-423",
+      "op": "inflect",
+      "lemma": "descobrir",
+      "paradigm": "V_DESCOBRIR",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "descoberto"
+      }
+    },
+    {
+      "id": "inf-424",
+      "op": "inflect",
+      "lemma": "vir",
+      "paradigm": "V_VIR",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "vindo"
+      }
+    },
+    {
+      "id": "inf-425",
+      "op": "inflect",
+      "lemma": "dar",
+      "paradigm": "V_DAR",
+      "features": "Gender=Masc|Number=Sing|VerbForm=Part",
+      "expected": {
+        "form": "dado"
+      }
+    }
   ]
 }

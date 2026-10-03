@@ -2171,34 +2171,6 @@
       ]
     },
     {
-      "id": "perguntar.PERGUNTAR_2",
-      "roles": {
-        "ARG0": {
-          "label": "quem pergunta",
-          "prefers": [
-            "PESSOA"
-          ]
-        },
-        "ARG1": {
-          "label": "pergunta",
-          "prefers": [
-            "INFORMACAO"
-          ]
-        }
-      },
-      "syntax": [
-        {
-          "ARG0": "nsubj"
-        },
-        {
-          "ARG1": "obj"
-        }
-      ],
-      "examples": [
-        "Você pergunta muito."
-      ]
-    },
-    {
       "id": "questionar.QUESTIONAR",
       "roles": {
         "ARG0": {
@@ -9282,33 +9254,6 @@
       "examples": []
     },
     {
-      "id": "dar.BATER",
-      "defaultTemplate": true,
-      "roles": {
-        "ARG0": {
-          "label": "quem dar",
-          "prefers": [
-            "SER_VIVO"
-          ]
-        },
-        "ARG1": {
-          "label": "o que é afetado por dar",
-          "prefers": [
-            "ENTIDADE"
-          ]
-        }
-      },
-      "syntax": [
-        {
-          "ARG0": "nsubj"
-        },
-        {
-          "ARG1": "obj"
-        }
-      ],
-      "examples": []
-    },
-    {
       "id": "decorar.MEMORIZAR",
       "defaultTemplate": true,
       "roles": {
@@ -11777,6 +11722,33 @@
         },
         "ARG1": {
           "label": "o que é afetado por destruir",
+          "prefers": [
+            "ENTIDADE"
+          ]
+        }
+      },
+      "syntax": [
+        {
+          "ARG0": "nsubj"
+        },
+        {
+          "ARG1": "obj"
+        }
+      ],
+      "examples": []
+    },
+    {
+      "id": "girar.GIRAR",
+      "defaultTemplate": true,
+      "roles": {
+        "ARG0": {
+          "label": "quem girar",
+          "prefers": [
+            "SER_VIVO"
+          ]
+        },
+        "ARG1": {
+          "label": "o que é afetado por girar",
           "prefers": [
             "ENTIDADE"
           ]

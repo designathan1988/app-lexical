@@ -32,6 +32,8 @@
     { "id": "AUGMENTATIVE", "definition": "forma grande (ou intensificada) da base", "inputTypes": ["ENTIDADE"], "outputType": "ENTIDADE", "graphRelation": "aumentativo_de", "glossTemplate": "{base} grande", "examples": ["casarão", "vozeirão", "dinheirão"] },
     { "id": "RELATIONAL_ADJ", "definition": "adjetivo de relação com a entidade da base", "inputTypes": ["ENTIDADE"], "outputType": "QUALIDADE", "graphRelation": "relativo_a", "glossTemplate": "relativo a {base}", "examples": ["nacional", "cultural", "mundial"] },
     { "id": "NATIONALITY_ORIGIN", "definition": "natural ou relativo ao lugar da base", "inputTypes": ["LUGAR"], "outputType": "QUALIDADE", "graphRelation": "originário_de", "glossTemplate": "natural de {base}", "examples": ["chinês", "francês", "cearense"] },
-    { "id": "CONVERSION", "definition": "mudança de classe sem afixo (sentido preservado)", "inputTypes": ["ENTIDADE"], "outputType": "ENTIDADE", "graphRelation": "conversão_de", "glossTemplate": "{base} (substantivado)", "examples": ["o jantar", "o verde", "o saber"] }
+    { "id": "CONVERSION", "definition": "mudança de classe sem afixo (sentido preservado)", "inputTypes": ["ENTIDADE"], "outputType": "ENTIDADE", "graphRelation": "conversão_de", "glossTemplate": "{base} (substantivado)", "examples": ["o jantar", "o verde", "o saber"] },
+    { "id": "COMPOSICAO", "definition": "sentido de um composto por justaposição a partir dos seus elementos", "inputTypes": ["ENTIDADE"], "outputType": "ENTIDADE", "graphRelation": "composto_de", "glossTemplate": "{elemento1} que se liga a {elemento2}", "examples": ["guarda-chuva", "beija-flor", "couve-flor"] },
+    { "id": "AGLUTINACAO", "definition": "sentido de um composto por aglutinação, com fusão fonética e sentido lexicalizado", "inputTypes": ["ENTIDADE"], "outputType": "ENTIDADE", "graphRelation": "aglutinado_de", "glossTemplate": "composto fundido de {elementos}", "examples": ["aguardente", "planalto", "pernalta"] }
   ]
 }
