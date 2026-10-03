@@ -1,0 +1,2985 @@
+{
+  "version": "1.0.0",
+  "schemaVersion": "1.0.0",
+  "description": "Held-out independente escrito por agente sem acesso ao código do parser; não usar para ajustar regras.",
+  "records": [
+    {
+      "id": "aud-001",
+      "input": "crie dentro da caixa um botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c1-word-order"
+      ]
+    },
+    {
+      "id": "aud-002",
+      "input": "Dentro da caixa, adicione dois textos",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_TEXT{}\n  C_ENT_TEXT{}"
+      },
+      "tags": [
+        "c1-word-order",
+        "c4-number-definiteness"
+      ],
+      "note": "INSIDE = último(s) filho(s), em ordem de criação."
+    },
+    {
+      "id": "aud-003",
+      "input": "dentro da caixa adicione um texto azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#000000"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#000000}\n  C_ENT_TEXT{C_PROP_TEXT_COLOR=#2563eb}"
+      },
+      "tags": [
+        "c1-word-order",
+        "c7-properties"
+      ],
+      "note": "Bindings padrão da KB: COLOR em botão/caixa -> C_PROP_BG_COLOR; em texto -> C_PROP_TEXT_COLOR."
+    },
+    {
+      "id": "aud-004",
+      "input": "Ao lado do botão, crie uma caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_CONTAINER{}\nC_ENT_TEXT{}"
+      },
+      "tags": [
+        "c1-word-order"
+      ],
+      "note": "Política assumida: relação BESIDE (ao lado de / do lado de) insere como irmão imediatamente DEPOIS do alvo."
+    },
+    {
+      "id": "aud-005",
+      "input": "ao lado do texto coloque um botão vermelho",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_TEXT{}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}"
+      },
+      "tags": [
+        "c1-word-order"
+      ],
+      "note": "Política assumida: relação BESIDE (ao lado de / do lado de) insere como irmão imediatamente DEPOIS do alvo. 3.G: colocar + objeto definido/pronome = MOVE; + indefinido = CREATE."
+    },
+    {
+      "id": "aud-006",
+      "input": "Depois da caixa, insira um texto",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_TEXT{}\nC_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c1-word-order"
+      ],
+      "note": "AFTER = irmão imediatamente depois do alvo."
+    },
+    {
+      "id": "aud-007",
+      "input": "depois do primeiro botão crie uma caixa amarela",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#eab308}\nC_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c1-word-order",
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-008",
+      "input": "Antes do texto, adicione um botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}\nC_ENT_TEXT{}"
+      },
+      "tags": [
+        "c1-word-order"
+      ],
+      "note": "BEFORE = irmão imediatamente antes do alvo."
+    },
+    {
+      "id": "aud-009",
+      "input": "antes da caixa ponha um texto",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}\nC_ENT_CONTAINER{}"
+      },
+      "tags": [
+        "c1-word-order",
+        "c6-morphology"
+      ],
+      "note": "\"ponha\" é forma de colocar na KB; objeto indefinido -> CREATE."
+    },
+    {
+      "id": "aud-010",
+      "input": "Em cima do botão, crie um texto",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}\nC_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c1-word-order"
+      ],
+      "note": "Política assumida: ABOVE (em cima de) insere como irmão imediatamente ANTES do alvo; BELOW (embaixo de) imediatamente DEPOIS (layout em fluxo vertical)."
+    },
+    {
+      "id": "aud-011",
+      "input": "em cima da caixa coloque um botão azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}\nC_ENT_CONTAINER{}"
+      },
+      "tags": [
+        "c1-word-order"
+      ],
+      "note": "Política assumida: ABOVE (em cima de) insere como irmão imediatamente ANTES do alvo; BELOW (embaixo de) imediatamente DEPOIS (layout em fluxo vertical)."
+    },
+    {
+      "id": "aud-012",
+      "input": "Embaixo do texto, crie uma caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}\nC_ENT_CONTAINER{}"
+      },
+      "tags": [
+        "c1-word-order"
+      ],
+      "note": "Política assumida: ABOVE (em cima de) insere como irmão imediatamente ANTES do alvo; BELOW (embaixo de) imediatamente DEPOIS (layout em fluxo vertical)."
+    },
+    {
+      "id": "aud-013",
+      "input": "embaixo da caixa adicione dois botões",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}\nC_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c1-word-order",
+        "c4-number-definiteness"
+      ],
+      "note": "Política assumida: ABOVE (em cima de) insere como irmão imediatamente ANTES do alvo; BELOW (embaixo de) imediatamente DEPOIS (layout em fluxo vertical)."
+    },
+    {
+      "id": "aud-014",
+      "input": "mude para azul o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}"
+      },
+      "tags": [
+        "c1-word-order"
+      ]
+    },
+    {
+      "id": "aud-015",
+      "input": "deixe verde o texto",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{C_PROP_TEXT_COLOR=#16a34a}"
+      },
+      "tags": [
+        "c1-word-order"
+      ],
+      "note": "Bindings padrão da KB: COLOR em botão/caixa -> C_PROP_BG_COLOR; em texto -> C_PROP_TEXT_COLOR."
+    },
+    {
+      "id": "aud-016",
+      "input": "pinte de roxo a caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#a855f7}\nC_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c1-word-order"
+      ]
+    },
+    {
+      "id": "aud-017",
+      "input": "crie, dentro da segunda caixa, um texto",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_CONTAINER{}\n  C_ENT_TEXT{}"
+      },
+      "tags": [
+        "c1-word-order",
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-018",
+      "input": "Do lado da caixa, coloque o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c1-word-order"
+      ],
+      "note": "Política assumida: relação BESIDE (ao lado de / do lado de) insere como irmão imediatamente DEPOIS do alvo. 3.G: colocar + objeto definido/pronome = MOVE; + indefinido = CREATE."
+    },
+    {
+      "id": "aud-019",
+      "input": "coloque dentro da caixa branca o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#000000"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#ffffff"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#000000}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#ffffff}\n  C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c1-word-order",
+        "c8-references-discourse"
+      ],
+      "note": "3.G: colocar + objeto definido/pronome = MOVE; + indefinido = CREATE. Adjetivo dentro do PP restringe o alvo."
+    },
+    {
+      "id": "aud-020",
+      "input": "altere para cinza a cor de fundo da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#000000"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#6b7280}"
+      },
+      "tags": [
+        "c1-word-order",
+        "c7-properties"
+      ]
+    },
+    {
+      "id": "aud-021",
+      "input": "crie uma caixa, um botão e um texto",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}\nC_ENT_TEXT{}"
+      },
+      "tags": [
+        "c2-coordination"
+      ],
+      "note": "Nós criados sem localização vão para a raiz, ao fim, na ordem de criação."
+    },
+    {
+      "id": "aud-022",
+      "input": "adicione um texto, duas caixas e um botão",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}\nC_ENT_CONTAINER{}\nC_ENT_CONTAINER{}\nC_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c2-coordination",
+        "c4-number-definiteness"
+      ],
+      "note": "Nós criados sem localização vão para a raiz, ao fim, na ordem de criação."
+    },
+    {
+      "id": "aud-023",
+      "input": "crie um botão e um texto azuis",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}\nC_ENT_TEXT{C_PROP_TEXT_COLOR=#2563eb}"
+      },
+      "tags": [
+        "c2-coordination",
+        "c3-agreement"
+      ],
+      "note": "PARTE IV 3.F: adjetivo plural concordando com a coordenação distribui para todos os núcleos (masc. plural se houver algum masculino). Bindings padrão da KB: COLOR em botão/caixa -> C_PROP_BG_COLOR; em texto -> C_PROP_TEXT_COLOR."
+    },
+    {
+      "id": "aud-024",
+      "input": "crie uma caixa e um texto brancos",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#ffffff}\nC_ENT_TEXT{C_PROP_TEXT_COLOR=#ffffff}"
+      },
+      "tags": [
+        "c2-coordination",
+        "c3-agreement"
+      ],
+      "note": "PARTE IV 3.F: adjetivo plural concordando com a coordenação distribui para todos os núcleos (masc. plural se houver algum masculino)."
+    },
+    {
+      "id": "aud-025",
+      "input": "crie duas caixas e um botão pretos",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#000000}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#000000}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#000000}"
+      },
+      "tags": [
+        "c2-coordination",
+        "c3-agreement",
+        "c4-number-definiteness"
+      ],
+      "note": "PARTE IV 3.F: adjetivo plural concordando com a coordenação distribui para todos os núcleos (masc. plural se houver algum masculino)."
+    },
+    {
+      "id": "aud-026",
+      "input": "crie um botão e uma caixa azul",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#2563eb}"
+      },
+      "tags": [
+        "c2-coordination",
+        "c3-agreement"
+      ],
+      "note": "PARTE IV 3.F: adjetivo singular aplica-se só ao núcleo mais próximo que concorda."
+    },
+    {
+      "id": "aud-027",
+      "input": "crie uma caixa e um botão amarela",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#eab308}\nC_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c2-coordination",
+        "c3-agreement"
+      ],
+      "note": "PARTE IV 3.F: adjetivo singular aplica-se só ao núcleo mais próximo que concorda. \"amarela\" é fem. sing.: só \"caixa\" concorda."
+    },
+    {
+      "id": "aud-028",
+      "input": "crie um texto e uma caixa verdes",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{C_PROP_TEXT_COLOR=#16a34a}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#16a34a}"
+      },
+      "tags": [
+        "c2-coordination",
+        "c3-agreement"
+      ],
+      "note": "PARTE IV 3.F: adjetivo plural concordando com a coordenação distribui para todos os núcleos (masc. plural se houver algum masculino). \"verde\" é uniforme em gênero."
+    },
+    {
+      "id": "aud-029",
+      "input": "apague a caixa e o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}"
+      },
+      "tags": [
+        "c2-coordination"
+      ]
+    },
+    {
+      "id": "aud-030",
+      "input": "remova o texto e a segunda caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#dc2626"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}"
+      },
+      "tags": [
+        "c2-coordination",
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-031",
+      "input": "pinte a caixa e o texto de vermelho",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#dc2626}\nC_ENT_TEXT{C_PROP_TEXT_COLOR=#dc2626}\nC_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c2-coordination"
+      ],
+      "note": "Bindings padrão da KB: COLOR em botão/caixa -> C_PROP_BG_COLOR; em texto -> C_PROP_TEXT_COLOR."
+    },
+    {
+      "id": "aud-032",
+      "input": "mova o botão e o texto para dentro da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}\n  C_ENT_TEXT{}"
+      },
+      "tags": [
+        "c2-coordination"
+      ],
+      "note": "Objetos coordenados movidos em ordem de menção."
+    },
+    {
+      "id": "aud-033",
+      "input": "crie uma caixa e pinte-a de cinza",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#6b7280}"
+      },
+      "tags": [
+        "c2-coordination",
+        "c5-clitics-pronouns"
+      ]
+    },
+    {
+      "id": "aud-034",
+      "input": "crie um botão e apague o texto",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c2-coordination"
+      ]
+    },
+    {
+      "id": "aud-035",
+      "input": "adicione uma caixa e coloque dentro dela um botão branco",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#ffffff}"
+      },
+      "tags": [
+        "c2-coordination",
+        "c5-clitics-pronouns",
+        "c1-word-order"
+      ],
+      "note": "3.G: colocar + objeto definido/pronome = MOVE; + indefinido = CREATE."
+    },
+    {
+      "id": "aud-036",
+      "input": "crie dois textos e pinte o segundo de laranja",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}\nC_ENT_TEXT{C_PROP_TEXT_COLOR=#f97316}"
+      },
+      "tags": [
+        "c2-coordination",
+        "c4-number-definiteness",
+        "c8-references-discourse"
+      ],
+      "note": "Elipse: \"o segundo\" herda \"texto\"."
+    },
+    {
+      "id": "aud-037",
+      "input": "apague o primeiro e o último botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#dc2626"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#2563eb"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#16a34a"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#eab308"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#16a34a}"
+      },
+      "tags": [
+        "c2-coordination",
+        "c4-number-definiteness"
+      ],
+      "note": "Coordenação de ordinais com núcleo compartilhado: primeiro e último botões."
+    },
+    {
+      "id": "aud-038",
+      "input": "crie uma caixa azul, um botão vermelho e um texto preto",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#2563eb}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}\nC_ENT_TEXT{C_PROP_TEXT_COLOR=#000000}"
+      },
+      "tags": [
+        "c2-coordination",
+        "c7-properties"
+      ],
+      "note": "Bindings padrão da KB: COLOR em botão/caixa -> C_PROP_BG_COLOR; em texto -> C_PROP_TEXT_COLOR."
+    },
+    {
+      "id": "aud-039",
+      "input": "crie um botão e não pinte a caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c2-coordination",
+        "c9-negative"
+      ],
+      "note": "Negação com escopo só na segunda oração (A2); sem erro."
+    },
+    {
+      "id": "aud-040",
+      "input": "crie uma caixa com um botão branca",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#ffffff}\n  C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c3-agreement"
+      ],
+      "note": "\"branca\" fem. sing. só concorda com caixa. Default impliedContainmentRelationId: \"X com Y\" põe Y dentro de X."
+    },
+    {
+      "id": "aud-041",
+      "input": "crie uma caixa com um botão branco",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#ffffff}"
+      },
+      "tags": [
+        "c3-agreement"
+      ],
+      "note": "\"branco\" masc.: botão. Default impliedContainmentRelationId: \"X com Y\" põe Y dentro de X."
+    },
+    {
+      "id": "aud-042",
+      "input": "adicione uma caixa com um texto vermelha",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#dc2626}\n  C_ENT_TEXT{}"
+      },
+      "tags": [
+        "c3-agreement"
+      ],
+      "note": "Default impliedContainmentRelationId: \"X com Y\" põe Y dentro de X."
+    },
+    {
+      "id": "aud-043",
+      "input": "crie uma caixa com dois botões amarelos",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#eab308}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#eab308}"
+      },
+      "tags": [
+        "c3-agreement",
+        "c4-number-definiteness"
+      ],
+      "note": "Default impliedContainmentRelationId: \"X com Y\" põe Y dentro de X."
+    },
+    {
+      "id": "aud-044",
+      "input": "crie uma caixa com dois botões amarela",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#eab308}\n  C_ENT_BUTTON{}\n  C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c3-agreement",
+        "c4-number-definiteness"
+      ],
+      "note": "Adjetivo fem. sing. separado do núcleo por PP. Default impliedContainmentRelationId: \"X com Y\" põe Y dentro de X."
+    },
+    {
+      "id": "aud-045",
+      "input": "crie um botão vermelha",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "AGREEMENT_MISMATCH"
+        ]
+      },
+      "tags": [
+        "c3-agreement",
+        "c9-negative"
+      ],
+      "note": "PARTE IV 3.F: nenhum núcleo concorda -> AGREEMENT_MISMATCH, nada executado."
+    },
+    {
+      "id": "aud-046",
+      "input": "crie um texto e um botão brancas",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "AGREEMENT_MISMATCH"
+        ]
+      },
+      "tags": [
+        "c3-agreement",
+        "c9-negative",
+        "c2-coordination"
+      ],
+      "note": "PARTE IV 3.F: nenhum núcleo concorda -> AGREEMENT_MISMATCH, nada executado."
+    },
+    {
+      "id": "aud-047",
+      "input": "deixe o texto amarela",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}",
+        "diagnostics": [
+          "AGREEMENT_MISMATCH"
+        ]
+      },
+      "tags": [
+        "c3-agreement",
+        "c9-negative"
+      ],
+      "note": "PARTE IV 3.F: nenhum núcleo concorda -> AGREEMENT_MISMATCH, nada executado."
+    },
+    {
+      "id": "aud-048",
+      "input": "crie duas caixas pretos",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "AGREEMENT_MISMATCH"
+        ]
+      },
+      "tags": [
+        "c3-agreement",
+        "c9-negative",
+        "c4-number-definiteness"
+      ],
+      "note": "PARTE IV 3.F: nenhum núcleo concorda -> AGREEMENT_MISMATCH, nada executado."
+    },
+    {
+      "id": "aud-049",
+      "input": "crie uma caixa azul com um botão preto dentro",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#2563eb}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#000000}"
+      },
+      "tags": [
+        "c3-agreement",
+        "c1-word-order"
+      ],
+      "note": "\"X com Y dentro\" põe Y dentro de X."
+    },
+    {
+      "id": "aud-050",
+      "input": "crie uma caixa cinza com dois textos brancos dentro",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#6b7280}\n  C_ENT_TEXT{C_PROP_TEXT_COLOR=#ffffff}\n  C_ENT_TEXT{C_PROP_TEXT_COLOR=#ffffff}"
+      },
+      "tags": [
+        "c3-agreement",
+        "c4-number-definiteness"
+      ],
+      "note": "Bindings padrão da KB: COLOR em botão/caixa -> C_PROP_BG_COLOR; em texto -> C_PROP_TEXT_COLOR."
+    },
+    {
+      "id": "aud-051",
+      "input": "deixe as caixas vermelhas",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#dc2626}\nC_ENT_BUTTON{}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#dc2626}"
+      },
+      "tags": [
+        "c3-agreement",
+        "c4-number-definiteness"
+      ],
+      "note": "Definido plural = todas."
+    },
+    {
+      "id": "aud-052",
+      "input": "deixe os botões vermelha",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{}",
+        "diagnostics": [
+          "AGREEMENT_MISMATCH"
+        ]
+      },
+      "tags": [
+        "c3-agreement",
+        "c9-negative",
+        "c4-number-definiteness"
+      ],
+      "note": "PARTE IV 3.F: nenhum núcleo concorda -> AGREEMENT_MISMATCH, nada executado."
+    },
+    {
+      "id": "aud-053",
+      "input": "crie um botão dentro de uma caixa roxa",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#a855f7}\n  C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c3-agreement",
+        "c1-word-order"
+      ],
+      "note": "Ordem superficial não decide pai/filho; cor concorda com caixa."
+    },
+    {
+      "id": "aud-054",
+      "input": "apague as caixas pretas",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#000000"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#ffffff"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#000000"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#ffffff}"
+      },
+      "tags": [
+        "c4-number-definiteness"
+      ],
+      "note": "Definido plural com filtro = todas as que casam."
+    },
+    {
+      "id": "aud-055",
+      "input": "apague o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#2563eb"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#dc2626"
+          }
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}",
+        "diagnostics": [
+          "AMBIGUOUS_REFERENCE"
+        ],
+        "ambiguous": true
+      },
+      "tags": [
+        "c4-number-definiteness",
+        "c9-negative"
+      ],
+      "note": "Definido singular, 2 candidatos, sem antecedente saliente."
+    },
+    {
+      "id": "aud-056",
+      "input": "pinte a caixa de amarelo",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_CONTAINER{}",
+        "diagnostics": [
+          "AMBIGUOUS_REFERENCE"
+        ],
+        "ambiguous": true
+      },
+      "tags": [
+        "c4-number-definiteness",
+        "c9-negative"
+      ]
+    },
+    {
+      "id": "aud-057",
+      "input": "crie um botão dentro da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#000000"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#ffffff"
+          }
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#000000}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#ffffff}",
+        "diagnostics": [
+          "AMBIGUOUS_REFERENCE"
+        ],
+        "ambiguous": true
+      },
+      "tags": [
+        "c4-number-definiteness",
+        "c9-negative",
+        "c1-word-order"
+      ]
+    },
+    {
+      "id": "aud-058",
+      "input": "mova o texto para depois do botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}\nC_ENT_BUTTON{}\nC_ENT_BUTTON{}",
+        "diagnostics": [
+          "AMBIGUOUS_REFERENCE"
+        ],
+        "ambiguous": true
+      },
+      "tags": [
+        "c4-number-definiteness",
+        "c9-negative"
+      ]
+    },
+    {
+      "id": "aud-059",
+      "input": "apague os dois últimos textos",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT",
+          "properties": {
+            "C_PROP_TEXT_COLOR": "#dc2626"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT",
+          "properties": {
+            "C_PROP_TEXT_COLOR": "#2563eb"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT",
+          "properties": {
+            "C_PROP_TEXT_COLOR": "#16a34a"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT",
+          "properties": {
+            "C_PROP_TEXT_COLOR": "#000000"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{C_PROP_TEXT_COLOR=#dc2626}\nC_ENT_TEXT{C_PROP_TEXT_COLOR=#2563eb}"
+      },
+      "tags": [
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-060",
+      "input": "apague os últimos dois textos",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT",
+          "properties": {
+            "C_PROP_TEXT_COLOR": "#dc2626"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT",
+          "properties": {
+            "C_PROP_TEXT_COLOR": "#2563eb"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT",
+          "properties": {
+            "C_PROP_TEXT_COLOR": "#16a34a"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT",
+          "properties": {
+            "C_PROP_TEXT_COLOR": "#000000"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{C_PROP_TEXT_COLOR=#dc2626}\nC_ENT_TEXT{C_PROP_TEXT_COLOR=#2563eb}"
+      },
+      "tags": [
+        "c4-number-definiteness",
+        "c1-word-order"
+      ],
+      "note": "Mesma leitura que \"os dois últimos\"."
+    },
+    {
+      "id": "aud-061",
+      "input": "pinte os três primeiros botões de verde",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#dc2626"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#2563eb"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#eab308"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#000000"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#16a34a}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#16a34a}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#16a34a}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#000000}"
+      },
+      "tags": [
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-062",
+      "input": "pinte os primeiros três botões de cinza",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#dc2626"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#2563eb"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#eab308"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#000000"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#6b7280}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#6b7280}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#6b7280}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#000000}"
+      },
+      "tags": [
+        "c4-number-definiteness",
+        "c1-word-order"
+      ]
+    },
+    {
+      "id": "aud-063",
+      "input": "remova a penúltima caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#dc2626"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#2563eb"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#16a34a"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#dc2626}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#16a34a}"
+      },
+      "tags": [
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-064",
+      "input": "mude a terceira caixa para preto",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "children": [
+            {
+              "entityConceptId": "C_ENT_CONTAINER"
+            }
+          ]
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_CONTAINER{}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#000000}"
+      },
+      "tags": [
+        "c4-number-definiteness",
+        "c8-references-discourse"
+      ],
+      "note": "Ordinais contam na pré-ordem do documento."
+    },
+    {
+      "id": "aud-065",
+      "input": "apague o quinto botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{}",
+        "diagnostics": [
+          "TARGET_NOT_FOUND"
+        ]
+      },
+      "tags": [
+        "c4-number-definiteness",
+        "c9-negative"
+      ]
+    },
+    {
+      "id": "aud-066",
+      "input": "crie botões",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "UNSUPPORTED_OPERATION"
+        ]
+      },
+      "tags": [
+        "c4-number-definiteness",
+        "c9-negative"
+      ],
+      "note": "3.G: plural nu sem quantidade."
+    },
+    {
+      "id": "aud-067",
+      "input": "crie alguns textos",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "UNSUPPORTED_OPERATION"
+        ]
+      },
+      "tags": [
+        "c4-number-definiteness",
+        "c9-negative"
+      ],
+      "note": "Quantificador vago não suportado."
+    },
+    {
+      "id": "aud-068",
+      "input": "deixe todos os textos cinza",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "children": [
+            {
+              "entityConceptId": "C_ENT_TEXT"
+            }
+          ]
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{C_PROP_TEXT_COLOR=#6b7280}\nC_ENT_CONTAINER{}\n  C_ENT_TEXT{C_PROP_TEXT_COLOR=#6b7280}"
+      },
+      "tags": [
+        "c4-number-definiteness"
+      ],
+      "note": "\"todos\" inclui aninhados."
+    },
+    {
+      "id": "aud-069",
+      "input": "apague o último botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "children": [
+            {
+              "entityConceptId": "C_ENT_BUTTON"
+            }
+          ]
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_CONTAINER{}"
+      },
+      "tags": [
+        "c4-number-definiteness",
+        "c8-references-discourse"
+      ],
+      "note": "Ordinais contam na pré-ordem do documento."
+    },
+    {
+      "id": "aud-070",
+      "input": "apague o botão azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#2563eb"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#dc2626"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}"
+      },
+      "tags": [
+        "c4-number-definiteness"
+      ],
+      "note": "Filtro de cor torna o definido único."
+    },
+    {
+      "id": "aud-071",
+      "input": "pinte-a de verde",
+      "discourse": [
+        "crie uma caixa",
+        "crie um botão"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#16a34a}\nC_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c5-clitics-pronouns"
+      ],
+      "note": "Clítico fem. sing. -> caixa."
+    },
+    {
+      "id": "aud-072",
+      "input": "apague-o",
+      "discourse": [
+        "crie um texto"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": ""
+      },
+      "tags": [
+        "c5-clitics-pronouns"
+      ]
+    },
+    {
+      "id": "aud-073",
+      "input": "pinte-os de azul",
+      "discourse": [
+        "crie três botões"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}"
+      },
+      "tags": [
+        "c5-clitics-pronouns",
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-074",
+      "input": "deixe-as pretas",
+      "discourse": [
+        "crie duas caixas"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#000000}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#000000}"
+      },
+      "tags": [
+        "c5-clitics-pronouns",
+        "c3-agreement"
+      ]
+    },
+    {
+      "id": "aud-075",
+      "input": "você pode apagá-la?",
+      "discourse": [
+        "crie uma caixa",
+        "crie um botão"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c5-clitics-pronouns",
+        "c6-morphology"
+      ]
+    },
+    {
+      "id": "aud-076",
+      "input": "coloque-o dentro da caixa",
+      "discourse": [
+        "crie um botão",
+        "crie uma caixa"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c5-clitics-pronouns"
+      ],
+      "note": "3.G: colocar + objeto definido/pronome = MOVE; + indefinido = CREATE."
+    },
+    {
+      "id": "aud-077",
+      "input": "mova-o para antes da caixa",
+      "discourse": [
+        "crie uma caixa",
+        "crie um texto"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}\nC_ENT_CONTAINER{}"
+      },
+      "tags": [
+        "c5-clitics-pronouns",
+        "c1-word-order"
+      ]
+    },
+    {
+      "id": "aud-078",
+      "input": "crie um botão dentro dela",
+      "discourse": [
+        "crie uma caixa"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c5-clitics-pronouns"
+      ]
+    },
+    {
+      "id": "aud-079",
+      "input": "adicione um texto ao lado dele",
+      "discourse": [
+        "crie um botão"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_TEXT{}"
+      },
+      "tags": [
+        "c5-clitics-pronouns"
+      ],
+      "note": "Política assumida: relação BESIDE (ao lado de / do lado de) insere como irmão imediatamente DEPOIS do alvo."
+    },
+    {
+      "id": "aud-080",
+      "input": "deixe eles roxos",
+      "discourse": [
+        "crie dois textos"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{C_PROP_TEXT_COLOR=#a855f7}\nC_ENT_TEXT{C_PROP_TEXT_COLOR=#a855f7}"
+      },
+      "tags": [
+        "c5-clitics-pronouns"
+      ],
+      "note": "Bindings padrão da KB: COLOR em botão/caixa -> C_PROP_BG_COLOR; em texto -> C_PROP_TEXT_COLOR."
+    },
+    {
+      "id": "aud-081",
+      "input": "apague elas",
+      "discourse": [
+        "crie duas caixas",
+        "crie um botão"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c5-clitics-pronouns"
+      ]
+    },
+    {
+      "id": "aud-082",
+      "input": "pinte-os de laranja",
+      "discourse": [
+        "crie uma caixa e um botão"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#f97316}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#f97316}"
+      },
+      "tags": [
+        "c5-clitics-pronouns",
+        "c2-coordination"
+      ],
+      "note": "Antecedente coordenado misto: masc. plural retoma os dois."
+    },
+    {
+      "id": "aud-083",
+      "input": "pinte-a de verde",
+      "discourse": [
+        "crie um botão"
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}",
+        "diagnostics": [
+          "UNRESOLVED_PRONOUN"
+        ]
+      },
+      "tags": [
+        "c5-clitics-pronouns",
+        "c9-negative"
+      ],
+      "note": "Sem antecedente fem. sing. no discurso."
+    },
+    {
+      "id": "aud-084",
+      "input": "crie uma caixa e um texto dentro dela",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_TEXT{}"
+      },
+      "tags": [
+        "c5-clitics-pronouns",
+        "c2-coordination"
+      ]
+    },
+    {
+      "id": "aud-085",
+      "input": "apague ele",
+      "discourse": [
+        "crie um botão",
+        "crie outro botão"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c5-clitics-pronouns",
+        "c8-references-discourse"
+      ],
+      "note": "Pronome retoma o mais saliente (o último criado)."
+    },
+    {
+      "id": "aud-086",
+      "input": "quero deixá-la cinza-claro",
+      "discourse": [
+        "crie uma caixa"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#d1d5db}"
+      },
+      "tags": [
+        "c5-clitics-pronouns",
+        "c6-morphology",
+        "c7-properties"
+      ]
+    },
+    {
+      "id": "aud-087",
+      "input": "apague ela",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "UNRESOLVED_PRONOUN"
+        ]
+      },
+      "tags": [
+        "c5-clitics-pronouns",
+        "c9-negative"
+      ]
+    },
+    {
+      "id": "aud-088",
+      "input": "coloque o texto depois dela",
+      "discourse": [
+        "crie um texto",
+        "crie uma caixa"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_TEXT{}"
+      },
+      "tags": [
+        "c5-clitics-pronouns",
+        "c1-word-order"
+      ],
+      "note": "3.G: colocar + objeto definido/pronome = MOVE; + indefinido = CREATE."
+    },
+    {
+      "id": "aud-089",
+      "input": "poderia pintá-la de vermelho?",
+      "discourse": [
+        "crie uma caixa"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#dc2626}"
+      },
+      "tags": [
+        "c5-clitics-pronouns",
+        "c6-morphology"
+      ]
+    },
+    {
+      "id": "aud-090",
+      "input": "criem uma caixa verde",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#16a34a}"
+      },
+      "tags": [
+        "c6-morphology"
+      ]
+    },
+    {
+      "id": "aud-091",
+      "input": "apaguem os textos",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c6-morphology",
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-092",
+      "input": "criar um botão laranja",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#f97316}"
+      },
+      "tags": [
+        "c6-morphology"
+      ],
+      "note": "Infinitivo como comando."
+    },
+    {
+      "id": "aud-093",
+      "input": "você poderia criar uma caixa cinza?",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#6b7280}"
+      },
+      "tags": [
+        "c6-morphology"
+      ]
+    },
+    {
+      "id": "aud-094",
+      "input": "quero uma caixa amarela com um botão preto dentro",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#eab308}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#000000}"
+      },
+      "tags": [
+        "c6-morphology",
+        "c3-agreement"
+      ],
+      "note": "quero NP = CREATE."
+    },
+    {
+      "id": "aud-095",
+      "input": "queria um botão preto",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#000000}"
+      },
+      "tags": [
+        "c6-morphology"
+      ],
+      "note": "queria NP = CREATE (3.F molduras)."
+    },
+    {
+      "id": "aud-096",
+      "input": "eu gostaria de remover a caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}"
+      },
+      "tags": [
+        "c6-morphology"
+      ]
+    },
+    {
+      "id": "aud-097",
+      "input": "gostaria de uma caixa verde",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#16a34a}"
+      },
+      "tags": [
+        "c6-morphology"
+      ],
+      "note": "gostar de + NP como pedido de criação (WRAPPER querer|gostar de)."
+    },
+    {
+      "id": "aud-098",
+      "input": "apague o texto, por favor",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c6-morphology"
+      ]
+    },
+    {
+      "id": "aud-099",
+      "input": "por favor, crie um botão verde-escuro",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#15803d}"
+      },
+      "tags": [
+        "c6-morphology",
+        "c7-properties"
+      ]
+    },
+    {
+      "id": "aud-100",
+      "input": "crie um botãozinho laranja",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#f97316}"
+      },
+      "tags": [
+        "c6-morphology"
+      ]
+    },
+    {
+      "id": "aud-101",
+      "input": "adicione três caixinhas cinza",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#6b7280}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#6b7280}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#6b7280}"
+      },
+      "tags": [
+        "c6-morphology",
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-102",
+      "input": "crie dois botõezinhos brancos dentro da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#ffffff}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#ffffff}"
+      },
+      "tags": [
+        "c6-morphology",
+        "c1-word-order"
+      ]
+    },
+    {
+      "id": "aud-103",
+      "input": "crie um botão pretinho",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#000000}"
+      },
+      "tags": [
+        "c6-morphology"
+      ],
+      "note": "Diminutivo do adjetivo preto (allowsDiminutive) = mesmo valor."
+    },
+    {
+      "id": "aud-104",
+      "input": "criei uma caixa",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "UNSUPPORTED_OPERATION"
+        ]
+      },
+      "tags": [
+        "c6-morphology",
+        "c9-negative"
+      ],
+      "note": "3.G: só imperativo, infinitivo ou pedido indireto são comandos; outro tempo -> UNSUPPORTED_OPERATION, nada executado."
+    },
+    {
+      "id": "aud-105",
+      "input": "criaremos uma caixa azul",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "UNSUPPORTED_OPERATION"
+        ]
+      },
+      "tags": [
+        "c6-morphology",
+        "c9-negative"
+      ],
+      "note": "3.G: só imperativo, infinitivo ou pedido indireto são comandos; outro tempo -> UNSUPPORTED_OPERATION, nada executado."
+    },
+    {
+      "id": "aud-106",
+      "input": "apagou o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}",
+        "diagnostics": [
+          "UNSUPPORTED_OPERATION"
+        ]
+      },
+      "tags": [
+        "c6-morphology",
+        "c9-negative"
+      ],
+      "note": "3.G: só imperativo, infinitivo ou pedido indireto são comandos; outro tempo -> UNSUPPORTED_OPERATION, nada executado."
+    },
+    {
+      "id": "aud-107",
+      "input": "pintava a caixa de azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}",
+        "diagnostics": [
+          "UNSUPPORTED_OPERATION"
+        ]
+      },
+      "tags": [
+        "c6-morphology",
+        "c9-negative"
+      ],
+      "note": "3.G: só imperativo, infinitivo ou pedido indireto são comandos; outro tempo -> UNSUPPORTED_OPERATION, nada executado."
+    },
+    {
+      "id": "aud-108",
+      "input": "cria uma caixa preta",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#000000}"
+      },
+      "tags": [
+        "c6-morphology"
+      ],
+      "note": "Leitura verbal imperativa no início da oração."
+    },
+    {
+      "id": "aud-109",
+      "input": "move o botão para dentro da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c6-morphology"
+      ]
+    },
+    {
+      "id": "aud-110",
+      "input": "pintem de branco os botões",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#ffffff}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#ffffff}"
+      },
+      "tags": [
+        "c6-morphology",
+        "c1-word-order"
+      ]
+    },
+    {
+      "id": "aud-111",
+      "input": "exclua todos os botões",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "children": [
+            {
+              "entityConceptId": "C_ENT_BUTTON"
+            }
+          ]
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_TEXT{}"
+      },
+      "tags": [
+        "c6-morphology",
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-112",
+      "input": "crie um botão com fundo verde e borda preta",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#16a34a,C_PROP_BORDER_COLOR=#000000}"
+      },
+      "tags": [
+        "c7-properties"
+      ]
+    },
+    {
+      "id": "aud-113",
+      "input": "crie uma caixa com borda vermelha de 2px",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BORDER_COLOR=#dc2626,C_PROP_BORDER_WIDTH=2px}"
+      },
+      "tags": [
+        "c7-properties"
+      ],
+      "note": "Grupo borda resolvido por categoria: COLOR->cor, SIZE->largura."
+    },
+    {
+      "id": "aud-114",
+      "input": "deixe a borda da caixa com 4px",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BORDER_WIDTH=4px}"
+      },
+      "tags": [
+        "c7-properties"
+      ]
+    },
+    {
+      "id": "aud-115",
+      "input": "mude a cor da letra do texto para roxo",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{C_PROP_TEXT_COLOR=#a855f7}"
+      },
+      "tags": [
+        "c7-properties"
+      ]
+    },
+    {
+      "id": "aud-116",
+      "input": "mude a cor do texto do botão para branco",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#2563eb"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb,C_PROP_TEXT_COLOR=#ffffff}"
+      },
+      "tags": [
+        "c7-properties"
+      ]
+    },
+    {
+      "id": "aud-117",
+      "input": "deixe o texto do botão amarelo",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_TEXT_COLOR=#eab308}"
+      },
+      "tags": [
+        "c7-properties"
+      ],
+      "note": "B5: \"texto\" como grupo; COLOR -> C_PROP_TEXT_COLOR."
+    },
+    {
+      "id": "aud-118",
+      "input": "deixe o texto do botão com 20px",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_FONT_SIZE=20px}"
+      },
+      "tags": [
+        "c7-properties"
+      ],
+      "note": "B5: SIZE -> C_PROP_FONT_SIZE."
+    },
+    {
+      "id": "aud-119",
+      "input": "altere as cores de fundo das caixas para amarelo",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#000000"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#ffffff"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#eab308}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#eab308}"
+      },
+      "tags": [
+        "c7-properties",
+        "c4-number-definiteness"
+      ],
+      "note": "MWE flexionada (cores de fundo)."
+    },
+    {
+      "id": "aud-120",
+      "input": "crie um botão redondo e vermelho",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626,C_PROP_BORDER_RADIUS=50%}"
+      },
+      "tags": [
+        "c7-properties"
+      ]
+    },
+    {
+      "id": "aud-121",
+      "input": "deixe o botão sem borda",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BORDER_COLOR": "#dc2626",
+            "C_PROP_BORDER_WIDTH": "2px",
+            "C_PROP_BORDER_STYLE": "solid"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BORDER_STYLE=none}"
+      },
+      "tags": [
+        "c7-properties"
+      ],
+      "note": "Política assumida: \"sem borda\" limpa o grupo (clearPropertyIds); propriedade com clearValue (borderStyle) fica com esse valor (none), as demais são removidas."
+    },
+    {
+      "id": "aud-122",
+      "input": "adicione uma caixa preta sem borda",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#000000,C_PROP_BORDER_STYLE=none}"
+      },
+      "tags": [
+        "c7-properties"
+      ],
+      "note": "Política assumida: \"sem borda\" limpa o grupo (clearPropertyIds); propriedade com clearValue (borderStyle) fica com esse valor (none), as demais são removidas."
+    },
+    {
+      "id": "aud-123",
+      "input": "mude a borda do botão para azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BORDER_WIDTH": "1px"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BORDER_COLOR=#2563eb,C_PROP_BORDER_WIDTH=1px}"
+      },
+      "tags": [
+        "c7-properties"
+      ]
+    },
+    {
+      "id": "aud-124",
+      "input": "crie um texto com fundo azul",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "INVALID_PROPERTY"
+        ]
+      },
+      "tags": [
+        "c7-properties",
+        "c9-negative"
+      ],
+      "note": "TEXT não aceita C_PROP_BG_COLOR."
+    },
+    {
+      "id": "aud-125",
+      "input": "deixe o fundo da caixa com 3px",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}",
+        "diagnostics": [
+          "INVALID_VALUE_CATEGORY"
+        ]
+      },
+      "tags": [
+        "c7-properties",
+        "c9-negative"
+      ]
+    },
+    {
+      "id": "aud-126",
+      "input": "crie um texto com borda preta",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "INVALID_PROPERTY"
+        ]
+      },
+      "tags": [
+        "c7-properties",
+        "c9-negative"
+      ],
+      "note": "TEXT não aceita propriedades de borda."
+    },
+    {
+      "id": "aud-127",
+      "input": "mude a cor de fundo da segunda caixa para verde-claro",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#86efac}"
+      },
+      "tags": [
+        "c7-properties",
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-128",
+      "input": "crie um botão escrito \"Enviar\"",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON\"Enviar\"{}"
+      },
+      "tags": [
+        "c7-properties"
+      ],
+      "note": "Conteúdo textual vai no campo text do nó (targetField text)."
+    },
+    {
+      "id": "aud-129",
+      "input": "crie uma caixa com o texto \"Bem-vindo\"",
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_TEXT\"Bem-vindo\"{}"
+      },
+      "tags": [
+        "c7-properties",
+        "c3-agreement"
+      ],
+      "note": "A4: caixa não aceita conteúdo textual; cria TEXT filho."
+    },
+    {
+      "id": "aud-130",
+      "input": "mude o botão \"Sair\" para vermelho",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "text": "Entrar"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "text": "Sair"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON\"Entrar\"{}\nC_ENT_BUTTON\"Sair\"{C_PROP_BG_COLOR=#dc2626}"
+      },
+      "tags": [
+        "c7-properties",
+        "c8-references-discourse"
+      ]
+    },
+    {
+      "id": "aud-131",
+      "input": "pinte de verde o texto que está dentro da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "children": [
+            {
+              "entityConceptId": "C_ENT_TEXT"
+            }
+          ]
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}\nC_ENT_CONTAINER{}\n  C_ENT_TEXT{C_PROP_TEXT_COLOR=#16a34a}"
+      },
+      "tags": [
+        "c8-references-discourse",
+        "c1-word-order"
+      ]
+    },
+    {
+      "id": "aud-132",
+      "input": "remova a caixa que tem borda azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BORDER_COLOR": "#2563eb"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BORDER_COLOR": "#dc2626"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BORDER_COLOR=#dc2626}"
+      },
+      "tags": [
+        "c8-references-discourse"
+      ]
+    },
+    {
+      "id": "aud-133",
+      "input": "apague os botões que estão dentro da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "children": [
+            {
+              "entityConceptId": "C_ENT_BUTTON"
+            },
+            {
+              "entityConceptId": "C_ENT_BUTTON"
+            }
+          ]
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_CONTAINER{}\nC_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c8-references-discourse",
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-134",
+      "input": "pinte todas as caixas de preto menos a primeira",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#000000}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#000000}"
+      },
+      "tags": [
+        "c8-references-discourse",
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-135",
+      "input": "apague todos os textos exceto o último",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT",
+          "properties": {
+            "C_PROP_TEXT_COLOR": "#dc2626"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT",
+          "properties": {
+            "C_PROP_TEXT_COLOR": "#2563eb"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT",
+          "properties": {
+            "C_PROP_TEXT_COLOR": "#16a34a"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{C_PROP_TEXT_COLOR=#16a34a}"
+      },
+      "tags": [
+        "c8-references-discourse",
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-136",
+      "input": "deixe todos os botões brancos salvo o terceiro",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#ffffff}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#ffffff}\nC_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c8-references-discourse",
+        "c4-number-definiteness"
+      ]
+    },
+    {
+      "id": "aud-137",
+      "input": "mova o botão para dentro da outra caixa",
+      "discourse": [
+        "crie duas caixas",
+        "crie um botão dentro da primeira caixa"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_CONTAINER{}\n  C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c8-references-discourse"
+      ],
+      "note": "\"outra\" = distinta da caixa saliente (a primeira, que contém o botão)."
+    },
+    {
+      "id": "aud-138",
+      "input": "crie outra caixa dentro dela",
+      "discourse": [
+        "crie uma caixa"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_CONTAINER{}"
+      },
+      "tags": [
+        "c8-references-discourse",
+        "c5-clitics-pronouns"
+      ]
+    },
+    {
+      "id": "aud-139",
+      "input": "mova o primeiro para antes da caixa",
+      "discourse": [
+        "crie uma caixa",
+        "adicione três textos dentro dela",
+        "pinte o terceiro de azul"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}\nC_ENT_CONTAINER{}\n  C_ENT_TEXT{}\n  C_ENT_TEXT{C_PROP_TEXT_COLOR=#2563eb}"
+      },
+      "tags": [
+        "c8-references-discourse",
+        "c1-word-order"
+      ],
+      "note": "Elipse de \"texto\" pelo discurso."
+    },
+    {
+      "id": "aud-140",
+      "input": "apague o texto azul",
+      "discourse": [
+        "crie uma caixa",
+        "adicione três textos dentro dela",
+        "pinte o terceiro de azul"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_TEXT{}\n  C_ENT_TEXT{}"
+      },
+      "tags": [
+        "c8-references-discourse"
+      ]
+    },
+    {
+      "id": "aud-141",
+      "input": "pinte o texto da esquerda de amarelo",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{C_PROP_TEXT_COLOR=#eab308}\nC_ENT_TEXT{}\nC_ENT_TEXT{}"
+      },
+      "tags": [
+        "c8-references-discourse"
+      ],
+      "note": "B4: sem rect, LEFTMOST/TOPMOST = primeiro e RIGHTMOST/BOTTOMMOST = último na ordem do documento."
+    },
+    {
+      "id": "aud-142",
+      "input": "apague a caixa mais à direita",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#dc2626"
+          }
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}"
+      },
+      "tags": [
+        "c8-references-discourse"
+      ],
+      "note": "B4: sem rect, LEFTMOST/TOPMOST = primeiro e RIGHTMOST/BOTTOMMOST = último na ordem do documento."
+    },
+    {
+      "id": "aud-143",
+      "input": "deixe azul a caixa que tem borda preta",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BORDER_COLOR": "#000000"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#2563eb,C_PROP_BORDER_COLOR=#000000}\nC_ENT_CONTAINER{}"
+      },
+      "tags": [
+        "c8-references-discourse",
+        "c1-word-order"
+      ]
+    },
+    {
+      "id": "aud-144",
+      "input": "pinte essa caixa de roxo",
+      "discourse": [
+        "crie uma caixa",
+        "crie um texto"
+      ],
+      "expectError": false,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#a855f7}\nC_ENT_TEXT{}"
+      },
+      "tags": [
+        "c8-references-discourse"
+      ]
+    },
+    {
+      "id": "aud-145",
+      "input": "crie um botão dentro do texto",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}",
+        "diagnostics": [
+          "INVALID_CONTAINMENT"
+        ]
+      },
+      "tags": [
+        "c9-negative"
+      ]
+    },
+    {
+      "id": "aud-146",
+      "input": "crie um texto com uma caixa dentro",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "INVALID_CONTAINMENT"
+        ]
+      },
+      "tags": [
+        "c9-negative",
+        "c3-agreement"
+      ]
+    },
+    {
+      "id": "aud-147",
+      "input": "mova a caixa para dentro do botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}",
+        "diagnostics": [
+          "INVALID_CONTAINMENT"
+        ]
+      },
+      "tags": [
+        "c9-negative"
+      ]
+    },
+    {
+      "id": "aud-148",
+      "input": "mova a primeira caixa para dentro da segunda",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "children": [
+            {
+              "entityConceptId": "C_ENT_CONTAINER"
+            }
+          ]
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_CONTAINER{}",
+        "diagnostics": [
+          "INVALID_CONTAINMENT"
+        ]
+      },
+      "tags": [
+        "c9-negative",
+        "c4-number-definiteness"
+      ],
+      "note": "Segunda caixa (pré-ordem) é filha da primeira: ciclo."
+    },
+    {
+      "id": "aud-149",
+      "input": "mova a caixa para dentro dela mesma",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}",
+        "diagnostics": [
+          "INVALID_CONTAINMENT"
+        ]
+      },
+      "tags": [
+        "c9-negative",
+        "c5-clitics-pronouns"
+      ]
+    },
+    {
+      "id": "aud-150",
+      "input": "adicione uma imagem",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": ""
+      },
+      "tags": [
+        "c9-negative"
+      ],
+      "note": "Palavra real do português fora do domínio: erro sem mutação; código pode ser UNSUPPORTED_OPERATION (3.H) ou UNKNOWN_WORD (sem fonte), por isso não fixado."
+    },
+    {
+      "id": "aud-151",
+      "input": "crie um blorptax",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "UNKNOWN_WORD"
+        ]
+      },
+      "tags": [
+        "c9-negative"
+      ]
+    },
+    {
+      "id": "aud-152",
+      "input": "pinte a caixa de fúcsia",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}"
+      },
+      "tags": [
+        "c9-negative"
+      ],
+      "note": "Palavra real do português fora do domínio: erro sem mutação; código pode ser UNSUPPORTED_OPERATION (3.H) ou UNKNOWN_WORD (sem fonte), por isso não fixado."
+    },
+    {
+      "id": "aud-153",
+      "input": "crie uma",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": ""
+      },
+      "tags": [
+        "c9-negative"
+      ],
+      "note": "Comando incompleto."
+    },
+    {
+      "id": "aud-154",
+      "input": "mude o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c9-negative"
+      ],
+      "note": "UPDATE sem valor."
+    },
+    {
+      "id": "aud-155",
+      "input": "remova todos",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "INCOMPLETE_REFERENCE"
+        ]
+      },
+      "tags": [
+        "c9-negative"
+      ]
+    },
+    {
+      "id": "aud-156",
+      "input": "pinte a caixa de azul",
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "TARGET_NOT_FOUND"
+        ]
+      },
+      "tags": [
+        "c9-negative"
+      ]
+    },
+    {
+      "id": "aud-157",
+      "input": "imprima o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}"
+      },
+      "tags": [
+        "c9-negative"
+      ],
+      "note": "Palavra real do português fora do domínio: erro sem mutação; código pode ser UNSUPPORTED_OPERATION (3.H) ou UNKNOWN_WORD (sem fonte), por isso não fixado."
+    },
+    {
+      "id": "aud-158",
+      "input": "não apague a caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expectError": false,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}"
+      },
+      "tags": [
+        "c9-negative"
+      ],
+      "note": "Negação: nenhuma mutação, sem erro."
+    },
+    {
+      "id": "aud-159",
+      "input": "deixe a caixa mais clara",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "properties": {
+            "C_PROP_BG_COLOR": "#000000"
+          }
+        }
+      ],
+      "expectError": true,
+      "expectNoMutation": true,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#000000}"
+      },
+      "tags": [
+        "c9-negative"
+      ],
+      "note": "Comparativo não suportado."
+    }
+  ]
+}
