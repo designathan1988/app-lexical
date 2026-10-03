@@ -4420,6 +4420,16 @@
           "base": "chuva guarda",
           "wouldBe": "chuva-guarda",
           "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "morar casa",
+          "wouldBe": "mora-casa",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "vender pão",
+          "wouldBe": "vende-pão",
+          "reason": "NOT_ATTESTED"
         }
       ],
       "sources": [
@@ -4487,6 +4497,16 @@
         {
           "base": "alto plano",
           "wouldBe": "altoplano",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "carne seca",
+          "wouldBe": "carneseca",
+          "reason": "NOT_ATTESTED"
+        },
+        {
+          "base": "pedra alta",
+          "wouldBe": "pedralta",
           "reason": "NOT_ATTESTED"
         }
       ],
