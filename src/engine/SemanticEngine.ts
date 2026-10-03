@@ -8,6 +8,8 @@ import { BuilderRuntimeAdapterImpl } from '../builder/BuilderRuntimeAdapterImpl'
 import { DEFAULT_ENGINE_SETTINGS, type EngineSettings } from './EngineSettings';
 import { diagnostic, normalizeSpan, type Diagnostic } from './diagnostics';
 import type { PlanSimulator } from './planning/TempNodes';
+import { createDerivationalAnalyzer } from '../knowledge/morphology';
+import type { DerivationalAnalyzer, DerivationAnalysis } from './morphology/DerivationalAnalyzer';
 
 export interface CommandResult {
   input: string;
@@ -72,7 +74,17 @@ export class SemanticEngine {
       kb.disambiguationRules ?? []
     );
     compiler.simulator = this.simulate;
+    this.derivations = createDerivationalAnalyzer(kb.lexemes);
+    compiler.morphology = this.derivations;
     return compiler;
+  }
+
+  private derivations?: DerivationalAnalyzer;
+
+  /** Decomposição derivacional de uma palavra (raiz + regras + glosa). */
+  analyzeWord(word: string): DerivationAnalysis[] {
+    this.derivations ??= createDerivationalAnalyzer(this.knowledgeBase.lexemes);
+    return this.derivations.analyze(word);
   }
 
   updateSettings(settings: EngineSettings): void {

@@ -24,6 +24,7 @@ import { SemanticTokenBuilder } from './parser/SemanticTokenBuilder';
 import { DomainParser, type ParserContext } from './parser/DomainParser';
 import { DiscourseContext, type NodeLookup } from './parser/DiscourseContext';
 import { LexicalRecovery } from './parser/LexicalRecovery';
+import type { DerivationalAnalyzer } from './morphology/DerivationalAnalyzer';
 import { buildGrammarIndex, type GrammarIndex } from './parser/GrammarIndex';
 import { ExecutionPlanner } from './planning/ExecutionPlanner';
 import { ReferenceResolver } from './document/ReferenceResolver';
@@ -97,6 +98,11 @@ export class SemanticCompiler {
 
     this.grammar = buildGrammarIndex(concepts, lexemes, surfaceForms);
     this.recovery = new LexicalRecovery(concepts, this.lexicalIndex, this.grammar, this.settings);
+  }
+
+  /** Analisador derivacional usado para explicar palavras desconhecidas. */
+  set morphology(analyzer: DerivationalAnalyzer | undefined) {
+    this.recovery.morphology = analyzer;
   }
 
   updateSettings(settings: EngineSettings): void {

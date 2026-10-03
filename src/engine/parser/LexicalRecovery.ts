@@ -6,6 +6,7 @@ import { entriesFor, type GrammarIndex } from './GrammarIndex';
 import type { Diagnostic } from '../diagnostics';
 import { diagnostic } from '../diagnostics';
 import type { EngineSettings } from '../EngineSettings';
+import type { DerivationalAnalyzer } from '../morphology/DerivationalAnalyzer';
 
 /** Categoria esperada numa posição, derivada da estrutura (não de palavras). */
 export type ExpectedSlot =
@@ -35,6 +36,9 @@ interface RecoveredCandidate extends SurfaceCandidate {
  * componentes do score.
  */
 export class LexicalRecovery {
+  /** Rede gerativa: decompõe a palavra desconhecida (só explica, nunca resolve). */
+  morphology?: DerivationalAnalyzer;
+
   constructor(
     private concepts: Record<ConceptId, ConceptNode>,
     private lexicalIndex: LexicalIndex,
@@ -150,6 +154,20 @@ export class LexicalRecovery {
     raw: Array<SurfaceCandidate & { candidates?: Array<{ conceptId: ConceptId }> }>
   ): Diagnostic {
     const suggestions = raw.slice(0, 3);
+    const morphology = (this.morphology?.analyze(word) ?? [])
+      .filter((a) => a.status !== 'HYPOTHESIS_BLOCKED')
+      .slice(0, 3)
+      .map((a) => ({
+        root: a.root.lemma,
+        rootId: a.root.id,
+        rules: a.chain.map((s) => s.rule),
+        pos: a.pos,
+        semantics: a.semantics,
+        gloss: a.gloss,
+        status: a.status,
+        domainRoot: a.root.domain === true
+      }));
+    const best = morphology[0];
     return diagnostic(
       'morphology',
       'ERROR',
@@ -159,11 +177,19 @@ export class LexicalRecovery {
           ? ` Você quis dizer ${suggestions
               .map((s) => `"${s.matchedForm}" (${s.lexeme.lemma}, ${s.score.toFixed(2)})`)
               .join(', ')}?`
+          : '') +
+        (best
+          ? ` Morfologia: ${best.rules.join(' + ')} sobre "${best.root}" (${best.pos}, "${best.gloss}", ` +
+            `${best.status === 'ATTESTED' ? 'atestada' : 'hipótese'}); ` +
+            (best.domainRoot
+              ? 'a raiz é do domínio, mas esta derivação não está cadastrada.'
+              : 'a raiz não é um conceito do domínio.')
           : ''),
       token.span,
       {
         candidates: suggestions.map((s) => s.lexeme.id),
-        scores: suggestions.map((s) => s.score)
+        scores: suggestions.map((s) => s.score),
+        ...(morphology.length ? { morphology } : {})
       }
     );
   }

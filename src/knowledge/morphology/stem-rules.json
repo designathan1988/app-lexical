@@ -1,0 +1,391 @@
+{
+  "version": "1.0.0",
+  "schemaVersion": "1.0.0",
+  "description": "Regras de RADICAL para a análise reversa (palavra derivada → base). Complementam affix-rules.json: variantes de superfície dos afixos, regras produtivas que faltavam e as transformações que restauram a base a partir do resíduo. Nenhum par palavra→base é listado aqui: tudo é regra.",
+  "surfaceVariants": [
+    {
+      "rule": "SUF_EZ",
+      "surface": "ez",
+      "note": "rapidez, rigidez: -ez é alomorfe de -eza"
+    },
+    {
+      "rule": "SUF_INHO",
+      "surface": "inha"
+    },
+    {
+      "rule": "SUF_INHO",
+      "surface": "inhos"
+    },
+    {
+      "rule": "SUF_INHO",
+      "surface": "inhas"
+    },
+    {
+      "rule": "SUF_INHO",
+      "surface": "zinho",
+      "note": "base inteira + -zinho: avião → aviãozinho"
+    },
+    {
+      "rule": "SUF_INHO",
+      "surface": "zinha"
+    },
+    {
+      "rule": "SUF_INHO",
+      "surface": "zinhos"
+    },
+    {
+      "rule": "SUF_INHO",
+      "surface": "zinhas"
+    },
+    {
+      "rule": "SUF_AO_AUG",
+      "surface": "arão",
+      "note": "casa → casarão"
+    },
+    {
+      "rule": "SUF_AO_AUG",
+      "surface": "zão"
+    },
+    {
+      "rule": "SUF_AO_AUG",
+      "surface": "ona"
+    },
+    {
+      "rule": "SUF_CAO",
+      "surface": "são",
+      "note": "radical latino: decidir → decisão"
+    },
+    {
+      "rule": "SUF_CAO",
+      "surface": "ssão"
+    },
+    {
+      "rule": "SUF_ADE",
+      "surface": "dade",
+      "note": "bondade, maldade"
+    },
+    {
+      "rule": "PRE_IN",
+      "surface": "im",
+      "note": "assimilação antes de p/b: impaciente"
+    },
+    {
+      "rule": "PRE_IN",
+      "surface": "i",
+      "note": "antes de l/m/n/r (r dobra): ilegal, irresponsável"
+    },
+    {
+      "rule": "PAR_EN_ECER",
+      "surface": "em",
+      "note": "en- → em- antes de p/b/m: emagrecer"
+    },
+    {
+      "rule": "PAR_EN_AR",
+      "surface": "em"
+    },
+    {
+      "rule": "SUF_ECER",
+      "surface": "escer",
+      "note": "flor → florescer"
+    }
+  ],
+  "extraRules": [
+    {
+      "id": "SUF_ANCA",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "ança"
+      },
+      "input": {
+        "pos": "VERB"
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Fem"
+      },
+      "semantics": {
+        "function": "ACTION_OF"
+      },
+      "productivity": "MEDIUM",
+      "examples": [
+        {
+          "base": "lembrar",
+          "derived": "lembrança"
+        },
+        {
+          "base": "mudar",
+          "derived": "mudança"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (sufixos nominais deverbais -ança/-ença)",
+          "verified": false
+        }
+      ]
+    },
+    {
+      "id": "SUF_ACO",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "aço"
+      },
+      "input": {
+        "pos": "VERB"
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Masc"
+      },
+      "semantics": {
+        "function": "RESULT_OF"
+      },
+      "productivity": "LOW",
+      "examples": [
+        {
+          "base": "cansar",
+          "derived": "cansaço"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Sandmann, Formação de Palavras no Português Brasileiro Contemporâneo",
+          "verified": false
+        }
+      ]
+    },
+    {
+      "id": "SUF_IDAO",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "idão"
+      },
+      "input": {
+        "pos": "ADJECTIVE"
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Fem"
+      },
+      "semantics": {
+        "function": "QUALITY_OF"
+      },
+      "productivity": "LOW",
+      "examples": [
+        {
+          "base": "lento",
+          "derived": "lentidão"
+        },
+        {
+          "base": "certo",
+          "derived": "certidão"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Cunha & Cintra, Nova Gramática (sufixos de qualidade)",
+          "verified": false
+        }
+      ]
+    },
+    {
+      "id": "SUF_ADA_V",
+      "process": "SUFFIX",
+      "form": {
+        "suffix": "ada"
+      },
+      "input": {
+        "pos": "VERB"
+      },
+      "output": {
+        "pos": "NOUN",
+        "gender": "Fem"
+      },
+      "semantics": {
+        "function": "ACTION_OF"
+      },
+      "productivity": "HIGH",
+      "examples": [
+        {
+          "base": "caminhar",
+          "derived": "caminhada"
+        },
+        {
+          "base": "olhar",
+          "derived": "olhada"
+        }
+      ],
+      "sources": [
+        {
+          "ref": "Basílio, Formação e Classes de Palavras no Português do Brasil (nominalização deverbal em -ada)",
+          "verified": false
+        }
+      ]
+    }
+  ],
+  "baseRestorations": {
+    "VERB": [
+      {
+        "end": "",
+        "add": "r",
+        "note": "resíduo com vogal temática: organiza- → organizar, vende- → vender"
+      },
+      {
+        "end": "á",
+        "replace": "ar",
+        "note": "aceitá-vel → aceitar"
+      },
+      {
+        "end": "í",
+        "replace": "er"
+      },
+      {
+        "end": "í",
+        "replace": "ir"
+      },
+      {
+        "end": "i",
+        "replace": "er",
+        "note": "conheci-mento → conhecer (vogal temática e → i)"
+      },
+      {
+        "end": "i",
+        "replace": "ir"
+      },
+      {
+        "end": "e",
+        "replace": "ir",
+        "note": "dirige-nte → dirigir"
+      },
+      {
+        "end": "",
+        "add": "ar",
+        "note": "radical nu: lav-agem, cans-aço, confi-ança, caminh-ada"
+      },
+      {
+        "end": "",
+        "add": "er"
+      },
+      {
+        "end": "",
+        "add": "ir"
+      },
+      {
+        "end": "",
+        "add": "dir",
+        "note": "radical latino: deci-são → decidir"
+      },
+      {
+        "end": "u",
+        "replace": "uzir",
+        "note": "produ-ção → produzir"
+      },
+      {
+        "end": "u",
+        "replace": "uir",
+        "note": "constru-ção → construir"
+      }
+    ],
+    "NOMINAL": [
+      {
+        "end": "",
+        "add": "",
+        "note": "a base é o próprio resíduo: feliz-mente, popular-idade"
+      },
+      {
+        "end": "",
+        "add": "o"
+      },
+      {
+        "end": "",
+        "add": "a"
+      },
+      {
+        "end": "",
+        "add": "e"
+      },
+      {
+        "end": "a",
+        "replace": "o",
+        "note": "-mente sobre o feminino: calma-mente → calmo"
+      },
+      {
+        "end": "bil",
+        "replace": "vel",
+        "note": "estabil-idade → estável"
+      },
+      {
+        "end": "c",
+        "replace": "z",
+        "note": "felic-idade → feliz"
+      },
+      {
+        "end": "n",
+        "replace": "m",
+        "note": "jardin-eiro → jardim"
+      },
+      {
+        "end": "",
+        "add": "ia",
+        "note": "histór-ico ← história, polít-ico ← política"
+      },
+      {
+        "end": "ion",
+        "replace": "ção",
+        "note": "nacion-al ← nação (radical latino -cion-)"
+      },
+      {
+        "end": "on",
+        "replace": "ão",
+        "note": "japon-ês ← Japão"
+      },
+      {
+        "end": "i",
+        "replace": "o",
+        "note": "mundi-al ← mundo"
+      },
+      {
+        "end": "",
+        "add": "es",
+        "note": "simpl-ificar ← simples"
+      }
+    ]
+  },
+  "invalidJunctions": [
+    {
+      "rule": "*",
+      "residueEnd": "m",
+      "suffixStartsWithVowel": true,
+      "note": "-m final vira -n antes de sufixo vocálico: jardim → jardineiro (nunca jardimeiro)"
+    },
+    {
+      "rule": "SUF_ADE",
+      "residueEnd": "z",
+      "note": "-z vira -c antes de -idade: feliz → felicidade"
+    },
+    {
+      "rule": "SUF_ADE",
+      "residueEnd": "vel",
+      "note": "-vel vira -bil antes de -idade: possível → possibilidade"
+    },
+    {
+      "rule": "PRE_IN",
+      "surface": "in",
+      "restStartsWith": [
+        "p",
+        "b"
+      ],
+      "note": "in- assimila para im- antes de p/b: impaciente"
+    },
+    {
+      "rule": "PRE_IN",
+      "surface": "in",
+      "restStartsWith": [
+        "l",
+        "r",
+        "m"
+      ],
+      "note": "in- vira i- antes de l/r/m: ilegal, irreal, imortal"
+    }
+  ]
+}

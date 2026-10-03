@@ -9,10 +9,12 @@ import { MetricsSection } from './admin/MetricsSection';
 import { DiagnosticsSection } from './admin/DiagnosticsSection';
 import { SettingsSection } from './admin/SettingsSection';
 import { HistorySection } from './admin/HistorySection';
+import { MorphologySection } from './admin/MorphologySection';
 
 export type AdminTab =
   | 'dados'
   | 'paradigmas'
+  | 'morfologia'
   | 'treinamento'
   | 'testes'
   | 'metricas'
@@ -44,6 +46,7 @@ export function AdminPanel({ engine, store, onChange }: Props) {
   const tabs: Array<{ id: AdminTab; label: string }> = [
     { id: 'dados', label: 'Dados' },
     { id: 'paradigmas', label: 'Paradigmas' },
+    { id: 'morfologia', label: 'Morfologia' },
     { id: 'treinamento', label: 'Treinamento' },
     { id: 'testes', label: 'Testes' },
     { id: 'metricas', label: 'Métricas' },
@@ -70,6 +73,7 @@ export function AdminPanel({ engine, store, onChange }: Props) {
         {store.migrationNotice && <p className="ok">{store.migrationNotice}</p>}
         {tab === 'dados' && <DataSection engine={engine} store={store} onChange={bump} />}
         {tab === 'paradigmas' && <ParadigmSection engine={engine} store={store} onChange={bump} />}
+        {tab === 'morfologia' && <MorphologySection engine={engine} />}
         {tab === 'treinamento' && (
           <TrainingSection engine={engine} store={store} onChange={bump} />
         )}

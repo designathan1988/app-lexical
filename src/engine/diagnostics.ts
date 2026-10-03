@@ -94,6 +94,21 @@ export interface Diagnostic {
   candidates?: string[];
   /** Scores associados aos candidatos, quando relevante. */
   scores?: number[];
+  /** Decomposição derivacional de palavra desconhecida (rede gerativa). */
+  morphology?: MorphologyNote[];
+}
+
+/** Uma leitura derivacional: raiz do léxico + regras aplicadas. */
+export interface MorphologyNote {
+  root: string;
+  rootId: string;
+  rules: string[];
+  pos: string;
+  semantics: string;
+  gloss: string;
+  status: 'ATTESTED' | 'HYPOTHESIS' | 'HYPOTHESIS_BLOCKED';
+  /** A raiz é lexema do domínio (ex.: "botãozinho" ← botão). */
+  domainRoot: boolean;
 }
 
 /**

@@ -212,7 +212,19 @@ export function PipelineInspector({ compile, execution, mutations }: Props) {
                     <tr key={i} className={`sev-${d.severity.toLowerCase()}`}>
                       <td>{d.severity}</td>
                       <td><code>{d.code}</code></td>
-                      <td>{d.message}</td>
+                      <td>
+                        {d.message}
+                        {d.morphology?.length ? (
+                          <ul className="morph-notes">
+                            {d.morphology.map((m, j) => (
+                              <li key={j}>
+                                <code>{m.semantics}</code> — {m.gloss} ({m.pos},{' '}
+                                {m.status === 'ATTESTED' ? 'atestada' : 'hipótese'})
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
+                      </td>
                       <td>{d.start !== undefined ? `${d.start}–${d.end ?? d.start}` : '—'}</td>
                       <td>{d.layer}</td>
                       <td>{d.candidates?.join(', ') ?? '—'}</td>
