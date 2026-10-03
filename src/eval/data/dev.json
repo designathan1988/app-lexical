@@ -3,75 +3,3680 @@
   "schemaVersion": "1.0.0",
   "description": "Conjunto de desenvolvimento. Usado para ajustar regras durante a implementacao.",
   "records": [
-    { "id": "dev-001", "input": "crie uma caixa", "expected": { "finalTree": "C_ENT_CONTAINER{}" }, "expectError": false, "tags": ["create"] },
-    { "id": "dev-002", "input": "criar uma caixa", "expected": { "finalTree": "C_ENT_CONTAINER{}" }, "expectError": false, "tags": ["create", "infinitive"] },
-    { "id": "dev-003", "input": "adicionar uma caixa", "expected": { "finalTree": "C_ENT_CONTAINER{}" }, "expectError": false, "tags": ["create", "synonym"] },
-    { "id": "dev-004", "input": "adicione um botão", "expected": { "finalTree": "C_ENT_BUTTON{}" }, "expectError": false, "tags": ["create", "synonym"] },
-    { "id": "dev-005", "input": "crie um botão", "expected": { "finalTree": "C_ENT_BUTTON{}" }, "expectError": false, "tags": ["create"] },
-    { "id": "dev-006", "input": "crie um texto", "expected": { "finalTree": "C_ENT_TEXT{}" }, "expectError": false, "tags": ["create", "text"] },
-    { "id": "dev-007", "input": "crie um botao", "expected": { "finalTree": "C_ENT_BUTTON{}" }, "expectError": false, "tags": ["create", "no-accent"] },
-    { "id": "dev-008", "input": "crie uma caixa azul", "expected": { "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#2563eb}" }, "expectError": false, "tags": ["create", "color"] },
-    { "id": "dev-009", "input": "crie uma caixa vermelha", "expected": { "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#dc2626}" }, "expectError": false, "tags": ["create", "color", "gender"] },
-    { "id": "dev-010", "input": "crie duas caixas", "expected": { "finalTree": "C_ENT_CONTAINER{}\nC_ENT_CONTAINER{}" }, "expectError": false, "tags": ["create", "quantity"] },
-    { "id": "dev-011", "input": "crie dois botões", "expected": { "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{}" }, "expectError": false, "tags": ["create", "quantity"] },
-    { "id": "dev-012", "input": "crie dois textos", "expected": { "finalTree": "C_ENT_TEXT{}\nC_ENT_TEXT{}" }, "expectError": false, "tags": ["create", "quantity"] },
-    { "id": "dev-013", "input": "crie um botão dentro de uma caixa", "expected": { "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}" }, "expectError": false, "tags": ["create", "containment"] },
-    { "id": "dev-014", "input": "crie uma caixa com um botão dentro", "expected": { "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}" }, "expectError": false, "tags": ["create", "containment"] },
-    { "id": "dev-015", "input": "crie uma caixa com dois botões dentro", "expected": { "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}\n  C_ENT_BUTTON{}" }, "expectError": false, "tags": ["create", "containment", "quantity"] },
-    { "id": "dev-016", "input": "crie um botão dentro de um texto", "expected": { "diagnostics": ["INVALID_CONTAINMENT"] }, "expectError": true, "expectNoMutation": true, "tags": ["constraint", "negative"] },
-    { "id": "dev-017", "input": "apague o botão", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "" }, "expectError": false, "tags": ["delete"] },
-    { "id": "dev-018", "input": "apague a caixa", "seed": [{ "entityConceptId": "C_ENT_CONTAINER" }], "expected": { "finalTree": "" }, "expectError": false, "tags": ["delete"] },
-    { "id": "dev-019", "input": "apague o texto", "seed": [{ "entityConceptId": "C_ENT_TEXT" }], "expected": { "finalTree": "" }, "expectError": false, "tags": ["delete"] },
-    { "id": "dev-020", "input": "apague o primeiro botão", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }, { "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "C_ENT_BUTTON{}" }, "expectError": false, "tags": ["delete", "ordinal"] },
-    { "id": "dev-021", "input": "apague o segundo botão", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }, { "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "C_ENT_BUTTON{}" }, "expectError": false, "tags": ["delete", "ordinal"] },
-    { "id": "dev-022", "input": "apague o último botão", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }, { "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "C_ENT_BUTTON{}" }, "expectError": false, "tags": ["delete", "ordinal", "last"] },
-    { "id": "dev-023", "input": "mude o botão para azul", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}" }, "expectError": false, "tags": ["update"] },
-    { "id": "dev-024", "input": "mude a caixa para verde", "seed": [{ "entityConceptId": "C_ENT_CONTAINER" }], "expected": { "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#16a34a}" }, "expectError": false, "tags": ["update"] },
-    { "id": "dev-025", "input": "deixe o texto azul", "seed": [{ "entityConceptId": "C_ENT_TEXT" }], "expected": { "finalTree": "C_ENT_TEXT{C_PROP_TEXT_COLOR=#2563eb}" }, "expectError": false, "tags": ["update", "text-color"] },
-    { "id": "dev-026", "input": "deixe a borda azul", "seed": [{ "entityConceptId": "C_ENT_CONTAINER" }], "selection": 0, "expected": { "finalTree": "C_ENT_CONTAINER{C_PROP_BORDER_COLOR=#2563eb}" }, "expectError": false, "tags": ["update", "border"] },
-    { "id": "dev-027", "input": "deixe a borda com 5px", "seed": [{ "entityConceptId": "C_ENT_CONTAINER" }], "selection": 0, "expected": { "finalTree": "C_ENT_CONTAINER{C_PROP_BORDER_WIDTH=5px}" }, "expectError": false, "tags": ["update", "border"] },
-    { "id": "dev-028", "input": "deixe a borda com 50%", "seed": [{ "entityConceptId": "C_ENT_CONTAINER" }], "selection": 0, "expected": { "finalTree": "C_ENT_CONTAINER{C_PROP_BORDER_WIDTH=50%}" }, "expectError": false, "tags": ["update", "border", "percent"] },
-    { "id": "dev-029", "input": "deixe o fundo azul", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }], "selection": 0, "expected": { "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}" }, "expectError": false, "tags": ["update", "explicit-property"] },
-    { "id": "dev-030", "input": "crie um botão sem borda", "expected": { "finalTree": "C_ENT_BUTTON{C_PROP_BORDER_STYLE=none}" }, "expectError": false, "tags": ["create", "negation"] },
-    { "id": "dev-031", "input": "não apague a caixa", "seed": [{ "entityConceptId": "C_ENT_CONTAINER" }], "expected": { "finalTree": "C_ENT_CONTAINER{}" }, "expectError": false, "expectNoMutation": true, "tags": ["negation"] },
-    { "id": "dev-032", "input": "não mova o botão", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "C_ENT_BUTTON{}" }, "expectError": false, "expectNoMutation": true, "tags": ["negation"] },
-    { "id": "dev-033", "input": "coloque o botão depois da caixa", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }, { "entityConceptId": "C_ENT_CONTAINER" }], "expected": { "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}" }, "expectError": false, "tags": ["move"] },
-    { "id": "dev-034", "input": "mova o botão para depois da caixa", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }, { "entityConceptId": "C_ENT_CONTAINER" }], "expected": { "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}" }, "expectError": false, "tags": ["move"] },
-    { "id": "dev-035", "input": "mova a caixa para antes do botão", "seed": [{ "entityConceptId": "C_ENT_CONTAINER" }, { "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}" }, "expectError": false, "tags": ["move", "before"] },
-    { "id": "dev-036", "input": "mova o botão para dentro da caixa", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }, { "entityConceptId": "C_ENT_CONTAINER" }], "expected": { "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}" }, "expectError": false, "tags": ["move", "containment"] },
-    { "id": "dev-037", "input": "crie uma caixa e um botão ao lado dela", "expected": { "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}" }, "expectError": false, "tags": ["create", "pronoun"] },
-    { "id": "dev-038", "input": "crie um botão e um texto", "expected": { "finalTree": "C_ENT_BUTTON{}\nC_ENT_TEXT{}" }, "expectError": false, "tags": ["create", "coordination"] },
-    { "id": "dev-039", "input": "crie uma caixa azul e um botão vermelho", "expected": { "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#2563eb}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}" }, "expectError": false, "tags": ["create", "coordination", "color"] },
-    { "id": "dev-040", "input": "deixe todos os botões azuis", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }, { "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}" }, "expectError": false, "tags": ["update", "quantity"] },
-    { "id": "dev-041", "input": "deixe todos os botões azuis menos o primeiro", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }, { "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}" }, "expectError": false, "tags": ["update", "exclusion"] },
-    { "id": "dev-042", "input": "apague o botão azul", "seed": [{ "entityConceptId": "C_ENT_BUTTON", "properties": { "C_PROP_BG_COLOR": "#2563eb" } }, { "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "C_ENT_BUTTON{}" }, "expectError": false, "tags": ["delete", "property-filter"] },
-    { "id": "dev-043", "input": "mude o botão \"Entrar\" para azul", "seed": [{ "entityConceptId": "C_ENT_BUTTON", "text": "Entrar" }], "expected": { "finalTree": "C_ENT_BUTTON\"Entrar\"{C_PROP_BG_COLOR=#2563eb}" }, "expectError": false, "tags": ["update", "text-ref"] },
-    { "id": "dev-044", "input": "mude o botão \"Sair\" para vermelho", "seed": [{ "entityConceptId": "C_ENT_BUTTON", "text": "Sair" }], "expected": { "finalTree": "C_ENT_BUTTON\"Sair\"{C_PROP_BG_COLOR=#dc2626}" }, "expectError": false, "tags": ["update", "text-ref"] },
-    { "id": "dev-045", "input": "apague o botão \"Sair\"", "seed": [{ "entityConceptId": "C_ENT_BUTTON", "text": "Sair" }, { "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "C_ENT_BUTTON{}" }, "expectError": false, "tags": ["delete", "text-ref"] },
-    { "id": "dev-046", "input": "crie um botão dentro da caixa", "seed": [{ "entityConceptId": "C_ENT_CONTAINER" }], "expected": { "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}" }, "expectError": false, "tags": ["create", "reference"] },
-    { "id": "dev-047", "input": "crie dois botões dentro da caixa", "seed": [{ "entityConceptId": "C_ENT_CONTAINER" }], "expected": { "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}\n  C_ENT_BUTTON{}" }, "expectError": false, "tags": ["create", "reference", "quantity"] },
-    { "id": "dev-048", "input": "crie um botão dentro da segunda caixa", "seed": [{ "entityConceptId": "C_ENT_CONTAINER" }, { "entityConceptId": "C_ENT_CONTAINER" }], "expected": { "finalTree": "C_ENT_CONTAINER{}\nC_ENT_CONTAINER{}\n  C_ENT_BUTTON{}" }, "expectError": false, "tags": ["create", "reference", "ordinal"] },
-    { "id": "dev-049", "input": "mova o botão de dentro da caixa para depois dela", "seed": [{ "entityConceptId": "C_ENT_CONTAINER", "children": [{ "entityConceptId": "C_ENT_BUTTON" }] }], "expected": { "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}" }, "expectError": false, "tags": ["move", "pronoun"] },
-    { "id": "dev-050", "input": "crie uma caixa dentro de outra caixa", "expected": { "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_CONTAINER{}" }, "expectError": false, "tags": ["create", "outro"] },
-    { "id": "dev-051", "input": "deixe a borda do botão com 4px", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "C_ENT_BUTTON{C_PROP_BORDER_WIDTH=4px}" }, "expectError": false, "tags": ["update", "border", "target"] },
-    { "id": "dev-052", "input": "crie um botão azul sem borda", "expected": { "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb,C_PROP_BORDER_STYLE=none}" }, "expectError": false, "tags": ["create", "negation", "color"] },
-    { "id": "dev-053", "input": "crie um botão com texto \"Ok\"", "expected": { "finalTree": "C_ENT_BUTTON\"Ok\"{}" }, "expectError": false, "tags": ["create", "text"] },
-    { "id": "dev-054", "input": "crie uma caixa com texto \"Olá\"", "expected": { "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_TEXT\"Olá\"{}" }, "expectError": false, "tags": ["create", "text", "child"] },
-    { "id": "dev-055", "input": "mude o texto do botão \"Entrar\" para \"Sair\"", "seed": [{ "entityConceptId": "C_ENT_BUTTON", "text": "Entrar" }], "expected": { "finalTree": "C_ENT_BUTTON\"Sair\"{}" }, "expectError": false, "tags": ["update", "text"] },
-    { "id": "dev-056", "input": "crie um botão com fundo azul e borda vermelha", "expected": { "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb,C_PROP_BORDER_COLOR=#dc2626}" }, "expectError": false, "tags": ["create", "coordination"] },
-    { "id": "dev-057", "input": "crie uma caixa azul e redonda", "expected": { "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#2563eb,C_PROP_BORDER_RADIUS=50%}" }, "expectError": false, "tags": ["create", "coordination"] },
-    { "id": "dev-058", "input": "deixe o botão vermelho com borda azul de 3px", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626,C_PROP_BORDER_COLOR=#2563eb,C_PROP_BORDER_WIDTH=3px}" }, "expectError": false, "tags": ["update", "multi-property"] },
-    { "id": "dev-059", "input": "crie um botão e não apague a caixa", "seed": [{ "entityConceptId": "C_ENT_CONTAINER" }], "expected": { "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}" }, "expectError": false, "tags": ["negation", "coordination"] },
-    { "id": "dev-060", "input": "selecione o segundo botão", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }, { "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{}" }, "expectError": false, "tags": ["query"] },
-    { "id": "dev-061", "input": "crie um botão vermelo", "expected": { "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}" }, "expectError": false, "tags": ["typo"] },
-    { "id": "dev-062", "input": "crie um botão rosa", "expected": { "diagnostics": ["UNKNOWN_WORD"] }, "expectError": true, "expectNoMutation": true, "tags": ["unknown", "negative"] },
-    { "id": "dev-063", "input": "apaga o botão", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }], "expected": { "finalTree": "" }, "expectError": false, "tags": ["inflection"] },
-    { "id": "dev-064", "input": "apague todos", "seed": [{ "entityConceptId": "C_ENT_CONTAINER" }, { "entityConceptId": "C_ENT_BUTTON" }], "expected": { "diagnostics": ["INCOMPLETE_REFERENCE"] }, "expectError": true, "expectNoMutation": true, "tags": ["ellipsis", "negative"] },
-    { "id": "dev-065", "input": "apague os dois últimos botões", "discourse": ["crie cinco botões"], "expected": { "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{}\nC_ENT_BUTTON{}" }, "expectError": false, "tags": ["ordinal", "from-end"] },
-    { "id": "dev-066", "input": "mude o fundo do botão para 2px", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }], "expected": { "diagnostics": ["INVALID_VALUE_CATEGORY"] }, "expectError": true, "expectNoMutation": true, "tags": ["diagnostic", "negative"] },
-    { "id": "dev-067", "input": "crie um botão 2px", "expected": { "diagnostics": ["INVALID_PROPERTY"] }, "expectError": true, "expectNoMutation": true, "tags": ["diagnostic", "negative"] },
-    { "id": "dev-068", "input": "apague o botão", "seed": [{ "entityConceptId": "C_ENT_BUTTON" }, { "entityConceptId": "C_ENT_BUTTON" }], "expected": { "diagnostics": ["AMBIGUOUS_REFERENCE"] }, "expectError": true, "expectNoMutation": true, "tags": ["ambiguity", "negative"] },
-    { "id": "dev-069", "input": "mova a primeira caixa para dentro da segunda caixa", "seed": [{ "entityConceptId": "C_ENT_CONTAINER", "children": [{ "entityConceptId": "C_ENT_CONTAINER" }] }], "expected": { "diagnostics": ["INVALID_CONTAINMENT"] }, "expectError": true, "expectNoMutation": true, "tags": ["cycle", "negative"] },
-    { "id": "dev-070", "input": "deixe o segundo azul", "discourse": ["crie uma caixa", "crie dois botões dentro dela"], "expected": { "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}" }, "expectError": false, "tags": ["ellipsis", "discourse"] }
+    {
+      "id": "dev-001",
+      "input": "crie uma caixa",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_CONTAINER]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_CONTAINER",
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create"
+      ]
+    },
+    {
+      "id": "dev-002",
+      "input": "criar uma caixa",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_CONTAINER]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_CONTAINER",
+        "readings": [
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "infinitive"
+      ]
+    },
+    {
+      "id": "dev-003",
+      "input": "adicionar uma caixa",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_CONTAINER]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_CONTAINER",
+        "readings": [
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "synonym"
+      ]
+    },
+    {
+      "id": "dev-004",
+      "input": "adicione um botão",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_BUTTON",
+        "readings": [
+          {
+            "surface": "adicione",
+            "lemma": "adicionar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "adicione",
+            "lexemeId": "LEX_ADICIONAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "synonym"
+      ]
+    },
+    {
+      "id": "dev-005",
+      "input": "crie um botão",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_BUTTON",
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create"
+      ]
+    },
+    {
+      "id": "dev-006",
+      "input": "crie um texto",
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_TEXT]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_TEXT",
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "texto",
+            "lemma": "texto",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "texto",
+            "lexemeId": "LEX_TEXTO",
+            "conceptId": "C_ENT_TEXT"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "text"
+      ]
+    },
+    {
+      "id": "dev-007",
+      "input": "crie um botao",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_BUTTON",
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botao",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "botao",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "no-accent"
+      ]
+    },
+    {
+      "id": "dev-008",
+      "input": "crie uma caixa azul",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#2563eb}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_CONTAINER set(C_PROP_BG_COLOR,COLOR:#2563eb)]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_CONTAINER\nSET_PROPERTY temp:tmp_1 C_PROP_BG_COLOR #2563eb",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BG_COLOR",
+            "#2563eb"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "azul",
+            "lemma": "azul",
+            "feats": "Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "color"
+      ]
+    },
+    {
+      "id": "dev-009",
+      "input": "crie uma caixa vermelha",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#dc2626}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_CONTAINER set(C_PROP_BG_COLOR,COLOR:#dc2626)]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_CONTAINER\nSET_PROPERTY temp:tmp_1 C_PROP_BG_COLOR #dc2626",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BG_COLOR",
+            "#dc2626"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "vermelha",
+            "lemma": "vermelho",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          },
+          {
+            "surface": "vermelha",
+            "lexemeId": "LEX_VERMELHO",
+            "conceptId": "C_VAL_RED"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "color",
+        "gender"
+      ]
+    },
+    {
+      "id": "dev-010",
+      "input": "crie duas caixas",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_CONTAINER{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_CONTAINER x2]",
+        "plan": "CREATE_NODE tmp_1_1 C_ENT_CONTAINER\nCREATE_NODE tmp_1_2 C_ENT_CONTAINER",
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "duas",
+            "lemma": "dois",
+            "feats": "Gender=Fem|Number=Plur"
+          },
+          {
+            "surface": "caixas",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Plur"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "duas",
+            "lexemeId": "LEX_CARD_2",
+            "conceptId": "C_CARD_2"
+          },
+          {
+            "surface": "caixas",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "quantity"
+      ]
+    },
+    {
+      "id": "dev-011",
+      "input": "crie dois botões",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON x2]",
+        "plan": "CREATE_NODE tmp_1_1 C_ENT_BUTTON\nCREATE_NODE tmp_1_2 C_ENT_BUTTON",
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "dois",
+            "lemma": "dois",
+            "feats": "Gender=Masc|Number=Plur"
+          },
+          {
+            "surface": "botões",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Plur"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "dois",
+            "lexemeId": "LEX_CARD_2",
+            "conceptId": "C_CARD_2"
+          },
+          {
+            "surface": "botões",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "quantity"
+      ]
+    },
+    {
+      "id": "dev-012",
+      "input": "crie dois textos",
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}\nC_ENT_TEXT{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_TEXT x2]",
+        "plan": "CREATE_NODE tmp_1_1 C_ENT_TEXT\nCREATE_NODE tmp_1_2 C_ENT_TEXT",
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "dois",
+            "lemma": "dois",
+            "feats": "Gender=Masc|Number=Plur"
+          },
+          {
+            "surface": "textos",
+            "lemma": "texto",
+            "feats": "Gender=Masc|Number=Plur"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "dois",
+            "lexemeId": "LEX_CARD_2",
+            "conceptId": "C_CARD_2"
+          },
+          {
+            "surface": "textos",
+            "lexemeId": "LEX_TEXTO",
+            "conceptId": "C_ENT_TEXT"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "quantity"
+      ]
+    },
+    {
+      "id": "dev-013",
+      "input": "crie um botão dentro de uma caixa",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON | CREATE tmp_2 C_ENT_CONTAINER] PLACE new:tmp_1 C_SPAT_INSIDE new:tmp_2",
+        "plan": "CREATE_NODE tmp_1 C_ENT_BUTTON\nCREATE_NODE tmp_2 C_ENT_CONTAINER\nPLACE_NODE temp:tmp_1 C_SPAT_INSIDE temp:tmp_2",
+        "attachments": [
+          [
+            "@1",
+            "C_SPAT_INSIDE",
+            "@0"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "containment"
+      ]
+    },
+    {
+      "id": "dev-014",
+      "input": "crie uma caixa com um botão dentro",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_CONTAINER | CREATE tmp_2 C_ENT_BUTTON] PLACE new:tmp_2 C_SPAT_INSIDE new:tmp_1",
+        "plan": "CREATE_NODE tmp_1 C_ENT_CONTAINER\nCREATE_NODE tmp_2 C_ENT_BUTTON\nPLACE_NODE temp:tmp_2 C_SPAT_INSIDE temp:tmp_1",
+        "attachments": [
+          [
+            "@1",
+            "C_SPAT_INSIDE",
+            "@0"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "containment"
+      ]
+    },
+    {
+      "id": "dev-015",
+      "input": "crie uma caixa com dois botões dentro",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}\n  C_ENT_BUTTON{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_CONTAINER | CREATE tmp_2 C_ENT_BUTTON x2] PLACE new:tmp_2 C_SPAT_INSIDE new:tmp_1",
+        "plan": "CREATE_NODE tmp_1 C_ENT_CONTAINER\nCREATE_NODE tmp_2_1 C_ENT_BUTTON\nCREATE_NODE tmp_2_2 C_ENT_BUTTON\nPLACE_NODE temp:tmp_2_1 C_SPAT_INSIDE temp:tmp_1\nPLACE_NODE temp:tmp_2_2 C_SPAT_INSIDE temp:tmp_1",
+        "attachments": [
+          [
+            "@1",
+            "C_SPAT_INSIDE",
+            "@0"
+          ],
+          [
+            "@2",
+            "C_SPAT_INSIDE",
+            "@0"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "dois",
+            "lemma": "dois",
+            "feats": "Gender=Masc|Number=Plur"
+          },
+          {
+            "surface": "botões",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Plur"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          },
+          {
+            "surface": "dois",
+            "lexemeId": "LEX_CARD_2",
+            "conceptId": "C_CARD_2"
+          },
+          {
+            "surface": "botões",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "containment",
+        "quantity"
+      ]
+    },
+    {
+      "id": "dev-016",
+      "input": "crie um botão dentro de um texto",
+      "expected": {
+        "diagnostics": [
+          "INVALID_CONTAINMENT"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "constraint",
+        "negative"
+      ]
+    },
+    {
+      "id": "dev-017",
+      "input": "apague o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "",
+        "ast": "DELETE sel:C_ENT_BUTTON",
+        "plan": "DELETE_NODE node_1",
+        "resolvedReferences": [
+          0
+        ],
+        "readings": [
+          {
+            "surface": "apague",
+            "lemma": "apagar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "apague",
+            "lexemeId": "LEX_APAGAR",
+            "conceptId": "C_ACT_DELETE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "delete"
+      ]
+    },
+    {
+      "id": "dev-018",
+      "input": "apague a caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "",
+        "ast": "DELETE sel:C_ENT_CONTAINER",
+        "plan": "DELETE_NODE node_1",
+        "resolvedReferences": [
+          0
+        ],
+        "readings": [
+          {
+            "surface": "apague",
+            "lemma": "apagar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "apague",
+            "lexemeId": "LEX_APAGAR",
+            "conceptId": "C_ACT_DELETE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "delete"
+      ]
+    },
+    {
+      "id": "dev-019",
+      "input": "apague o texto",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expected": {
+        "finalTree": "",
+        "ast": "DELETE sel:C_ENT_TEXT",
+        "plan": "DELETE_NODE node_1",
+        "resolvedReferences": [
+          0
+        ],
+        "readings": [
+          {
+            "surface": "apague",
+            "lemma": "apagar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "texto",
+            "lemma": "texto",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "apague",
+            "lexemeId": "LEX_APAGAR",
+            "conceptId": "C_ACT_DELETE"
+          },
+          {
+            "surface": "texto",
+            "lexemeId": "LEX_TEXTO",
+            "conceptId": "C_ENT_TEXT"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "delete"
+      ]
+    },
+    {
+      "id": "dev-020",
+      "input": "apague o primeiro botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}",
+        "ast": "DELETE sel:C_ENT_BUTTON;ord=0",
+        "plan": "DELETE_NODE node_1",
+        "resolvedReferences": [
+          0
+        ],
+        "readings": [
+          {
+            "surface": "apague",
+            "lemma": "apagar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "primeiro",
+            "lemma": "primeiro",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "apague",
+            "lexemeId": "LEX_APAGAR",
+            "conceptId": "C_ACT_DELETE"
+          },
+          {
+            "surface": "primeiro",
+            "lexemeId": "LEX_ORD_1",
+            "conceptId": "C_ORD_1"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "delete",
+        "ordinal"
+      ]
+    },
+    {
+      "id": "dev-021",
+      "input": "apague o segundo botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}",
+        "ast": "DELETE sel:C_ENT_BUTTON;ord=1",
+        "plan": "DELETE_NODE node_2",
+        "resolvedReferences": [
+          1
+        ],
+        "readings": [
+          {
+            "surface": "apague",
+            "lemma": "apagar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "segundo",
+            "lemma": "segundo",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "apague",
+            "lexemeId": "LEX_APAGAR",
+            "conceptId": "C_ACT_DELETE"
+          },
+          {
+            "surface": "segundo",
+            "lexemeId": "LEX_ORD_2",
+            "conceptId": "C_ORD_2"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "delete",
+        "ordinal"
+      ]
+    },
+    {
+      "id": "dev-022",
+      "input": "apague o último botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}",
+        "ast": "DELETE sel:C_ENT_BUTTON;ord=-1",
+        "plan": "DELETE_NODE node_2",
+        "resolvedReferences": [
+          1
+        ],
+        "readings": [
+          {
+            "surface": "apague",
+            "lemma": "apagar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "último",
+            "lemma": "último",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "apague",
+            "lexemeId": "LEX_APAGAR",
+            "conceptId": "C_ACT_DELETE"
+          },
+          {
+            "surface": "último",
+            "lexemeId": "LEX_ORD_LAST",
+            "conceptId": "C_ORD_LAST"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "delete",
+        "ordinal",
+        "last"
+      ]
+    },
+    {
+      "id": "dev-023",
+      "input": "mude o botão para azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}",
+        "ast": "UPDATE sel:C_ENT_BUTTON set(C_PROP_BG_COLOR,COLOR:#2563eb)",
+        "plan": "SET_PROPERTY node:node_1 C_PROP_BG_COLOR #2563eb",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BG_COLOR",
+            "#2563eb"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "mude",
+            "lemma": "mudar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "azul",
+            "lemma": "azul",
+            "feats": "Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "mude",
+            "lexemeId": "LEX_MUDAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "update"
+      ]
+    },
+    {
+      "id": "dev-024",
+      "input": "mude a caixa para verde",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#16a34a}",
+        "ast": "UPDATE sel:C_ENT_CONTAINER set(C_PROP_BG_COLOR,COLOR:#16a34a)",
+        "plan": "SET_PROPERTY node:node_1 C_PROP_BG_COLOR #16a34a",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BG_COLOR",
+            "#16a34a"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "mude",
+            "lemma": "mudar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "verde",
+            "lemma": "verde",
+            "feats": "Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "mude",
+            "lexemeId": "LEX_MUDAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          },
+          {
+            "surface": "verde",
+            "lexemeId": "LEX_VERDE",
+            "conceptId": "C_VAL_GREEN"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "update"
+      ]
+    },
+    {
+      "id": "dev-025",
+      "input": "deixe o texto azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_TEXT{C_PROP_TEXT_COLOR=#2563eb}",
+        "ast": "UPDATE sel:C_ENT_TEXT set(C_PROP_TEXT_COLOR,COLOR:#2563eb)",
+        "plan": "SET_PROPERTY node:node_1 C_PROP_TEXT_COLOR #2563eb",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_TEXT_COLOR",
+            "#2563eb"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "deixe",
+            "lemma": "deixar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "texto",
+            "lemma": "texto",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "azul",
+            "lemma": "azul",
+            "feats": "Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "deixe",
+            "lexemeId": "LEX_DEIXAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "texto",
+            "lexemeId": "LEX_TEXTO",
+            "conceptId": "C_ENT_TEXT"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "text-color"
+      ]
+    },
+    {
+      "id": "dev-026",
+      "input": "deixe a borda azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "selection": 0,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BORDER_COLOR=#2563eb}",
+        "ast": "UPDATE selection set(C_PROP_BORDER_COLOR,COLOR:#2563eb)",
+        "plan": "SET_PROPERTY node:node_1 C_PROP_BORDER_COLOR #2563eb",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BORDER_COLOR",
+            "#2563eb"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "deixe",
+            "lemma": "deixar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "borda",
+            "lemma": "borda",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "azul",
+            "lemma": "azul",
+            "feats": "Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "deixe",
+            "lexemeId": "LEX_DEIXAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "borda",
+            "lexemeId": "LEX_BORDA",
+            "conceptId": "C_PROP_GROUP_BORDER"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "border"
+      ]
+    },
+    {
+      "id": "dev-027",
+      "input": "deixe a borda com 5px",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "selection": 0,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BORDER_WIDTH=5px}",
+        "ast": "UPDATE selection set(C_PROP_BORDER_WIDTH,SIZE:5px)",
+        "plan": "SET_PROPERTY node:node_1 C_PROP_BORDER_WIDTH 5px",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BORDER_WIDTH",
+            "5px"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "deixe",
+            "lemma": "deixar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "borda",
+            "lemma": "borda",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "deixe",
+            "lexemeId": "LEX_DEIXAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "borda",
+            "lexemeId": "LEX_BORDA",
+            "conceptId": "C_PROP_GROUP_BORDER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "border"
+      ]
+    },
+    {
+      "id": "dev-028",
+      "input": "deixe a borda com 50%",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "selection": 0,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BORDER_WIDTH=50%}",
+        "ast": "UPDATE selection set(C_PROP_BORDER_WIDTH,SIZE:50%)",
+        "plan": "SET_PROPERTY node:node_1 C_PROP_BORDER_WIDTH 50%",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BORDER_WIDTH",
+            "50%"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "deixe",
+            "lemma": "deixar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "borda",
+            "lemma": "borda",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "deixe",
+            "lexemeId": "LEX_DEIXAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "borda",
+            "lexemeId": "LEX_BORDA",
+            "conceptId": "C_PROP_GROUP_BORDER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "border",
+        "percent"
+      ]
+    },
+    {
+      "id": "dev-029",
+      "input": "deixe o fundo azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "selection": 0,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}",
+        "ast": "UPDATE selection set(C_PROP_BG_COLOR,COLOR:#2563eb)",
+        "plan": "SET_PROPERTY node:node_1 C_PROP_BG_COLOR #2563eb",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BG_COLOR",
+            "#2563eb"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "deixe",
+            "lemma": "deixar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "fundo",
+            "lemma": "fundo",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "azul",
+            "lemma": "azul",
+            "feats": "Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "deixe",
+            "lexemeId": "LEX_DEIXAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "fundo",
+            "lexemeId": "LEX_FUNDO",
+            "conceptId": "C_PROP_BG_COLOR"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "explicit-property"
+      ]
+    },
+    {
+      "id": "dev-030",
+      "input": "crie um botão sem borda",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BORDER_STYLE=none}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON clear(C_PROP_GROUP_BORDER)]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_BUTTON\nCLEAR_PROPERTY temp:tmp_1 C_PROP_BORDER_COLOR\nCLEAR_PROPERTY temp:tmp_1 C_PROP_BORDER_WIDTH\nCLEAR_PROPERTY temp:tmp_1 C_PROP_BORDER_STYLE",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BORDER_STYLE",
+            "none"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "borda",
+            "lemma": "borda",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "borda",
+            "lexemeId": "LEX_BORDA",
+            "conceptId": "C_PROP_GROUP_BORDER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "negation"
+      ]
+    },
+    {
+      "id": "dev-031",
+      "input": "não apague a caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}",
+        "ast": "NO_OP",
+        "plan": "",
+        "readings": [
+          {
+            "surface": "apague",
+            "lemma": "apagar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "apague",
+            "lexemeId": "LEX_APAGAR",
+            "conceptId": "C_ACT_DELETE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "expectNoMutation": true,
+      "tags": [
+        "negation"
+      ]
+    },
+    {
+      "id": "dev-032",
+      "input": "não mova o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}",
+        "ast": "NO_OP",
+        "plan": "",
+        "readings": [
+          {
+            "surface": "mova",
+            "lemma": "mover",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "mova",
+            "lexemeId": "LEX_MOVER",
+            "conceptId": "C_ACT_MOVE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "expectNoMutation": true,
+      "tags": [
+        "negation"
+      ]
+    },
+    {
+      "id": "dev-033",
+      "input": "coloque o botão depois da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}",
+        "ast": "MOVE sel:C_ENT_BUTTON C_SPAT_AFTER sel:C_ENT_CONTAINER",
+        "plan": "MOVE_NODE node_1 C_SPAT_AFTER node:node_2",
+        "resolvedReferences": [
+          0
+        ],
+        "readings": [
+          {
+            "surface": "coloque",
+            "lemma": "colocar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "coloque",
+            "lexemeId": "LEX_COLOCAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "move"
+      ]
+    },
+    {
+      "id": "dev-034",
+      "input": "mova o botão para depois da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}",
+        "ast": "MOVE sel:C_ENT_BUTTON C_SPAT_AFTER sel:C_ENT_CONTAINER",
+        "plan": "MOVE_NODE node_1 C_SPAT_AFTER node:node_2",
+        "resolvedReferences": [
+          0
+        ],
+        "readings": [
+          {
+            "surface": "mova",
+            "lemma": "mover",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "mova",
+            "lexemeId": "LEX_MOVER",
+            "conceptId": "C_ACT_MOVE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "move"
+      ]
+    },
+    {
+      "id": "dev-035",
+      "input": "mova a caixa para antes do botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}",
+        "ast": "MOVE sel:C_ENT_CONTAINER C_SPAT_BEFORE sel:C_ENT_BUTTON",
+        "plan": "MOVE_NODE node_1 C_SPAT_BEFORE node:node_2",
+        "resolvedReferences": [
+          0
+        ],
+        "readings": [
+          {
+            "surface": "mova",
+            "lemma": "mover",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "mova",
+            "lexemeId": "LEX_MOVER",
+            "conceptId": "C_ACT_MOVE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "move",
+        "before"
+      ]
+    },
+    {
+      "id": "dev-036",
+      "input": "mova o botão para dentro da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}",
+        "ast": "MOVE sel:C_ENT_BUTTON C_SPAT_INSIDE sel:C_ENT_CONTAINER",
+        "plan": "MOVE_NODE node_1 C_SPAT_INSIDE node:node_2",
+        "attachments": [
+          [
+            "@1",
+            "C_SPAT_INSIDE",
+            "@0"
+          ]
+        ],
+        "resolvedReferences": [
+          0
+        ],
+        "readings": [
+          {
+            "surface": "mova",
+            "lemma": "mover",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "mova",
+            "lexemeId": "LEX_MOVER",
+            "conceptId": "C_ACT_MOVE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "move",
+        "containment"
+      ]
+    },
+    {
+      "id": "dev-037",
+      "input": "crie uma caixa e um botão ao lado dela",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_CONTAINER | CREATE tmp_2 C_ENT_BUTTON] PLACE new:tmp_2 C_SPAT_BESIDE new:tmp_1",
+        "plan": "CREATE_NODE tmp_1 C_ENT_CONTAINER\nCREATE_NODE tmp_2 C_ENT_BUTTON\nPLACE_NODE temp:tmp_2 C_SPAT_BESIDE temp:tmp_1",
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "dev-038",
+      "input": "crie um botão e um texto",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_TEXT{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON | CREATE tmp_2 C_ENT_TEXT]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_BUTTON\nCREATE_NODE tmp_2 C_ENT_TEXT",
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "texto",
+            "lemma": "texto",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "texto",
+            "lexemeId": "LEX_TEXTO",
+            "conceptId": "C_ENT_TEXT"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "coordination"
+      ]
+    },
+    {
+      "id": "dev-039",
+      "input": "crie uma caixa azul e um botão vermelho",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#2563eb}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_CONTAINER set(C_PROP_BG_COLOR,COLOR:#2563eb) | CREATE tmp_2 C_ENT_BUTTON set(C_PROP_BG_COLOR,COLOR:#dc2626)]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_CONTAINER\nSET_PROPERTY temp:tmp_1 C_PROP_BG_COLOR #2563eb\nCREATE_NODE tmp_2 C_ENT_BUTTON\nSET_PROPERTY temp:tmp_2 C_PROP_BG_COLOR #dc2626",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BG_COLOR",
+            "#2563eb"
+          ],
+          [
+            "@1",
+            "C_PROP_BG_COLOR",
+            "#dc2626"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "azul",
+            "lemma": "azul",
+            "feats": "Number=Sing"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "vermelho",
+            "lemma": "vermelho",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "vermelho",
+            "lexemeId": "LEX_VERMELHO",
+            "conceptId": "C_VAL_RED"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "coordination",
+        "color"
+      ]
+    },
+    {
+      "id": "dev-040",
+      "input": "deixe todos os botões azuis",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}",
+        "ast": "UPDATE sel:C_ENT_BUTTON;all set(C_PROP_BG_COLOR,COLOR:#2563eb)",
+        "plan": "SET_PROPERTY node:node_1 C_PROP_BG_COLOR #2563eb\nSET_PROPERTY node:node_2 C_PROP_BG_COLOR #2563eb",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BG_COLOR",
+            "#2563eb"
+          ],
+          [
+            "@1",
+            "C_PROP_BG_COLOR",
+            "#2563eb"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "deixe",
+            "lemma": "deixar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botões",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Plur"
+          },
+          {
+            "surface": "azuis",
+            "lemma": "azul",
+            "feats": "Number=Plur"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "deixe",
+            "lexemeId": "LEX_DEIXAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "botões",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "azuis",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "quantity"
+      ]
+    },
+    {
+      "id": "dev-041",
+      "input": "deixe todos os botões azuis menos o primeiro",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}",
+        "ast": "UPDATE sel:C_ENT_BUTTON;all;minus[C_ENT_BUTTON;ord=0] set(C_PROP_BG_COLOR,COLOR:#2563eb)",
+        "plan": "SET_PROPERTY node:node_2 C_PROP_BG_COLOR #2563eb",
+        "bindings": [
+          [
+            "@1",
+            "C_PROP_BG_COLOR",
+            "#2563eb"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "deixe",
+            "lemma": "deixar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botões",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Plur"
+          },
+          {
+            "surface": "azuis",
+            "lemma": "azul",
+            "feats": "Number=Plur"
+          },
+          {
+            "surface": "primeiro",
+            "lemma": "primeiro",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "deixe",
+            "lexemeId": "LEX_DEIXAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "botões",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "azuis",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          },
+          {
+            "surface": "primeiro",
+            "lexemeId": "LEX_ORD_1",
+            "conceptId": "C_ORD_1"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "exclusion"
+      ]
+    },
+    {
+      "id": "dev-042",
+      "input": "apague o botão azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "properties": {
+            "C_PROP_BG_COLOR": "#2563eb"
+          }
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}",
+        "ast": "DELETE sel:C_ENT_BUTTON;prop[C_PROP_BG_COLOR=#2563eb]",
+        "plan": "DELETE_NODE node_1",
+        "resolvedReferences": [
+          0
+        ],
+        "readings": [
+          {
+            "surface": "apague",
+            "lemma": "apagar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "azul",
+            "lemma": "azul",
+            "feats": "Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "apague",
+            "lexemeId": "LEX_APAGAR",
+            "conceptId": "C_ACT_DELETE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "delete",
+        "property-filter"
+      ]
+    },
+    {
+      "id": "dev-043",
+      "input": "mude o botão \"Entrar\" para azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "text": "Entrar"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON\"Entrar\"{C_PROP_BG_COLOR=#2563eb}",
+        "ast": "UPDATE sel:C_ENT_BUTTON;text=\"Entrar\" set(C_PROP_BG_COLOR,COLOR:#2563eb)",
+        "plan": "SET_PROPERTY node:node_1 C_PROP_BG_COLOR #2563eb",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BG_COLOR",
+            "#2563eb"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "mude",
+            "lemma": "mudar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "azul",
+            "lemma": "azul",
+            "feats": "Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "mude",
+            "lexemeId": "LEX_MUDAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "text-ref"
+      ]
+    },
+    {
+      "id": "dev-044",
+      "input": "mude o botão \"Sair\" para vermelho",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "text": "Sair"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON\"Sair\"{C_PROP_BG_COLOR=#dc2626}",
+        "ast": "UPDATE sel:C_ENT_BUTTON;text=\"Sair\" set(C_PROP_BG_COLOR,COLOR:#dc2626)",
+        "plan": "SET_PROPERTY node:node_1 C_PROP_BG_COLOR #dc2626",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BG_COLOR",
+            "#dc2626"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "mude",
+            "lemma": "mudar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "vermelho",
+            "lemma": "vermelho",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "mude",
+            "lexemeId": "LEX_MUDAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "vermelho",
+            "lexemeId": "LEX_VERMELHO",
+            "conceptId": "C_VAL_RED"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "text-ref"
+      ]
+    },
+    {
+      "id": "dev-045",
+      "input": "apague o botão \"Sair\"",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "text": "Sair"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}",
+        "ast": "DELETE sel:C_ENT_BUTTON;text=\"Sair\"",
+        "plan": "DELETE_NODE node_1",
+        "resolvedReferences": [
+          0
+        ],
+        "readings": [
+          {
+            "surface": "apague",
+            "lemma": "apagar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "apague",
+            "lexemeId": "LEX_APAGAR",
+            "conceptId": "C_ACT_DELETE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "delete",
+        "text-ref"
+      ]
+    },
+    {
+      "id": "dev-046",
+      "input": "crie um botão dentro da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON] PLACE new:tmp_1 C_SPAT_INSIDE sel:C_ENT_CONTAINER",
+        "plan": "CREATE_NODE tmp_1 C_ENT_BUTTON\nPLACE_NODE temp:tmp_1 C_SPAT_INSIDE node:node_1",
+        "attachments": [
+          [
+            "@1",
+            "C_SPAT_INSIDE",
+            "@0"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "reference"
+      ]
+    },
+    {
+      "id": "dev-047",
+      "input": "crie dois botões dentro da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}\n  C_ENT_BUTTON{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON x2] PLACE new:tmp_1 C_SPAT_INSIDE sel:C_ENT_CONTAINER",
+        "plan": "CREATE_NODE tmp_1_1 C_ENT_BUTTON\nCREATE_NODE tmp_1_2 C_ENT_BUTTON\nPLACE_NODE temp:tmp_1_1 C_SPAT_INSIDE node:node_1\nPLACE_NODE temp:tmp_1_2 C_SPAT_INSIDE node:node_1",
+        "attachments": [
+          [
+            "@1",
+            "C_SPAT_INSIDE",
+            "@0"
+          ],
+          [
+            "@2",
+            "C_SPAT_INSIDE",
+            "@0"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "dois",
+            "lemma": "dois",
+            "feats": "Gender=Masc|Number=Plur"
+          },
+          {
+            "surface": "botões",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Plur"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "dois",
+            "lexemeId": "LEX_CARD_2",
+            "conceptId": "C_CARD_2"
+          },
+          {
+            "surface": "botões",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "reference",
+        "quantity"
+      ]
+    },
+    {
+      "id": "dev-048",
+      "input": "crie um botão dentro da segunda caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_CONTAINER{}\n  C_ENT_BUTTON{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON] PLACE new:tmp_1 C_SPAT_INSIDE sel:C_ENT_CONTAINER;ord=1",
+        "plan": "CREATE_NODE tmp_1 C_ENT_BUTTON\nPLACE_NODE temp:tmp_1 C_SPAT_INSIDE node:node_2",
+        "attachments": [
+          [
+            "@2",
+            "C_SPAT_INSIDE",
+            "@1"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "segunda",
+            "lemma": "segundo",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "segunda",
+            "lexemeId": "LEX_ORD_2",
+            "conceptId": "C_ORD_2"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "reference",
+        "ordinal"
+      ]
+    },
+    {
+      "id": "dev-049",
+      "input": "mova o botão de dentro da caixa para depois dela",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "children": [
+            {
+              "entityConceptId": "C_ENT_BUTTON"
+            }
+          ]
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}",
+        "ast": "MOVE sel:C_ENT_BUTTON;parent[C_ENT_CONTAINER] C_SPAT_AFTER sel:C_ENT_CONTAINER",
+        "plan": "MOVE_NODE node_2 C_SPAT_AFTER node:node_1",
+        "resolvedReferences": [
+          1
+        ],
+        "readings": [
+          {
+            "surface": "mova",
+            "lemma": "mover",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "mova",
+            "lexemeId": "LEX_MOVER",
+            "conceptId": "C_ACT_MOVE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "move",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "dev-050",
+      "input": "crie uma caixa dentro de outra caixa",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_CONTAINER{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_CONTAINER | CREATE tmp_2 C_ENT_CONTAINER] PLACE new:tmp_1 C_SPAT_INSIDE new:tmp_2",
+        "plan": "CREATE_NODE tmp_1 C_ENT_CONTAINER\nCREATE_NODE tmp_2 C_ENT_CONTAINER\nPLACE_NODE temp:tmp_1 C_SPAT_INSIDE temp:tmp_2",
+        "attachments": [
+          [
+            "@1",
+            "C_SPAT_INSIDE",
+            "@0"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "outro"
+      ]
+    },
+    {
+      "id": "dev-051",
+      "input": "deixe a borda do botão com 4px",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BORDER_WIDTH=4px}",
+        "ast": "UPDATE sel:C_ENT_BUTTON set(C_PROP_BORDER_WIDTH,SIZE:4px)",
+        "plan": "SET_PROPERTY node:node_1 C_PROP_BORDER_WIDTH 4px",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BORDER_WIDTH",
+            "4px"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "deixe",
+            "lemma": "deixar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "borda",
+            "lemma": "borda",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "deixe",
+            "lexemeId": "LEX_DEIXAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "borda",
+            "lexemeId": "LEX_BORDA",
+            "conceptId": "C_PROP_GROUP_BORDER"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "border",
+        "target"
+      ]
+    },
+    {
+      "id": "dev-052",
+      "input": "crie um botão azul sem borda",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb,C_PROP_BORDER_STYLE=none}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON set(C_PROP_BG_COLOR,COLOR:#2563eb) clear(C_PROP_GROUP_BORDER)]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_BUTTON\nSET_PROPERTY temp:tmp_1 C_PROP_BG_COLOR #2563eb\nCLEAR_PROPERTY temp:tmp_1 C_PROP_BORDER_COLOR\nCLEAR_PROPERTY temp:tmp_1 C_PROP_BORDER_WIDTH\nCLEAR_PROPERTY temp:tmp_1 C_PROP_BORDER_STYLE",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BG_COLOR",
+            "#2563eb"
+          ],
+          [
+            "@0",
+            "C_PROP_BORDER_STYLE",
+            "none"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "azul",
+            "lemma": "azul",
+            "feats": "Number=Sing"
+          },
+          {
+            "surface": "borda",
+            "lemma": "borda",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          },
+          {
+            "surface": "borda",
+            "lexemeId": "LEX_BORDA",
+            "conceptId": "C_PROP_GROUP_BORDER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "negation",
+        "color"
+      ]
+    },
+    {
+      "id": "dev-053",
+      "input": "crie um botão com texto \"Ok\"",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON\"Ok\"{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON set(C_PROP_TEXT_CONTENT,TEXT:Ok)]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_BUTTON\nSET_PROPERTY temp:tmp_1 C_PROP_TEXT_CONTENT Ok",
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "texto",
+            "lemma": "texto",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "texto",
+            "lexemeId": "LEX_TEXTO",
+            "conceptId": "C_ENT_TEXT"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "text"
+      ]
+    },
+    {
+      "id": "dev-054",
+      "input": "crie uma caixa com texto \"Olá\"",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_TEXT\"Olá\"{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_CONTAINER | CREATE tmp_2 C_ENT_TEXT \"Olá\"] PLACE new:tmp_2 C_SPAT_INSIDE new:tmp_1",
+        "plan": "CREATE_NODE tmp_1 C_ENT_CONTAINER\nCREATE_NODE tmp_2 C_ENT_TEXT \"Olá\"\nPLACE_NODE temp:tmp_2 C_SPAT_INSIDE temp:tmp_1",
+        "attachments": [
+          [
+            "@1",
+            "C_SPAT_INSIDE",
+            "@0"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "texto",
+            "lemma": "texto",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          },
+          {
+            "surface": "texto",
+            "lexemeId": "LEX_TEXTO",
+            "conceptId": "C_ENT_TEXT"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "text",
+        "child"
+      ]
+    },
+    {
+      "id": "dev-055",
+      "input": "mude o texto do botão \"Entrar\" para \"Sair\"",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "text": "Entrar"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON\"Sair\"{}",
+        "ast": "UPDATE sel:C_ENT_BUTTON;text=\"Entrar\" set(C_PROP_TEXT_CONTENT,TEXT:Sair)",
+        "plan": "SET_PROPERTY node:node_1 C_PROP_TEXT_CONTENT Sair",
+        "readings": [
+          {
+            "surface": "mude",
+            "lemma": "mudar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "texto",
+            "lemma": "texto",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "mude",
+            "lexemeId": "LEX_MUDAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "texto",
+            "lexemeId": "LEX_TEXTO",
+            "conceptId": "C_ENT_TEXT"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "text"
+      ]
+    },
+    {
+      "id": "dev-056",
+      "input": "crie um botão com fundo azul e borda vermelha",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb,C_PROP_BORDER_COLOR=#dc2626}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON set(C_PROP_BG_COLOR,COLOR:#2563eb) set(C_PROP_BORDER_COLOR,COLOR:#dc2626)]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_BUTTON\nSET_PROPERTY temp:tmp_1 C_PROP_BG_COLOR #2563eb\nSET_PROPERTY temp:tmp_1 C_PROP_BORDER_COLOR #dc2626",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BG_COLOR",
+            "#2563eb"
+          ],
+          [
+            "@0",
+            "C_PROP_BORDER_COLOR",
+            "#dc2626"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "fundo",
+            "lemma": "fundo",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "azul",
+            "lemma": "azul",
+            "feats": "Number=Sing"
+          },
+          {
+            "surface": "borda",
+            "lemma": "borda",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "vermelha",
+            "lemma": "vermelho",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "fundo",
+            "lexemeId": "LEX_FUNDO",
+            "conceptId": "C_PROP_BG_COLOR"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          },
+          {
+            "surface": "borda",
+            "lexemeId": "LEX_BORDA",
+            "conceptId": "C_PROP_GROUP_BORDER"
+          },
+          {
+            "surface": "vermelha",
+            "lexemeId": "LEX_VERMELHO",
+            "conceptId": "C_VAL_RED"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "coordination"
+      ]
+    },
+    {
+      "id": "dev-057",
+      "input": "crie uma caixa azul e redonda",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#2563eb,C_PROP_BORDER_RADIUS=50%}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_CONTAINER set(C_PROP_BG_COLOR,COLOR:#2563eb) set(C_PROP_BORDER_RADIUS,SIZE:50%)]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_CONTAINER\nSET_PROPERTY temp:tmp_1 C_PROP_BG_COLOR #2563eb\nSET_PROPERTY temp:tmp_1 C_PROP_BORDER_RADIUS 50%",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BG_COLOR",
+            "#2563eb"
+          ],
+          [
+            "@0",
+            "C_PROP_BORDER_RADIUS",
+            "50%"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "azul",
+            "lemma": "azul",
+            "feats": "Number=Sing"
+          },
+          {
+            "surface": "redonda",
+            "lemma": "redondo",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          },
+          {
+            "surface": "redonda",
+            "lexemeId": "LEX_REDONDO",
+            "conceptId": "C_VAL_ROUND"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "coordination"
+      ]
+    },
+    {
+      "id": "dev-058",
+      "input": "deixe o botão vermelho com borda azul de 3px",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626,C_PROP_BORDER_COLOR=#2563eb,C_PROP_BORDER_WIDTH=3px}",
+        "ast": "UPDATE sel:C_ENT_BUTTON set(C_PROP_BG_COLOR,COLOR:#dc2626) set(C_PROP_BORDER_COLOR,COLOR:#2563eb) set(C_PROP_BORDER_WIDTH,SIZE:3px)",
+        "plan": "SET_PROPERTY node:node_1 C_PROP_BG_COLOR #dc2626\nSET_PROPERTY node:node_1 C_PROP_BORDER_COLOR #2563eb\nSET_PROPERTY node:node_1 C_PROP_BORDER_WIDTH 3px",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BG_COLOR",
+            "#dc2626"
+          ],
+          [
+            "@0",
+            "C_PROP_BORDER_COLOR",
+            "#2563eb"
+          ],
+          [
+            "@0",
+            "C_PROP_BORDER_WIDTH",
+            "3px"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "deixe",
+            "lemma": "deixar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "vermelho",
+            "lemma": "vermelho",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "borda",
+            "lemma": "borda",
+            "feats": "Gender=Fem|Number=Sing"
+          },
+          {
+            "surface": "azul",
+            "lemma": "azul",
+            "feats": "Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "deixe",
+            "lexemeId": "LEX_DEIXAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "vermelho",
+            "lexemeId": "LEX_VERMELHO",
+            "conceptId": "C_VAL_RED"
+          },
+          {
+            "surface": "borda",
+            "lexemeId": "LEX_BORDA",
+            "conceptId": "C_PROP_GROUP_BORDER"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "multi-property"
+      ]
+    },
+    {
+      "id": "dev-059",
+      "input": "crie um botão e não apague a caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON]\nNO_OP",
+        "plan": "CREATE_NODE tmp_1 C_ENT_BUTTON",
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "apague",
+            "lemma": "apagar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "caixa",
+            "lemma": "caixa",
+            "feats": "Gender=Fem|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "apague",
+            "lexemeId": "LEX_APAGAR",
+            "conceptId": "C_ACT_DELETE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "negation",
+        "coordination"
+      ]
+    },
+    {
+      "id": "dev-060",
+      "input": "selecione o segundo botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{}",
+        "ast": "QUERY sel:C_ENT_BUTTON;ord=1",
+        "plan": "QUERY_NODE node_2",
+        "readings": [
+          {
+            "surface": "selecione",
+            "lemma": "selecionar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "segundo",
+            "lemma": "segundo",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "selecione",
+            "lexemeId": "LEX_SELECIONAR",
+            "conceptId": "C_ACT_QUERY"
+          },
+          {
+            "surface": "segundo",
+            "lexemeId": "LEX_ORD_2",
+            "conceptId": "C_ORD_2"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "query"
+      ]
+    },
+    {
+      "id": "dev-061",
+      "input": "crie um botão vermelo",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}",
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON set(C_PROP_BG_COLOR,COLOR:#dc2626)]",
+        "plan": "CREATE_NODE tmp_1 C_ENT_BUTTON\nSET_PROPERTY temp:tmp_1 C_PROP_BG_COLOR #dc2626",
+        "bindings": [
+          [
+            "@0",
+            "C_PROP_BG_COLOR",
+            "#dc2626"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "crie",
+            "lemma": "criar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "vermelo",
+            "lemma": "vermelho",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "vermelo",
+            "lexemeId": "LEX_VERMELHO",
+            "conceptId": "C_VAL_RED"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "typo"
+      ]
+    },
+    {
+      "id": "dev-062",
+      "input": "crie um botão rosa",
+      "expected": {
+        "diagnostics": [
+          "UNKNOWN_WORD"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "unknown",
+        "negative"
+      ]
+    },
+    {
+      "id": "dev-063",
+      "input": "apaga o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "",
+        "ast": "DELETE sel:C_ENT_BUTTON",
+        "plan": "DELETE_NODE node_1",
+        "resolvedReferences": [
+          0
+        ],
+        "readings": [
+          {
+            "surface": "apaga",
+            "lemma": "apagar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "botão",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "apaga",
+            "lexemeId": "LEX_APAGAR",
+            "conceptId": "C_ACT_DELETE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "inflection"
+      ]
+    },
+    {
+      "id": "dev-064",
+      "input": "apague todos",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "INCOMPLETE_REFERENCE"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "ellipsis",
+        "negative"
+      ]
+    },
+    {
+      "id": "dev-065",
+      "input": "apague os dois últimos botões",
+      "discourse": [
+        "crie cinco botões"
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{}\nC_ENT_BUTTON{}",
+        "ast": "DELETE sel:C_ENT_BUTTON;ord=-1;count=2",
+        "plan": "DELETE_NODE node_4\nDELETE_NODE node_5",
+        "resolvedReferences": [
+          3,
+          4
+        ],
+        "readings": [
+          {
+            "surface": "apague",
+            "lemma": "apagar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "dois",
+            "lemma": "dois",
+            "feats": "Gender=Masc|Number=Plur"
+          },
+          {
+            "surface": "últimos",
+            "lemma": "último",
+            "feats": "Gender=Masc|Number=Plur"
+          },
+          {
+            "surface": "botões",
+            "lemma": "botão",
+            "feats": "Gender=Masc|Number=Plur"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "apague",
+            "lexemeId": "LEX_APAGAR",
+            "conceptId": "C_ACT_DELETE"
+          },
+          {
+            "surface": "dois",
+            "lexemeId": "LEX_CARD_2",
+            "conceptId": "C_CARD_2"
+          },
+          {
+            "surface": "últimos",
+            "lexemeId": "LEX_ORD_LAST",
+            "conceptId": "C_ORD_LAST"
+          },
+          {
+            "surface": "botões",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "ordinal",
+        "from-end"
+      ]
+    },
+    {
+      "id": "dev-066",
+      "input": "mude o fundo do botão para 2px",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "INVALID_VALUE_CATEGORY"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "diagnostic",
+        "negative"
+      ]
+    },
+    {
+      "id": "dev-067",
+      "input": "crie um botão 2px",
+      "expected": {
+        "diagnostics": [
+          "INVALID_PROPERTY"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "diagnostic",
+        "negative"
+      ]
+    },
+    {
+      "id": "dev-068",
+      "input": "apague o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "AMBIGUOUS_REFERENCE"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "ambiguity",
+        "negative"
+      ]
+    },
+    {
+      "id": "dev-069",
+      "input": "mova a primeira caixa para dentro da segunda caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "children": [
+            {
+              "entityConceptId": "C_ENT_CONTAINER"
+            }
+          ]
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "INVALID_CONTAINMENT"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "cycle",
+        "negative"
+      ]
+    },
+    {
+      "id": "dev-070",
+      "input": "deixe o segundo azul",
+      "discourse": [
+        "crie uma caixa",
+        "crie dois botões dentro dela"
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}",
+        "ast": "UPDATE sel:C_ENT_BUTTON;ord=1;elided=C_ENT_BUTTON set(C_PROP_BG_COLOR,COLOR:#2563eb)",
+        "plan": "SET_PROPERTY node:node_3 C_PROP_BG_COLOR #2563eb",
+        "bindings": [
+          [
+            "@2",
+            "C_PROP_BG_COLOR",
+            "#2563eb"
+          ]
+        ],
+        "attachments": [
+          [
+            "@1",
+            "C_SPAT_INSIDE",
+            "@0"
+          ],
+          [
+            "@2",
+            "C_SPAT_INSIDE",
+            "@0"
+          ]
+        ],
+        "readings": [
+          {
+            "surface": "deixe",
+            "lemma": "deixar",
+            "feats": "Mood=Imp|VerbForm=Fin"
+          },
+          {
+            "surface": "segundo",
+            "lemma": "segundo",
+            "feats": "Gender=Masc|Number=Sing"
+          },
+          {
+            "surface": "azul",
+            "lemma": "azul",
+            "feats": "Number=Sing"
+          }
+        ],
+        "tokens": [
+          {
+            "surface": "deixe",
+            "lexemeId": "LEX_DEIXAR",
+            "conceptId": "C_ACT_UPDATE"
+          },
+          {
+            "surface": "segundo",
+            "lexemeId": "LEX_ORD_2",
+            "conceptId": "C_ORD_2"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "ellipsis",
+        "discourse"
+      ]
+    }
   ]
 }
