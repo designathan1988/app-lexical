@@ -205,6 +205,9 @@ function SurfaceTable({
   const [newLexeme, setNewLexeme] = useState(lexemeIds[0] ?? '');
   const [newType, setNewType] = useState<SurfaceForm['formType']>('CANONICAL');
 
+  const generated = list.filter((sf) => sf.generated);
+  const manual = list.filter((sf) => !sf.generated);
+
   return (
     <>
       <div className="add-row">
@@ -243,6 +246,34 @@ function SurfaceTable({
         </button>
       </div>
 
+      <h4>Formas geradas por paradigma (somente leitura)</h4>
+      <table className="data-table">
+        <thead>
+          <tr>
+            <th>forma</th>
+            <th>lexema</th>
+            <th>traços</th>
+            <th>selo</th>
+          </tr>
+        </thead>
+        <tbody>
+          {generated.map((sf) => (
+            <tr key={sf.id}>
+              <td>{sf.rawText}</td>
+              <td><code>{sf.lexemeId}</code></td>
+              <td className="details"><code>{sf.features ?? ''}</code></td>
+              <td><span className="details">gerada</span></td>
+            </tr>
+          ))}
+          {generated.length === 0 && (
+            <tr>
+              <td colSpan={4} className="details">Nenhuma forma gerada neste filtro.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+
+      <h4>Formas manuais (erro, coloquial, abreviação, sinônimo, exceção)</h4>
       <table className="data-table">
         <thead>
           <tr>
@@ -254,7 +285,7 @@ function SurfaceTable({
           </tr>
         </thead>
         <tbody>
-          {list.map((sf) => (
+          {manual.map((sf) => (
             <tr key={sf.id}>
               <td><code>{sf.id}</code></td>
               <td>{sf.rawText}</td>

@@ -9,6 +9,33 @@ import type {
 } from '../engine/types';
 import type { ConceptNode } from '../engine/ontology/Concept';
 import { PARADIGMS, generateForms, generateDiminutives } from './paradigms';
+import type { Paradigm, OrthographyRule } from './paradigms';
+
+/** Override persistido de um paradigma (F2.5): substitui células/regras. */
+export interface ParadigmOverride {
+  cells?: Paradigm['cells'];
+  orthography?: OrthographyRule[];
+  /** Células desativadas globalmente (por chave canônica). */
+  disabledCells?: string[];
+}
+
+/**
+ * Paradigma efetivo: dados de fábrica com o override do painel aplicado.
+ */
+export function effectiveParadigm(
+  paradigmId: string,
+  overrides?: Record<string, ParadigmOverride>
+): Paradigm | undefined {
+  const base = PARADIGMS[paradigmId];
+  if (!base) return undefined;
+  const override = overrides?.[paradigmId];
+  if (!override) return base;
+  return {
+    ...base,
+    cells: override.cells ?? base.cells,
+    orthography: override.orthography ?? base.orthography
+  };
+}
 
 /**
  * Base de conhecimento persistível (JSON-safe): conceitos, lexemas, formas
@@ -32,6 +59,8 @@ export interface KnowledgeBase {
     /** Propriedade de grupo usada quando o grupo não tem binding para a categoria. */
     textContentPropertyId: ConceptId;
   };
+  /** Edições de paradigma feitas no painel (F2.5), por id de paradigma. */
+  paradigmOverrides?: Record<string, ParadigmOverride>;
 }
 
 // ---------------------------------------------------------------------------
@@ -591,17 +620,22 @@ export const INITIAL_SURFACE_FORMS: SurfaceForm[] = [
  * com `allowsDiminutive`.
  */
 export function generateSurfaceForms(
-  lexemes: Record<LexemeId, Lexeme>
+  lexemes: Record<LexemeId, Lexeme>,
+  overrides?: Record<string, ParadigmOverride>
 ): SurfaceForm[] {
   const out: SurfaceForm[] = [];
   for (const lexeme of Object.values(lexemes)) {
     if (lexeme.paradigmId) {
-      const paradigm = PARADIGMS[lexeme.paradigmId];
+      const paradigm = effectiveParadigm(lexeme.paradigmId, overrides);
       if (!paradigm) continue;
+      const override = overrides?.[lexeme.paradigmId];
       for (const form of generateForms(lexeme.id, lexeme.lemma, paradigm, {
         inherent: lexeme.inherent,
         irregular: lexeme.irregular,
-        disabledForms: lexeme.disabledForms
+        disabledForms: [
+          ...(lexeme.disabledForms ?? []),
+          ...(override?.disabledCells ?? [])
+        ]
       })) {
         out.push({
           id: `${lexeme.id}#${form.featureKey}`,
@@ -713,11 +747,13 @@ export function createInitialKnowledgeBase(): KnowledgeBase {
 }
 
 export function cloneKnowledgeBase(kb: KnowledgeBase): KnowledgeBase {
-  return {
+  const clone: KnowledgeBase = {
     surfaceForms: kb.surfaceForms.map((s) => ({ ...s })),
     lexemes: Object.fromEntries(Object.entries(kb.lexemes).map(([id, l]) => [id, { ...l }])),
     concepts: structuredClone(kb.concepts),
     multiwords: kb.multiwords.map((m) => ({ ...m })),
     defaults: { ...kb.defaults }
   };
+  if (kb.paradigmOverrides) clone.paradigmOverrides = structuredClone(kb.paradigmOverrides);
+  return clone;
 }

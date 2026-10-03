@@ -1,6 +1,7 @@
 import {
   createInitialKnowledgeBase,
   cloneKnowledgeBase,
+  generateSurfaceForms,
   type KnowledgeBase
 } from './knowledgeBase';
 import type { SurfaceForm, Lexeme, LexemeId, ConceptId, MultiwordEntry } from '../engine/types';
@@ -105,6 +106,19 @@ export class KnowledgeBaseStore {
 
     this.kb = initial ?? createInitialKnowledgeBase();
     this.snapshotVersion('Base inicial');
+  }
+
+  /**
+   * Regenera as SurfaceForms de paradigma (F2.1/F2.5) e as mantém ANTES das
+   * manuais na ordem de candidatos (invariante da migração). Chamado sempre
+   * que lexemas mudam; barato o bastante para rodar a cada edição.
+   */
+  private rebuildGeneratedForms(): void {
+    const manual = this.kb.surfaceForms.filter((s) => !s.generated);
+    this.kb.surfaceForms = [
+      ...generateSurfaceForms(this.kb.lexemes, this.kb.paradigmOverrides),
+      ...manual
+    ];
   }
 
   // ---- Persistência ---------------------------------------------------------
@@ -398,6 +412,7 @@ export class KnowledgeBaseStore {
 
   addLexeme(lexeme: Lexeme): void {
     this.kb.lexemes[lexeme.id] = lexeme;
+    this.rebuildGeneratedForms();
     this.emit();
   }
 
@@ -405,12 +420,36 @@ export class KnowledgeBaseStore {
     const current = this.kb.lexemes[id];
     if (!current) return;
     this.kb.lexemes[id] = { ...current, ...patch };
+    this.rebuildGeneratedForms();
+    this.emit();
+  }
+
+  /** Edição de paradigma pelo painel (F2.5): persiste e regenera. */
+  updateParadigm(
+    paradigmId: string,
+    patch: { cells?: unknown; orthography?: unknown; disabledCells?: string[] }
+  ): void {
+    this.kb.paradigmOverrides = this.kb.paradigmOverrides ?? {};
+    const current = this.kb.paradigmOverrides[paradigmId] ?? {};
+    this.kb.paradigmOverrides[paradigmId] = {
+      ...current,
+      ...(patch as Record<string, never>)
+    };
+    this.rebuildGeneratedForms();
+    this.emit();
+  }
+
+  /** Restaura um paradigma ao padrão de fábrica. */
+  resetParadigm(paradigmId: string): void {
+    if (this.kb.paradigmOverrides) delete this.kb.paradigmOverrides[paradigmId];
+    this.rebuildGeneratedForms();
     this.emit();
   }
 
   removeLexeme(id: LexemeId): void {
     delete this.kb.lexemes[id];
     this.kb.surfaceForms = this.kb.surfaceForms.filter((s) => s.lexemeId !== id);
+    this.rebuildGeneratedForms();
     this.emit();
   }
 
@@ -474,6 +513,7 @@ export class KnowledgeBaseStore {
     if (parsed.knowledgeBase) {
       this.kb = parsed.knowledgeBase;
       if (parsed.settings) this.settings = { ...DEFAULT_SETTINGS, ...parsed.settings };
+      this.rebuildGeneratedForms();
       this.emit();
     }
   }

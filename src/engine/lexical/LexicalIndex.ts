@@ -45,6 +45,18 @@ function exactScore(formType: SurfaceForm['formType']): number {
  * varre o dicionário por comando — e devolve CANDIDATOS com score decomposto.
  * A decisão de aceitar é da camada de política.
  */
+/** Forma que casa com mais de uma leitura (lexemas ou células distintos). */
+export interface HomographEntry {
+  surface: string;
+  readings: Array<{
+    lexemeId: LexemeId;
+    lemma: string;
+    formType: SurfaceForm['formType'];
+    /** Chave canônica dos traços (F2.1); ausente em formas manuais. */
+    features?: string;
+  }>;
+}
+
 export class LexicalIndex {
   private exact = new Map<string, SurfaceForm[]>();
   private approximate: ApproximateIndex;
@@ -167,5 +179,35 @@ export class LexicalIndex {
 
   get approximateIndexSize(): number {
     return this.approximate.size;
+  }
+
+  /**
+   * F2.4 — Homógrafos: formas compartilhadas por lexemas diferentes ou por
+   * células diferentes do mesmo lexema ("cria": indicativo/imperativo;
+   * "texto": entidade/propriedade). A desambiguação é da camada de análise,
+   * nunca do índice.
+   */
+  homographs(): HomographEntry[] {
+    const out: HomographEntry[] = [];
+    for (const [normalized, forms] of this.exact) {
+      if (forms.length < 2) continue;
+      const readings = forms
+        .map((surface) => ({
+          lexemeId: surface.lexemeId,
+          lemma: this.lexemes[surface.lexemeId]?.lemma ?? surface.lexemeId,
+          formType: surface.formType,
+          features: surface.features
+        }))
+        .sort(
+          (a, b) =>
+            a.lexemeId.localeCompare(b.lexemeId) ||
+            (a.features ?? '').localeCompare(b.features ?? '')
+        );
+      const distinctCells = new Set(
+        readings.map((r) => `${r.lexemeId}#${r.features ?? r.formType}`)
+      );
+      if (distinctCells.size > 1) out.push({ surface: normalized, readings });
+    }
+    return out.sort((a, b) => a.surface.localeCompare(b.surface));
   }
 }

@@ -2,6 +2,7 @@ import React, { useState, useSyncExternalStore } from 'react';
 import type { SemanticEngine } from '../../engine/SemanticEngine';
 import type { KnowledgeBaseStore } from '../../knowledge/KnowledgeBaseStore';
 import { DataSection } from './admin/DataSection';
+import { ParadigmSection } from './admin/ParadigmSection';
 import { TrainingSection } from './admin/TrainingSection';
 import { TestSection } from './admin/TestSection';
 import { MetricsSection } from './admin/MetricsSection';
@@ -11,6 +12,7 @@ import { HistorySection } from './admin/HistorySection';
 
 export type AdminTab =
   | 'dados'
+  | 'paradigmas'
   | 'treinamento'
   | 'testes'
   | 'metricas'
@@ -41,6 +43,7 @@ export function AdminPanel({ engine, store, onChange }: Props) {
 
   const tabs: Array<{ id: AdminTab; label: string }> = [
     { id: 'dados', label: 'Dados' },
+    { id: 'paradigmas', label: 'Paradigmas' },
     { id: 'treinamento', label: 'Treinamento' },
     { id: 'testes', label: 'Testes' },
     { id: 'metricas', label: 'Métricas' },
@@ -65,6 +68,7 @@ export function AdminPanel({ engine, store, onChange }: Props) {
 
       <main className="admin-body">
         {tab === 'dados' && <DataSection engine={engine} store={store} onChange={bump} />}
+        {tab === 'paradigmas' && <ParadigmSection engine={engine} store={store} onChange={bump} />}
         {tab === 'treinamento' && (
           <TrainingSection engine={engine} store={store} onChange={bump} />
         )}
