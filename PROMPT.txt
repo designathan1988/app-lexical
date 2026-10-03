@@ -1,0 +1,930 @@
+Você deve implementar a aplicação completa descrita em `LEXICAL.TXT`. Esse arquivo é a especificação arquitetural e conceitual principal do projeto. Leia-o integralmente antes de alterar qualquer código. Não reescreva nem simplifique a arquitetura nele definida: transforme-a em uma aplicação real, executável, testável e integrada.
+
+OBJETIVO
+
+Construir um motor semântico determinístico capaz de receber comandos em português natural relacionados à manipulação de uma interface/pagebuilder e convertê-los corretamente em operações estruturadas sobre o documento.
+
+O sistema deve compreender frases como:
+
+- crie uma caixa azul com um botão vermelho dentro
+- crie um botão dentro de uma caixa azul
+- crie dois botões dentro da caixa
+- deixe a borda azul
+- deixe a borda com 2px
+- crie um botão azul sem borda
+- não apague o botão
+- apague o segundo botão
+- mude o botão "Entrar" para azul
+- mude o fundo do segundo botão para azul
+- coloque o botão depois da caixa
+- mova o botão de dentro da caixa para depois dela
+- deixe todos os botões azuis menos o primeiro
+
+A meta não é reconhecer essas frases especificamente. A meta é implementar os mecanismos gerais que fazem essas e novas combinações funcionarem a partir dos dados lexicais, da ontologia, das regras semânticas e do estado real do documento.
+
+PRINCÍPIO CENTRAL
+
+O sistema deve preservar rigorosamente a separação:
+
+SurfaceForm ≠ Lexeme ≠ Concept ≠ Mention ≠ DocumentInstance ≠ SemanticAST ≠ ExecutionPlan ≠ RuntimeMutation.
+
+Não volte a criar um parser baseado em uma variável global do tipo `currentEntity`, em associação por simples ordem dos tokens ou em regras específicas para frases de teste.
+
+`LEXICAL.TXT` define a arquitetura necessária. Implemente-a de verdade, inclusive as partes que exigem adaptação ao projeto existente.
+
+ANTES DE IMPLEMENTAR
+
+Primeiro faça uma inspeção completa do projeto existente.
+
+Localize:
+
+- estrutura atual da aplicação;
+- modelo interno do documento;
+- criação e remoção de componentes;
+- sistema de seleção;
+- árvore de componentes;
+- IDs dos nós;
+- propriedades e estilos;
+- mecanismo de undo/redo;
+- mutações;
+- persistência;
+- renderização;
+- comandos existentes;
+- event bus/store, se houver;
+- APIs disponíveis para inserir, mover, atualizar e excluir elementos.
+
+Não substitua sistemas existentes que já resolvem essas responsabilidades. O motor semântico deve utilizar a infraestrutura real do builder através de uma camada adaptadora.
+
+Se o projeto já possui um modelo de documento próprio, `DocumentModel` deve adaptar esse modelo, e não criar uma segunda árvore independente.
+
+Se já existem comandos transacionais ou undo/redo, todas as mutações semânticas devem passar por eles.
+
+ARQUITETURA A IMPLEMENTAR
+
+Implemente o pipeline completo:
+
+entrada bruta
+→ lexer não destrutivo
+→ normalização gramatical
+→ reconhecimento de expressões multiword
+→ resolução lexical
+→ candidatos de sentido
+→ parser sintático-semântico
+→ Semantic AST
+→ resolução propriedade/valor
+→ resolução de referências ao documento
+→ validação de constraints
+→ ExecutionPlan
+→ executor específico da operação
+→ runtime real do builder.
+
+Cada camada deve possuir responsabilidade clara e testes próprios.
+
+1. LÉXICO
+
+Implemente SurfaceForm e Lexeme separadamente.
+
+Não coloque sinônimos diferentes como se fossem flexões do mesmo lexema.
+
+Exemplo conceitual:
+
+criar, adicionar, colocar, botar e fazer podem convergir semanticamente para uma ação de criação, mas continuam sendo lexemas independentes.
+
+As formas flexionadas, coloquiais, abreviadas e erros conhecidos pertencem a SurfaceForm.
+
+Normalização Unicode e remoção de diacríticos devem existir apenas como forma de indexação. Nunca perca a forma original recebida.
+
+Use índices eficientes para lookup.
+
+2. TOKENIZAÇÃO
+
+O lexer deve preservar:
+
+- acentos;
+- offsets no texto original;
+- strings entre aspas;
+- números;
+- valores negativos;
+- decimais;
+- medidas CSS;
+- porcentagens;
+- cores hexadecimais;
+- identificadores;
+- pontuação relevante.
+
+Não destrua:
+
+`#2563eb`
+`20px`
+`1.5rem`
+`50%`
+`"Entrar agora"`
+
+O lexer não deve decidir semântica. Ele apenas identifica unidades.
+
+3. EXPRESSÕES MULTIWORD
+
+Implemente longest-match real com Trie ou estrutura equivalente eficiente.
+
+Expressões como:
+
+- cor de fundo
+- cor do texto
+- dentro de
+- depois de
+- antes de
+- ao lado de
+
+devem ser reconhecidas atomicamente.
+
+A estrutura deve ser orientada pelos dados e permitir adicionar milhares de expressões sem alterar o parser.
+
+4. PORTUGUÊS
+
+Implemente normalização gramatical necessária para o domínio.
+
+Trate contrações como:
+
+- do = de + o
+- da = de + a
+- no = em + o
+- na = em + a
+- dele = de + ele
+- dela = de + ela
+
+sem transformar essas contrações em conceitos artificiais da ontologia.
+
+Reconheça artigos, determinantes, quantificadores, números, ordinais, conjunções, pronomes e operadores relevantes.
+
+5. FONÉTICA E ERROS
+
+A recuperação fonética deve gerar candidatos, nunca decidir sozinha o significado.
+
+Fluxo obrigatório:
+
+entrada desconhecida
+→ chave fonética
+→ candidatos
+→ compatibilidade lexical
+→ compatibilidade gramatical
+→ compatibilidade semântica
+→ contexto
+→ candidato final.
+
+Não utilize `matches[0]` como resolução semântica arbitrária.
+
+Registre a origem da resolução e seu score para fins de depuração.
+
+6. ONTOLOGIA
+
+Implemente conceitos através de união discriminada real.
+
+Devem existir separadamente, conforme `LEXICAL.TXT`:
+
+- EntityConcept;
+- ActionConcept;
+- PropertyConcept;
+- PropertyGroupConcept;
+- ValueConcept;
+- SpatialConcept;
+- OperatorConcept;
+- QueryConcept.
+
+Uma ação não possui `domTag`.
+
+Uma cor não possui affordance de filhos.
+
+Uma relação espacial não possui propriedades de renderização.
+
+Não coloque novamente campos irrelevantes em um `ConceptNode` universal.
+
+7. PROPRIEDADES E VALORES
+
+Property e Value são conceitos diferentes.
+
+`azul` é um valor da categoria COLOR.
+
+Ele não significa automaticamente `backgroundColor`.
+
+A associação deve ser resolvida por:
+
+1. propriedade explicitamente mencionada;
+2. PropertyGroup compatível;
+3. binding padrão da entidade;
+4. constraints da ontologia.
+
+Exemplos:
+
+`fundo azul`
+→ backgroundColor.
+
+`borda azul`
+→ borderColor.
+
+`borda 2px`
+→ borderWidth.
+
+`botão azul`
+→ propriedade COLOR padrão definida para BUTTON.
+
+`texto azul`
+→ propriedade COLOR padrão definida para TEXT.
+
+Implemente validação da categoria do valor antes da criação do plano.
+
+Nunca permita semanticamente algo como:
+
+`borderWidth = "#2563eb"`.
+
+8. PROPERTY GROUPS
+
+Use grupos para conceitos linguisticamente amplos como `borda`.
+
+O grupo deve permitir resolver a propriedade concreta a partir da categoria do valor.
+
+Também deve permitir operações como:
+
+`sem borda`
+
+que geram uma operação de limpeza coerente do grupo, sem exigir um valor posterior.
+
+9. PARSER SEMÂNTICO
+
+Não implemente um scanner guloso plano.
+
+O parser precisa representar relações entre ocorrências.
+
+Ele deve compreender pelo menos:
+
+- ação;
+- argumentos;
+- sintagmas nominais;
+- propriedades;
+- valores;
+- quantidade;
+- ordinal;
+- coordenação;
+- relações espaciais;
+- containment;
+- escopo de negação;
+- exclusão;
+- pronomes;
+- referências a elementos existentes.
+
+A ordem superficial das palavras não pode determinar automaticamente pai e filho.
+
+Exemplo obrigatório:
+
+`crie um botão dentro de uma caixa azul`
+
+deve produzir semanticamente:
+
+BUTTON CHILD_OF CONTAINER
+
+e nunca:
+
+CONTAINER CHILD_OF BUTTON.
+
+10. AST SEMÂNTICA
+
+Crie uma representação intermediária serializável e sem referências circulares.
+
+A AST deve representar significado, não DOM.
+
+Ela deve permitir inspecionar claramente:
+
+- qual operação foi solicitada;
+- quais entidades foram mencionadas;
+- propriedades;
+- valores;
+- seletores;
+- quantidade;
+- relações;
+- exclusões;
+- pronomes resolvidos;
+- negadores;
+- novas entidades temporárias.
+
+Não coloque objetos vivos do DOM dentro da AST.
+
+11. NEGAÇÃO
+
+Implemente escopo real.
+
+Exemplos:
+
+`não apague o botão`
+
+deve impedir DELETE.
+
+`crie um botão sem borda`
+
+deve criar o botão e aplicar apenas a negação/limpeza da borda.
+
+`deixe todos os botões azuis menos o primeiro`
+
+deve aplicar UPDATE ao conjunto selecionado excluindo corretamente o primeiro.
+
+Não implemente negação como flag global.
+
+12. REFERÊNCIAS AO DOCUMENTO
+
+Diferencie conceito de instância.
+
+`BUTTON` é um tipo.
+
+`node_123` é um botão real da página.
+
+Implemente seletores semânticos capazes de representar:
+
+- o botão;
+- os botões;
+- todos os botões;
+- dois botões;
+- o primeiro botão;
+- o segundo botão;
+- o botão "Entrar";
+- o botão dentro da caixa;
+- o botão da direita;
+- o último container;
+- elementos excluindo outro conjunto.
+
+O ReferenceResolver deve consultar o documento real.
+
+Não crie uma árvore paralela que possa divergir do builder.
+
+13. COREFERÊNCIA
+
+Implemente contexto de discurso suficiente para resolver referências como:
+
+- ele;
+- ela;
+- eles;
+- elas;
+- dele;
+- dela.
+
+Exemplo:
+
+`crie uma caixa e um botão ao lado dela`
+
+`ela` deve resolver para a ocorrência correta de caixa.
+
+A resolução deve trabalhar sobre mentions, não simplesmente sobre o último ConceptId encontrado.
+
+14. QUANTIDADE
+
+Quantidade deve participar da AST e do plano.
+
+Exemplo:
+
+`crie três botões`
+
+deve produzir três instâncias independentes.
+
+`apague os três primeiros botões`
+
+deve selecionar exatamente o subconjunto solicitado.
+
+Não trate plural apenas como informação morfológica decorativa.
+
+15. RELAÇÕES ESPACIAIS
+
+Implemente semanticamente relações como:
+
+- CHILD_OF;
+- BEFORE;
+- AFTER;
+- BESIDE;
+- ABOVE;
+- BELOW.
+
+Depois converta essas relações para operações reais suportadas pelo builder.
+
+Não assuma que todas equivalem a `appendChild`.
+
+O runtime adapter deve traduzir o significado semântico para a estrutura real de layout do projeto.
+
+16. CONSTRAINTS
+
+As constraints não podem existir apenas no schema.
+
+Execute-as.
+
+Valide antes da mutação:
+
+- propriedades permitidas;
+- categorias de valores;
+- pais permitidos;
+- filhos permitidos;
+- capacidade de conter filhos;
+- operações permitidas;
+- referências inexistentes;
+- cardinalidade;
+- incompatibilidades.
+
+Nenhum plano com erro estrutural deve alterar silenciosamente o documento.
+
+17. EXECUTION PLAN
+
+Depois da AST, gere um plano explícito e determinístico.
+
+O plano deve conter operações simples e auditáveis, como:
+
+- CREATE_NODE;
+- SET_PROPERTY;
+- CLEAR_PROPERTY;
+- PLACE_NODE;
+- MOVE_NODE;
+- DELETE_NODE;
+- QUERY_NODE.
+
+Use IDs determinísticos dentro de cada compilação.
+
+Não use `Math.random()` para IDs internos de parser ou planner.
+
+A mesma entrada, no mesmo estado do documento, deve produzir o mesmo plano lógico.
+
+18. EXECUÇÃO
+
+Não gere JavaScript de DOM como mecanismo principal.
+
+Crie um `BuilderRuntimeAdapter` conectado ao sistema real da aplicação.
+
+O executor deve chamar operações reais da aplicação.
+
+CREATE, UPDATE, DELETE, MOVE e QUERY precisam possuir comportamentos específicos.
+
+Nunca faça:
+
+DELETE → `createElement`.
+
+Nunca manipule diretamente o DOM se o builder possuir modelo de estado próprio.
+
+19. TRANSAÇÃO
+
+Uma instrução do usuário deve ser executada como uma transação lógica.
+
+Se uma frase produzir várias mutações:
+
+`crie uma caixa azul com dois botões vermelhos dentro`
+
+a operação completa deve poder ser:
+
+- aplicada;
+- desfeita;
+- refeita;
+
+como uma unidade coerente, utilizando o sistema de histórico existente.
+
+20. DIAGNÓSTICOS
+
+Crie diagnósticos estruturados.
+
+Cada problema deve possuir:
+
+- severity;
+- code;
+- message;
+- trecho da entrada;
+- posição/offset quando disponível;
+- camada que detectou o problema;
+- candidatos considerados quando relevante.
+
+Diferencie:
+
+- UNKNOWN_WORD;
+- AMBIGUOUS_REFERENCE;
+- TARGET_NOT_FOUND;
+- INVALID_PROPERTY;
+- INVALID_VALUE_CATEGORY;
+- INVALID_CONTAINMENT;
+- UNRESOLVED_PRONOUN;
+- AMBIGUOUS_SENSE;
+- UNSUPPORTED_OPERATION.
+
+Não silencie tokens importantes que não puderam ser compreendidos.
+
+21. OBSERVABILIDADE
+
+Crie modo de debug capaz de mostrar:
+
+entrada
+→ raw tokens
+→ tokens normalizados
+→ MWEs
+→ candidatos lexicais
+→ conceitos candidatos
+→ AST
+→ referências resolvidas
+→ ExecutionPlan
+→ resultado da validação
+→ mutações executadas.
+
+Isso é obrigatório para que erros semânticos possam ser diagnosticados.
+
+22. INTERFACE DE TESTE
+
+Crie uma pequena interface de desenvolvimento dentro da aplicação ou uma página de diagnóstico separada.
+
+Ela deve possuir:
+
+- campo para escrever uma frase;
+- botão Executar;
+- botão apenas Analisar;
+- visualização de tokens;
+- AST;
+- ExecutionPlan;
+- diagnostics;
+- resultado da execução;
+- estado/árvore do documento quando útil.
+
+O objetivo não é criar uma interface visual sofisticada. É permitir validar rapidamente o motor inteiro.
+
+23. TESTES UNITÁRIOS
+
+Crie testes separados para:
+
+- Unicode;
+- acentuação;
+- SurfaceForm;
+- flexões;
+- lexemas;
+- aliases;
+- misspellings;
+- fonética;
+- Trie/MWE;
+- tokenização;
+- medidas CSS;
+- cores;
+- strings;
+- propriedades;
+- PropertyGroups;
+- values;
+- quantity;
+- ordinals;
+- pronomes;
+- negação;
+- exclusions;
+- AST;
+- reference resolution;
+- constraints;
+- planner;
+- executor.
+
+24. TESTES SEMÂNTICOS END-TO-END
+
+No mínimo cubra:
+
+1. `crie uma caixa azul com um botão vermelho dentro`
+2. `crie um botão dentro de uma caixa azul`
+3. `crie uma caixa e um botão ao lado dela`
+4. `crie dois botões dentro da caixa`
+5. `deixe a borda azul`
+6. `deixe a borda com 2px`
+7. `crie um botão azul sem borda`
+8. `não apague o botão`
+9. `apague o segundo botão`
+10. `mude o botão "Entrar" para azul`
+11. `mude o fundo do segundo botão para azul`
+12. `coloque o botão depois da caixa`
+13. `mova o botão de dentro da caixa para depois dela`
+14. `deixe todos os botões azuis menos o primeiro`
+
+Para cada caso teste:
+
+- tokens esperados;
+- conceitos relevantes;
+- AST;
+- reference resolution;
+- plano;
+- mutação final.
+
+Não considere um teste aprovado somente porque a aparência final coincidentemente ficou correta.
+
+25. TESTES DE COMPOSIÇÃO
+
+Depois dos testes básicos, gere automaticamente variações combinatórias.
+
+Exemplo:
+
+ações × entidades × propriedades × valores × quantidade × posição.
+
+Teste:
+
+- singular/plural;
+- masculino/feminino;
+- palavra com e sem acento;
+- ordem sintática diferente;
+- sinônimos;
+- valores explícitos;
+- propriedades explícitas;
+- propriedades implícitas;
+- referências existentes;
+- relações espaciais.
+
+O objetivo é detectar regras que só funcionam porque uma determinada frase estava prevista.
+
+26. TESTES NEGATIVOS
+
+Crie casos que DEVEM falhar.
+
+Exemplos:
+
+- propriedade incompatível;
+- valor incompatível;
+- container inexistente;
+- ordinal inexistente;
+- referência ambígua;
+- relação estrutural impossível;
+- pronome sem antecedente;
+- comando incompleto.
+
+O sistema deve produzir diagnóstico, não inventar uma interpretação.
+
+27. MÉTRICAS
+
+Construa uma suíte de avaliação.
+
+Cada caso deve possuir resultado esperado estruturado.
+
+Meça pelo menos:
+
+- lexical resolution accuracy;
+- concept/sense accuracy;
+- entity attachment accuracy;
+- property/value binding accuracy;
+- reference resolution accuracy;
+- AST exact match;
+- execution-plan exact match;
+- end-to-end command success;
+- false-positive rate;
+- ambiguity detection rate.
+
+Não utilize apenas uma métrica geral.
+
+Mostre onde o motor está errando.
+
+28. DATASET DE AVALIAÇÃO
+
+Crie dataset versionado em arquivos de teste.
+
+Cada registro deve conter:
+
+- input;
+- documento inicial quando necessário;
+- AST esperado;
+- plano esperado;
+- resultado esperado;
+- diagnostics esperados.
+
+Separe:
+
+- treinamento/desenvolvimento de regras;
+- regressão;
+- avaliação final.
+
+Não ajuste regras exclusivamente para um único teste sem verificar regressões.
+
+29. TESTES DE ROBUSTEZ
+
+Teste também entradas como:
+
+- falta de acento;
+- maiúsculas;
+- espaços extras;
+- pontuação;
+- erro ortográfico cadastrado;
+- sinônimo;
+- formas verbais;
+- frases mais longas;
+- vários componentes;
+- múltiplas propriedades;
+- relações encadeadas.
+
+Não faça fuzzy matching tão permissivo que palavras desconhecidas passem a ser interpretadas como comandos perigosos.
+
+30. PERFORMANCE
+
+Meça separadamente:
+
+- inicialização dos índices;
+- tokenização;
+- lookup lexical;
+- MWE;
+- parsing;
+- reference resolution;
+- planning;
+- validation;
+- execução.
+
+Crie benchmark com:
+
+- 100;
+- 1.000;
+- 10.000;
+- 100.000 SurfaceForms, quando possível através de dados sintéticos.
+
+Lookup lexical deve usar índices apropriados e não varrer todo o dicionário por comando.
+
+Trie deve continuar eficiente com milhares de MWEs.
+
+Não sacrifique correção semântica por micro-otimização prematura.
+
+31. SEGURANÇA DE EXECUÇÃO
+
+O motor semântico nunca deve executar texto arbitrário recebido do usuário.
+
+Não utilize `eval`, `new Function` ou geração/execução dinâmica de JavaScript a partir da frase.
+
+Dados semânticos devem virar operações tipadas do runtime.
+
+Strings destinadas a texto visual continuam sendo dados.
+
+32. EXTENSIBILIDADE
+
+Adicionar posteriormente uma nova palavra, flexão, cor ou alias não deve exigir alterar o parser.
+
+Adicionar uma nova entidade deve exigir principalmente:
+
+- conceito;
+- propriedades permitidas;
+- bindings;
+- renderer/runtime mapping;
+- léxico correspondente.
+
+Adicionar uma nova propriedade deve exigir principalmente:
+
+- PropertyConcept;
+- categorias aceitas;
+- formas lexicais;
+- regras/bindings necessários.
+
+O parser deve trabalhar por categorias e relações, não por listas gigantes de `if palavra === ...`.
+
+33. NÃO IMPLEMENTAR POR FRASES
+
+É proibido criar lógica como:
+
+```text
+if input contains "botão dentro da caixa"
+```
+
+ou regexes que codifiquem frases de teste completas.
+
+Regex pode ser utilizada legitimamente pelo lexer para reconhecer classes lexicais como números e unidades.
+
+Não pode substituir a análise semântica.
+
+34. NÃO MASCARAR TESTES
+
+Os resultados apresentados precisam ser gerados pelo código realmente executado.
+
+Não escreva AST, JSON ou resultado “esperado” e apresente como se fosse saída real.
+
+Automatize os testes e mantenha snapshots ou assertions verificáveis.
+
+35. CRITÉRIO DE ACEITAÇÃO PRINCIPAL
+
+A implementação só está pronta quando:
+
+- todas as camadas de `LEXICAL.TXT` estiverem realmente conectadas;
+- os testes de regressão passarem;
+- as frases semanticamente equivalentes produzirem planos equivalentes;
+- frases estruturalmente diferentes produzirem planos diferentes;
+- referências a instâncias reais funcionarem;
+- propriedades e valores forem desambiguados corretamente;
+- negação possuir escopo;
+- quantidade funcionar;
+- pronomes funcionarem;
+- containment possuir direção correta;
+- DELETE realmente apagar;
+- MOVE realmente mover;
+- UPDATE realmente atualizar;
+- CREATE realmente criar;
+- operações inválidas forem bloqueadas pelas constraints;
+- undo/redo preservar a operação semântica como unidade;
+- nenhuma camada importante existir apenas no TypeScript sem participar da execução.
+
+36. CRITÉRIO DE QUALIDADE
+
+Não considere concluído porque os 14 exemplos passaram.
+
+Após fazê-los passar, crie novas variações que não estavam no conjunto inicial.
+
+Por exemplo:
+
+- `adicione três caixas vermelhas`
+- `coloque dois botões azuis dentro da segunda caixa`
+- `apague todos os botões menos o primeiro`
+- `mude para vermelho o botão "Cancelar"`
+- `deixe a borda do botão com 3px`
+- `adicione uma caixa e coloque um botão dentro dela`
+- `mova o segundo botão para depois do terceiro`
+- `crie uma caixa dentro de outra caixa`
+
+A arquitetura deve resolver essas construções pelos mesmos mecanismos gerais.
+
+37. PROCESSO DE IMPLEMENTAÇÃO
+
+Trabalhe diretamente no projeto.
+
+Não pare na produção de um plano.
+
+Faça:
+
+1. inspeção;
+2. integração arquitetural;
+3. implementação;
+4. testes unitários;
+5. testes semânticos;
+6. integração com o builder;
+7. execução real;
+8. identificação de falhas;
+9. correção;
+10. regressão;
+11. benchmark;
+12. relatório final.
+
+Não peça confirmação entre cada etapa.
+
+Não abandone a implementação após criar apenas lexer, dicionário ou parser.
+
+38. VALIDAÇÃO FINAL
+
+Execute a aplicação real.
+
+Não valide apenas lendo código.
+
+Faça comandos contra um documento real de teste e confira:
+
+- árvore antes;
+- frase;
+- AST;
+- plano;
+- árvore depois;
+- propriedades resultantes;
+- ordem dos nós;
+- undo;
+- redo.
+
+Faça também testes sequenciais, porque referência e contexto dependem do estado:
+
+```text
+crie uma caixa
+crie dois botões dentro dela
+deixe o segundo azul
+mova o primeiro para depois da caixa
+apague o botão azul
+```
+
+Confira o estado após cada operação.
+
+39. RELATÓRIO FINAL
+
+Ao terminar, entregue objetivamente:
+
+- arquitetura realmente implementada;
+- arquivos criados/modificados;
+- integração feita com o builder;
+- quantidade de testes;
+- quantidade de testes aprovados/reprovados;
+- métricas semânticas;
+- resultados do benchmark;
+- casos ainda não suportados;
+- limitações reais encontradas;
+- exemplos de AST e ExecutionPlan produzidos pela aplicação real;
+- prova dos testes end-to-end.
+
+Não declare suporte a algo que não tenha sido testado.
+
+Não esconda falhas remanescentes.
+
+OBJETIVO FINAL
+
+O resultado deve ser um compilador semântico de domínio para português que compreenda a intenção estrutural do usuário e opere o pagebuilder através de uma representação intermediária tipada e validada.
+
+Ele não deve depender de decorar frases.
+
+Os dados definem o vocabulário e o conhecimento do domínio; o parser compõe esses elementos; o resolver identifica as instâncias corretas; o planner converte significado em operações; o validator impede mutações inválidas; e o runtime adapter executa essas operações no sistema real.
+
+Use `LEXICAL.TXT` como contrato arquitetural principal e implemente esse sistema até que seja utilizável, mensurável e verificável na aplicação real.
+
+Crie também uma interface web de teste integrada ao motor semântico. A tela deve ter, à esquerda, um chat/campo de comando onde eu possa escrever frases em linguagem natural e executá-las; à direita, um preview visual renderizado em tempo real mostrando o resultado real do comando no builder. Cada comando enviado deve passar pelo pipeline semântico completo e atualizar o preview usando o runtime real da aplicação, permitindo testar criação, edição, movimentação e exclusão de elementos diretamente pela conversa.
+
+Além do chat com preview renderizado, crie um painel administrativo completo para operar e evoluir o motor semântico.
+
+O painel deve permitir:
+
+- adicionar, editar, remover, pesquisar e importar/exportar SurfaceForms, lexemas, conceitos, sinônimos, flexões, erros comuns, expressões multiword, propriedades, valores, relações e regras;
+- cadastrar frases de treinamento/avaliação com AST, ExecutionPlan e resultado esperado;
+- corrigir manualmente interpretações erradas e salvar essas correções como novos dados de treinamento/regressão;
+- executar testes unitários, semânticos, regressivos, negativos, combinatórios e end-to-end;
+- visualizar tokens, candidatos lexicais, sentidos, AST, referências resolvidas, constraints, ExecutionPlan e resultado final;
+- acompanhar métricas de acurácia por camada, falsos positivos, ambiguidades, erros e regressões;
+- comparar versões da base de conhecimento e dos resultados;
+- importar/exportar datasets e backups;
+- configurar thresholds de confiança, recuperação fonética, resolução de ambiguidades e demais parâmetros do motor;
+- possuir áreas separadas para Dados, Treinamento, Testes, Métricas, Erros/Diagnósticos, Configurações e Histórico.
+
+O painel deve usar os mesmos dados e o mesmo motor da aplicação real, sem criar uma implementação paralela apenas para demonstração. Toda alteração feita nele deve poder ser validada imediatamente pelo chat e pelo preview.

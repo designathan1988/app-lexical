@@ -1,0 +1,6543 @@
+# ARQUITETURA CANÔNICA DO COMPILADOR SEMÂNTICO
+
+## 1. Pipeline definitivo
+
+```text
+RAW INPUT
+   │
+   ▼
+NON-DESTRUCTIVE LEXER
+   │
+   ├── WORD
+   ├── STRING_LITERAL
+   ├── NUMBER
+   ├── CSS_UNIT
+   ├── COLOR_HEX
+   └── PUNCTUATION
+   │
+   ▼
+GRAMMATICAL NORMALIZER
+   │
+   ├── Unicode normalization
+   ├── Portuguese contractions
+   └── token boundaries preserved
+   │
+   ▼
+MULTIWORD MATCHER
+   │
+   └── Trie / longest match
+   │
+   ▼
+LEXICAL RESOLUTION
+   │
+   ├── exact SurfaceForm candidates
+   ├── Lexeme candidates
+   ├── Concept/Sense candidates
+   └── phonetic candidates only as fallback
+   │
+   ▼
+DOMAIN PARSER
+   │
+   ├── action scope
+   ├── noun/entity phrases
+   ├── property/value phrases
+   ├── coordination
+   ├── containment
+   ├── spatial relations
+   ├── quantification
+   ├── negation
+   └── reference expressions
+   │
+   ▼
+SEMANTIC AST
+   │
+   ▼
+WORD-SENSE + PROPERTY BINDING
+   │
+   ▼
+DOCUMENT REFERENCE RESOLVER
+   │
+   ▼
+CONSTRAINT VALIDATOR
+   │
+   ▼
+EXECUTION PLANNER
+   │
+   ▼
+EXECUTION PLAN
+   │
+   ▼
+OPERATION-SPECIFIC EXECUTOR
+   ├── CREATE
+   ├── UPDATE
+   ├── DELETE
+   ├── MOVE
+   └── QUERY
+```
+
+A regra estrutural é:
+
+```text
+SurfaceForm ≠ Lexeme
+Lexeme ≠ Concept
+Concept ≠ Mention
+Mention ≠ DocumentInstance
+SemanticAST ≠ ExecutionPlan
+ExecutionPlan ≠ RuntimeMutation
+```
+
+---
+
+# 2. Tipos fundamentais
+
+```ts
+export type SurfaceFormId = string;
+export type LexemeId = string;
+export type ConceptId = string;
+export type DocumentNodeId = string;
+export type TempNodeId = string;
+export type RuleId = string;
+
+export type PartOfSpeech =
+  | 'NOUN'
+  | 'VERB'
+  | 'ADJECTIVE'
+  | 'ADVERB'
+  | 'PREPOSITION'
+  | 'PRONOUN'
+  | 'NUMERAL'
+  | 'CONJUNCTION'
+  | 'DETERMINER';
+
+export type GrammaticalGender =
+  | 'MASC'
+  | 'FEM'
+  | 'NEUTER'
+  | 'INVARIANT';
+
+export type GrammaticalNumber =
+  | 'SINGULAR'
+  | 'PLURAL'
+  | 'INVARIANT';
+
+export type ValueCategory =
+  | 'COLOR'
+  | 'SIZE'
+  | 'NUMBER'
+  | 'TEXT'
+  | 'BOOLEAN'
+  | 'ALIGNMENT'
+  | 'WEIGHT'
+  | 'DISPLAY'
+  | 'ENUM';
+
+export interface Morphology {
+  gender?: GrammaticalGender;
+  number?: GrammaticalNumber;
+
+  mood?:
+    | 'INDICATIVE'
+    | 'SUBJUNCTIVE'
+    | 'IMPERATIVE'
+    | 'INFINITIVE'
+    | 'GERUND'
+    | 'PARTICIPLE';
+
+  tense?:
+    | 'PRESENT'
+    | 'PAST'
+    | 'FUTURE';
+
+  person?: 1 | 2 | 3;
+}
+```
+
+---
+
+# 3. Camada lexical
+
+## 3.1 SurfaceForm
+
+Uma forma escrita representa somente uma ocorrência lexical reconhecível.
+
+Ela não carrega significado de runtime.
+
+```ts
+export interface SurfaceForm {
+  id: SurfaceFormId;
+
+  rawText: string;
+
+  lexemeId: LexemeId;
+
+  formType:
+    | 'CANONICAL'
+    | 'INFLECTION'
+    | 'COLLOQUIAL'
+    | 'MISSPELLING'
+    | 'ABBREVIATION';
+
+  morphology?: Morphology;
+}
+```
+
+Campos derivados como `searchKey` e `phoneticKey` não são persistidos obrigatoriamente.
+
+São índices calculados durante a inicialização.
+
+---
+
+## 3.2 Lexeme
+
+```ts
+export interface Lexeme {
+  id: LexemeId;
+
+  lemma: string;
+
+  pos: PartOfSpeech;
+
+  senseConceptIds: ConceptId[];
+}
+```
+
+Exemplo correto:
+
+```ts
+const LEXEMES: Record<LexemeId, Lexeme> = {
+  LEX_CRIAR: {
+    id: 'LEX_CRIAR',
+    lemma: 'criar',
+    pos: 'VERB',
+    senseConceptIds: ['C_ACT_CREATE']
+  },
+
+  LEX_ADICIONAR: {
+    id: 'LEX_ADICIONAR',
+    lemma: 'adicionar',
+    pos: 'VERB',
+    senseConceptIds: ['C_ACT_CREATE']
+  },
+
+  LEX_COLOCAR: {
+    id: 'LEX_COLOCAR',
+    lemma: 'colocar',
+    pos: 'VERB',
+    senseConceptIds: ['C_ACT_CREATE']
+  },
+
+  LEX_MUDAR: {
+    id: 'LEX_MUDAR',
+    lemma: 'mudar',
+    pos: 'VERB',
+    senseConceptIds: ['C_ACT_UPDATE']
+  },
+
+  LEX_DEIXAR: {
+    id: 'LEX_DEIXAR',
+    lemma: 'deixar',
+    pos: 'VERB',
+    senseConceptIds: ['C_ACT_UPDATE']
+  },
+
+  LEX_APAGAR: {
+    id: 'LEX_APAGAR',
+    lemma: 'apagar',
+    pos: 'VERB',
+    senseConceptIds: ['C_ACT_DELETE']
+  },
+
+  LEX_MOVER: {
+    id: 'LEX_MOVER',
+    lemma: 'mover',
+    pos: 'VERB',
+    senseConceptIds: ['C_ACT_MOVE']
+  }
+};
+```
+
+Assim:
+
+```text
+criar ─────────┐
+adicionar ─────┤
+colocar ───────┼──> C_ACT_CREATE
+botar ─────────┤
+fazer ─────────┘
+```
+
+continua representando lexemas independentes.
+
+---
+
+# 4. Ontologia
+
+```ts
+export type ConceptNode =
+  | EntityConcept
+  | ActionConcept
+  | PropertyConcept
+  | PropertyGroupConcept
+  | ValueConcept
+  | SpatialConcept
+  | OperatorConcept
+  | QueryConcept;
+```
+
+---
+
+## 4.1 EntityConcept
+
+```ts
+export interface EntityConcept {
+  kind: 'ENTITY';
+
+  id: ConceptId;
+
+  capabilities: {
+    canContainChildren: boolean;
+
+    allowedChildConceptIds?: ConceptId[];
+
+    allowedParentConceptIds?: ConceptId[];
+
+    acceptedPropertyIds: ConceptId[];
+
+    defaultValueBindings:
+      Partial<Record<ValueCategory, ConceptId>>;
+  };
+
+  rendering: {
+    rendererId: string;
+
+    domTag?: string;
+
+    defaultAttributes:
+      Record<string, string | number | boolean>;
+
+    defaultStyles:
+      Record<string, string | number>;
+  };
+}
+```
+
+---
+
+## 4.2 ActionConcept
+
+```ts
+export type RuntimeOperation =
+  | 'CREATE'
+  | 'UPDATE'
+  | 'DELETE'
+  | 'MOVE'
+  | 'QUERY';
+
+export interface ActionConcept {
+  kind: 'ACTION';
+
+  id: ConceptId;
+
+  operation: RuntimeOperation;
+
+  allowedArgumentRoles: Array<
+    | 'TARGET'
+    | 'ENTITY'
+    | 'PROPERTY'
+    | 'VALUE'
+    | 'DESTINATION'
+  >;
+}
+```
+
+---
+
+## 4.3 PropertyConcept
+
+```ts
+export interface PropertyConcept {
+  kind: 'PROPERTY';
+
+  id: ConceptId;
+
+  runtimeProperty: string;
+
+  valueCategories: ValueCategory[];
+
+  groupId?: ConceptId;
+
+  clearValue?: string | number | boolean | null;
+}
+```
+
+---
+
+## 4.4 PropertyGroupConcept
+
+Isto resolve corretamente termos como `borda`.
+
+`borda` não precisa significar diretamente `borderColor` nem `borderWidth`.
+
+```ts
+export interface PropertyGroupConcept {
+  kind: 'PROPERTY_GROUP';
+
+  id: ConceptId;
+
+  members: ConceptId[];
+
+  bindingByValueCategory:
+    Partial<Record<ValueCategory, ConceptId>>;
+
+  clearPropertyIds: ConceptId[];
+}
+```
+
+Exemplo:
+
+```ts
+const BORDER_GROUP: PropertyGroupConcept = {
+  kind: 'PROPERTY_GROUP',
+
+  id: 'C_PROP_GROUP_BORDER',
+
+  members: [
+    'C_PROP_BORDER_COLOR',
+    'C_PROP_BORDER_WIDTH',
+    'C_PROP_BORDER_STYLE'
+  ],
+
+  bindingByValueCategory: {
+    COLOR: 'C_PROP_BORDER_COLOR',
+    SIZE: 'C_PROP_BORDER_WIDTH',
+    ENUM: 'C_PROP_BORDER_STYLE'
+  },
+
+  clearPropertyIds: [
+    'C_PROP_BORDER_COLOR',
+    'C_PROP_BORDER_WIDTH',
+    'C_PROP_BORDER_STYLE'
+  ]
+};
+```
+
+Portanto:
+
+```text
+borda azul
+→ COLOR
+→ borderColor
+
+borda 2px
+→ SIZE
+→ borderWidth
+
+sem borda
+→ CLEAR C_PROP_GROUP_BORDER
+```
+
+---
+
+## 4.5 ValueConcept
+
+```ts
+export interface ValueConcept {
+  kind: 'VALUE';
+
+  id: ConceptId;
+
+  valueCategory: ValueCategory;
+
+  literal: string | number | boolean;
+}
+```
+
+Exemplo:
+
+```ts
+const BLUE: ValueConcept = {
+  kind: 'VALUE',
+  id: 'C_VAL_BLUE',
+  valueCategory: 'COLOR',
+  literal: '#2563eb'
+};
+```
+
+---
+
+## 4.6 SpatialConcept
+
+```ts
+export type SpatialRelation =
+  | 'CHILD_OF'
+  | 'BEFORE'
+  | 'AFTER'
+  | 'BESIDE'
+  | 'ABOVE'
+  | 'BELOW';
+
+export interface SpatialConcept {
+  kind: 'SPATIAL';
+
+  id: ConceptId;
+
+  relation: SpatialRelation;
+}
+```
+
+---
+
+## 4.7 Operators
+
+```ts
+export interface OperatorConcept {
+  kind: 'OPERATOR';
+
+  id: ConceptId;
+
+  operator:
+    | 'NEGATION'
+    | 'WITHOUT'
+    | 'EXCEPT';
+}
+```
+
+---
+
+## 4.8 Queries
+
+```ts
+export interface QueryConcept {
+  kind: 'QUERY';
+
+  id: ConceptId;
+
+  query:
+    | 'INSPECT'
+    | 'COUNT'
+    | 'EXISTS';
+}
+```
+
+---
+
+# 5. Banco ontológico inicial
+
+```ts
+export const CONCEPTS:
+  Record<ConceptId, ConceptNode> = {
+
+  C_ENT_CONTAINER: {
+    kind: 'ENTITY',
+
+    id: 'C_ENT_CONTAINER',
+
+    capabilities: {
+      canContainChildren: true,
+
+      allowedChildConceptIds: [
+        'C_ENT_CONTAINER',
+        'C_ENT_BUTTON',
+        'C_ENT_TEXT'
+      ],
+
+      allowedParentConceptIds: [
+        'C_ENT_ROOT',
+        'C_ENT_CONTAINER'
+      ],
+
+      acceptedPropertyIds: [
+        'C_PROP_BG_COLOR',
+        'C_PROP_BORDER_COLOR',
+        'C_PROP_BORDER_WIDTH',
+        'C_PROP_BORDER_STYLE',
+        'C_PROP_PADDING'
+      ],
+
+      defaultValueBindings: {
+        COLOR: 'C_PROP_BG_COLOR'
+      }
+    },
+
+    rendering: {
+      rendererId: 'container',
+
+      domTag: 'div',
+
+      defaultAttributes: {
+        'data-builder-type': 'container'
+      },
+
+      defaultStyles: {
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '16px',
+        gap: '8px'
+      }
+    }
+  },
+
+  C_ENT_BUTTON: {
+    kind: 'ENTITY',
+
+    id: 'C_ENT_BUTTON',
+
+    capabilities: {
+      canContainChildren: false,
+
+      allowedChildConceptIds: [],
+
+      allowedParentConceptIds: [
+        'C_ENT_ROOT',
+        'C_ENT_CONTAINER'
+      ],
+
+      acceptedPropertyIds: [
+        'C_PROP_BG_COLOR',
+        'C_PROP_TEXT_COLOR',
+        'C_PROP_BORDER_COLOR',
+        'C_PROP_BORDER_WIDTH',
+        'C_PROP_BORDER_STYLE'
+      ],
+
+      defaultValueBindings: {
+        COLOR: 'C_PROP_BG_COLOR'
+      }
+    },
+
+    rendering: {
+      rendererId: 'button',
+
+      domTag: 'button',
+
+      defaultAttributes: {
+        type: 'button'
+      },
+
+      defaultStyles: {
+        padding: '10px 16px',
+        cursor: 'pointer'
+      }
+    }
+  },
+
+  C_ACT_CREATE: {
+    kind: 'ACTION',
+    id: 'C_ACT_CREATE',
+    operation: 'CREATE',
+    allowedArgumentRoles: [
+      'ENTITY',
+      'PROPERTY',
+      'VALUE',
+      'DESTINATION'
+    ]
+  },
+
+  C_ACT_UPDATE: {
+    kind: 'ACTION',
+    id: 'C_ACT_UPDATE',
+    operation: 'UPDATE',
+    allowedArgumentRoles: [
+      'TARGET',
+      'PROPERTY',
+      'VALUE'
+    ]
+  },
+
+  C_ACT_DELETE: {
+    kind: 'ACTION',
+    id: 'C_ACT_DELETE',
+    operation: 'DELETE',
+    allowedArgumentRoles: ['TARGET']
+  },
+
+  C_ACT_MOVE: {
+    kind: 'ACTION',
+    id: 'C_ACT_MOVE',
+    operation: 'MOVE',
+    allowedArgumentRoles: [
+      'TARGET',
+      'DESTINATION'
+    ]
+  },
+
+  C_PROP_BG_COLOR: {
+    kind: 'PROPERTY',
+    id: 'C_PROP_BG_COLOR',
+    runtimeProperty: 'backgroundColor',
+    valueCategories: ['COLOR']
+  },
+
+  C_PROP_TEXT_COLOR: {
+    kind: 'PROPERTY',
+    id: 'C_PROP_TEXT_COLOR',
+    runtimeProperty: 'color',
+    valueCategories: ['COLOR']
+  },
+
+  C_PROP_BORDER_COLOR: {
+    kind: 'PROPERTY',
+    id: 'C_PROP_BORDER_COLOR',
+    runtimeProperty: 'borderColor',
+    valueCategories: ['COLOR'],
+    groupId: 'C_PROP_GROUP_BORDER'
+  },
+
+  C_PROP_BORDER_WIDTH: {
+    kind: 'PROPERTY',
+    id: 'C_PROP_BORDER_WIDTH',
+    runtimeProperty: 'borderWidth',
+    valueCategories: ['SIZE'],
+    groupId: 'C_PROP_GROUP_BORDER'
+  },
+
+  C_PROP_BORDER_STYLE: {
+    kind: 'PROPERTY',
+    id: 'C_PROP_BORDER_STYLE',
+    runtimeProperty: 'borderStyle',
+    valueCategories: ['ENUM'],
+    groupId: 'C_PROP_GROUP_BORDER',
+    clearValue: 'none'
+  },
+
+  C_PROP_GROUP_BORDER: {
+    kind: 'PROPERTY_GROUP',
+
+    id: 'C_PROP_GROUP_BORDER',
+
+    members: [
+      'C_PROP_BORDER_COLOR',
+      'C_PROP_BORDER_WIDTH',
+      'C_PROP_BORDER_STYLE'
+    ],
+
+    bindingByValueCategory: {
+      COLOR: 'C_PROP_BORDER_COLOR',
+      SIZE: 'C_PROP_BORDER_WIDTH',
+      ENUM: 'C_PROP_BORDER_STYLE'
+    },
+
+    clearPropertyIds: [
+      'C_PROP_BORDER_COLOR',
+      'C_PROP_BORDER_WIDTH',
+      'C_PROP_BORDER_STYLE'
+    ]
+  },
+
+  C_VAL_BLUE: {
+    kind: 'VALUE',
+    id: 'C_VAL_BLUE',
+    valueCategory: 'COLOR',
+    literal: '#2563eb'
+  },
+
+  C_VAL_RED: {
+    kind: 'VALUE',
+    id: 'C_VAL_RED',
+    valueCategory: 'COLOR',
+    literal: '#dc2626'
+  },
+
+  C_VAL_NONE: {
+    kind: 'VALUE',
+    id: 'C_VAL_NONE',
+    valueCategory: 'ENUM',
+    literal: 'none'
+  },
+
+  C_SPAT_INSIDE: {
+    kind: 'SPATIAL',
+    id: 'C_SPAT_INSIDE',
+    relation: 'CHILD_OF'
+  },
+
+  C_SPAT_AFTER: {
+    kind: 'SPATIAL',
+    id: 'C_SPAT_AFTER',
+    relation: 'AFTER'
+  },
+
+  C_SPAT_BEFORE: {
+    kind: 'SPATIAL',
+    id: 'C_SPAT_BEFORE',
+    relation: 'BEFORE'
+  },
+
+  C_SPAT_BESIDE: {
+    kind: 'SPATIAL',
+    id: 'C_SPAT_BESIDE',
+    relation: 'BESIDE'
+  },
+
+  C_OP_NOT: {
+    kind: 'OPERATOR',
+    id: 'C_OP_NOT',
+    operator: 'NEGATION'
+  },
+
+  C_OP_WITHOUT: {
+    kind: 'OPERATOR',
+    id: 'C_OP_WITHOUT',
+    operator: 'WITHOUT'
+  },
+
+  C_OP_EXCEPT: {
+    kind: 'OPERATOR',
+    id: 'C_OP_EXCEPT',
+    operator: 'EXCEPT'
+  }
+};
+```
+
+---
+
+# 6. Formas superficiais
+
+```ts
+export const SURFACE_FORMS: SurfaceForm[] = [
+  {
+    id: 'SF_CRIAR',
+    rawText: 'criar',
+    lexemeId: 'LEX_CRIAR',
+    formType: 'CANONICAL'
+  },
+
+  {
+    id: 'SF_CRIE',
+    rawText: 'crie',
+    lexemeId: 'LEX_CRIAR',
+    formType: 'INFLECTION',
+    morphology: {
+      mood: 'IMPERATIVE'
+    }
+  },
+
+  {
+    id: 'SF_ADICIONE',
+    rawText: 'adicione',
+    lexemeId: 'LEX_ADICIONAR',
+    formType: 'INFLECTION'
+  },
+
+  {
+    id: 'SF_MUDE',
+    rawText: 'mude',
+    lexemeId: 'LEX_MUDAR',
+    formType: 'INFLECTION'
+  },
+
+  {
+    id: 'SF_DEIXE',
+    rawText: 'deixe',
+    lexemeId: 'LEX_DEIXAR',
+    formType: 'INFLECTION'
+  },
+
+  {
+    id: 'SF_APAGUE',
+    rawText: 'apague',
+    lexemeId: 'LEX_APAGAR',
+    formType: 'INFLECTION'
+  },
+
+  {
+    id: 'SF_MOVA',
+    rawText: 'mova',
+    lexemeId: 'LEX_MOVER',
+    formType: 'INFLECTION'
+  },
+
+  {
+    id: 'SF_BOTAO',
+    rawText: 'botão',
+    lexemeId: 'LEX_BOTAO',
+    formType: 'CANONICAL',
+    morphology: {
+      gender: 'MASC',
+      number: 'SINGULAR'
+    }
+  },
+
+  {
+    id: 'SF_BOTOES',
+    rawText: 'botões',
+    lexemeId: 'LEX_BOTAO',
+    formType: 'INFLECTION',
+    morphology: {
+      gender: 'MASC',
+      number: 'PLURAL'
+    }
+  },
+
+  {
+    id: 'SF_BOTAO_ASCII',
+    rawText: 'botao',
+    lexemeId: 'LEX_BOTAO',
+    formType: 'COLLOQUIAL'
+  },
+
+  {
+    id: 'SF_CAIXA',
+    rawText: 'caixa',
+    lexemeId: 'LEX_CAIXA',
+    formType: 'CANONICAL',
+    morphology: {
+      gender: 'FEM',
+      number: 'SINGULAR'
+    }
+  },
+
+  {
+    id: 'SF_CAIXAS',
+    rawText: 'caixas',
+    lexemeId: 'LEX_CAIXA',
+    formType: 'INFLECTION',
+    morphology: {
+      gender: 'FEM',
+      number: 'PLURAL'
+    }
+  },
+
+  {
+    id: 'SF_AZUL',
+    rawText: 'azul',
+    lexemeId: 'LEX_AZUL',
+    formType: 'CANONICAL'
+  },
+
+  {
+    id: 'SF_AZUIS',
+    rawText: 'azuis',
+    lexemeId: 'LEX_AZUL',
+    formType: 'INFLECTION'
+  },
+
+  {
+    id: 'SF_ASUL',
+    rawText: 'asul',
+    lexemeId: 'LEX_AZUL',
+    formType: 'MISSPELLING'
+  },
+
+  {
+    id: 'SF_VERMELHO',
+    rawText: 'vermelho',
+    lexemeId: 'LEX_VERMELHO',
+    formType: 'CANONICAL'
+  },
+
+  {
+    id: 'SF_BORDA',
+    rawText: 'borda',
+    lexemeId: 'LEX_BORDA',
+    formType: 'CANONICAL'
+  },
+
+  {
+    id: 'SF_FUNDO',
+    rawText: 'fundo',
+    lexemeId: 'LEX_FUNDO',
+    formType: 'CANONICAL'
+  }
+];
+```
+
+---
+
+# 7. Lexemas semânticos
+
+```ts
+Object.assign(LEXEMES, {
+  LEX_BOTAO: {
+    id: 'LEX_BOTAO',
+    lemma: 'botão',
+    pos: 'NOUN',
+    senseConceptIds: ['C_ENT_BUTTON']
+  },
+
+  LEX_CAIXA: {
+    id: 'LEX_CAIXA',
+    lemma: 'caixa',
+    pos: 'NOUN',
+    senseConceptIds: ['C_ENT_CONTAINER']
+  },
+
+  LEX_AZUL: {
+    id: 'LEX_AZUL',
+    lemma: 'azul',
+    pos: 'ADJECTIVE',
+    senseConceptIds: ['C_VAL_BLUE']
+  },
+
+  LEX_VERMELHO: {
+    id: 'LEX_VERMELHO',
+    lemma: 'vermelho',
+    pos: 'ADJECTIVE',
+    senseConceptIds: ['C_VAL_RED']
+  },
+
+  LEX_BORDA: {
+    id: 'LEX_BORDA',
+    lemma: 'borda',
+    pos: 'NOUN',
+    senseConceptIds: ['C_PROP_GROUP_BORDER']
+  },
+
+  LEX_FUNDO: {
+    id: 'LEX_FUNDO',
+    lemma: 'fundo',
+    pos: 'NOUN',
+    senseConceptIds: ['C_PROP_BG_COLOR']
+  }
+});
+```
+
+---
+
+# 8. Multiword Expressions
+
+```ts
+export interface MultiwordEntry {
+  id: string;
+  phrase: string;
+  conceptId: ConceptId;
+}
+
+export const MULTIWORDS: MultiwordEntry[] = [
+  {
+    id: 'MWE_BG_COLOR',
+    phrase: 'cor de fundo',
+    conceptId: 'C_PROP_BG_COLOR'
+  },
+
+  {
+    id: 'MWE_TEXT_COLOR',
+    phrase: 'cor do texto',
+    conceptId: 'C_PROP_TEXT_COLOR'
+  },
+
+  {
+    id: 'MWE_INSIDE',
+    phrase: 'dentro de',
+    conceptId: 'C_SPAT_INSIDE'
+  },
+
+  {
+    id: 'MWE_AFTER',
+    phrase: 'depois de',
+    conceptId: 'C_SPAT_AFTER'
+  },
+
+  {
+    id: 'MWE_BEFORE',
+    phrase: 'antes de',
+    conceptId: 'C_SPAT_BEFORE'
+  },
+
+  {
+    id: 'MWE_BESIDE',
+    phrase: 'ao lado de',
+    conceptId: 'C_SPAT_BESIDE'
+  }
+];
+```
+
+---
+
+# 9. Lexer não destrutivo
+
+```ts
+export type RawTokenType =
+  | 'WORD'
+  | 'STRING'
+  | 'NUMBER'
+  | 'CSS_UNIT'
+  | 'COLOR_HEX'
+  | 'PUNCT';
+
+export interface RawToken {
+  type: RawTokenType;
+
+  raw: string;
+
+  normalized?: string;
+
+  start: number;
+
+  end: number;
+
+  value?: string | number;
+
+  unit?: string;
+}
+
+export class RawLexer {
+  static normalize(text: string): string {
+    return text
+      .normalize('NFD')
+      .replace(/\p{M}/gu, '')
+      .toLowerCase();
+  }
+
+  lex(input: string): RawToken[] {
+    const tokens: RawToken[] = [];
+
+    let i = 0;
+
+    while (i < input.length) {
+      const char = input[i];
+
+      if (/\s/u.test(char)) {
+        i++;
+        continue;
+      }
+
+      const rest = input.slice(i);
+
+      if (char === '"' || char === "'") {
+        const quote = char;
+
+        let j = i + 1;
+        let escaped = false;
+
+        while (j < input.length) {
+          if (!escaped && input[j] === quote) {
+            break;
+          }
+
+          escaped =
+            !escaped &&
+            input[j] === '\\';
+
+          if (input[j] !== '\\') {
+            escaped = false;
+          }
+
+          j++;
+        }
+
+        const close =
+          j < input.length
+            ? j
+            : input.length - 1;
+
+        const raw =
+          input.slice(i, close + 1);
+
+        const value =
+          input.slice(i + 1, close);
+
+        tokens.push({
+          type: 'STRING',
+          raw,
+          value,
+          start: i,
+          end: close + 1
+        });
+
+        i = close + 1;
+        continue;
+      }
+
+      const hex =
+        rest.match(/^#[0-9a-fA-F]{3,8}(?![0-9a-fA-F])/);
+
+      if (hex) {
+        tokens.push({
+          type: 'COLOR_HEX',
+          raw: hex[0],
+          value: hex[0],
+          start: i,
+          end: i + hex[0].length
+        });
+
+        i += hex[0].length;
+        continue;
+      }
+
+      const unit =
+        rest.match(
+          /^-?(?:\d+(?:\.\d+)?|\.\d+)(px|rem|em|%|vh|vw|vmin|vmax|ch|ex)\b/i
+        );
+
+      if (unit) {
+        const amount =
+          Number.parseFloat(unit[0]);
+
+        tokens.push({
+          type: 'CSS_UNIT',
+          raw: unit[0],
+          value: amount,
+          unit: unit[1].toLowerCase(),
+          start: i,
+          end: i + unit[0].length
+        });
+
+        i += unit[0].length;
+        continue;
+      }
+
+      const number =
+        rest.match(
+          /^-?(?:\d+(?:\.\d+)?|\.\d+)/
+        );
+
+      if (number) {
+        tokens.push({
+          type: 'NUMBER',
+          raw: number[0],
+          value:
+            Number.parseFloat(number[0]),
+          start: i,
+          end: i + number[0].length
+        });
+
+        i += number[0].length;
+        continue;
+      }
+
+      const word =
+        rest.match(
+          /^[\p{L}\p{M}][\p{L}\p{M}\d_-]*/u
+        );
+
+      if (word) {
+        tokens.push({
+          type: 'WORD',
+          raw: word[0],
+          normalized:
+            RawLexer.normalize(word[0]),
+          start: i,
+          end: i + word[0].length
+        });
+
+        i += word[0].length;
+        continue;
+      }
+
+      tokens.push({
+        type: 'PUNCT',
+        raw: char,
+        value: char,
+        start: i,
+        end: i + 1
+      });
+
+      i++;
+    }
+
+    return tokens;
+  }
+}
+```
+
+Nenhum `#2563eb`, `20px`, `"Entrar"` ou `1.5rem` é destruído.
+
+---
+
+# 10. Expansão gramatical das contrações portuguesas
+
+A contração é uma característica gramatical.
+
+Ela não deve poluir a ontologia.
+
+```ts
+const CONTRACTIONS:
+  Record<string, string[]> = {
+  do: ['de', 'o'],
+  da: ['de', 'a'],
+  dos: ['de', 'os'],
+  das: ['de', 'as'],
+
+  no: ['em', 'o'],
+  na: ['em', 'a'],
+  nos: ['em', 'os'],
+  nas: ['em', 'as'],
+
+  pelo: ['por', 'o'],
+  pela: ['por', 'a'],
+
+  dele: ['de', 'ele'],
+  dela: ['de', 'ela'],
+  deles: ['de', 'eles'],
+  delas: ['de', 'elas']
+};
+
+export function expandContractions(
+  tokens: RawToken[]
+): RawToken[] {
+  const result: RawToken[] = [];
+
+  for (const token of tokens) {
+    if (
+      token.type !== 'WORD' ||
+      !token.normalized
+    ) {
+      result.push(token);
+      continue;
+    }
+
+    const expansion =
+      CONTRACTIONS[token.normalized];
+
+    if (!expansion) {
+      result.push(token);
+      continue;
+    }
+
+    for (const word of expansion) {
+      result.push({
+        type: 'WORD',
+        raw: word,
+        normalized: word,
+        start: token.start,
+        end: token.end
+      });
+    }
+  }
+
+  return result;
+}
+```
+
+---
+
+# 11. Trie verdadeiro para expressões multiword
+
+```ts
+interface TrieNode {
+  children: Map<string, TrieNode>;
+  entry?: MultiwordEntry;
+}
+
+export class MultiwordTrie {
+  private root: TrieNode = {
+    children: new Map()
+  };
+
+  constructor(entries: MultiwordEntry[]) {
+    for (const entry of entries) {
+      this.insert(entry);
+    }
+  }
+
+  private insert(entry: MultiwordEntry): void {
+    const parts =
+      RawLexer
+        .normalize(entry.phrase)
+        .split(/\s+/);
+
+    let node = this.root;
+
+    for (const part of parts) {
+      let child =
+        node.children.get(part);
+
+      if (!child) {
+        child = {
+          children: new Map()
+        };
+
+        node.children.set(
+          part,
+          child
+        );
+      }
+
+      node = child;
+    }
+
+    node.entry = entry;
+  }
+
+  match(
+    tokens: RawToken[],
+    start: number
+  ): {
+    entry: MultiwordEntry;
+    length: number;
+  } | null {
+    let node = this.root;
+
+    let best:
+      | {
+          entry: MultiwordEntry;
+          length: number;
+        }
+      | null = null;
+
+    for (
+      let i = start;
+      i < tokens.length;
+      i++
+    ) {
+      const token = tokens[i];
+
+      if (
+        token.type !== 'WORD' ||
+        !token.normalized
+      ) {
+        break;
+      }
+
+      const child =
+        node.children.get(
+          token.normalized
+        );
+
+      if (!child) {
+        break;
+      }
+
+      node = child;
+
+      if (node.entry) {
+        best = {
+          entry: node.entry,
+          length: i - start + 1
+        };
+      }
+    }
+
+    return best;
+  }
+}
+```
+
+---
+
+# 12. Fonética: somente geração de candidatos
+
+A fonética jamais seleciona diretamente um significado.
+
+```ts
+export class PortuguesePhonetic {
+  static key(input: string): string {
+    let s =
+      RawLexer.normalize(input);
+
+    s = s
+      .replace(/nh/g, 'N')
+      .replace(/lh/g, 'L')
+      .replace(/ch/g, 'X')
+      .replace(/sh/g, 'X')
+      .replace(/ph/g, 'F');
+
+    s = s
+      .replace(/qu(?=[ei])/g, 'K')
+      .replace(/gu(?=[ei])/g, 'G');
+
+    s = s
+      .replace(/ç/g, 's')
+      .replace(/c(?=[ei])/g, 's')
+      .replace(/c/g, 'k')
+      .replace(/q/g, 'k')
+      .replace(/z/g, 's')
+      .replace(/x/g, 's')
+      .replace(/g(?=[ei])/g, 'j')
+      .replace(/h/g, '');
+
+    s = s
+      .replace(/[aeiou]+/g, 'A')
+      .replace(/(.)\1+/g, '$1');
+
+    return s.toUpperCase();
+  }
+}
+```
+
+A função pode ser substituída posteriormente por algoritmo fonético português mais sofisticado sem alterar nenhuma outra camada.
+
+---
+
+# 13. Índices lexicais
+
+```ts
+export interface SurfaceCandidate {
+  surfaceForm: SurfaceForm;
+  lexeme: Lexeme;
+
+  source:
+    | 'EXACT'
+    | 'PHONETIC';
+
+  score: number;
+}
+
+export class LexicalIndex {
+  private exact =
+    new Map<string, SurfaceForm[]>();
+
+  private phonetic =
+    new Map<string, SurfaceForm[]>();
+
+  constructor(
+    private surfaceForms: SurfaceForm[],
+    private lexemes:
+      Record<LexemeId, Lexeme>
+  ) {
+    this.build();
+  }
+
+  private build(): void {
+    for (
+      const surface
+      of this.surfaceForms
+    ) {
+      const normalized =
+        RawLexer.normalize(
+          surface.rawText
+        );
+
+      const exactBucket =
+        this.exact.get(normalized) ?? [];
+
+      exactBucket.push(surface);
+
+      this.exact.set(
+        normalized,
+        exactBucket
+      );
+
+      const phoneticKey =
+        PortuguesePhonetic.key(
+          surface.rawText
+        );
+
+      const phoneticBucket =
+        this.phonetic.get(
+          phoneticKey
+        ) ?? [];
+
+      phoneticBucket.push(surface);
+
+      this.phonetic.set(
+        phoneticKey,
+        phoneticBucket
+      );
+    }
+  }
+
+  resolve(
+    raw: string
+  ): SurfaceCandidate[] {
+    const normalized =
+      RawLexer.normalize(raw);
+
+    const exactMatches =
+      this.exact.get(normalized);
+
+    if (exactMatches?.length) {
+      return exactMatches
+        .map(surface => ({
+          surfaceForm: surface,
+
+          lexeme:
+            this.lexemes[
+              surface.lexemeId
+            ],
+
+          source: 'EXACT' as const,
+
+          score:
+            surface.formType ===
+            'CANONICAL'
+              ? 1
+              : 0.98
+        }))
+        .filter(x => x.lexeme);
+    }
+
+    const phonetic =
+      PortuguesePhonetic.key(raw);
+
+    return (
+      this.phonetic.get(
+        phonetic
+      ) ?? []
+    )
+      .map(surface => ({
+        surfaceForm: surface,
+
+        lexeme:
+          this.lexemes[
+            surface.lexemeId
+          ],
+
+        source:
+          'PHONETIC' as const,
+
+        score: 0.65
+      }))
+      .filter(x => x.lexeme);
+  }
+}
+```
+
+Nenhum:
+
+```ts
+matches[0]
+```
+
+é utilizado como decisão semântica.
+
+---
+
+# 14. Tokens semânticos
+
+```ts
+export interface ConceptCandidate {
+  conceptId: ConceptId;
+
+  lexemeId?: LexemeId;
+
+  score: number;
+
+  source:
+    | 'EXACT'
+    | 'PHONETIC'
+    | 'MULTIWORD'
+    | 'LITERAL';
+}
+
+export interface SemanticToken {
+  rawTokens: RawToken[];
+
+  candidates: ConceptCandidate[];
+
+  literal?:
+    | {
+        kind: 'TEXT';
+        value: string;
+      }
+    | {
+        kind: 'SIZE';
+        value: number;
+        unit: string;
+      }
+    | {
+        kind: 'NUMBER';
+        value: number;
+      }
+    | {
+        kind: 'COLOR';
+        value: string;
+      };
+}
+```
+
+---
+
+# 15. Resolução lexical
+
+```ts
+export class SemanticTokenBuilder {
+  constructor(
+    private concepts:
+      Record<ConceptId, ConceptNode>,
+
+    private lexicalIndex:
+      LexicalIndex,
+
+    private trie:
+      MultiwordTrie
+  ) {}
+
+  build(
+    tokens: RawToken[]
+  ): SemanticToken[] {
+    const output:
+      SemanticToken[] = [];
+
+    for (
+      let i = 0;
+      i < tokens.length;
+    ) {
+      const token = tokens[i];
+
+      const mwe =
+        this.trie.match(
+          tokens,
+          i
+        );
+
+      if (mwe) {
+        output.push({
+          rawTokens:
+            tokens.slice(
+              i,
+              i + mwe.length
+            ),
+
+          candidates: [
+            {
+              conceptId:
+                mwe.entry.conceptId,
+
+              score: 1,
+
+              source:
+                'MULTIWORD'
+            }
+          ]
+        });
+
+        i += mwe.length;
+        continue;
+      }
+
+      if (
+        token.type === 'STRING'
+      ) {
+        output.push({
+          rawTokens: [token],
+          candidates: [],
+          literal: {
+            kind: 'TEXT',
+            value:
+              String(token.value)
+          }
+        });
+
+        i++;
+        continue;
+      }
+
+      if (
+        token.type ===
+        'COLOR_HEX'
+      ) {
+        output.push({
+          rawTokens: [token],
+          candidates: [],
+          literal: {
+            kind: 'COLOR',
+            value:
+              String(token.value)
+          }
+        });
+
+        i++;
+        continue;
+      }
+
+      if (
+        token.type ===
+        'CSS_UNIT'
+      ) {
+        output.push({
+          rawTokens: [token],
+          candidates: [],
+          literal: {
+            kind: 'SIZE',
+            value:
+              Number(token.value),
+            unit:
+              token.unit!
+          }
+        });
+
+        i++;
+        continue;
+      }
+
+      if (
+        token.type === 'NUMBER'
+      ) {
+        output.push({
+          rawTokens: [token],
+          candidates: [],
+          literal: {
+            kind: 'NUMBER',
+            value:
+              Number(token.value)
+          }
+        });
+
+        i++;
+        continue;
+      }
+
+      if (
+        token.type === 'WORD'
+      ) {
+        const lexical =
+          this.lexicalIndex.resolve(
+            token.raw
+          );
+
+        const candidates:
+          ConceptCandidate[] = [];
+
+        for (
+          const candidate
+          of lexical
+        ) {
+          for (
+            const conceptId
+            of candidate.lexeme
+              .senseConceptIds
+          ) {
+            if (
+              this.concepts[
+                conceptId
+              ]
+            ) {
+              candidates.push({
+                conceptId,
+                lexemeId:
+                  candidate.lexeme.id,
+                score:
+                  candidate.score,
+                source:
+                  candidate.source
+              });
+            }
+          }
+        }
+
+        output.push({
+          rawTokens: [token],
+          candidates
+        });
+
+        i++;
+        continue;
+      }
+
+      output.push({
+        rawTokens: [token],
+        candidates: []
+      });
+
+      i++;
+    }
+
+    return output;
+  }
+}
+```
+
+---
+
+# 16. Gramática fechada
+
+Artigos, conectivos, ordinais e quantificadores não precisam ser transformados em componentes do builder.
+
+```ts
+export const GRAMMAR = {
+  definiteArticles:
+    new Set([
+      'o',
+      'a',
+      'os',
+      'as'
+    ]),
+
+  indefiniteArticles:
+    new Set([
+      'um',
+      'uma',
+      'uns',
+      'umas'
+    ]),
+
+  conjunctions:
+    new Set([
+      'e'
+    ]),
+
+  with:
+    new Set([
+      'com'
+    ]),
+
+  to:
+    new Set([
+      'para'
+    ]),
+
+  from:
+    new Set([
+      'de'
+    ]),
+
+  except:
+    new Set([
+      'menos',
+      'exceto'
+    ]),
+
+  all:
+    new Set([
+      'todo',
+      'toda',
+      'todos',
+      'todas'
+    ]),
+
+  pronouns:
+    new Set([
+      'ele',
+      'ela',
+      'eles',
+      'elas'
+    ]),
+
+  ordinals:
+    new Map<string, number>([
+      ['primeiro', 0],
+      ['primeira', 0],
+      ['segundo', 1],
+      ['segunda', 1],
+      ['terceiro', 2],
+      ['terceira', 2],
+      ['quarto', 3],
+      ['quarta', 3],
+      ['quinto', 4],
+      ['quinta', 4]
+    ])
+};
+```
+
+---
+
+# 17. Semantic AST
+
+O AST não contém nós do DOM.
+
+Não contém funções.
+
+Não contém referências circulares.
+
+```ts
+export interface NewEntityRef {
+  kind: 'NEW_ENTITY';
+  tempId: TempNodeId;
+}
+
+export interface SelectorRef {
+  kind: 'SELECTOR';
+  selector: SemanticSelector;
+}
+
+export interface SelectionRef {
+  kind: 'CURRENT_SELECTION';
+}
+
+export type SemanticReference =
+  | NewEntityRef
+  | SelectorRef
+  | SelectionRef;
+```
+
+---
+
+## 17.1 Selector
+
+```ts
+export interface SemanticSelector {
+  entityConceptId?: ConceptId;
+
+  ordinalIndex?: number;
+
+  quantity?:
+    | {
+        mode: 'ONE';
+      }
+    | {
+        mode: 'ALL';
+      }
+    | {
+        mode: 'COUNT';
+        count: number;
+      };
+
+  textEquals?: string;
+
+  parent?: SemanticSelector;
+
+  direction?:
+    | 'LEFTMOST'
+    | 'RIGHTMOST'
+    | 'TOPMOST'
+    | 'BOTTOMMOST';
+
+  exclusions?:
+    SemanticSelector[];
+}
+```
+
+---
+
+## 17.2 Property mutations
+
+```ts
+export type AstPropertyMutation =
+  | {
+      kind: 'SET';
+
+      propertyConceptId?:
+        ConceptId;
+
+      propertyGroupId?:
+        ConceptId;
+
+      value:
+        AstValue;
+    }
+  | {
+      kind: 'CLEAR';
+
+      propertyConceptId?:
+        ConceptId;
+
+      propertyGroupId?:
+        ConceptId;
+    };
+
+export interface AstValue {
+  category: ValueCategory;
+
+  literal:
+    string |
+    number |
+    boolean;
+}
+```
+
+---
+
+## 17.3 New entity
+
+```ts
+export interface NewEntityAst {
+  tempId: TempNodeId;
+
+  entityConceptId:
+    ConceptId;
+
+  quantity: number;
+
+  text?: string;
+
+  mutations:
+    AstPropertyMutation[];
+}
+```
+
+---
+
+## 17.4 Placement
+
+```ts
+export interface PlacementAst {
+  source:
+    SemanticReference;
+
+  relationConceptId:
+    ConceptId;
+
+  target:
+    SemanticReference;
+}
+```
+
+---
+
+## 17.5 Commands
+
+```ts
+export type SemanticCommand =
+  | CreateCommandAst
+  | UpdateCommandAst
+  | DeleteCommandAst
+  | MoveCommandAst
+  | QueryCommandAst
+  | NoOpCommandAst;
+
+export interface CreateCommandAst {
+  kind: 'CREATE';
+
+  entities:
+    NewEntityAst[];
+
+  placements:
+    PlacementAst[];
+}
+
+export interface UpdateCommandAst {
+  kind: 'UPDATE';
+
+  target:
+    SemanticReference;
+
+  mutations:
+    AstPropertyMutation[];
+}
+
+export interface DeleteCommandAst {
+  kind: 'DELETE';
+
+  target:
+    SemanticReference;
+}
+
+export interface MoveCommandAst {
+  kind: 'MOVE';
+
+  target:
+    SemanticReference;
+
+  placement:
+    PlacementAst;
+}
+
+export interface QueryCommandAst {
+  kind: 'QUERY';
+
+  target:
+    SemanticReference;
+}
+
+export interface NoOpCommandAst {
+  kind: 'NO_OP';
+
+  reason:
+    'NEGATED_ACTION';
+}
+
+export interface SemanticDocumentAst {
+  commands:
+    SemanticCommand[];
+}
+```
+
+---
+
+# 18. Mention context
+
+Pronomes como `ela`, `ele`, `dela`, `dele` apontam para ocorrências anteriores, não para conceitos globais.
+
+```ts
+interface Mention {
+  reference:
+    SemanticReference;
+
+  entityConceptId?:
+    ConceptId;
+
+  gender?:
+    GrammaticalGender;
+
+  number?:
+    GrammaticalNumber;
+}
+
+class DiscourseContext {
+  private mentions:
+    Mention[] = [];
+
+  add(
+    mention: Mention
+  ): void {
+    this.mentions.push(
+      mention
+    );
+  }
+
+  resolvePronoun(
+    gender?:
+      GrammaticalGender,
+
+    number?:
+      GrammaticalNumber
+  ): SemanticReference | null {
+    for (
+      let i =
+        this.mentions.length - 1;
+      i >= 0;
+      i--
+    ) {
+      const mention =
+        this.mentions[i];
+
+      if (
+        gender &&
+        mention.gender &&
+        gender !==
+          mention.gender
+      ) {
+        continue;
+      }
+
+      if (
+        number &&
+        mention.number &&
+        number !==
+          mention.number
+      ) {
+        continue;
+      }
+
+      return mention.reference;
+    }
+
+    return null;
+  }
+}
+```
+
+---
+
+# 19. SemanticCursor
+
+```ts
+class SemanticCursor {
+  index = 0;
+
+  constructor(
+    public tokens:
+      SemanticToken[]
+  ) {}
+
+  eof(): boolean {
+    return (
+      this.index >=
+      this.tokens.length
+    );
+  }
+
+  peek(
+    offset = 0
+  ): SemanticToken | undefined {
+    return this.tokens[
+      this.index + offset
+    ];
+  }
+
+  consume():
+    SemanticToken | undefined {
+    return this.tokens[
+      this.index++
+    ];
+  }
+
+  rawWord(
+    offset = 0
+  ): string | null {
+    const token =
+      this.peek(offset);
+
+    if (!token) {
+      return null;
+    }
+
+    const raw =
+      token.rawTokens
+        .map(x => x.raw)
+        .join(' ');
+
+    return RawLexer.normalize(
+      raw
+    );
+  }
+
+  consumeWord(
+    expected: string
+  ): boolean {
+    if (
+      this.rawWord() !==
+      expected
+    ) {
+      return false;
+    }
+
+    this.consume();
+    return true;
+  }
+}
+```
+
+---
+
+# 20. Seleção contextual de conceitos
+
+```ts
+function conceptsOfKind<
+  K extends ConceptNode['kind']
+>(
+  token: SemanticToken | undefined,
+  concepts:
+    Record<ConceptId, ConceptNode>,
+  kind: K
+): Extract<
+  ConceptNode,
+  { kind: K }
+>[] {
+  if (!token) {
+    return [];
+  }
+
+  return token.candidates
+    .map(
+      candidate =>
+        concepts[
+          candidate.conceptId
+        ]
+    )
+    .filter(
+      (
+        concept
+      ): concept is Extract<
+        ConceptNode,
+        { kind: K }
+      > =>
+        Boolean(
+          concept &&
+          concept.kind === kind
+        )
+    );
+}
+```
+
+---
+
+# 21. Property Binder
+
+```ts
+export class PropertyBinder {
+  constructor(
+    private concepts:
+      Record<
+        ConceptId,
+        ConceptNode
+      >
+  ) {}
+
+  bind(
+    entityConceptId:
+      ConceptId | undefined,
+
+    mutation:
+      AstPropertyMutation
+  ): AstPropertyMutation {
+    if (
+      mutation.kind ===
+      'CLEAR'
+    ) {
+      return mutation;
+    }
+
+    if (
+      mutation.propertyConceptId
+    ) {
+      const property =
+        this.concepts[
+          mutation
+            .propertyConceptId
+        ];
+
+      if (
+        property?.kind !==
+        'PROPERTY'
+      ) {
+        throw new Error(
+          `Unknown property ${mutation.propertyConceptId}`
+        );
+      }
+
+      if (
+        !property
+          .valueCategories
+          .includes(
+            mutation
+              .value
+              .category
+          )
+      ) {
+        throw new Error(
+          `Property ${property.id} does not accept ${mutation.value.category}`
+        );
+      }
+
+      return mutation;
+    }
+
+    if (
+      mutation.propertyGroupId
+    ) {
+      const group =
+        this.concepts[
+          mutation
+            .propertyGroupId
+        ];
+
+      if (
+        group?.kind !==
+        'PROPERTY_GROUP'
+      ) {
+        throw new Error(
+          `Unknown property group ${mutation.propertyGroupId}`
+        );
+      }
+
+      const propertyId =
+        group
+          .bindingByValueCategory[
+            mutation
+              .value
+              .category
+          ];
+
+      if (!propertyId) {
+        throw new Error(
+          `Property group ${group.id} has no binding for ${mutation.value.category}`
+        );
+      }
+
+      return {
+        kind: 'SET',
+
+        propertyConceptId:
+          propertyId,
+
+        value:
+          mutation.value
+      };
+    }
+
+    if (!entityConceptId) {
+      throw new Error(
+        'Cannot infer property without entity context'
+      );
+    }
+
+    const entity =
+      this.concepts[
+        entityConceptId
+      ];
+
+    if (
+      entity?.kind !==
+      'ENTITY'
+    ) {
+      throw new Error(
+        `Unknown entity ${entityConceptId}`
+      );
+    }
+
+    const propertyId =
+      entity
+        .capabilities
+        .defaultValueBindings[
+          mutation
+            .value
+            .category
+        ];
+
+    if (!propertyId) {
+      throw new Error(
+        `Entity ${entity.id} has no default binding for ${mutation.value.category}`
+      );
+    }
+
+    return {
+      kind: 'SET',
+
+      propertyConceptId:
+        propertyId,
+
+      value:
+        mutation.value
+    };
+  }
+}
+```
+
+Isso resolve:
+
+```text
+botão azul
+→ BUTTON default COLOR
+→ backgroundColor
+
+fundo azul
+→ explicit backgroundColor
+
+borda azul
+→ BORDER group + COLOR
+→ borderColor
+
+borda 2px
+→ BORDER group + SIZE
+→ borderWidth
+```
+
+---
+
+# 22. Parser
+
+O parser trabalha sobre estruturas, não sobre um único `currentEntity`.
+
+```ts
+export class DomainParser {
+  private tempCounter = 0;
+
+  private discourse =
+    new DiscourseContext();
+
+  private binder:
+    PropertyBinder;
+
+  constructor(
+    private concepts:
+      Record<ConceptId, ConceptNode>
+  ) {
+    this.binder =
+      new PropertyBinder(
+        concepts
+      );
+  }
+
+  private nextTempId():
+    TempNodeId {
+    this.tempCounter++;
+
+    return `tmp_${this.tempCounter}`;
+  }
+
+  parse(
+    tokens:
+      SemanticToken[]
+  ): SemanticDocumentAst {
+    const commandGroups =
+      this.splitCommands(
+        tokens
+      );
+
+    const commands:
+      SemanticCommand[] = [];
+
+    for (
+      const group
+      of commandGroups
+    ) {
+      if (!group.length) {
+        continue;
+      }
+
+      commands.push(
+        this.parseCommand(
+          new SemanticCursor(
+            group
+          )
+        )
+      );
+    }
+
+    return {
+      commands
+    };
+  }
+```
+
+---
+
+## 22.1 Separação de comandos
+
+```ts
+  private splitCommands(
+    tokens:
+      SemanticToken[]
+  ): SemanticToken[][] {
+    const groups:
+      SemanticToken[][] = [];
+
+    let current:
+      SemanticToken[] = [];
+
+    for (
+      const token
+      of tokens
+    ) {
+      const raw =
+        token.rawTokens
+          .map(x => x.raw)
+          .join('');
+
+      if (
+        raw === ';'
+      ) {
+        groups.push(
+          current
+        );
+
+        current = [];
+        continue;
+      }
+
+      current.push(
+        token
+      );
+    }
+
+    if (current.length) {
+      groups.push(
+        current
+      );
+    }
+
+    return groups;
+  }
+```
+
+---
+
+## 22.2 Comando principal
+
+```ts
+  private parseCommand(
+    cursor:
+      SemanticCursor
+  ): SemanticCommand {
+    let actionNegated =
+      false;
+
+    if (
+      cursor.rawWord() ===
+        'nao' ||
+      cursor.rawWord() ===
+        'não'
+    ) {
+      cursor.consume();
+      actionNegated = true;
+    }
+
+    const action =
+      this.consumeAction(
+        cursor
+      );
+
+    if (
+      actionNegated
+    ) {
+      return {
+        kind: 'NO_OP',
+        reason:
+          'NEGATED_ACTION'
+      };
+    }
+
+    if (!action) {
+      return this
+        .parseImplicitCommand(
+          cursor
+        );
+    }
+
+    switch (
+      action.operation
+    ) {
+      case 'CREATE':
+        return this
+          .parseCreate(
+            cursor
+          );
+
+      case 'UPDATE':
+        return this
+          .parseUpdate(
+            cursor
+          );
+
+      case 'DELETE':
+        return this
+          .parseDelete(
+            cursor
+          );
+
+      case 'MOVE':
+        return this
+          .parseMove(
+            cursor
+          );
+
+      case 'QUERY':
+        return {
+          kind: 'QUERY',
+          target:
+            this.parseReference(
+              cursor
+            )
+        };
+    }
+  }
+```
+
+---
+
+## 22.3 Ação
+
+```ts
+  private consumeAction(
+    cursor:
+      SemanticCursor
+  ): ActionConcept | null {
+    const candidates =
+      conceptsOfKind(
+        cursor.peek(),
+        this.concepts,
+        'ACTION'
+      );
+
+    if (!candidates.length) {
+      return null;
+    }
+
+    const chosen =
+      candidates[0];
+
+    cursor.consume();
+
+    return chosen;
+  }
+```
+
+O uso de `[0]` aqui é seguro somente porque o filtro já restringiu a um único domínio sintático `ACTION`.
+
+Se dois sentidos verbais de ação continuarem possíveis, deve-se aplicar score contextual antes da escolha.
+
+---
+
+# 23. Determinantes, quantidade e ordinal
+
+```ts
+  private parseNominalPrefix(
+    cursor:
+      SemanticCursor
+  ): {
+    definiteness:
+      | 'DEFINITE'
+      | 'INDEFINITE'
+      | 'UNSPECIFIED';
+
+    quantity:
+      | number
+      | 'ALL'
+      | null;
+
+    ordinal:
+      number | null;
+  } {
+    let definiteness:
+      | 'DEFINITE'
+      | 'INDEFINITE'
+      | 'UNSPECIFIED' =
+      'UNSPECIFIED';
+
+    let quantity:
+      | number
+      | 'ALL'
+      | null = null;
+
+    let ordinal:
+      number | null = null;
+
+    const word =
+      cursor.rawWord();
+
+    if (
+      word &&
+      GRAMMAR
+        .definiteArticles
+        .has(word)
+    ) {
+      definiteness =
+        'DEFINITE';
+
+      cursor.consume();
+    } else if (
+      word &&
+      GRAMMAR
+        .indefiniteArticles
+        .has(word)
+    ) {
+      definiteness =
+        'INDEFINITE';
+
+      cursor.consume();
+    } else if (
+      word &&
+      GRAMMAR
+        .all
+        .has(word)
+    ) {
+      quantity =
+        'ALL';
+
+      definiteness =
+        'DEFINITE';
+
+      cursor.consume();
+
+      const article =
+        cursor.rawWord();
+
+      if (
+        article &&
+        GRAMMAR
+          .definiteArticles
+          .has(article)
+      ) {
+        cursor.consume();
+      }
+    }
+
+    const ordinalWord =
+      cursor.rawWord();
+
+    if (
+      ordinalWord &&
+      GRAMMAR
+        .ordinals
+        .has(
+          ordinalWord
+        )
+    ) {
+      ordinal =
+        GRAMMAR
+          .ordinals
+          .get(
+            ordinalWord
+          )!;
+
+      cursor.consume();
+    }
+
+    const literal =
+      cursor.peek()
+        ?.literal;
+
+    if (
+      literal?.kind ===
+      'NUMBER'
+    ) {
+      quantity =
+        Number(
+          literal.value
+        );
+
+      cursor.consume();
+    }
+
+    return {
+      definiteness,
+      quantity,
+      ordinal
+    };
+  }
+```
+
+---
+
+# 24. Entity phrase
+
+```ts
+  private parseEntityHead(
+    cursor:
+      SemanticCursor
+  ): {
+    concept:
+      EntityConcept;
+
+    gender?:
+      GrammaticalGender;
+
+    number?:
+      GrammaticalNumber;
+  } | null {
+    const token =
+      cursor.peek();
+
+    const entities =
+      conceptsOfKind(
+        token,
+        this.concepts,
+        'ENTITY'
+      );
+
+    if (!entities.length) {
+      return null;
+    }
+
+    const concept =
+      entities[0];
+
+    let gender:
+      GrammaticalGender
+      | undefined;
+
+    let number:
+      GrammaticalNumber
+      | undefined;
+
+    cursor.consume();
+
+    return {
+      concept,
+      gender,
+      number
+    };
+  }
+```
+
+---
+
+# 25. Valores
+
+```ts
+  private parseValue(
+    cursor:
+      SemanticCursor
+  ): AstValue | null {
+    const token =
+      cursor.peek();
+
+    if (!token) {
+      return null;
+    }
+
+    if (token.literal) {
+      switch (
+        token.literal.kind
+      ) {
+        case 'COLOR':
+          cursor.consume();
+
+          return {
+            category: 'COLOR',
+            literal:
+              token.literal.value
+          };
+
+        case 'SIZE':
+          cursor.consume();
+
+          return {
+            category: 'SIZE',
+
+            literal:
+              `${token.literal.value}${token.literal.unit}`
+          };
+
+        case 'NUMBER':
+          cursor.consume();
+
+          return {
+            category: 'NUMBER',
+
+            literal:
+              token.literal.value
+          };
+
+        case 'TEXT':
+          return null;
+      }
+    }
+
+    const values =
+      conceptsOfKind(
+        token,
+        this.concepts,
+        'VALUE'
+      );
+
+    if (!values.length) {
+      return null;
+    }
+
+    const value =
+      values[0];
+
+    cursor.consume();
+
+    return {
+      category:
+        value.valueCategory,
+
+      literal:
+        value.literal
+    };
+  }
+```
+
+---
+
+# 26. Propriedade explícita
+
+```ts
+  private parsePropertyHead(
+    cursor:
+      SemanticCursor
+  ):
+    | {
+        kind: 'PROPERTY';
+        conceptId:
+          ConceptId;
+      }
+    | {
+        kind:
+          'PROPERTY_GROUP';
+        conceptId:
+          ConceptId;
+      }
+    | null {
+    const token =
+      cursor.peek();
+
+    const property =
+      conceptsOfKind(
+        token,
+        this.concepts,
+        'PROPERTY'
+      )[0];
+
+    if (property) {
+      cursor.consume();
+
+      return {
+        kind: 'PROPERTY',
+        conceptId:
+          property.id
+      };
+    }
+
+    const group =
+      conceptsOfKind(
+        token,
+        this.concepts,
+        'PROPERTY_GROUP'
+      )[0];
+
+    if (group) {
+      cursor.consume();
+
+      return {
+        kind:
+          'PROPERTY_GROUP',
+
+        conceptId:
+          group.id
+      };
+    }
+
+    return null;
+  }
+```
+
+---
+
+# 27. Mutation parser
+
+```ts
+  private parseMutation(
+    cursor:
+      SemanticCursor,
+
+    entityConceptId?:
+      ConceptId
+  ): AstPropertyMutation | null {
+    const initialIndex =
+      cursor.index;
+
+    const raw =
+      cursor.rawWord();
+
+    if (
+      raw === 'sem'
+    ) {
+      cursor.consume();
+
+      const property =
+        this.parsePropertyHead(
+          cursor
+        );
+
+      if (!property) {
+        cursor.index =
+          initialIndex;
+
+        return null;
+      }
+
+      return property.kind ===
+        'PROPERTY'
+        ? {
+            kind: 'CLEAR',
+            propertyConceptId:
+              property.conceptId
+          }
+        : {
+            kind: 'CLEAR',
+            propertyGroupId:
+              property.conceptId
+          };
+    }
+
+    const explicitProperty =
+      this.parsePropertyHead(
+        cursor
+      );
+
+    if (
+      explicitProperty
+    ) {
+      if (
+        cursor.rawWord() ===
+          'com' ||
+        cursor.rawWord() ===
+          'para' ||
+        cursor.rawWord() ===
+          'de'
+      ) {
+        cursor.consume();
+      }
+
+      const value =
+        this.parseValue(
+          cursor
+        );
+
+      if (!value) {
+        cursor.index =
+          initialIndex;
+
+        return null;
+      }
+
+      const unresolved:
+        AstPropertyMutation =
+        explicitProperty.kind ===
+          'PROPERTY'
+          ? {
+              kind: 'SET',
+              propertyConceptId:
+                explicitProperty
+                  .conceptId,
+              value
+            }
+          : {
+              kind: 'SET',
+              propertyGroupId:
+                explicitProperty
+                  .conceptId,
+              value
+            };
+
+      return this
+        .binder
+        .bind(
+          entityConceptId,
+          unresolved
+        );
+    }
+
+    const value =
+      this.parseValue(
+        cursor
+      );
+
+    if (value) {
+      return this
+        .binder
+        .bind(
+          entityConceptId,
+          {
+            kind: 'SET',
+            value
+          }
+        );
+    }
+
+    cursor.index =
+      initialIndex;
+
+    return null;
+  }
+```
+
+---
+
+# 28. Parse de entidade nova
+
+```ts
+  private parseNewEntity(
+    cursor:
+      SemanticCursor
+  ): NewEntityAst | null {
+    const prefix =
+      this.parseNominalPrefix(
+        cursor
+      );
+
+    const head =
+      this.parseEntityHead(
+        cursor
+      );
+
+    if (!head) {
+      return null;
+    }
+
+    const tempId =
+      this.nextTempId();
+
+    const entity:
+      NewEntityAst = {
+      tempId,
+
+      entityConceptId:
+        head.concept.id,
+
+      quantity:
+        typeof prefix.quantity ===
+          'number'
+          ? prefix.quantity
+          : 1,
+
+      mutations: []
+    };
+
+    const literal =
+      cursor.peek()
+        ?.literal;
+
+    if (
+      literal?.kind ===
+      'TEXT'
+    ) {
+      entity.text =
+        String(
+          literal.value
+        );
+
+      cursor.consume();
+    }
+
+    while (
+      !cursor.eof()
+    ) {
+      const before =
+        cursor.index;
+
+      const mutation =
+        this.parseMutation(
+          cursor,
+          entity
+            .entityConceptId
+        );
+
+      if (mutation) {
+        entity.mutations.push(
+          mutation
+        );
+
+        continue;
+      }
+
+      if (
+        before ===
+        cursor.index
+      ) {
+        break;
+      }
+    }
+
+    this.discourse.add({
+      reference: {
+        kind:
+          'NEW_ENTITY',
+        tempId
+      },
+
+      entityConceptId:
+        entity.entityConceptId,
+
+      gender:
+        head.gender,
+
+      number:
+        head.number
+    });
+
+    return entity;
+  }
+```
+
+---
+
+# 29. Selector parser
+
+```ts
+  private parseSelector(
+    cursor:
+      SemanticCursor,
+
+    inheritedEntityConceptId?:
+      ConceptId
+  ): SemanticSelector {
+    const prefix =
+      this.parseNominalPrefix(
+        cursor
+      );
+
+    let entityConceptId =
+      inheritedEntityConceptId;
+
+    const head =
+      this.parseEntityHead(
+        cursor
+      );
+
+    if (head) {
+      entityConceptId =
+        head.concept.id;
+    }
+
+    const selector:
+      SemanticSelector = {
+      entityConceptId,
+
+      quantity:
+        prefix.quantity ===
+          'ALL'
+          ? {
+              mode: 'ALL'
+            }
+          : typeof prefix.quantity ===
+              'number'
+            ? {
+                mode: 'COUNT',
+                count:
+                  prefix.quantity
+              }
+            : {
+                mode: 'ONE'
+              }
+    };
+
+    if (
+      prefix.ordinal !==
+      null
+    ) {
+      selector.ordinalIndex =
+        prefix.ordinal;
+    }
+
+    const text =
+      cursor.peek()
+        ?.literal;
+
+    if (
+      text?.kind ===
+      'TEXT'
+    ) {
+      selector.textEquals =
+        String(
+          text.value
+        );
+
+      cursor.consume();
+    }
+
+    if (
+      GRAMMAR
+        .except
+        .has(
+          cursor.rawWord() ?? ''
+        )
+    ) {
+      cursor.consume();
+
+      selector.exclusions = [
+        this.parseSelector(
+          cursor,
+          entityConceptId
+        )
+      ];
+    }
+
+    return selector;
+  }
+```
+
+---
+
+# 30. Referências e pronomes
+
+```ts
+  private parseReference(
+    cursor:
+      SemanticCursor,
+
+    inheritedEntityConceptId?:
+      ConceptId
+  ): SemanticReference {
+    const word =
+      cursor.rawWord();
+
+    if (
+      word &&
+      GRAMMAR
+        .pronouns
+        .has(word)
+    ) {
+      cursor.consume();
+
+      const gender:
+        GrammaticalGender =
+        word === 'ela' ||
+        word === 'elas'
+          ? 'FEM'
+          : 'MASC';
+
+      const number:
+        GrammaticalNumber =
+        word === 'eles' ||
+        word === 'elas'
+          ? 'PLURAL'
+          : 'SINGULAR';
+
+      const resolved =
+        this.discourse
+          .resolvePronoun(
+            gender,
+            number
+          );
+
+      if (!resolved) {
+        throw new Error(
+          `Unable to resolve pronoun "${word}"`
+        );
+      }
+
+      return resolved;
+    }
+
+    return {
+      kind: 'SELECTOR',
+
+      selector:
+        this.parseSelector(
+          cursor,
+          inheritedEntityConceptId
+        )
+    };
+  }
+```
+
+---
+
+# 31. Relações espaciais
+
+```ts
+  private parseSpatial(
+    cursor:
+      SemanticCursor
+  ): SpatialConcept | null {
+    const spatials =
+      conceptsOfKind(
+        cursor.peek(),
+        this.concepts,
+        'SPATIAL'
+      );
+
+    if (!spatials.length) {
+      return null;
+    }
+
+    const spatial =
+      spatials[0];
+
+    cursor.consume();
+
+    return spatial;
+  }
+```
+
+---
+
+# 32. CREATE parser
+
+```ts
+  private parseCreate(
+    cursor:
+      SemanticCursor
+  ): CreateCommandAst {
+    const entities:
+      NewEntityAst[] = [];
+
+    const placements:
+      PlacementAst[] = [];
+
+    const first =
+      this.parseNewEntity(
+        cursor
+      );
+
+    if (!first) {
+      throw new Error(
+        'CREATE requires an entity'
+      );
+    }
+
+    entities.push(first);
+
+    let current =
+      first;
+
+    let previous =
+      first;
+
+    while (
+      !cursor.eof()
+    ) {
+      const word =
+        cursor.rawWord();
+
+      // "caixa com um botão"
+      if (
+        word === 'com'
+      ) {
+        const checkpoint =
+          cursor.index;
+
+        cursor.consume();
+
+        const child =
+          this.parseNewEntity(
+            cursor
+          );
+
+        if (child) {
+          entities.push(
+            child
+          );
+
+          placements.push({
+            source: {
+              kind:
+                'NEW_ENTITY',
+              tempId:
+                child.tempId
+            },
+
+            relationConceptId:
+              'C_SPAT_INSIDE',
+
+            target: {
+              kind:
+                'NEW_ENTITY',
+              tempId:
+                current.tempId
+            }
+          });
+
+          previous =
+            current;
+
+          current =
+            child;
+
+          // "com um botão vermelho dentro"
+          if (
+            cursor.rawWord() ===
+            'dentro'
+          ) {
+            cursor.consume();
+          }
+
+          continue;
+        }
+
+        cursor.index =
+          checkpoint;
+
+        const mutation =
+          this.parseMutation(
+            cursor,
+            current
+              .entityConceptId
+          );
+
+        if (mutation) {
+          current
+            .mutations
+            .push(mutation);
+
+          continue;
+        }
+
+        break;
+      }
+
+      // "uma caixa e um botão"
+      if (
+        word === 'e'
+      ) {
+        cursor.consume();
+
+        const sibling =
+          this.parseNewEntity(
+            cursor
+          );
+
+        if (!sibling) {
+          break;
+        }
+
+        entities.push(
+          sibling
+        );
+
+        previous =
+          current;
+
+        current =
+          sibling;
+
+        continue;
+      }
+
+      const spatial =
+        this.parseSpatial(
+          cursor
+        );
+
+      if (spatial) {
+        // "botão dentro de uma caixa"
+        const prefixIndex =
+          cursor.index;
+
+        const rawNext =
+          cursor.rawWord();
+
+        const targetIsIndefinite =
+          rawNext !== null &&
+          GRAMMAR
+            .indefiniteArticles
+            .has(rawNext);
+
+        if (
+          targetIsIndefinite
+        ) {
+          const target =
+            this.parseNewEntity(
+              cursor
+            );
+
+          if (!target) {
+            throw new Error(
+              'Spatial relation requires target'
+            );
+          }
+
+          entities.push(
+            target
+          );
+
+          placements.push({
+            source: {
+              kind:
+                'NEW_ENTITY',
+              tempId:
+                current.tempId
+            },
+
+            relationConceptId:
+              spatial.id,
+
+            target: {
+              kind:
+                'NEW_ENTITY',
+              tempId:
+                target.tempId
+            }
+          });
+
+          previous =
+            current;
+
+          current =
+            target;
+
+          continue;
+        }
+
+        cursor.index =
+          prefixIndex;
+
+        const target =
+          this.parseReference(
+            cursor
+          );
+
+        placements.push({
+          source: {
+            kind:
+              'NEW_ENTITY',
+            tempId:
+              current.tempId
+          },
+
+          relationConceptId:
+            spatial.id,
+
+          target
+        });
+
+        continue;
+      }
+
+      // "ao lado dela"
+      if (
+        word === 'ela' ||
+        word === 'ele' ||
+        word === 'elas' ||
+        word === 'eles'
+      ) {
+        break;
+      }
+
+      break;
+    }
+
+    return {
+      kind: 'CREATE',
+      entities,
+      placements
+    };
+  }
+```
+
+Para:
+
+```text
+crie um botão dentro de uma caixa azul
+```
+
+o AST não precisa inverter pai e filho.
+
+Ele produz:
+
+```text
+CREATE tmp_button
+CREATE tmp_container
+
+PLACEMENT:
+  source = tmp_button
+  relation = CHILD_OF
+  target = tmp_container
+```
+
+O planner determina a ordem física posteriormente.
+
+---
+
+# 33. UPDATE parser
+
+```ts
+  private parseUpdate(
+    cursor:
+      SemanticCursor
+  ): UpdateCommandAst {
+    const start =
+      cursor.index;
+
+    let explicitProperty:
+      | {
+          kind: 'PROPERTY';
+          conceptId:
+            ConceptId;
+        }
+      | {
+          kind:
+            'PROPERTY_GROUP';
+          conceptId:
+            ConceptId;
+        }
+      | null = null;
+
+    // "mude o fundo do segundo botão..."
+    const prefixBeforeProperty =
+      this.parseNominalPrefix(
+        cursor
+      );
+
+    explicitProperty =
+      this.parsePropertyHead(
+        cursor
+      );
+
+    if (
+      explicitProperty &&
+      cursor.rawWord() ===
+        'de'
+    ) {
+      cursor.consume();
+
+      const target =
+        this.parseReference(
+          cursor
+        );
+
+      if (
+        cursor.rawWord() ===
+          'para' ||
+        cursor.rawWord() ===
+          'com'
+      ) {
+        cursor.consume();
+      }
+
+      const value =
+        this.parseValue(
+          cursor
+        );
+
+      if (!value) {
+        throw new Error(
+          'UPDATE property requires value'
+        );
+      }
+
+      const mutation =
+        this.binder.bind(
+          target.kind ===
+            'SELECTOR'
+            ? target
+                .selector
+                .entityConceptId
+            : undefined,
+
+          explicitProperty.kind ===
+            'PROPERTY'
+            ? {
+                kind: 'SET',
+                propertyConceptId:
+                  explicitProperty
+                    .conceptId,
+                value
+              }
+            : {
+                kind: 'SET',
+                propertyGroupId:
+                  explicitProperty
+                    .conceptId,
+                value
+              }
+        );
+
+      return {
+        kind: 'UPDATE',
+        target,
+        mutations: [
+          mutation
+        ]
+      };
+    }
+
+    cursor.index = start;
+
+    // "deixe a borda azul"
+    const nominalStart =
+      cursor.index;
+
+    this.parseNominalPrefix(
+      cursor
+    );
+
+    const directProperty =
+      this.parsePropertyHead(
+        cursor
+      );
+
+    if (directProperty) {
+      const value =
+        this.parseValue(
+          cursor
+        );
+
+      if (value) {
+        const mutation =
+          this.binder.bind(
+            undefined,
+
+            directProperty.kind ===
+              'PROPERTY'
+              ? {
+                  kind: 'SET',
+                  propertyConceptId:
+                    directProperty
+                      .conceptId,
+                  value
+                }
+              : {
+                  kind: 'SET',
+                  propertyGroupId:
+                    directProperty
+                      .conceptId,
+                  value
+                }
+          );
+
+        return {
+          kind: 'UPDATE',
+
+          target: {
+            kind:
+              'CURRENT_SELECTION'
+          },
+
+          mutations: [
+            mutation
+          ]
+        };
+      }
+    }
+
+    cursor.index =
+      nominalStart;
+
+    // "mude o botão 'Entrar' para azul"
+    const target =
+      this.parseReference(
+        cursor
+      );
+
+    const mutations:
+      AstPropertyMutation[] =
+      [];
+
+    while (
+      !cursor.eof()
+    ) {
+      if (
+        cursor.rawWord() ===
+          'para' ||
+        cursor.rawWord() ===
+          'com'
+      ) {
+        cursor.consume();
+      }
+
+      const entityId =
+        target.kind ===
+          'SELECTOR'
+          ? target
+              .selector
+              .entityConceptId
+          : undefined;
+
+      const mutation =
+        this.parseMutation(
+          cursor,
+          entityId
+        );
+
+      if (mutation) {
+        mutations.push(
+          mutation
+        );
+
+        continue;
+      }
+
+      const word =
+        cursor.rawWord();
+
+      if (
+        word &&
+        GRAMMAR
+          .except
+          .has(word) &&
+        target.kind ===
+          'SELECTOR'
+      ) {
+        cursor.consume();
+
+        target
+          .selector
+          .exclusions = [
+            this.parseSelector(
+              cursor,
+              target
+                .selector
+                .entityConceptId
+            )
+          ];
+
+        continue;
+      }
+
+      break;
+    }
+
+    return {
+      kind: 'UPDATE',
+      target,
+      mutations
+    };
+  }
+```
+
+---
+
+# 34. DELETE parser
+
+```ts
+  private parseDelete(
+    cursor:
+      SemanticCursor
+  ): DeleteCommandAst {
+    return {
+      kind: 'DELETE',
+
+      target:
+        this.parseReference(
+          cursor
+        )
+    };
+  }
+```
+
+`não apague o botão` nunca chega aqui porque a negação possui escopo sobre a ação e produz `NO_OP`.
+
+---
+
+# 35. MOVE parser
+
+```ts
+  private parseMove(
+    cursor:
+      SemanticCursor
+  ): MoveCommandAst {
+    const target =
+      this.parseReference(
+        cursor
+      );
+
+    // "botão de dentro da caixa"
+    if (
+      cursor.rawWord() ===
+      'de'
+    ) {
+      const checkpoint =
+        cursor.index;
+
+      cursor.consume();
+
+      const spatial =
+        this.parseSpatial(
+          cursor
+        );
+
+      if (
+        spatial?.relation ===
+          'CHILD_OF' &&
+        target.kind ===
+          'SELECTOR'
+      ) {
+        const parent =
+          this.parseSelector(
+            cursor
+          );
+
+        target
+          .selector
+          .parent =
+          parent;
+      } else {
+        cursor.index =
+          checkpoint;
+      }
+    }
+
+    if (
+      cursor.rawWord() ===
+      'para'
+    ) {
+      cursor.consume();
+    }
+
+    const relation =
+      this.parseSpatial(
+        cursor
+      );
+
+    if (!relation) {
+      throw new Error(
+        'MOVE requires destination relation'
+      );
+    }
+
+    const destination =
+      this.parseReference(
+        cursor
+      );
+
+    return {
+      kind: 'MOVE',
+
+      target,
+
+      placement: {
+        source: target,
+
+        relationConceptId:
+          relation.id,
+
+        target:
+          destination
+      }
+    };
+  }
+```
+
+---
+
+# 36. Comando implícito
+
+Nada de assumir globalmente que qualquer substantivo significa `CREATE`.
+
+```ts
+  private parseImplicitCommand(
+    cursor:
+      SemanticCursor
+  ): SemanticCommand {
+    const entityCandidates =
+      conceptsOfKind(
+        cursor.peek(),
+        this.concepts,
+        'ENTITY'
+      );
+
+    if (
+      entityCandidates.length
+    ) {
+      throw new Error(
+        'Implicit entity command requires interaction context'
+      );
+    }
+
+    throw new Error(
+      'Unable to determine command'
+    );
+  }
+}
+```
+
+A camada da aplicação pode definir posteriormente:
+
+```text
+CREATE mode
+EDIT mode
+QUERY mode
+```
+
+e somente então permitir ações implícitas.
+
+---
+
+# 37. Modelo vivo do documento
+
+```ts
+export interface DocumentRect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface DocumentNode {
+  id: DocumentNodeId;
+
+  entityConceptId:
+    ConceptId;
+
+  parentId:
+    DocumentNodeId | null;
+
+  childIds:
+    DocumentNodeId[];
+
+  text?: string;
+
+  properties:
+    Record<
+      ConceptId,
+      string |
+      number |
+      boolean
+    >;
+
+  rect?:
+    DocumentRect;
+}
+
+export interface DocumentModel {
+  nodes:
+    Map<
+      DocumentNodeId,
+      DocumentNode
+    >;
+
+  rootIds:
+    DocumentNodeId[];
+
+  selectionIds:
+    DocumentNodeId[];
+}
+```
+
+---
+
+# 38. ReferenceResolver
+
+```ts
+export class ReferenceResolver {
+  constructor(
+    private document:
+      DocumentModel
+  ) {}
+
+  resolve(
+    reference:
+      SemanticReference
+  ): DocumentNodeId[] {
+    switch (
+      reference.kind
+    ) {
+      case 'CURRENT_SELECTION':
+        return [
+          ...this.document
+            .selectionIds
+        ];
+
+      case 'NEW_ENTITY':
+        throw new Error(
+          'NEW_ENTITY references must be resolved by ExecutionPlanner'
+        );
+
+      case 'SELECTOR':
+        return this
+          .resolveSelector(
+            reference.selector
+          );
+    }
+  }
+
+  private resolveSelector(
+    selector:
+      SemanticSelector
+  ): DocumentNodeId[] {
+    let nodes =
+      Array.from(
+        this.document
+          .nodes
+          .values()
+      );
+
+    if (
+      selector.entityConceptId
+    ) {
+      nodes =
+        nodes.filter(
+          node =>
+            node
+              .entityConceptId ===
+            selector
+              .entityConceptId
+        );
+    }
+
+    if (
+      selector.textEquals !==
+      undefined
+    ) {
+      nodes =
+        nodes.filter(
+          node =>
+            node.text ===
+            selector.textEquals
+        );
+    }
+
+    if (
+      selector.parent
+    ) {
+      const parents =
+        new Set(
+          this.resolveSelector(
+            selector.parent
+          )
+        );
+
+      nodes =
+        nodes.filter(
+          node =>
+            node.parentId !==
+              null &&
+            parents.has(
+              node.parentId
+            )
+        );
+    }
+
+    if (
+      selector.direction &&
+      nodes.length
+    ) {
+      nodes =
+        this.applyDirection(
+          nodes,
+          selector.direction
+        );
+    }
+
+    if (
+      selector.exclusions
+        ?.length
+    ) {
+      const excluded =
+        new Set<
+          DocumentNodeId
+        >();
+
+      for (
+        const exclusion
+        of selector.exclusions
+      ) {
+        for (
+          const id
+          of this
+            .resolveSelector(
+              exclusion
+            )
+        ) {
+          excluded.add(id);
+        }
+      }
+
+      nodes =
+        nodes.filter(
+          node =>
+            !excluded.has(
+              node.id
+            )
+        );
+    }
+
+    if (
+      selector.ordinalIndex !==
+      undefined
+    ) {
+      const node =
+        nodes[
+          selector.ordinalIndex
+        ];
+
+      return node
+        ? [node.id]
+        : [];
+    }
+
+    switch (
+      selector.quantity?.mode
+    ) {
+      case 'ALL':
+        return nodes.map(
+          node => node.id
+        );
+
+      case 'COUNT':
+        return nodes
+          .slice(
+            0,
+            selector
+              .quantity
+              .count
+          )
+          .map(
+            node =>
+              node.id
+          );
+
+      case 'ONE':
+      default:
+        return nodes[0]
+          ? [nodes[0].id]
+          : [];
+    }
+  }
+
+  private applyDirection(
+    nodes:
+      DocumentNode[],
+
+    direction:
+      NonNullable<
+        SemanticSelector[
+          'direction'
+        ]
+      >
+  ): DocumentNode[] {
+    const withRect =
+      nodes.filter(
+        node =>
+          node.rect
+      );
+
+    if (
+      !withRect.length
+    ) {
+      return nodes;
+    }
+
+    const score = (
+      node:
+        DocumentNode
+    ): number => {
+      const rect =
+        node.rect!;
+
+      switch (
+        direction
+      ) {
+        case 'LEFTMOST':
+          return rect.x;
+
+        case 'RIGHTMOST':
+          return -(
+            rect.x +
+            rect.width
+          );
+
+        case 'TOPMOST':
+          return rect.y;
+
+        case 'BOTTOMMOST':
+          return -(
+            rect.y +
+            rect.height
+          );
+      }
+    };
+
+    return withRect
+      .slice()
+      .sort(
+        (a, b) =>
+          score(a) -
+          score(b)
+      );
+  }
+}
+```
+
+---
+
+# 39. Execution Plan
+
+O plano não contém `ConceptNode` completos nem referências circulares.
+
+Só IDs e valores resolvidos.
+
+```ts
+export type ExecutionStep =
+  | CreateStep
+  | SetPropertyStep
+  | ClearPropertyStep
+  | PlaceStep
+  | DeleteStep
+  | MoveStep
+  | QueryStep;
+
+export interface CreateStep {
+  kind: 'CREATE_NODE';
+
+  stepId: string;
+
+  tempId: TempNodeId;
+
+  entityConceptId:
+    ConceptId;
+
+  text?: string;
+}
+
+export interface SetPropertyStep {
+  kind: 'SET_PROPERTY';
+
+  stepId: string;
+
+  target:
+    ExecutableReference;
+
+  propertyConceptId:
+    ConceptId;
+
+  value:
+    string |
+    number |
+    boolean;
+}
+
+export interface ClearPropertyStep {
+  kind: 'CLEAR_PROPERTY';
+
+  stepId: string;
+
+  target:
+    ExecutableReference;
+
+  propertyConceptId:
+    ConceptId;
+}
+
+export interface PlaceStep {
+  kind: 'PLACE_NODE';
+
+  stepId: string;
+
+  source:
+    ExecutableReference;
+
+  relationConceptId:
+    ConceptId;
+
+  target:
+    ExecutableReference;
+}
+
+export interface DeleteStep {
+  kind: 'DELETE_NODE';
+
+  stepId: string;
+
+  targetNodeId:
+    DocumentNodeId;
+}
+
+export interface MoveStep {
+  kind: 'MOVE_NODE';
+
+  stepId: string;
+
+  sourceNodeId:
+    DocumentNodeId;
+
+  relationConceptId:
+    ConceptId;
+
+  target:
+    ExecutableReference;
+}
+
+export interface QueryStep {
+  kind: 'QUERY_NODE';
+
+  stepId: string;
+
+  targetNodeId:
+    DocumentNodeId;
+}
+
+export type ExecutableReference =
+  | {
+      kind: 'TEMP';
+      tempId:
+        TempNodeId;
+    }
+  | {
+      kind: 'NODE';
+      nodeId:
+        DocumentNodeId;
+    };
+
+export interface ExecutionPlan {
+  steps:
+    ExecutionStep[];
+
+  diagnostics:
+    Array<{
+      severity:
+        | 'INFO'
+        | 'WARNING'
+        | 'ERROR';
+
+      code: string;
+
+      message: string;
+    }>;
+}
+```
+
+---
+
+# 40. ExecutionPlanner
+
+```ts
+export class ExecutionPlanner {
+  private stepCounter = 0;
+
+  constructor(
+    private concepts:
+      Record<ConceptId, ConceptNode>,
+
+    private document:
+      DocumentModel
+  ) {}
+
+  private stepId():
+    string {
+    this.stepCounter++;
+
+    return `step_${this.stepCounter}`;
+  }
+
+  build(
+    ast:
+      SemanticDocumentAst
+  ): ExecutionPlan {
+    const plan:
+      ExecutionPlan = {
+      steps: [],
+      diagnostics: []
+    };
+
+    const resolver =
+      new ReferenceResolver(
+        this.document
+      );
+
+    for (
+      const command
+      of ast.commands
+    ) {
+      switch (
+        command.kind
+      ) {
+        case 'NO_OP':
+          plan.diagnostics.push({
+            severity: 'INFO',
+            code:
+              'NEGATED_ACTION',
+            message:
+              'The requested action was explicitly negated.'
+          });
+          break;
+
+        case 'CREATE':
+          this.planCreate(
+            command,
+            plan,
+            resolver
+          );
+          break;
+
+        case 'UPDATE':
+          this.planUpdate(
+            command,
+            plan,
+            resolver
+          );
+          break;
+
+        case 'DELETE':
+          this.planDelete(
+            command,
+            plan,
+            resolver
+          );
+          break;
+
+        case 'MOVE':
+          this.planMove(
+            command,
+            plan,
+            resolver
+          );
+          break;
+
+        case 'QUERY':
+          this.planQuery(
+            command,
+            plan,
+            resolver
+          );
+          break;
+      }
+    }
+
+    return plan;
+  }
+```
+
+---
+
+## 40.1 Expansion de quantidade
+
+```ts
+  private expandEntities(
+    entities:
+      NewEntityAst[]
+  ): {
+    copies:
+      NewEntityAst[];
+
+    groupMap:
+      Map<
+        TempNodeId,
+        TempNodeId[]
+      >;
+  } {
+    const copies:
+      NewEntityAst[] = [];
+
+    const groupMap =
+      new Map<
+        TempNodeId,
+        TempNodeId[]
+      >();
+
+    for (
+      const entity
+      of entities
+    ) {
+      const ids:
+        TempNodeId[] = [];
+
+      for (
+        let i = 0;
+        i < entity.quantity;
+        i++
+      ) {
+        const tempId =
+          entity.quantity === 1
+            ? entity.tempId
+            : `${entity.tempId}_${i + 1}`;
+
+        ids.push(tempId);
+
+        copies.push({
+          ...entity,
+          tempId,
+          quantity: 1,
+          mutations:
+            entity
+              .mutations
+              .map(
+                mutation => ({
+                  ...mutation
+                })
+              )
+        });
+      }
+
+      groupMap.set(
+        entity.tempId,
+        ids
+      );
+    }
+
+    return {
+      copies,
+      groupMap
+    };
+  }
+```
+
+---
+
+## 40.2 CREATE planning
+
+```ts
+  private planCreate(
+    command:
+      CreateCommandAst,
+
+    plan:
+      ExecutionPlan,
+
+    resolver:
+      ReferenceResolver
+  ): void {
+    const {
+      copies,
+      groupMap
+    } =
+      this.expandEntities(
+        command.entities
+      );
+
+    for (
+      const entity
+      of copies
+    ) {
+      plan.steps.push({
+        kind:
+          'CREATE_NODE',
+
+        stepId:
+          this.stepId(),
+
+        tempId:
+          entity.tempId,
+
+        entityConceptId:
+          entity
+            .entityConceptId,
+
+        text:
+          entity.text
+      });
+
+      this.emitMutations(
+        {
+          kind: 'TEMP',
+          tempId:
+            entity.tempId
+        },
+
+        entity
+          .entityConceptId,
+
+        entity.mutations,
+
+        plan
+      );
+    }
+
+    for (
+      const placement
+      of command.placements
+    ) {
+      const sources =
+        this.expandReference(
+          placement.source,
+          groupMap,
+          resolver
+        );
+
+      const targets =
+        this.expandReference(
+          placement.target,
+          groupMap,
+          resolver
+        );
+
+      if (!targets.length) {
+        plan.diagnostics.push({
+          severity: 'ERROR',
+          code:
+            'UNRESOLVED_PLACEMENT_TARGET',
+          message:
+            'Placement target could not be resolved.'
+        });
+
+        continue;
+      }
+
+      const target =
+        targets[0];
+
+      for (
+        const source
+        of sources
+      ) {
+        plan.steps.push({
+          kind:
+            'PLACE_NODE',
+
+          stepId:
+            this.stepId(),
+
+          source,
+
+          relationConceptId:
+            placement
+              .relationConceptId,
+
+          target
+        });
+      }
+    }
+  }
+```
+
+---
+
+## 40.3 Mutations
+
+```ts
+  private emitMutations(
+    target:
+      ExecutableReference,
+
+    entityConceptId:
+      ConceptId,
+
+    mutations:
+      AstPropertyMutation[],
+
+    plan:
+      ExecutionPlan
+  ): void {
+    const binder =
+      new PropertyBinder(
+        this.concepts
+      );
+
+    for (
+      const original
+      of mutations
+    ) {
+      const mutation =
+        binder.bind(
+          entityConceptId,
+          original
+        );
+
+      if (
+        mutation.kind ===
+        'SET'
+      ) {
+        plan.steps.push({
+          kind:
+            'SET_PROPERTY',
+
+          stepId:
+            this.stepId(),
+
+          target,
+
+          propertyConceptId:
+            mutation
+              .propertyConceptId!,
+
+          value:
+            mutation
+              .value
+              .literal
+        });
+
+        continue;
+      }
+
+      if (
+        mutation.propertyConceptId
+      ) {
+        plan.steps.push({
+          kind:
+            'CLEAR_PROPERTY',
+
+          stepId:
+            this.stepId(),
+
+          target,
+
+          propertyConceptId:
+            mutation
+              .propertyConceptId
+        });
+
+        continue;
+      }
+
+      if (
+        mutation.propertyGroupId
+      ) {
+        const group =
+          this.concepts[
+            mutation
+              .propertyGroupId
+          ];
+
+        if (
+          group?.kind !==
+          'PROPERTY_GROUP'
+        ) {
+          continue;
+        }
+
+        for (
+          const propertyId
+          of group
+            .clearPropertyIds
+        ) {
+          plan.steps.push({
+            kind:
+              'CLEAR_PROPERTY',
+
+            stepId:
+              this.stepId(),
+
+            target,
+
+            propertyConceptId:
+              propertyId
+          });
+        }
+      }
+    }
+  }
+```
+
+---
+
+## 40.4 UPDATE
+
+```ts
+  private planUpdate(
+    command:
+      UpdateCommandAst,
+
+    plan:
+      ExecutionPlan,
+
+    resolver:
+      ReferenceResolver
+  ): void {
+    const nodeIds =
+      resolver.resolve(
+        command.target
+      );
+
+    if (!nodeIds.length) {
+      plan.diagnostics.push({
+        severity: 'ERROR',
+        code:
+          'TARGET_NOT_FOUND',
+        message:
+          'Update target was not found.'
+      });
+
+      return;
+    }
+
+    for (
+      const nodeId
+      of nodeIds
+    ) {
+      const node =
+        this.document
+          .nodes
+          .get(nodeId);
+
+      if (!node) {
+        continue;
+      }
+
+      this.emitMutations(
+        {
+          kind: 'NODE',
+          nodeId
+        },
+
+        node
+          .entityConceptId,
+
+        command.mutations,
+
+        plan
+      );
+    }
+  }
+```
+
+---
+
+## 40.5 DELETE
+
+```ts
+  private planDelete(
+    command:
+      DeleteCommandAst,
+
+    plan:
+      ExecutionPlan,
+
+    resolver:
+      ReferenceResolver
+  ): void {
+    const nodeIds =
+      resolver.resolve(
+        command.target
+      );
+
+    for (
+      const nodeId
+      of nodeIds
+    ) {
+      plan.steps.push({
+        kind:
+          'DELETE_NODE',
+
+        stepId:
+          this.stepId(),
+
+        targetNodeId:
+          nodeId
+      });
+    }
+
+    if (!nodeIds.length) {
+      plan.diagnostics.push({
+        severity: 'ERROR',
+        code:
+          'TARGET_NOT_FOUND',
+        message:
+          'Delete target was not found.'
+      });
+    }
+  }
+```
+
+---
+
+## 40.6 MOVE
+
+```ts
+  private planMove(
+    command:
+      MoveCommandAst,
+
+    plan:
+      ExecutionPlan,
+
+    resolver:
+      ReferenceResolver
+  ): void {
+    const sourceIds =
+      resolver.resolve(
+        command.target
+      );
+
+    const targetRefs =
+      this.expandReference(
+        command
+          .placement
+          .target,
+
+        new Map(),
+
+        resolver
+      );
+
+    if (
+      !sourceIds.length ||
+      !targetRefs.length
+    ) {
+      plan.diagnostics.push({
+        severity: 'ERROR',
+        code:
+          'MOVE_REFERENCE_NOT_FOUND',
+        message:
+          'Move source or destination was not resolved.'
+      });
+
+      return;
+    }
+
+    for (
+      const sourceNodeId
+      of sourceIds
+    ) {
+      plan.steps.push({
+        kind:
+          'MOVE_NODE',
+
+        stepId:
+          this.stepId(),
+
+        sourceNodeId,
+
+        relationConceptId:
+          command
+            .placement
+            .relationConceptId,
+
+        target:
+          targetRefs[0]
+      });
+    }
+  }
+```
+
+---
+
+## 40.7 QUERY
+
+```ts
+  private planQuery(
+    command:
+      QueryCommandAst,
+
+    plan:
+      ExecutionPlan,
+
+    resolver:
+      ReferenceResolver
+  ): void {
+    for (
+      const nodeId
+      of resolver.resolve(
+        command.target
+      )
+    ) {
+      plan.steps.push({
+        kind:
+          'QUERY_NODE',
+
+        stepId:
+          this.stepId(),
+
+        targetNodeId:
+          nodeId
+      });
+    }
+  }
+```
+
+---
+
+## 40.8 Reference expansion
+
+```ts
+  private expandReference(
+    reference:
+      SemanticReference,
+
+    groupMap:
+      Map<
+        TempNodeId,
+        TempNodeId[]
+      >,
+
+    resolver:
+      ReferenceResolver
+  ): ExecutableReference[] {
+    if (
+      reference.kind ===
+      'NEW_ENTITY'
+    ) {
+      const ids =
+        groupMap.get(
+          reference.tempId
+        ) ?? [
+          reference.tempId
+        ];
+
+      return ids.map(
+        tempId => ({
+          kind: 'TEMP',
+          tempId
+        })
+      );
+    }
+
+    return resolver
+      .resolve(reference)
+      .map(
+        nodeId => ({
+          kind: 'NODE',
+          nodeId
+        })
+      );
+  }
+}
+```
+
+---
+
+# 41. Constraint Validator
+
+As affordances agora são realmente executadas.
+
+```ts
+export class ConstraintValidator {
+  constructor(
+    private concepts:
+      Record<ConceptId, ConceptNode>,
+
+    private document:
+      DocumentModel
+  ) {}
+
+  validate(
+    plan:
+      ExecutionPlan
+  ): ExecutionPlan {
+    const diagnostics =
+      [...plan.diagnostics];
+
+    const tempEntityTypes =
+      new Map<
+        TempNodeId,
+        ConceptId
+      >();
+
+    for (
+      const step
+      of plan.steps
+    ) {
+      if (
+        step.kind ===
+        'CREATE_NODE'
+      ) {
+        tempEntityTypes.set(
+          step.tempId,
+          step.entityConceptId
+        );
+      }
+    }
+
+    for (
+      const step
+      of plan.steps
+    ) {
+      if (
+        step.kind ===
+        'SET_PROPERTY'
+      ) {
+        const entityId =
+          this.resolveEntityType(
+            step.target,
+            tempEntityTypes
+          );
+
+        if (!entityId) {
+          continue;
+        }
+
+        const entity =
+          this.concepts[
+            entityId
+          ];
+
+        if (
+          entity?.kind !==
+          'ENTITY'
+        ) {
+          continue;
+        }
+
+        if (
+          !entity
+            .capabilities
+            .acceptedPropertyIds
+            .includes(
+              step
+                .propertyConceptId
+            )
+        ) {
+          diagnostics.push({
+            severity: 'ERROR',
+
+            code:
+              'INVALID_PROPERTY_FOR_ENTITY',
+
+            message:
+              `${entity.id} does not accept ${step.propertyConceptId}.`
+          });
+        }
+      }
+
+      if (
+        step.kind ===
+          'PLACE_NODE' ||
+        step.kind ===
+          'MOVE_NODE'
+      ) {
+        const relation =
+          this.concepts[
+            step
+              .relationConceptId
+          ];
+
+        if (
+          relation?.kind !==
+          'SPATIAL'
+        ) {
+          diagnostics.push({
+            severity: 'ERROR',
+
+            code:
+              'INVALID_SPATIAL_RELATION',
+
+            message:
+              `Unknown spatial relation ${step.relationConceptId}.`
+          });
+
+          continue;
+        }
+
+        if (
+          relation.relation ===
+          'CHILD_OF'
+        ) {
+          const childRef =
+            step.kind ===
+              'PLACE_NODE'
+              ? step.source
+              : {
+                  kind:
+                    'NODE' as const,
+
+                  nodeId:
+                    step
+                      .sourceNodeId
+                };
+
+          const childType =
+            this.resolveEntityType(
+              childRef,
+              tempEntityTypes
+            );
+
+          const parentType =
+            this.resolveEntityType(
+              step.target,
+              tempEntityTypes
+            );
+
+          if (
+            childType &&
+            parentType
+          ) {
+            this.validateContainment(
+              childType,
+              parentType,
+              diagnostics
+            );
+          }
+        }
+      }
+    }
+
+    return {
+      ...plan,
+      diagnostics
+    };
+  }
+
+  private resolveEntityType(
+    reference:
+      ExecutableReference,
+
+    tempEntityTypes:
+      Map<
+        TempNodeId,
+        ConceptId
+      >
+  ): ConceptId | null {
+    if (
+      reference.kind ===
+      'TEMP'
+    ) {
+      return (
+        tempEntityTypes.get(
+          reference.tempId
+        ) ?? null
+      );
+    }
+
+    return (
+      this.document
+        .nodes
+        .get(
+          reference.nodeId
+        )
+        ?.entityConceptId ??
+      null
+    );
+  }
+
+  private validateContainment(
+    childConceptId:
+      ConceptId,
+
+    parentConceptId:
+      ConceptId,
+
+    diagnostics:
+      ExecutionPlan[
+        'diagnostics'
+      ]
+  ): void {
+    const child =
+      this.concepts[
+        childConceptId
+      ];
+
+    const parent =
+      this.concepts[
+        parentConceptId
+      ];
+
+    if (
+      child?.kind !==
+        'ENTITY' ||
+      parent?.kind !==
+        'ENTITY'
+    ) {
+      return;
+    }
+
+    if (
+      !parent
+        .capabilities
+        .canContainChildren
+    ) {
+      diagnostics.push({
+        severity: 'ERROR',
+
+        code:
+          'PARENT_CANNOT_CONTAIN',
+
+        message:
+          `${parent.id} cannot contain children.`
+      });
+
+      return;
+    }
+
+    const allowedChildren =
+      parent
+        .capabilities
+        .allowedChildConceptIds;
+
+    if (
+      allowedChildren &&
+      !allowedChildren
+        .includes(
+          childConceptId
+        )
+    ) {
+      diagnostics.push({
+        severity: 'ERROR',
+
+        code:
+          'INVALID_CHILD_TYPE',
+
+        message:
+          `${child.id} cannot be inserted into ${parent.id}.`
+      });
+    }
+
+    const allowedParents =
+      child
+        .capabilities
+        .allowedParentConceptIds;
+
+    if (
+      allowedParents &&
+      !allowedParents
+        .includes(
+          parentConceptId
+        )
+    ) {
+      diagnostics.push({
+        severity: 'ERROR',
+
+        code:
+          'INVALID_PARENT_TYPE',
+
+        message:
+          `${parent.id} is not an allowed parent of ${child.id}.`
+      });
+    }
+  }
+}
+```
+
+---
+
+# 42. Runtime Adapter
+
+O compilador não deve manipular o DOM diretamente.
+
+Ele opera contra a API real do builder.
+
+```ts
+export interface BuilderRuntimeAdapter {
+  createNode(args: {
+    entityConceptId:
+      ConceptId;
+
+    text?: string;
+  }): DocumentNodeId;
+
+  setProperty(args: {
+    nodeId:
+      DocumentNodeId;
+
+    propertyConceptId:
+      ConceptId;
+
+    runtimeProperty:
+      string;
+
+    value:
+      string |
+      number |
+      boolean;
+  }): void;
+
+  clearProperty(args: {
+    nodeId:
+      DocumentNodeId;
+
+    propertyConceptId:
+      ConceptId;
+
+    runtimeProperty:
+      string;
+
+    clearValue:
+      string |
+      number |
+      boolean |
+      null;
+  }): void;
+
+  place(args: {
+    sourceNodeId:
+      DocumentNodeId;
+
+    relation:
+      SpatialRelation;
+
+    targetNodeId:
+      DocumentNodeId;
+  }): void;
+
+  deleteNode(
+    nodeId:
+      DocumentNodeId
+  ): void;
+
+  inspectNode(
+    nodeId:
+      DocumentNodeId
+  ): unknown;
+}
+```
+
+---
+
+# 43. Operation Executor
+
+```ts
+export class ExecutionEngine {
+  constructor(
+    private concepts:
+      Record<ConceptId, ConceptNode>,
+
+    private adapter:
+      BuilderRuntimeAdapter
+  ) {}
+
+  execute(
+    plan:
+      ExecutionPlan
+  ): {
+    success: boolean;
+
+    diagnostics:
+      ExecutionPlan[
+        'diagnostics'
+      ];
+
+    createdNodes:
+      Record<
+        TempNodeId,
+        DocumentNodeId
+      >;
+  } {
+    const fatal =
+      plan.diagnostics.some(
+        diagnostic =>
+          diagnostic.severity ===
+          'ERROR'
+      );
+
+    if (fatal) {
+      return {
+        success: false,
+
+        diagnostics:
+          plan.diagnostics,
+
+        createdNodes: {}
+      };
+    }
+
+    const tempMap =
+      new Map<
+        TempNodeId,
+        DocumentNodeId
+      >();
+
+    for (
+      const step
+      of plan.steps
+    ) {
+      switch (
+        step.kind
+      ) {
+        case 'CREATE_NODE': {
+          const nodeId =
+            this.adapter
+              .createNode({
+                entityConceptId:
+                  step
+                    .entityConceptId,
+
+                text:
+                  step.text
+              });
+
+          tempMap.set(
+            step.tempId,
+            nodeId
+          );
+
+          break;
+        }
+
+        case 'SET_PROPERTY': {
+          const nodeId =
+            this.resolveExecutableReference(
+              step.target,
+              tempMap
+            );
+
+          const property =
+            this.concepts[
+              step
+                .propertyConceptId
+            ];
+
+          if (
+            property?.kind !==
+            'PROPERTY'
+          ) {
+            throw new Error(
+              `Invalid property ${step.propertyConceptId}`
+            );
+          }
+
+          this.adapter
+            .setProperty({
+              nodeId,
+
+              propertyConceptId:
+                property.id,
+
+              runtimeProperty:
+                property
+                  .runtimeProperty,
+
+              value:
+                step.value
+            });
+
+          break;
+        }
+
+        case 'CLEAR_PROPERTY': {
+          const nodeId =
+            this.resolveExecutableReference(
+              step.target,
+              tempMap
+            );
+
+          const property =
+            this.concepts[
+              step
+                .propertyConceptId
+            ];
+
+          if (
+            property?.kind !==
+            'PROPERTY'
+          ) {
+            throw new Error(
+              `Invalid property ${step.propertyConceptId}`
+            );
+          }
+
+          this.adapter
+            .clearProperty({
+              nodeId,
+
+              propertyConceptId:
+                property.id,
+
+              runtimeProperty:
+                property
+                  .runtimeProperty,
+
+              clearValue:
+                property
+                  .clearValue ??
+                null
+            });
+
+          break;
+        }
+
+        case 'PLACE_NODE': {
+          const sourceNodeId =
+            this.resolveExecutableReference(
+              step.source,
+              tempMap
+            );
+
+          const targetNodeId =
+            this.resolveExecutableReference(
+              step.target,
+              tempMap
+            );
+
+          const relation =
+            this.concepts[
+              step
+                .relationConceptId
+            ];
+
+          if (
+            relation?.kind !==
+            'SPATIAL'
+          ) {
+            throw new Error(
+              `Invalid spatial relation ${step.relationConceptId}`
+            );
+          }
+
+          this.adapter.place({
+            sourceNodeId,
+
+            relation:
+              relation.relation,
+
+            targetNodeId
+          });
+
+          break;
+        }
+
+        case 'DELETE_NODE':
+          this.adapter
+            .deleteNode(
+              step.targetNodeId
+            );
+          break;
+
+        case 'MOVE_NODE': {
+          const targetNodeId =
+            this.resolveExecutableReference(
+              step.target,
+              tempMap
+            );
+
+          const relation =
+            this.concepts[
+              step
+                .relationConceptId
+            ];
+
+          if (
+            relation?.kind !==
+            'SPATIAL'
+          ) {
+            throw new Error(
+              `Invalid spatial relation ${step.relationConceptId}`
+            );
+          }
+
+          this.adapter.place({
+            sourceNodeId:
+              step.sourceNodeId,
+
+            relation:
+              relation.relation,
+
+            targetNodeId
+          });
+
+          break;
+        }
+
+        case 'QUERY_NODE':
+          this.adapter
+            .inspectNode(
+              step.targetNodeId
+            );
+          break;
+      }
+    }
+
+    return {
+      success: true,
+
+      diagnostics:
+        plan.diagnostics,
+
+      createdNodes:
+        Object.fromEntries(
+          tempMap
+        )
+    };
+  }
+
+  private resolveExecutableReference(
+    reference:
+      ExecutableReference,
+
+    tempMap:
+      Map<
+        TempNodeId,
+        DocumentNodeId
+      >
+  ): DocumentNodeId {
+    if (
+      reference.kind ===
+      'NODE'
+    ) {
+      return reference.nodeId;
+    }
+
+    const resolved =
+      tempMap.get(
+        reference.tempId
+      );
+
+    if (!resolved) {
+      throw new Error(
+        `Temporary node ${reference.tempId} has not been created`
+      );
+    }
+
+    return resolved;
+  }
+}
+```
+
+CREATE, UPDATE, DELETE e MOVE não compartilham mais a falsa lógica:
+
+```text
+operation → document.createElement()
+```
+
+Cada operação gera passos próprios.
+
+---
+
+# 44. Compilador completo
+
+```ts
+export class SemanticCompiler {
+  private lexer:
+    RawLexer;
+
+  private lexicalIndex:
+    LexicalIndex;
+
+  private trie:
+    MultiwordTrie;
+
+  private tokenBuilder:
+    SemanticTokenBuilder;
+
+  constructor(
+    private concepts:
+      Record<
+        ConceptId,
+        ConceptNode
+      >,
+
+    lexemes:
+      Record<
+        LexemeId,
+        Lexeme
+      >,
+
+    surfaceForms:
+      SurfaceForm[],
+
+    multiwords:
+      MultiwordEntry[]
+  ) {
+    this.lexer =
+      new RawLexer();
+
+    this.lexicalIndex =
+      new LexicalIndex(
+        surfaceForms,
+        lexemes
+      );
+
+    this.trie =
+      new MultiwordTrie(
+        multiwords
+      );
+
+    this.tokenBuilder =
+      new SemanticTokenBuilder(
+        concepts,
+        this.lexicalIndex,
+        this.trie
+      );
+  }
+
+  compileToAst(
+    input: string
+  ): SemanticDocumentAst {
+    const raw =
+      this.lexer.lex(
+        input
+      );
+
+    const grammatical =
+      expandContractions(
+        raw
+      );
+
+    const semanticTokens =
+      this.tokenBuilder
+        .build(
+          grammatical
+        );
+
+    const parser =
+      new DomainParser(
+        this.concepts
+      );
+
+    return parser.parse(
+      semanticTokens
+    );
+  }
+
+  compile(
+    input: string,
+
+    document:
+      DocumentModel
+  ): ExecutionPlan {
+    const ast =
+      this.compileToAst(
+        input
+      );
+
+    const planner =
+      new ExecutionPlanner(
+        this.concepts,
+        document
+      );
+
+    const plan =
+      planner.build(
+        ast
+      );
+
+    const validator =
+      new ConstraintValidator(
+        this.concepts,
+        document
+      );
+
+    return validator
+      .validate(plan);
+  }
+}
+```
+
+---
+
+# 45. Casos obrigatórios de aceitação
+
+## 45.1 Caixa com botão
+
+```text
+crie uma caixa azul com um botão vermelho dentro
+```
+
+Resultado semântico obrigatório:
+
+```text
+CREATE CONTAINER
+  backgroundColor = BLUE
+
+CREATE BUTTON
+  backgroundColor = RED
+
+PLACE BUTTON
+  CHILD_OF
+  CONTAINER
+```
+
+---
+
+## 45.2 Relação invertida na frase
+
+```text
+crie um botão dentro de uma caixa azul
+```
+
+Resultado obrigatório:
+
+```text
+CREATE BUTTON
+
+CREATE CONTAINER
+  backgroundColor = BLUE
+
+PLACE BUTTON
+  CHILD_OF
+  CONTAINER
+```
+
+Nunca:
+
+```text
+BUTTON
+└── CONTAINER
+```
+
+---
+
+## 45.3 Quantidade
+
+```text
+crie dois botões dentro da caixa
+```
+
+Resultado:
+
+```text
+CREATE BUTTON #1
+CREATE BUTTON #2
+
+RESOLVE existing CONTAINER
+
+PLACE BUTTON #1 CHILD_OF CONTAINER
+PLACE BUTTON #2 CHILD_OF CONTAINER
+```
+
+---
+
+## 45.4 Borda + cor
+
+```text
+deixe a borda azul
+```
+
+```text
+PROPERTY_GROUP BORDER
+VALUE CATEGORY COLOR
+
+→ C_PROP_BORDER_COLOR
+
+UPDATE current selection:
+borderColor = #2563eb
+```
+
+---
+
+## 45.5 Borda + tamanho
+
+```text
+deixe a borda com 2px
+```
+
+```text
+PROPERTY_GROUP BORDER
+VALUE CATEGORY SIZE
+
+→ C_PROP_BORDER_WIDTH
+
+borderWidth = 2px
+```
+
+---
+
+## 45.6 Negação de propriedade
+
+```text
+crie um botão azul sem borda
+```
+
+```text
+CREATE BUTTON
+
+SET backgroundColor = BLUE
+
+CLEAR:
+  borderColor
+  borderWidth
+  borderStyle
+```
+
+---
+
+## 45.7 Negação de ação
+
+```text
+não apague o botão
+```
+
+```text
+NO_OP
+reason = NEGATED_ACTION
+```
+
+Nenhum DELETE é emitido.
+
+---
+
+## 45.8 Ordinal
+
+```text
+apague o segundo botão
+```
+
+Selector:
+
+```json
+{
+  "entityConceptId": "C_ENT_BUTTON",
+  "ordinalIndex": 1,
+  "quantity": {
+    "mode": "ONE"
+  }
+}
+```
+
+Somente o segundo botão é resolvido.
+
+---
+
+## 45.9 Referência por texto
+
+```text
+mude o botão "Entrar" para azul
+```
+
+Selector:
+
+```json
+{
+  "entityConceptId": "C_ENT_BUTTON",
+  "textEquals": "Entrar"
+}
+```
+
+Mutation:
+
+```text
+COLOR
+→ default button binding
+→ backgroundColor
+→ #2563eb
+```
+
+---
+
+## 45.10 Property-first syntax
+
+```text
+mude o fundo do segundo botão para azul
+```
+
+Resultado:
+
+```text
+TARGET:
+  BUTTON
+  ordinal = 1
+
+PROPERTY:
+  backgroundColor
+
+VALUE:
+  #2563eb
+```
+
+---
+
+## 45.11 Exclusão
+
+```text
+deixe todos os botões azuis menos o primeiro
+```
+
+Selector:
+
+```text
+all BUTTONS
+minus:
+  ordinal BUTTON[0]
+```
+
+Mutation:
+
+```text
+backgroundColor = BLUE
+```
+
+---
+
+## 45.12 Movimento
+
+```text
+mova o botão de dentro da caixa para depois dela
+```
+
+Primeiro:
+
+```text
+SELECT BUTTON
+WHERE parent = BOX
+```
+
+Depois:
+
+```text
+MOVE BUTTON
+AFTER BOX
+```
+
+A ocorrência `ela` aponta para a menção de `caixa`, não para `C_ENT_CONTAINER` globalmente.
+
+---
+
+# 46. Testes de regressão obrigatórios
+
+```ts
+const CASES = [
+  'crie uma caixa azul com um botão vermelho dentro',
+
+  'crie um botão dentro de uma caixa azul',
+
+  'crie uma caixa e um botão ao lado dela',
+
+  'crie dois botões dentro da caixa',
+
+  'deixe a borda azul',
+
+  'deixe a borda com 2px',
+
+  'crie um botão sem borda',
+
+  'não apague o botão',
+
+  'apague o segundo botão',
+
+  'mude o botão "Entrar" para azul',
+
+  'mude o fundo do segundo botão para azul',
+
+  'coloque o botão depois da caixa',
+
+  'mova o botão de dentro da caixa para depois dela',
+
+  'deixe todos os botões azuis menos o primeiro'
+];
+```
+
+Cada teste precisa validar separadamente:
+
+```text
+1. lexer
+2. MWE
+3. lexical candidates
+4. AST
+5. selector
+6. property binding
+7. execution plan
+8. constraint validation
+9. runtime mutation
+```
+
+Não basta verificar somente o DOM final.
+
+---
+
+# 47. Estrutura física recomendada
+
+```text
+semantic-engine/
+│
+├── lexical/
+│   ├── SurfaceForm.ts
+│   ├── Lexeme.ts
+│   ├── LexicalIndex.ts
+│   ├── PortuguesePhonetic.ts
+│   ├── RawLexer.ts
+│   ├── MultiwordTrie.ts
+│   └── GrammarNormalizer.ts
+│
+├── ontology/
+│   ├── Concept.ts
+│   ├── EntityConcept.ts
+│   ├── ActionConcept.ts
+│   ├── PropertyConcept.ts
+│   ├── PropertyGroupConcept.ts
+│   ├── ValueConcept.ts
+│   ├── SpatialConcept.ts
+│   └── knowledge-base/
+│
+├── parser/
+│   ├── SemanticToken.ts
+│   ├── SemanticTokenBuilder.ts
+│   ├── SemanticCursor.ts
+│   ├── DomainParser.ts
+│   ├── PropertyBinder.ts
+│   └── DiscourseContext.ts
+│
+├── ast/
+│   ├── SemanticReference.ts
+│   ├── SemanticSelector.ts
+│   ├── SemanticCommand.ts
+│   └── SemanticDocumentAst.ts
+│
+├── document/
+│   ├── DocumentModel.ts
+│   └── ReferenceResolver.ts
+│
+├── planning/
+│   ├── ExecutionPlan.ts
+│   ├── ExecutionPlanner.ts
+│   └── ConstraintValidator.ts
+│
+├── runtime/
+│   ├── BuilderRuntimeAdapter.ts
+│   └── ExecutionEngine.ts
+│
+├── tests/
+│   ├── lexical.test.ts
+│   ├── parser.test.ts
+│   ├── references.test.ts
+│   ├── binding.test.ts
+│   ├── planning.test.ts
+│   └── runtime.test.ts
+│
+└── SemanticCompiler.ts
+```
+
+---
+
+# 48. Formato persistente
+
+A base permanente pode e deve ser JSON.
+
+Exemplo:
+
+```json
+{
+  "surfaceForms": [
+    {
+      "id": "SF_BOTAO",
+      "rawText": "botão",
+      "lexemeId": "LEX_BOTAO",
+      "formType": "CANONICAL",
+      "morphology": {
+        "gender": "MASC",
+        "number": "SINGULAR"
+      }
+    }
+  ],
+
+  "lexemes": [
+    {
+      "id": "LEX_BOTAO",
+      "lemma": "botão",
+      "pos": "NOUN",
+      "senseConceptIds": [
+        "C_ENT_BUTTON"
+      ]
+    }
+  ],
+
+  "concepts": [
+    {
+      "kind": "VALUE",
+      "id": "C_VAL_BLUE",
+      "valueCategory": "COLOR",
+      "literal": "#2563eb"
+    }
+  ]
+}
+```
+
+Não entram no JSON:
+
+```text
+functions
+callbacks
+closures
+DOM references
+Map instances
+runtime objects
+document nodes
+parser state
+```
+
+Tudo isso pertence ao código ou ao estado vivo da aplicação.
+
+---
+
+# 49. Regra final de responsabilidade
+
+```text
+DATABASE
+    knows facts
+
+LEXER
+    knows characters and token boundaries
+
+LEXICAL INDEX
+    knows possible words
+
+ONTOLOGY
+    knows possible meanings
+
+PARSER
+    knows relationships between occurrences
+
+BINDER
+    knows property/value compatibility
+
+REFERENCE RESOLVER
+    knows which real document node is being mentioned
+
+VALIDATOR
+    knows whether the operation is legal
+
+PLANNER
+    knows which ordered mutations are required
+
+EXECUTOR
+    performs those mutations
+
+RUNTIME ADAPTER
+    knows how the builder actually implements them
+```
+
+Nenhuma dessas responsabilidades deve voltar a ser fundida em um único `ConceptNode`, `ResolvedFrame` ou scanner linear.

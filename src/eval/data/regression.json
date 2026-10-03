@@ -1,0 +1,1973 @@
+{
+  "version": "1.0.0",
+  "schemaVersion": "1.0.0",
+  "description": "Conjunto de regressao. Contem os 14 casos obrigatorios do LEXICAL secao 46, as 8 variacoes da secao 36 do PROMPT, a sequencia da secao 38 e um caso para cada defeito D1-D11.",
+  "records": [
+    {
+      "id": "reg-001",
+      "input": "crie uma caixa azul com um botão vermelho dentro",
+      "expected": {
+        "ast": "CREATE [CREATE tmp_1 C_ENT_CONTAINER set(C_PROP_BG_COLOR,COLOR:#2563eb) | CREATE tmp_2 C_ENT_BUTTON set(C_PROP_BG_COLOR,COLOR:#dc2626)] PLACE new:tmp_2 C_SPAT_INSIDE new:tmp_1",
+        "plan": "CREATE_NODE tmp_1 C_ENT_CONTAINER\nSET_PROPERTY temp:tmp_1 C_PROP_BG_COLOR #2563eb\nCREATE_NODE tmp_2 C_ENT_BUTTON\nSET_PROPERTY temp:tmp_2 C_PROP_BG_COLOR #dc2626\nPLACE_NODE temp:tmp_2 C_SPAT_INSIDE temp:tmp_1",
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#2563eb}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}",
+        "attachments": [
+          [
+            "button",
+            "C_SPAT_INSIDE",
+            "container"
+          ]
+        ],
+        "tokens": [
+          {
+            "surface": "crie",
+            "lexemeId": "LEX_CRIAR",
+            "conceptId": "C_ACT_CREATE"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "vermelho",
+            "lexemeId": "LEX_VERMELHO",
+            "conceptId": "C_VAL_RED"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "mandatory",
+        "create",
+        "containment",
+        "color"
+      ]
+    },
+    {
+      "id": "reg-002",
+      "input": "crie um botão dentro de uma caixa azul",
+      "expected": {
+        "ast": "CREATE [CREATE tmp_1 C_ENT_BUTTON | CREATE tmp_2 C_ENT_CONTAINER set(C_PROP_BG_COLOR,COLOR:#2563eb)] PLACE new:tmp_1 C_SPAT_INSIDE new:tmp_2",
+        "plan": "CREATE_NODE tmp_1 C_ENT_BUTTON\nCREATE_NODE tmp_2 C_ENT_CONTAINER\nSET_PROPERTY temp:tmp_2 C_PROP_BG_COLOR #2563eb\nPLACE_NODE temp:tmp_1 C_SPAT_INSIDE temp:tmp_2",
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#2563eb}\n  C_ENT_BUTTON{}",
+        "attachments": [
+          [
+            "button",
+            "C_SPAT_INSIDE",
+            "container"
+          ]
+        ],
+        "tokens": [
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          },
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          },
+          {
+            "surface": "azul",
+            "lexemeId": "LEX_AZUL",
+            "conceptId": "C_VAL_BLUE"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "mandatory",
+        "create",
+        "containment",
+        "direction"
+      ]
+    },
+    {
+      "id": "reg-003",
+      "input": "crie uma caixa e um botão ao lado dela",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}",
+        "attachments": [],
+        "tokens": [
+          {
+            "surface": "caixa",
+            "lexemeId": "LEX_CAIXA",
+            "conceptId": "C_ENT_CONTAINER"
+          },
+          {
+            "surface": "botão",
+            "lexemeId": "LEX_BOTAO",
+            "conceptId": "C_ENT_BUTTON"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "mandatory",
+        "create",
+        "spatial",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "reg-004",
+      "input": "crie dois botões dentro da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}\n  C_ENT_BUTTON{}",
+        "attachments": [
+          [
+            "@1",
+            "C_SPAT_INSIDE",
+            "@0"
+          ],
+          [
+            "@2",
+            "C_SPAT_INSIDE",
+            "@0"
+          ]
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "mandatory",
+        "create",
+        "quantity",
+        "containment"
+      ]
+    },
+    {
+      "id": "reg-005",
+      "input": "deixe a borda azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "selection": 0,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BORDER_COLOR=#2563eb}",
+        "bindings": [
+          [
+            "only",
+            "C_PROP_BORDER_COLOR",
+            "#2563eb"
+          ]
+        ],
+        "tokens": [
+          {
+            "surface": "borda",
+            "lexemeId": "LEX_BORDA",
+            "conceptId": "C_PROP_GROUP_BORDER"
+          }
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "mandatory",
+        "update",
+        "border",
+        "property-group"
+      ]
+    },
+    {
+      "id": "reg-006",
+      "input": "deixe a borda com 2px",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "selection": 0,
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BORDER_WIDTH=2px}",
+        "bindings": [
+          [
+            "only",
+            "C_PROP_BORDER_WIDTH",
+            "2px"
+          ]
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "mandatory",
+        "update",
+        "border",
+        "size"
+      ]
+    },
+    {
+      "id": "reg-007",
+      "input": "crie um botão sem borda",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BORDER_STYLE=none}",
+        "bindings": [
+          [
+            "only",
+            "C_PROP_BORDER_STYLE",
+            "none"
+          ]
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "mandatory",
+        "create",
+        "negation",
+        "property-group"
+      ]
+    },
+    {
+      "id": "reg-008",
+      "input": "não apague o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}",
+        "diagnostics": [
+          "NEGATED_ACTION"
+        ]
+      },
+      "expectError": false,
+      "expectNoMutation": true,
+      "tags": [
+        "mandatory",
+        "negation"
+      ]
+    },
+    {
+      "id": "reg-009",
+      "input": "apague o segundo botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}",
+        "resolvedReferences": [
+          1
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "mandatory",
+        "delete",
+        "ordinal"
+      ]
+    },
+    {
+      "id": "reg-010",
+      "input": "mude o botão \"Entrar\" para azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "text": "Entrar"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON\"Entrar\"{C_PROP_BG_COLOR=#2563eb}",
+        "bindings": [
+          [
+            "only",
+            "C_PROP_BG_COLOR",
+            "#2563eb"
+          ]
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "mandatory",
+        "update",
+        "text-reference",
+        "color"
+      ]
+    },
+    {
+      "id": "reg-011",
+      "input": "mude o fundo do segundo botão para azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}"
+      },
+      "expectError": false,
+      "tags": [
+        "mandatory",
+        "update",
+        "ordinal",
+        "property-first"
+      ]
+    },
+    {
+      "id": "reg-012",
+      "input": "coloque o botão depois da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "mandatory",
+        "move",
+        "spatial"
+      ]
+    },
+    {
+      "id": "reg-013",
+      "input": "mova o botão de dentro da caixa para depois dela",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "children": [
+            {
+              "entityConceptId": "C_ENT_BUTTON"
+            }
+          ]
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "mandatory",
+        "move",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "reg-014",
+      "input": "deixe todos os botões azuis menos o primeiro",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}"
+      },
+      "expectError": false,
+      "tags": [
+        "mandatory",
+        "update",
+        "exclusion",
+        "quantity"
+      ]
+    },
+    {
+      "id": "reg-015",
+      "input": "adicione três caixas vermelhas",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#dc2626}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#dc2626}\nC_ENT_CONTAINER{C_PROP_BG_COLOR=#dc2626}"
+      },
+      "expectError": false,
+      "tags": [
+        "section36",
+        "create",
+        "quantity"
+      ]
+    },
+    {
+      "id": "reg-016",
+      "input": "coloque dois botões azuis dentro da segunda caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_CONTAINER{}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}"
+      },
+      "expectError": false,
+      "tags": [
+        "section36",
+        "create",
+        "quantity",
+        "ordinal",
+        "containment"
+      ]
+    },
+    {
+      "id": "reg-017",
+      "input": "apague todos os botões menos o primeiro",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "section36",
+        "delete",
+        "exclusion"
+      ]
+    },
+    {
+      "id": "reg-018",
+      "input": "mude para vermelho o botão \"Cancelar\"",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON",
+          "text": "Cancelar"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON\"Cancelar\"{C_PROP_BG_COLOR=#dc2626}"
+      },
+      "expectError": false,
+      "tags": [
+        "section36",
+        "update",
+        "value-first"
+      ]
+    },
+    {
+      "id": "reg-019",
+      "input": "deixe a borda do botão com 3px",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BORDER_WIDTH=3px}"
+      },
+      "expectError": false,
+      "tags": [
+        "section36",
+        "update",
+        "border",
+        "explicit-target"
+      ]
+    },
+    {
+      "id": "reg-020",
+      "input": "adicione uma caixa e coloque um botão dentro dela",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "section36",
+        "coordination",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "reg-021",
+      "input": "mova o segundo botão para depois do terceiro",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{}\nC_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "section36",
+        "move",
+        "ordinal"
+      ]
+    },
+    {
+      "id": "reg-022",
+      "input": "crie uma caixa dentro de outra caixa",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_CONTAINER{}"
+      },
+      "expectError": false,
+      "tags": [
+        "section36",
+        "create",
+        "containment",
+        "outro",
+        "D8"
+      ]
+    },
+    {
+      "id": "reg-023",
+      "input": "crie uma caixa",
+      "discourse": [],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}"
+      },
+      "expectError": false,
+      "tags": [
+        "section38",
+        "sequence"
+      ]
+    },
+    {
+      "id": "reg-024",
+      "input": "crie dois botões dentro dela",
+      "discourse": [
+        "crie uma caixa"
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}\n  C_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "section38",
+        "sequence",
+        "pronoun"
+      ]
+    },
+    {
+      "id": "reg-025",
+      "input": "deixe o segundo azul",
+      "discourse": [
+        "crie uma caixa",
+        "crie dois botões dentro dela"
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}"
+      },
+      "expectError": false,
+      "tags": [
+        "section38",
+        "sequence",
+        "ellipsis",
+        "ordinal"
+      ]
+    },
+    {
+      "id": "reg-026",
+      "input": "mova o primeiro para depois da caixa",
+      "discourse": [
+        "crie uma caixa",
+        "crie dois botões dentro dela"
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}\nC_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "section38",
+        "sequence",
+        "ellipsis",
+        "move"
+      ]
+    },
+    {
+      "id": "reg-027",
+      "input": "apague o botão azul",
+      "discourse": [
+        "crie uma caixa",
+        "crie dois botões dentro dela",
+        "deixe o segundo azul"
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "section38",
+        "sequence",
+        "property-filter"
+      ]
+    },
+    {
+      "id": "reg-028",
+      "input": "apague ela",
+      "discourse": [
+        "crie uma caixa banana",
+        "crie um botão"
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}",
+        "diagnostics": [
+          "UNRESOLVED_PRONOUN"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "D1",
+        "pronoun",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-029",
+      "input": "crie um botão dentro dela",
+      "discourse": [
+        "crie uma caixa"
+      ],
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "UNRESOLVED_PRONOUN"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "undoBeforeInput": true,
+      "tags": [
+        "D1",
+        "pronoun",
+        "undo",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-030",
+      "input": "apague o primeiro botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "discourse": [
+        "mude o primeiro botão para azul",
+        "mova o primeiro botão para depois do segundo botão"
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}"
+      },
+      "expectError": false,
+      "tags": [
+        "D2",
+        "ordinal",
+        "document-order"
+      ]
+    },
+    {
+      "id": "reg-031",
+      "input": "mude o fundo do botão para 2px",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "INVALID_VALUE_CATEGORY"
+        ],
+        "severities": {
+          "INVALID_VALUE_CATEGORY": "ERROR"
+        }
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "D3",
+        "diagnostic",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-032",
+      "input": "crie um botão 2px",
+      "expected": {
+        "diagnostics": [
+          "INVALID_PROPERTY"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "D3",
+        "diagnostic",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-033",
+      "input": "apague todos",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "INCOMPLETE_REFERENCE"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "D5",
+        "ellipsis",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-034",
+      "input": "apague os dois últimos botões",
+      "discourse": [
+        "crie cinco botões"
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{}\nC_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "D7",
+        "ordinal",
+        "from-end"
+      ]
+    },
+    {
+      "id": "reg-035",
+      "input": "mova a primeira caixa para dentro da segunda caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER",
+          "children": [
+            {
+              "entityConceptId": "C_ENT_CONTAINER"
+            }
+          ]
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "INVALID_CONTAINMENT"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "D9",
+        "cycle",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-036",
+      "input": "apague o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "AMBIGUOUS_REFERENCE"
+        ],
+        "ambiguous": true
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "D10",
+        "ambiguity",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-037",
+      "input": "deixe a borda azul",
+      "discourse": [
+        "crie uma caixa"
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BORDER_COLOR=#2563eb}"
+      },
+      "expectError": false,
+      "tags": [
+        "D11",
+        "selection-after-command"
+      ]
+    },
+    {
+      "id": "reg-038",
+      "input": "crie um botão",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "simple"
+      ]
+    },
+    {
+      "id": "reg-039",
+      "input": "crie uma caixa",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "simple"
+      ]
+    },
+    {
+      "id": "reg-040",
+      "input": "crie um texto",
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "entity"
+      ]
+    },
+    {
+      "id": "reg-041",
+      "input": "crie um botão verde",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#16a34a}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "color"
+      ]
+    },
+    {
+      "id": "reg-042",
+      "input": "crie um botão amarelo",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#eab308}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "color"
+      ]
+    },
+    {
+      "id": "reg-043",
+      "input": "crie um botão preto",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#000000}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "color"
+      ]
+    },
+    {
+      "id": "reg-044",
+      "input": "crie um botão branco",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#ffffff}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "color"
+      ]
+    },
+    {
+      "id": "reg-045",
+      "input": "crie um botão cinza",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#6b7280}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "color"
+      ]
+    },
+    {
+      "id": "reg-046",
+      "input": "crie um botão roxo",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#a855f7}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "color"
+      ]
+    },
+    {
+      "id": "reg-047",
+      "input": "crie um botão laranja",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#f97316}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "color"
+      ]
+    },
+    {
+      "id": "reg-048",
+      "input": "crie um botão azul e um botão vermelho",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "coordination"
+      ]
+    },
+    {
+      "id": "reg-049",
+      "input": "crie quatro caixas",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_CONTAINER{}\nC_ENT_CONTAINER{}\nC_ENT_CONTAINER{}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "quantity"
+      ]
+    },
+    {
+      "id": "reg-050",
+      "input": "crie duas caixas e um botão",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_CONTAINER{}\nC_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "quantity",
+        "coordination"
+      ]
+    },
+    {
+      "id": "reg-051",
+      "input": "deixe o fundo do botão vermelho",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}"
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "explicit-property"
+      ]
+    },
+    {
+      "id": "reg-052",
+      "input": "deixe a cor do texto do botão amarela",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_TEXT_COLOR=#eab308}"
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "mwe",
+        "text-color"
+      ]
+    },
+    {
+      "id": "reg-053",
+      "input": "deixe a cor de fundo da caixa verde",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#16a34a}"
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "mwe"
+      ]
+    },
+    {
+      "id": "reg-054",
+      "input": "deixe a borda com 1.5rem",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "selection": 0,
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BORDER_WIDTH=1.5rem}"
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "css-unit",
+        "decimal"
+      ]
+    },
+    {
+      "id": "reg-055",
+      "input": "deixe a cor de fundo do botão #2563eb",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}"
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "hex-literal"
+      ]
+    },
+    {
+      "id": "reg-056",
+      "input": "apague o terceiro botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{}",
+        "resolvedReferences": [
+          2
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "delete",
+        "ordinal"
+      ]
+    },
+    {
+      "id": "reg-057",
+      "input": "apague a primeira caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}",
+        "resolvedReferences": [
+          0
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "delete",
+        "ordinal",
+        "gender"
+      ]
+    },
+    {
+      "id": "reg-058",
+      "input": "apague todos os botões",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}"
+      },
+      "expectError": false,
+      "tags": [
+        "delete",
+        "quantity"
+      ]
+    },
+    {
+      "id": "reg-059",
+      "input": "mova o botão para dentro da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "move",
+        "containment"
+      ]
+    },
+    {
+      "id": "reg-060",
+      "input": "coloque a caixa antes do botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "move",
+        "spatial",
+        "before"
+      ]
+    },
+    {
+      "id": "reg-061",
+      "input": "crie um botão escrito \"Ok\"",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON\"Ok\"{}"
+      },
+      "expectError": false,
+      "tags": [
+        "A4",
+        "text"
+      ]
+    },
+    {
+      "id": "reg-062",
+      "input": "crie um botão com fundo azul e borda vermelha",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb,C_PROP_BORDER_COLOR=#dc2626}"
+      },
+      "expectError": false,
+      "tags": [
+        "A3",
+        "coordination",
+        "properties"
+      ]
+    },
+    {
+      "id": "reg-063",
+      "input": "crie uma caixa azul e com borda 2px",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#2563eb,C_PROP_BORDER_WIDTH=2px}"
+      },
+      "expectError": false,
+      "tags": [
+        "A3",
+        "coordination"
+      ]
+    },
+    {
+      "id": "reg-064",
+      "input": "crie uma caixa azul e redonda",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{C_PROP_BG_COLOR=#2563eb,C_PROP_BORDER_RADIUS=50%}"
+      },
+      "expectError": false,
+      "tags": [
+        "A3",
+        "coordination",
+        "value"
+      ]
+    },
+    {
+      "id": "reg-065",
+      "input": "deixe o botão vermelho com borda azul de 3px",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626,C_PROP_BORDER_COLOR=#2563eb,C_PROP_BORDER_WIDTH=3px}"
+      },
+      "expectError": false,
+      "tags": [
+        "A3",
+        "multi-property"
+      ]
+    },
+    {
+      "id": "reg-066",
+      "input": "crie um botão e não apague a caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\nC_ENT_BUTTON{}",
+        "diagnostics": [
+          "NEGATED_ACTION"
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "A2",
+        "negation",
+        "coordination"
+      ]
+    },
+    {
+      "id": "reg-067",
+      "input": "não crie um botão",
+      "expected": {
+        "finalTree": "",
+        "diagnostics": [
+          "NEGATED_ACTION"
+        ]
+      },
+      "expectError": false,
+      "expectNoMutation": true,
+      "tags": [
+        "A2",
+        "negation"
+      ]
+    },
+    {
+      "id": "reg-068",
+      "input": "crie um botão rosa",
+      "expected": {
+        "diagnostics": [
+          "UNKNOWN_WORD"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "D4",
+        "unknown",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-069",
+      "input": "crie um botão vermelo",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}",
+        "diagnostics": [
+          "PHONETIC_MATCH"
+        ]
+      },
+      "expectError": false,
+      "tags": [
+        "D4",
+        "typo",
+        "recovery"
+      ]
+    },
+    {
+      "id": "reg-070",
+      "input": "apaga o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": ""
+      },
+      "expectError": false,
+      "tags": [
+        "D4",
+        "inflection",
+        "exact"
+      ]
+    },
+    {
+      "id": "reg-071",
+      "input": "tire o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": ""
+      },
+      "expectError": false,
+      "tags": [
+        "D4",
+        "synonym",
+        "exact"
+      ]
+    },
+    {
+      "id": "reg-072",
+      "input": "remova a caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": ""
+      },
+      "expectError": false,
+      "tags": [
+        "D4",
+        "synonym",
+        "exact"
+      ]
+    },
+    {
+      "id": "reg-073",
+      "input": "deixe a borda do segundo botão azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{C_PROP_BORDER_COLOR=#2563eb}"
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "border",
+        "target"
+      ]
+    },
+    {
+      "id": "reg-074",
+      "input": "crie um botão dentro de uma caixa dentro de uma caixa",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_CONTAINER{}\n    C_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "nested-containment"
+      ]
+    },
+    {
+      "id": "reg-075",
+      "input": "crie um botão dentro de um botão",
+      "expected": {
+        "diagnostics": [
+          "INVALID_CONTAINMENT"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "constraint",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-076",
+      "input": "apague o quinto botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "TARGET_NOT_FOUND"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "ordinal",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-077",
+      "input": "crie um botão ao lado dela",
+      "expected": {
+        "diagnostics": [
+          "UNRESOLVED_PRONOUN"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "pronoun",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-078",
+      "input": "crie um botão dentro da caixa",
+      "expected": {
+        "diagnostics": [
+          "TARGET_NOT_FOUND"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "reference",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-079",
+      "input": "crie uma banana",
+      "expected": {
+        "diagnostics": [
+          "UNKNOWN_WORD"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "unknown",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-080",
+      "input": "xyzzy quux plugh",
+      "expected": {
+        "diagnostics": [
+          "UNKNOWN_WORD"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "unknown",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-081",
+      "input": "deixe a borda com banana",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "selection": 0,
+      "expected": {
+        "diagnostics": [
+          "UNKNOWN_WORD"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "unknown",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-082",
+      "input": "mova o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "UNSUPPORTED_OPERATION"
+        ]
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "incomplete",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-083",
+      "input": "selecione o segundo botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "query",
+        "selection"
+      ]
+    },
+    {
+      "id": "reg-084",
+      "input": "crie um botão azul",
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "color"
+      ]
+    },
+    {
+      "id": "reg-085",
+      "input": "crie uma caixa com um botão vermelho dentro",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "containment"
+      ]
+    },
+    {
+      "id": "reg-086",
+      "input": "deixe todos os botões menos o segundo azuis",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}\nC_ENT_BUTTON{}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}"
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "exclusion",
+        "word-order"
+      ]
+    },
+    {
+      "id": "reg-087",
+      "input": "crie um botão com texto \"Salvar\" dentro de uma caixa",
+      "expected": {
+        "finalTree": "C_ENT_CONTAINER{}\n  C_ENT_BUTTON\"Salvar\"{}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "text",
+        "containment"
+      ]
+    },
+    {
+      "id": "reg-088",
+      "input": "deixe o botão com borda azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{C_PROP_BORDER_COLOR=#2563eb}"
+      },
+      "expectError": false,
+      "tags": [
+        "update",
+        "border"
+      ]
+    },
+    {
+      "id": "reg-089",
+      "input": "crie três textos",
+      "expected": {
+        "finalTree": "C_ENT_TEXT{}\nC_ENT_TEXT{}\nC_ENT_TEXT{}"
+      },
+      "expectError": false,
+      "tags": [
+        "create",
+        "quantity",
+        "text"
+      ]
+    },
+    {
+      "id": "reg-090",
+      "input": "mova o segundo botão para dentro da caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "finalTree": "C_ENT_BUTTON{}\nC_ENT_CONTAINER{}\n  C_ENT_BUTTON{}"
+      },
+      "expectError": false,
+      "tags": [
+        "move",
+        "ordinal",
+        "containment"
+      ]
+    },
+    {
+      "id": "reg-091",
+      "input": "apague o botão",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "AMBIGUOUS_REFERENCE"
+        ],
+        "ambiguous": true
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "D10",
+        "ambiguity",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-092",
+      "input": "mude a caixa para azul",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "AMBIGUOUS_REFERENCE"
+        ],
+        "ambiguous": true
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "D10",
+        "ambiguity",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-093",
+      "input": "deixe o texto vermelho",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        },
+        {
+          "entityConceptId": "C_ENT_TEXT"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "AMBIGUOUS_REFERENCE"
+        ],
+        "ambiguous": true
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "D10",
+        "ambiguity",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-094",
+      "input": "apague a caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "AMBIGUOUS_REFERENCE"
+        ],
+        "ambiguous": true
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "D10",
+        "ambiguity",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-095",
+      "input": "mova o botão para dentro de uma caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "AMBIGUOUS_REFERENCE"
+        ],
+        "ambiguous": true
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "D10",
+        "ambiguity",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-096",
+      "input": "mude o botão para verde",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "AMBIGUOUS_REFERENCE"
+        ],
+        "ambiguous": true
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "D10",
+        "ambiguity",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-097",
+      "input": "deixe a borda do botão vermelha",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {
+        "diagnostics": [
+          "AMBIGUOUS_REFERENCE"
+        ],
+        "ambiguous": true
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "D10",
+        "ambiguity",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-098",
+      "input": "apague o botão que está na caixa",
+      "seed": [
+        {
+          "entityConceptId": "C_ENT_CONTAINER"
+        },
+        {
+          "entityConceptId": "C_ENT_BUTTON"
+        }
+      ],
+      "expected": {},
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "relative",
+        "unsupported",
+        "negative"
+      ]
+    },
+    {
+      "id": "reg-099",
+      "input": "crie alguns botões",
+      "expected": {
+        "diagnostics": [
+          "UNSUPPORTED_OPERATION"
+        ],
+        "ambiguous": true
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "vague-quantifier",
+        "A12",
+        "negative",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "reg-100",
+      "input": "crie vários botões",
+      "expected": {
+        "diagnostics": [
+          "UNSUPPORTED_OPERATION"
+        ],
+        "ambiguous": true
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "vague-quantifier",
+        "A12",
+        "negative",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "reg-101",
+      "input": "apague uns botões",
+      "expected": {
+        "diagnostics": [
+          "UNSUPPORTED_OPERATION"
+        ],
+        "ambiguous": true
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "vague-quantifier",
+        "A12",
+        "negative",
+        "ambiguous"
+      ]
+    },
+    {
+      "id": "reg-102",
+      "input": "coloque",
+      "expected": {
+        "diagnostics": [
+          "AMBIGUOUS_SENSE"
+        ],
+        "ambiguous": true
+      },
+      "expectError": true,
+      "expectNoMutation": true,
+      "tags": [
+        "A12",
+        "ambiguous-sense",
+        "negative",
+        "ambiguous"
+      ]
+    }
+  ]
+}
