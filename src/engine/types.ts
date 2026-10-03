@@ -64,11 +64,13 @@ export interface Morphology {
     | 'INDICATIVE'
     | 'SUBJUNCTIVE'
     | 'IMPERATIVE'
+    | 'CONDITIONAL'
     | 'INFINITIVE'
     | 'GERUND'
     | 'PARTICIPLE';
 
-  tense?: 'PRESENT' | 'PAST' | 'FUTURE';
+  /** `IMPERFECT` = pretérito imperfeito; `PAST` = pretérito perfeito. */
+  tense?: 'PRESENT' | 'PAST' | 'IMPERFECT' | 'FUTURE';
   person?: 1 | 2 | 3;
 }
 
