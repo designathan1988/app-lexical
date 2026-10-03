@@ -1,0 +1,10 @@
+{
+  "rules": [
+    {"id":"GUESS_ADV_MENTE","suffix":"mente","upos":"ADV","feats":{},"note":"sufixo adverbial produtivo"},
+    {"id":"GUESS_NOUN_CAO","suffix":"ção","upos":"NOUN","feats":{"Gender":"Fem"},"note":"nominalização"},
+    {"id":"GUESS_NOUN_DADE","suffix":"dade","upos":"NOUN","feats":{"Gender":"Fem"},"note":"substantivo abstrato"},
+    {"id":"GUESS_VERB_AR","suffix":"ar","upos":"VERB","feats":{"VerbForm":"Inf"},"note":"infinitivo da primeira conjugação"},
+    {"id":"GUESS_VERB_ER","suffix":"er","upos":"VERB","feats":{"VerbForm":"Inf"},"note":"infinitivo da segunda conjugação"},
+    {"id":"GUESS_VERB_IR","suffix":"ir","upos":"VERB","feats":{"VerbForm":"Inf"},"note":"infinitivo da terceira conjugação"}
+  ]
+}

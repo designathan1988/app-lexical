@@ -1,0 +1,7 @@
+{
+  "rules": [
+    {"paradigm":"V_AR","suffixes":["ar","ares","ar","armos","ardes","arem"],"note":"futuro do subjuntivo regular em -ar"},
+    {"paradigm":"V_ER","suffixes":["er","eres","er","ermos","erdes","erem"],"note":"futuro do subjuntivo regular em -er"},
+    {"paradigm":"V_IR","suffixes":["ir","ires","ir","irmos","irdes","irem"],"note":"futuro do subjuntivo regular em -ir"}
+  ]
+}

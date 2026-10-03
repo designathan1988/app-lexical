@@ -46,10 +46,11 @@ describe('flexão e índice inverso', () => {
         const expected = sentence.tokens[index];
         if (expected.pos === 'PUNCT') continue;
         total++;
-        const correct = analyzer.analyzeSurface(expected.form).some((reading) => reading.lemma === expected.lemma &&
+        const candidates = analyzer.analyzeSurface(expected.form);
+        const correct = candidates.some((reading) => reading.lemma === expected.lemma &&
           (!expected.feats || Object.entries(Object.fromEntries(expected.feats.split('|').map((feature) => feature.split('=')))).every(([key, value]) => reading.feats[key] === value)));
         if (correct) hits++;
-        else failures.push(`${sentence.id}:${expected.form}`);
+        else failures.push(`${sentence.id}:${expected.form} → ${candidates.map((reading) => `${reading.lemma}/${reading.upos}/${JSON.stringify(reading.feats)}`).join(';')}`);
       }
     }
     console.info('Leitura lexical no gabarito', hits, '/', total, 'falhas:', failures.join(', '));

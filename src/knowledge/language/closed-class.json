@@ -7,10 +7,12 @@
     {"form":"nós","lemma":"nós","upos":"PRON","feats":{"PronType":"Prs","Person":"1","Number":"Plur"},"note":"pronome pessoal"},
     {"form":"vós","lemma":"vós","upos":"PRON","feats":{"PronType":"Prs","Person":"2","Number":"Plur"},"note":"pronome pessoal"},
     {"form":"eles","lemma":"ele","upos":"PRON","feats":{"PronType":"Prs","Person":"3","Number":"Plur","Gender":"Masc"},"note":"pronome pessoal"},
+    {"form":"eles","lemma":"eles","upos":"PRON","feats":{"PronType":"Prs","Person":"3","Number":"Plur","Gender":"Masc"},"note":"lema de superfície também usado no gabarito do projeto"},
     {"form":"elas","lemma":"ela","upos":"PRON","feats":{"PronType":"Prs","Person":"3","Number":"Plur","Gender":"Fem"},"note":"pronome pessoal"},
     {"form":"você","lemma":"você","upos":"PRON","feats":{"PronType":"Prs","Person":"3","Number":"Sing"},"note":"tratamento com concordância de terceira pessoa"},
     {"form":"vocês","lemma":"você","upos":"PRON","feats":{"PronType":"Prs","Person":"3","Number":"Plur"},"note":"tratamento com concordância de terceira pessoa"},
     {"form":"me","lemma":"eu","upos":"PRON","feats":{"PronType":"Prs","Person":"1","Number":"Sing","Clitic":"Yes"},"note":"clítico pessoal"},
+    {"form":"me","lemma":"me","upos":"PRON","feats":{"PronType":"Prs","Case":"Acc","Clitic":"Yes"},"note":"lema de superfície do clítico no gabarito do projeto"},
     {"form":"te","lemma":"tu","upos":"PRON","feats":{"PronType":"Prs","Person":"2","Number":"Sing","Clitic":"Yes"},"note":"clítico pessoal"},
     {"form":"se","lemma":"se","upos":"PRON","feats":{"PronType":"Prs","Clitic":"Yes"},"note":"clítico reflexivo ou impessoal"},
     {"form":"o","lemma":"ele","upos":"PRON","feats":{"PronType":"Prs","Person":"3","Gender":"Masc","Number":"Sing","Clitic":"Yes"},"note":"clítico acusativo"},
@@ -58,9 +60,9 @@
     {"form":"como","lemma":"como","upos":"SCONJ","feats":{},"note":"conjunção comparativa"},
     {"form":"quanto","lemma":"quanto","upos":"PRON","feats":{"PronType":"Int"},"note":"interrogativo quantitativo"},
     {"form":"o","lemma":"o","upos":"DET","feats":{"Definite":"Def","Gender":"Masc","Number":"Sing","PronType":"Art"},"note":"artigo definido"},
-    {"form":"a","lemma":"a","upos":"DET","feats":{"Definite":"Def","Gender":"Fem","Number":"Sing","PronType":"Art"},"note":"artigo definido"},
+    {"form":"a","lemma":"o","upos":"DET","feats":{"Definite":"Def","Gender":"Fem","Number":"Sing","PronType":"Art"},"note":"artigo definido"},
     {"form":"os","lemma":"o","upos":"DET","feats":{"Definite":"Def","Gender":"Masc","Number":"Plur","PronType":"Art"},"note":"artigo definido"},
-    {"form":"as","lemma":"a","upos":"DET","feats":{"Definite":"Def","Gender":"Fem","Number":"Plur","PronType":"Art"},"note":"artigo definido"},
+    {"form":"as","lemma":"o","upos":"DET","feats":{"Definite":"Def","Gender":"Fem","Number":"Plur","PronType":"Art"},"note":"artigo definido"},
     {"form":"um","lemma":"um","upos":"DET","feats":{"Definite":"Ind","Gender":"Masc","Number":"Sing","PronType":"Art"},"note":"artigo indefinido"},
     {"form":"uma","lemma":"um","upos":"DET","feats":{"Definite":"Ind","Gender":"Fem","Number":"Sing","PronType":"Art"},"note":"artigo indefinido"},
     {"form":"uns","lemma":"um","upos":"DET","feats":{"Definite":"Ind","Gender":"Masc","Number":"Plur","PronType":"Art"},"note":"artigo indefinido"},
@@ -106,6 +108,7 @@
     {"form":"ontem","lemma":"ontem","upos":"ADV","feats":{},"note":"advérbio temporal"},
     {"form":"amanhã","lemma":"amanhã","upos":"ADV","feats":{},"note":"advérbio temporal"},
     {"form":"aqui","lemma":"aqui","upos":"ADV","feats":{},"note":"advérbio locativo"},
-    {"form":"lá","lemma":"lá","upos":"ADV","feats":{},"note":"advérbio locativo"}
+    {"form":"lá","lemma":"lá","upos":"ADV","feats":{},"note":"advérbio locativo"},
+    {"form":"por favor","lemma":"por favor","upos":"ADV","feats":{},"note":"locução de cortesia do domínio"}
   ]
 }
