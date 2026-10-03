@@ -759,7 +759,9 @@ export class DomainParser {
       return target;
     }
 
-    const reference = this.parseReference(cursor);
+    // O alvo de um posicionamento aceita filtros de propriedade ("da caixa
+    // preta"): sem isso, o adjetivo vazaria como mutação da entidade corrente.
+    const reference = this.parseReference(cursor, undefined, true, false);
     placements.push({
       source: { kind: 'NEW_ENTITY', tempId: current.tempId },
       relationConceptId: spatial.id,

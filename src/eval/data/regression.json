@@ -5753,7 +5753,7 @@
         }
       ],
       "expected": {
-        "ast": "UPDATE sel:C_ENT_BUTTON;all;minus[sel:C_ENT_BUTTON;ord=0] set(C_PROP_BG_COLOR,COLOR:#dc2626)",
+        "ast": "UPDATE sel:C_ENT_BUTTON;all;minus[C_ENT_BUTTON;ord=0] set(C_PROP_BG_COLOR,COLOR:#dc2626)",
         "plan": "SET_PROPERTY node:node_2 C_PROP_BG_COLOR #dc2626\nSET_PROPERTY node:node_3 C_PROP_BG_COLOR #dc2626",
         "finalTree": "C_ENT_BUTTON{}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}\nC_ENT_BUTTON{C_PROP_BG_COLOR=#dc2626}",
         "bindings": [
