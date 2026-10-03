@@ -9,6 +9,7 @@ import type {
 } from '../engine/types';
 import type { ConceptNode } from '../engine/ontology/Concept';
 import { PARADIGMS, generateForms, generateDiminutives } from './paradigms';
+import { featureKey, featuresToMorphology } from './features';
 import type { Paradigm, OrthographyRule } from './paradigms';
 import type { DisambiguationRule } from '../engine/syntax/Disambiguator';
 
@@ -379,6 +380,8 @@ export const INITIAL_CONCEPTS: Record<ConceptId, ConceptNode> = {
 interface LexOptions {
   paradigmId?: string;
   gender?: 'Masc' | 'Fem';
+  /** Número inerente de um lema sem flexão ("lado", "direita"). */
+  number?: 'Sing' | 'Plur';
   irregular?: Record<string, string | string[]>;
   disabledForms?: string[];
   derivedFrom?: LexemeId;
@@ -394,7 +397,12 @@ function lex(
 ): Lexeme {
   const lexeme: Lexeme = { id, lemma, pos, senseConceptIds };
   if (options.paradigmId) lexeme.paradigmId = options.paradigmId;
-  if (options.gender) lexeme.inherent = { Gender: options.gender };
+  if (options.gender || options.number) {
+    lexeme.inherent = {
+      ...(options.gender ? { Gender: options.gender } : {}),
+      ...(options.number ? { Number: options.number } : {})
+    };
+  }
   if (options.irregular) lexeme.irregular = options.irregular;
   if (options.disabledForms) lexeme.disabledForms = options.disabledForms;
   if (options.derivedFrom) lexeme.derivedFrom = options.derivedFrom;
@@ -481,8 +489,17 @@ export const INITIAL_LEXEMES: Record<LexemeId, Lexeme> = {
   LEX_ORD_PENULTIMATE: lex('LEX_ORD_PENULTIMATE', 'penúltimo', 'NUMERAL', ['C_ORD_PENULTIMATE'], { paradigmId: 'ADJ_O' }),
 
   // Numerais — cardinais
-  LEX_CARD_1: lex('LEX_CARD_1', 'um', 'NUMERAL', ['C_CARD_1']),
-  LEX_CARD_2: lex('LEX_CARD_2', 'dois', 'NUMERAL', ['C_CARD_2']),
+  // "um/uma" (só singular) e "dois/duas" (só plural): mesmo mecanismo de
+  // paradigma, com células desativadas e forma irregular.
+  LEX_CARD_1: lex('LEX_CARD_1', 'um', 'NUMERAL', ['C_CARD_1'], {
+    paradigmId: 'DET_UM',
+    disabledForms: ['Gender=Masc|Number=Plur', 'Gender=Fem|Number=Plur']
+  }),
+  LEX_CARD_2: lex('LEX_CARD_2', 'dois', 'NUMERAL', ['C_CARD_2'], {
+    paradigmId: 'ADJ_O',
+    disabledForms: ['Gender=Masc|Number=Sing', 'Gender=Fem|Number=Sing'],
+    irregular: { 'Gender=Masc|Number=Plur': 'dois', 'Gender=Fem|Number=Plur': 'duas' }
+  }),
   LEX_CARD_3: lex('LEX_CARD_3', 'três', 'NUMERAL', ['C_CARD_3']),
   LEX_CARD_4: lex('LEX_CARD_4', 'quatro', 'NUMERAL', ['C_CARD_4']),
   LEX_CARD_5: lex('LEX_CARD_5', 'cinco', 'NUMERAL', ['C_CARD_5']),
@@ -491,8 +508,11 @@ export const INITIAL_LEXEMES: Record<LexemeId, Lexeme> = {
   LEX_CARD_8: lex('LEX_CARD_8', 'oito', 'NUMERAL', ['C_CARD_8']),
   LEX_CARD_9: lex('LEX_CARD_9', 'nove', 'NUMERAL', ['C_CARD_9']),
   LEX_CARD_10: lex('LEX_CARD_10', 'dez', 'NUMERAL', ['C_CARD_10']),
-  LEX_VAGUE_SOME: lex('LEX_VAGUE_SOME', 'alguns', 'NUMERAL', ['C_VAL_VAGUE_SOME']),
-  LEX_VAGUE_SEVERAL: lex('LEX_VAGUE_SEVERAL', 'vários', 'NUMERAL', ['C_VAL_VAGUE_SOME']),
+  LEX_VAGUE_SOME: lex('LEX_VAGUE_SOME', 'algum', 'NUMERAL', ['C_VAL_VAGUE_SOME'], { paradigmId: 'DET_UM' }),
+  LEX_VAGUE_SEVERAL: lex('LEX_VAGUE_SEVERAL', 'vário', 'NUMERAL', ['C_VAL_VAGUE_SOME'], {
+    paradigmId: 'ADJ_O',
+    disabledForms: ['Gender=Masc|Number=Sing', 'Gender=Fem|Number=Sing']
+  }),
 
   // Operadores / determinantes / preposições / conjunções
   LEX_NAO: lex('LEX_NAO', 'não', 'ADVERB', ['C_OP_NOT']),
@@ -505,30 +525,28 @@ export const INITIAL_LEXEMES: Record<LexemeId, Lexeme> = {
   LEX_PARA: lex('LEX_PARA', 'para', 'PREPOSITION', ['C_OP_PARA']),
   LEX_DE: lex('LEX_DE', 'de', 'PREPOSITION', ['C_OP_DE']),
   LEX_E: lex('LEX_E', 'e', 'CONJUNCTION', ['C_OP_E']),
-  LEX_O: lex('LEX_O', 'o', 'DETERMINER', ['C_OP_DEF_ART']),
-  LEX_UM: lex('LEX_UM', 'um', 'DETERMINER', ['C_OP_INDEF_ART']),
-  LEX_TODO: lex('LEX_TODO', 'todo', 'DETERMINER', ['C_OP_ALL']),
-  LEX_OUTRO: lex('LEX_OUTRO', 'outro', 'DETERMINER', ['C_OP_OTHER']),
+  LEX_O: lex('LEX_O', 'o', 'DETERMINER', ['C_OP_DEF_ART'], { paradigmId: 'ADJ_O' }),
+  LEX_UM: lex('LEX_UM', 'um', 'DETERMINER', ['C_OP_INDEF_ART'], { paradigmId: 'DET_UM' }),
+  LEX_TODO: lex('LEX_TODO', 'todo', 'DETERMINER', ['C_OP_ALL'], { paradigmId: 'ADJ_O' }),
+  LEX_OUTRO: lex('LEX_OUTRO', 'outro', 'DETERMINER', ['C_OP_OTHER'], { paradigmId: 'ADJ_O' }),
 
   // Pronomes pessoais (referência anafórica)
   LEX_EU: lex('LEX_EU', 'eu', 'PRONOUN', ['C_OP_EU']),
   LEX_VOCE: lex('LEX_VOCE', 'você', 'PRONOUN', ['C_OP_VOCE']),
-  LEX_ELE: lex('LEX_ELE', 'ele', 'PRONOUN', []),
-  LEX_ELA: lex('LEX_ELA', 'ela', 'PRONOUN', []),
-  LEX_ELES: lex('LEX_ELES', 'eles', 'PRONOUN', []),
-  LEX_ELAS: lex('LEX_ELAS', 'elas', 'PRONOUN', []),
+  // ele/ela/eles/elas: UM lema, flexão pelo paradigma.
+  LEX_ELE: lex('LEX_ELE', 'ele', 'PRONOUN', [], { paradigmId: 'DET_E' }),
 
   // Demonstrativos e anafóricos definidos
-  LEX_ESSE: lex('LEX_ESSE', 'esse', 'DETERMINER', ['C_OP_DEF_ART']),
-  LEX_ESTE: lex('LEX_ESTE', 'este', 'DETERMINER', ['C_OP_DEF_ART']),
-  LEX_AQUELE: lex('LEX_AQUELE', 'aquele', 'DETERMINER', ['C_OP_DEF_ART']),
-  LEX_MESMO: lex('LEX_MESMO', 'mesmo', 'DETERMINER', ['C_OP_DEF_ART', 'C_OP_REFLEXIVE']),
+  LEX_ESSE: lex('LEX_ESSE', 'esse', 'DETERMINER', ['C_OP_DEF_ART'], { paradigmId: 'DET_E' }),
+  LEX_ESTE: lex('LEX_ESTE', 'este', 'DETERMINER', ['C_OP_DEF_ART'], { paradigmId: 'DET_E' }),
+  LEX_AQUELE: lex('LEX_AQUELE', 'aquele', 'DETERMINER', ['C_OP_DEF_ART'], { paradigmId: 'DET_E' }),
+  LEX_MESMO: lex('LEX_MESMO', 'mesmo', 'DETERMINER', ['C_OP_DEF_ART', 'C_OP_REFLEXIVE'], { paradigmId: 'ADJ_O' }),
 
   // Espaciais
   LEX_DENTRO: lex('LEX_DENTRO', 'dentro', 'ADVERB', ['C_SPAT_INSIDE']),
   LEX_DEPOIS: lex('LEX_DEPOIS', 'depois', 'ADVERB', ['C_SPAT_AFTER']),
   LEX_ANTES: lex('LEX_ANTES', 'antes', 'ADVERB', ['C_SPAT_BEFORE']),
-  LEX_LADO: lex('LEX_LADO', 'lado', 'NOUN', ['C_SPAT_BESIDE'])
+  LEX_LADO: lex('LEX_LADO', 'lado', 'NOUN', ['C_SPAT_BESIDE'], { gender: 'Masc', number: 'Sing' })
 };
 
 // ---------------------------------------------------------------------------
@@ -571,108 +589,20 @@ export const INITIAL_SURFACE_FORMS: SurfaceForm[] = [
   sf('SF_TEXTO_PROP', 'texto', 'LEX_CONTEUDO', 'CANONICAL', { gender: M, number: S }),
 
   // --- Erros de digitação, formas coloquiais e abreviações --------------------
-  sf('SF_FACA_ASCII', 'faca', 'LEX_FAZER', 'MISSPELLING', { mood: 'IMPERATIVE' }),
-  sf('SF_BOTAO_ASCII', 'botao', 'LEX_BOTAO', 'COLLOQUIAL', { gender: M, number: S }),
-  sf('SF_BOTOES_ASCII', 'botoes', 'LEX_BOTAO', 'COLLOQUIAL', { gender: M, number: P }),
-  sf('SF_ROTULO_ASCII', 'rotulo', 'LEX_ROTULO', 'COLLOQUIAL', { gender: M, number: S }),
-  sf('SF_CONTEUDO_ASCII', 'conteudo', 'LEX_CONTEUDO', 'COLLOQUIAL', { gender: M, number: S }),
   sf('SF_ASUL', 'asul', 'LEX_AZUL', 'MISSPELLING', { number: S }),
   sf('SF_ORD_7_ASCII', 'setim', 'LEX_ORD_7', 'MISSPELLING'),
   sf('SF_ORD_10_ASCII', 'decim', 'LEX_ORD_10', 'MISSPELLING'),
-  sf('SF_ORD_LAST_ASCII_S', 'ultimo', 'LEX_ORD_LAST', 'COLLOQUIAL', { gender: M, number: S }),
-  sf('SF_ORD_LAST_ASCII_F', 'ultima', 'LEX_ORD_LAST', 'COLLOQUIAL', { gender: F, number: S }),
-  sf('SF_ORD_LAST_ASCII_MP', 'ultimos', 'LEX_ORD_LAST', 'COLLOQUIAL', { gender: M, number: P }),
-  sf('SF_ORD_LAST_ASCII_FP', 'ultimas', 'LEX_ORD_LAST', 'COLLOQUIAL', { gender: F, number: P }),
-  sf('SF_ORD_PEN_ASCII_S', 'penultimo', 'LEX_ORD_PENULTIMATE', 'COLLOQUIAL', { gender: M, number: S }),
-  sf('SF_ORD_PEN_ASCII_F', 'penultima', 'LEX_ORD_PENULTIMATE', 'COLLOQUIAL', { gender: F, number: S }),
-  sf('SF_NAO_ASCII', 'nao', 'LEX_NAO', 'COLLOQUIAL'),
-  sf('SF_CARD_3_ASCII', 'tres', 'LEX_CARD_3', 'COLLOQUIAL'),
 
   // --- Numerais cardinais e quantificadores vagos (classe fechada) ------------
-  sf('SF_CARD_1_M', 'um', 'LEX_CARD_1', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_CARD_1_F', 'uma', 'LEX_CARD_1', 'INFLECTION', { gender: F, number: S }),
-  sf('SF_CARD_2_M', 'dois', 'LEX_CARD_2', 'CANONICAL', { gender: M, number: P }),
-  sf('SF_CARD_2_F', 'duas', 'LEX_CARD_2', 'INFLECTION', { gender: F, number: P }),
-  sf('SF_CARD_3', 'três', 'LEX_CARD_3', 'CANONICAL'),
-  sf('SF_CARD_4', 'quatro', 'LEX_CARD_4'),
-  sf('SF_CARD_5', 'cinco', 'LEX_CARD_5'),
-  sf('SF_CARD_6', 'seis', 'LEX_CARD_6'),
-  sf('SF_CARD_7', 'sete', 'LEX_CARD_7'),
-  sf('SF_CARD_8', 'oito', 'LEX_CARD_8'),
-  sf('SF_CARD_9', 'nove', 'LEX_CARD_9'),
-  sf('SF_CARD_10', 'dez', 'LEX_CARD_10'),
-  sf('SF_VAGUE_SOME_M', 'alguns', 'LEX_VAGUE_SOME', 'CANONICAL', { gender: M, number: P }),
-  sf('SF_VAGUE_SOME_F', 'algumas', 'LEX_VAGUE_SOME', 'INFLECTION', { gender: F, number: P }),
-  sf('SF_VAGUE_SOME_S', 'algum', 'LEX_VAGUE_SOME', 'INFLECTION', { gender: M, number: S }),
-  sf('SF_VAGUE_SOME_SF', 'alguma', 'LEX_VAGUE_SOME', 'INFLECTION', { gender: F, number: S }),
-  sf('SF_VAGUE_SEVERAL_M', 'vários', 'LEX_VAGUE_SEVERAL', 'CANONICAL', { gender: M, number: P }),
-  sf('SF_VAGUE_SEVERAL_F', 'várias', 'LEX_VAGUE_SEVERAL', 'INFLECTION', { gender: F, number: P }),
 
   // --- Operadores e palavras gramaticais (classe fechada) ---------------------
-  sf('SF_NAO', 'não', 'LEX_NAO'),
-  sf('SF_SEM', 'sem', 'LEX_SEM'),
-  sf('SF_MENOS', 'menos', 'LEX_MENOS'),
-  sf('SF_MAIS', 'mais', 'LEX_MAIS'),
-  sf('SF_EXCETO', 'exceto', 'LEX_EXCETO'),
-  sf('SF_SALVO', 'salvo', 'LEX_SALVO'),
-  sf('SF_COM', 'com', 'LEX_COM'),
-  sf('SF_PARA', 'para', 'LEX_PARA'),
-  sf('SF_DE', 'de', 'LEX_DE'),
-  sf('SF_E', 'e', 'LEX_E'),
 
-  sf('SF_O_M_S', 'o', 'LEX_O', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_O_F_S', 'a', 'LEX_O', 'INFLECTION', { gender: F, number: S }),
-  sf('SF_O_M_P', 'os', 'LEX_O', 'INFLECTION', { gender: M, number: P }),
-  sf('SF_O_F_P', 'as', 'LEX_O', 'INFLECTION', { gender: F, number: P }),
 
-  sf('SF_UM_M_S', 'um', 'LEX_UM', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_UM_F_S', 'uma', 'LEX_UM', 'INFLECTION', { gender: F, number: S }),
-  sf('SF_UM_M_P', 'uns', 'LEX_UM', 'INFLECTION', { gender: M, number: P }),
-  sf('SF_UM_F_P', 'umas', 'LEX_UM', 'INFLECTION', { gender: F, number: P }),
 
-  sf('SF_TODO_M_S', 'todo', 'LEX_TODO', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_TODO_F_S', 'toda', 'LEX_TODO', 'INFLECTION', { gender: F, number: S }),
-  sf('SF_TODO_M_P', 'todos', 'LEX_TODO', 'INFLECTION', { gender: M, number: P }),
-  sf('SF_TODO_F_P', 'todas', 'LEX_TODO', 'INFLECTION', { gender: F, number: P }),
 
-  sf('SF_OUTRO_M_S', 'outro', 'LEX_OUTRO', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_OUTRO_F_S', 'outra', 'LEX_OUTRO', 'INFLECTION', { gender: F, number: S }),
-  sf('SF_OUTRO_M_P', 'outros', 'LEX_OUTRO', 'INFLECTION', { gender: M, number: P }),
-  sf('SF_OUTRO_F_P', 'outras', 'LEX_OUTRO', 'INFLECTION', { gender: F, number: P }),
 
-  sf('SF_EU', 'eu', 'LEX_EU', 'CANONICAL'),
-  sf('SF_VOCE', 'você', 'LEX_VOCE', 'CANONICAL'),
-  sf('SF_ELE', 'ele', 'LEX_ELE', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_ELA', 'ela', 'LEX_ELA', 'CANONICAL', { gender: F, number: S }),
-  sf('SF_ELES', 'eles', 'LEX_ELES', 'CANONICAL', { gender: M, number: P }),
-  sf('SF_ELAS', 'elas', 'LEX_ELAS', 'CANONICAL', { gender: F, number: P }),
 
-  sf('SF_ESSE_M_S', 'esse', 'LEX_ESSE', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_ESSE_F_S', 'essa', 'LEX_ESSE', 'INFLECTION', { gender: F, number: S }),
-  sf('SF_ESSE_M_P', 'esses', 'LEX_ESSE', 'INFLECTION', { gender: M, number: P }),
-  sf('SF_ESSE_F_P', 'essas', 'LEX_ESSE', 'INFLECTION', { gender: F, number: P }),
-  sf('SF_ESTE_M_S', 'este', 'LEX_ESTE', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_ESTE_F_S', 'esta', 'LEX_ESTE', 'INFLECTION', { gender: F, number: S }),
-  sf('SF_AQUELE_M_S', 'aquele', 'LEX_AQUELE', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_AQUELE_F_S', 'aquela', 'LEX_AQUELE', 'INFLECTION', { gender: F, number: S }),
-  sf('SF_AQUELE_M_P', 'aqueles', 'LEX_AQUELE', 'INFLECTION', { gender: M, number: P }),
-  sf('SF_AQUELE_F_P', 'aquelas', 'LEX_AQUELE', 'INFLECTION', { gender: F, number: P }),
-  sf('SF_MESMO_M_S', 'mesmo', 'LEX_MESMO', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_MESMO_F_S', 'mesma', 'LEX_MESMO', 'INFLECTION', { gender: F, number: S }),
-  sf('SF_MESMO_M_P', 'mesmos', 'LEX_MESMO', 'INFLECTION', { gender: M, number: P }),
-  sf('SF_MESMO_F_P', 'mesmas', 'LEX_MESMO', 'INFLECTION', { gender: F, number: P }),
 
-  sf('SF_DENTRO', 'dentro', 'LEX_DENTRO'),
-  sf('SF_DEPOIS', 'depois', 'LEX_DEPOIS'),
-  sf('SF_ANTES', 'antes', 'LEX_ANTES'),
-  sf('SF_LADO', 'lado', 'LEX_LADO', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_AZUL_CLARO', 'azul-claro', 'LEX_AZUL_CLARO', 'CANONICAL', { number: INV }),
-  sf('SF_AZUL_ESCURO', 'azul-escuro', 'LEX_AZUL_ESCURO', 'CANONICAL', { number: INV }),
-  sf('SF_VERDE_CLARO', 'verde-claro', 'LEX_VERDE_CLARO', 'CANONICAL', { number: INV }),
-  sf('SF_VERDE_ESCURO', 'verde-escuro', 'LEX_VERDE_ESCURO', 'CANONICAL', { number: INV }),
-  sf('SF_CINZA_CLARO', 'cinza-claro', 'LEX_CINZA_CLARO', 'CANONICAL', { number: INV }),
-  sf('SF_DIREITA', 'direita', 'LEX_DIREITA', 'CANONICAL', { gender: F, number: S }),
-  sf('SF_ESQUERDA', 'esquerda', 'LEX_ESQUERDA', 'CANONICAL', { gender: F, number: S })
 ];
 
 /**
@@ -710,6 +640,20 @@ export function generateSurfaceForms(
         });
       }
     }
+    if (!lexeme.paradigmId && !lexeme.lemma.includes(' ')) {
+      // Lema sem flexão ("com", "não", "três"): a própria forma do lema é
+      // gerada — nenhum lexema depende de cadastro manual da sua forma.
+      const key = lexeme.inherent ? featureKey(lexeme.inherent) : '';
+      out.push({
+        id: `${lexeme.id}#${key || 'lemma'}`,
+        rawText: lexeme.lemma,
+        lexemeId: lexeme.id,
+        formType: 'CANONICAL',
+        morphology: lexeme.inherent ? featuresToMorphology(lexeme.inherent) : undefined,
+        features: key,
+        generated: true
+      });
+    }
     if (lexeme.allowsDiminutive && (lexeme.pos === 'NOUN' || lexeme.pos === 'ADJECTIVE')) {
       const gender = lexeme.inherent?.Gender === 'Fem' ? 'Fem' : 'Masc';
       for (const number of ['Sing', 'Plur'] as const) {
@@ -731,8 +675,8 @@ export function generateSurfaceForms(
 }
 
 // Direções espaciais
-INITIAL_LEXEMES['LEX_DIREITA'] = lex('LEX_DIREITA', 'direita', 'ADVERB', ['C_SPAT_RIGHT']);
-INITIAL_LEXEMES['LEX_ESQUERDA'] = lex('LEX_ESQUERDA', 'esquerda', 'ADVERB', ['C_SPAT_LEFT']);
+INITIAL_LEXEMES['LEX_DIREITA'] = lex('LEX_DIREITA', 'direita', 'ADVERB', ['C_SPAT_RIGHT'], { gender: 'Fem', number: 'Sing' });
+INITIAL_LEXEMES['LEX_ESQUERDA'] = lex('LEX_ESQUERDA', 'esquerda', 'ADVERB', ['C_SPAT_LEFT'], { gender: 'Fem', number: 'Sing' });
 
 // ---------------------------------------------------------------------------
 // Expressões multiword

@@ -109,14 +109,8 @@ export class SemanticTokenBuilder {
         // A leitura pronominal vem primeiro; a resolução anafórica é do
         // discurso, não do índice.
         if (token.clitic) {
-          const lexemeId =
-            token.clitic.gender === 'Fem'
-              ? token.clitic.number === 'Plur'
-                ? 'LEX_ELAS'
-                : 'LEX_ELA'
-              : token.clitic.number === 'Plur'
-                ? 'LEX_ELES'
-                : 'LEX_ELE';
+          // Um único lema pronominal; gênero e número vão na morfologia.
+          const lexemeId = 'LEX_ELE';
           candidates.push({
             conceptId: GRAMMATICAL_CONCEPT,
             lexemeId,

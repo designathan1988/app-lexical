@@ -732,7 +732,32 @@ export function buildParadigms(): Record<ParadigmId, Paradigm> {
       strip: 'l',
       cells: [cell({ Number: 'Sing' }, 'l'), cell({ Number: 'Plur' }, 'is')]
     },
-    /** Uniforme em gênero com plural em -s (verde/verdes, cinza/cinzas). */
+    // --- Determinantes e pronomes (classes fechadas, mesmas regras) ------------
+    /** -e/-a/-es/-as: esse, este, aquele, ele. */
+    DET_E: {
+      id: 'DET_E',
+      pos: 'DETERMINER',
+      strip: 'e',
+      cells: [
+        cell({ Gender: 'Masc', Number: 'Sing' }, 'e'),
+        cell({ Gender: 'Fem', Number: 'Sing' }, 'a'),
+        cell({ Gender: 'Masc', Number: 'Plur' }, 'es'),
+        cell({ Gender: 'Fem', Number: 'Plur' }, 'as')
+      ]
+    },
+    /** -um/-uma/-uns/-umas: um, algum. */
+    DET_UM: {
+      id: 'DET_UM',
+      pos: 'DETERMINER',
+      strip: 'um',
+      cells: [
+        cell({ Gender: 'Masc', Number: 'Sing' }, 'um'),
+        cell({ Gender: 'Fem', Number: 'Sing' }, 'uma'),
+        cell({ Gender: 'Masc', Number: 'Plur' }, 'uns'),
+        cell({ Gender: 'Fem', Number: 'Plur' }, 'umas')
+      ]
+    },
+
     // Uniforme em gênero, variável em número: "verde/verdes".
     ADJ_UNIFORM: {
       id: 'ADJ_UNIFORM',
