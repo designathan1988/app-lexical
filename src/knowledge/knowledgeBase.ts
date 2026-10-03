@@ -324,6 +324,10 @@ export const INITIAL_CONCEPTS: Record<ConceptId, ConceptNode> = {
   C_OP_EXCEPT: { kind: 'OPERATOR', id: 'C_OP_EXCEPT', operator: 'EXCEPT' },
   C_OP_COM: { kind: 'OPERATOR', id: 'C_OP_COM', operator: 'COMITATIVE' },
   C_OP_PARA: { kind: 'OPERATOR', id: 'C_OP_PARA', operator: 'ALLATIVE' },
+  C_OP_EU: { kind: 'OPERATOR', id: 'C_OP_EU', operator: 'SUBJECT_PRONOUN' },
+  C_OP_VOCE: { kind: 'OPERATOR', id: 'C_OP_VOCE', operator: 'SUBJECT_PRONOUN' },
+  C_OP_POLITE_REQUEST: { kind: 'OPERATOR', id: 'C_OP_POLITE_REQUEST', operator: 'POLITE_REQUEST' },
+  C_OP_POLITE_DESIRE: { kind: 'OPERATOR', id: 'C_OP_POLITE_DESIRE', operator: 'POLITE_DESIRE' },
   C_OP_DE: { kind: 'OPERATOR', id: 'C_OP_DE', operator: 'PARTITIVE' },
   C_OP_E: { kind: 'OPERATOR', id: 'C_OP_E', operator: 'COORDINATION' },
   C_OP_DEF_ART: { kind: 'OPERATOR', id: 'C_OP_DEF_ART', operator: 'DEFINITE_ARTICLE' },
@@ -393,6 +397,12 @@ export const INITIAL_LEXEMES: Record<LexemeId, Lexeme> = {
   LEX_SELECIONAR: lex('LEX_SELECIONAR', 'selecionar', 'VERB', ['C_ACT_QUERY'], { paradigmId: 'V_AR' }),
   LEX_MARCAR: lex('LEX_MARCAR', 'marcar', 'VERB', ['C_ACT_QUERY'], { paradigmId: 'V_AR_CAR' }),
 
+  // Verbos de pedido indireto (operadores, não ações): "pode/poderia criar",
+  // "quero um botão", "gostaria de apagar".
+  LEX_PODER_OP: lex('LEX_PODER_OP', 'poder', 'VERB', ['C_OP_POLITE_REQUEST'], { paradigmId: 'V_PODER' }),
+  LEX_QUERER_OP: lex('LEX_QUERER_OP', 'querer', 'VERB', ['C_OP_POLITE_DESIRE'], { paradigmId: 'V_QUERER' }),
+  LEX_GOSTAR_OP: lex('LEX_GOSTAR_OP', 'gostar', 'VERB', ['C_OP_POLITE_DESIRE'], { paradigmId: 'V_AR' }),
+
   // Substantivos
   LEX_BOTAO: lex('LEX_BOTAO', 'botão', 'NOUN', ['C_ENT_BUTTON'], { paradigmId: 'N_AO_OES', gender: 'Masc', allowsDiminutive: true }),
   LEX_CAIXA: lex('LEX_CAIXA', 'caixa', 'NOUN', ['C_ENT_CONTAINER'], { paradigmId: 'N_S', gender: 'Fem', allowsDiminutive: true }),
@@ -461,6 +471,8 @@ export const INITIAL_LEXEMES: Record<LexemeId, Lexeme> = {
   LEX_OUTRO: lex('LEX_OUTRO', 'outro', 'DETERMINER', ['C_OP_OTHER']),
 
   // Pronomes pessoais (referência anafórica)
+  LEX_EU: lex('LEX_EU', 'eu', 'PRONOUN', ['C_OP_EU']),
+  LEX_VOCE: lex('LEX_VOCE', 'você', 'PRONOUN', ['C_OP_VOCE']),
   LEX_ELE: lex('LEX_ELE', 'ele', 'PRONOUN', []),
   LEX_ELA: lex('LEX_ELA', 'ela', 'PRONOUN', []),
   LEX_ELES: lex('LEX_ELES', 'eles', 'PRONOUN', []),
@@ -585,6 +597,8 @@ export const INITIAL_SURFACE_FORMS: SurfaceForm[] = [
   sf('SF_OUTRO_M_P', 'outros', 'LEX_OUTRO', 'INFLECTION', { gender: M, number: P }),
   sf('SF_OUTRO_F_P', 'outras', 'LEX_OUTRO', 'INFLECTION', { gender: F, number: P }),
 
+  sf('SF_EU', 'eu', 'LEX_EU', 'CANONICAL'),
+  sf('SF_VOCE', 'você', 'LEX_VOCE', 'CANONICAL'),
   sf('SF_ELE', 'ele', 'LEX_ELE', 'CANONICAL', { gender: M, number: S }),
   sf('SF_ELA', 'ela', 'LEX_ELA', 'CANONICAL', { gender: F, number: S }),
   sf('SF_ELES', 'eles', 'LEX_ELES', 'CANONICAL', { gender: M, number: P }),
@@ -704,7 +718,8 @@ export const INITIAL_MULTIWORDS: MultiwordEntry[] = [
   { id: 'MWE_RELATIVE_HAVE', phrase: 'que tem', conceptId: 'C_RELATIVE_HAVE' },
   { id: 'MWE_RELATIVE_HAVE_SUBJ', phrase: 'que tenha', conceptId: 'C_RELATIVE_HAVE' },
   { id: 'MWE_RELATIVE_HAVE_SUBJ_PL', phrase: 'que tenham', conceptId: 'C_RELATIVE_HAVE' },
-  { id: 'MWE_RELATIVE_HAVE_ALT', phrase: 'que possui', conceptId: 'C_RELATIVE_HAVE' }
+  { id: 'MWE_RELATIVE_HAVE_ALT', phrase: 'que possui', conceptId: 'C_RELATIVE_HAVE' },
+  { id: 'MWE_POR_FAVOR', phrase: 'por favor', conceptId: 'C_OP_POLITE_REQUEST' }
 ];
 
 /**

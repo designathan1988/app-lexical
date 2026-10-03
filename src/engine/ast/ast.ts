@@ -110,6 +110,8 @@ export interface CreateCommandAst {
   entities: NewEntityAst[];
   placements: PlacementAst[];
   span?: Span;
+  /** Pedido indireto registrado ("você pode…", "quero…", "por favor"). */
+  politeness?: boolean;
 }
 
 export interface UpdateCommandAst {
@@ -117,12 +119,16 @@ export interface UpdateCommandAst {
   target: SemanticReference;
   mutations: AstPropertyMutation[];
   span?: Span;
+  /** Pedido indireto registrado ("você pode…", "quero…", "por favor"). */
+  politeness?: boolean;
 }
 
 export interface DeleteCommandAst {
   kind: 'DELETE';
   target: SemanticReference;
   span?: Span;
+  /** Pedido indireto registrado ("você pode…", "quero…", "por favor"). */
+  politeness?: boolean;
 }
 
 export interface MoveCommandAst {
@@ -130,18 +136,24 @@ export interface MoveCommandAst {
   target: SemanticReference;
   placement: PlacementAst;
   span?: Span;
+  /** Pedido indireto registrado ("você pode…", "quero…", "por favor"). */
+  politeness?: boolean;
 }
 
 export interface QueryCommandAst {
   kind: 'QUERY';
   target: SemanticReference;
   span?: Span;
+  /** Pedido indireto registrado ("você pode…", "quero…", "por favor"). */
+  politeness?: boolean;
 }
 
 export interface NoOpCommandAst {
   kind: 'NO_OP';
   reason: 'NEGATED_ACTION';
   negatedOperation?: string;
+  /** Pedido indireto registrado ("você pode…", "quero…", "por favor"). */
+  politeness?: boolean;
   span?: Span;
 }
 

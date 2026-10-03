@@ -90,6 +90,11 @@ consciente da lista — o oráculo só encolhe).
 geração por paradigma e `morph-15`, `morph-16` e `morph-17` passaram —
 removidos da lista (28 → 25 falhas conhecidas). Nenhum esperado foi alterado.
 
+**Atualização F3 (G7 pedido indireto, 2026-10-03):** [eu/você] + pode/
+poderia/quero/gostaria/queria + opcional "de" (e "por favor" no fim) são
+operadores gramaticais (dados) que envolvem o comando interno, registrando
+ na AST.  passaram (14 → 10).
+
 **Atualização F3 (definido plural, ambiguidade e B4, 2026-10-03):** definido
 plural sem numeral vale por todos os que casam com os filtros; ambiguidade
 fatal não gera passos no plano nem TARGET_NOT_FOUND em cascata; direção

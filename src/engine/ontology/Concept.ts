@@ -114,7 +114,13 @@ export type OperatorKind =
   /** Oração relativa de estado: "que está dentro da caixa". */
   | 'RELATIVE_STATE'
   /** Oração relativa possessiva: "que tem borda azul". */
-  | 'RELATIVE_HAVE';
+  | 'RELATIVE_HAVE'
+  /** Sujeito pronominal de pedido indireto ("eu", "você"). */
+  | 'SUBJECT_PRONOUN'
+  /** Pedido indireto neutro: "você pode criar…", "poderia…", "por favor". */
+  | 'POLITE_REQUEST'
+  /** Desejo que implica criação/ação: "quero um botão", "gostaria de apagar…". */
+  | 'POLITE_DESIRE';
 
 export interface OperatorConcept {
   kind: 'OPERATOR';

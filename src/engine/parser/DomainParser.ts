@@ -313,8 +313,22 @@ export class DomainParser {
 
   private parseCommand(cursor: SemanticCursor): SemanticCommand {
     const startSpan = cursor.peek()?.span;
+
+    // G7 — Pedido indireto: "[eu] quero …", "[você] pode/poderia …",
+    // "gostaria de …", "por favor". O wrapper é gramatical: o comando interno
+    // é o comando de verdade, e a cortesia fica registrada.
+    const polite = this.consumePoliteWrapper(cursor);
+
     const negated = this.consumeOperator(cursor, 'NEGATION');
     const action = this.consumeAction(cursor);
+
+    if (polite && !action) {
+      // "quero um botão vermelho": desejo + sintagma nominal = CREATE.
+      const inner = this.parseCreate(cursor, startSpan);
+      inner.politeness = true;
+      this.consumeTrailingPoliteness(cursor);
+      return inner;
+    }
 
     if (negated) {
       // A ação negada é ignorada por inteiro; o span do comando cobre todo o
@@ -334,17 +348,84 @@ export class DomainParser {
 
     if (!action) return this.parseImplicitCommand(cursor);
 
+    let command: SemanticCommand;
     switch (action.operation) {
       case 'CREATE':
-        return this.parseCreate(cursor, startSpan);
+        command = this.parseCreate(cursor, startSpan);
+        break;
       case 'UPDATE':
-        return this.parseUpdate(cursor, startSpan);
+        command = this.parseUpdate(cursor, startSpan);
+        break;
       case 'DELETE':
-        return this.parseDelete(cursor, startSpan);
+        command = this.parseDelete(cursor, startSpan);
+        break;
       case 'MOVE':
-        return this.parseMove(cursor, startSpan);
+        command = this.parseMove(cursor, startSpan);
+        break;
       case 'QUERY':
-        return this.parseQuery(cursor, startSpan);
+        command = this.parseQuery(cursor, startSpan);
+        break;
+    }
+    if (polite) command.politeness = true;
+    this.consumeTrailingPoliteness(cursor);
+    return command;
+  }
+
+  /**
+   * Wrapper de pedido indireto (dados): [sujeito] + verbo de cortesia +
+   * opcional "de". Consome o wrapper e devolve `true`; senão não move o cursor.
+   */
+  private consumePoliteWrapper(cursor: SemanticCursor): boolean {
+    const checkpoint = cursor.index;
+    let consumed = false;
+
+    // Sujeito pronominal opcional: "eu gostaria", "você pode".
+    if (this.hasOperator(cursor.peek(), 'SUBJECT_PRONOUN')) {
+      cursor.consume();
+      consumed = true;
+    }
+
+    if (
+      !this.hasOperator(cursor.peek(), 'POLITE_REQUEST') &&
+      !this.hasOperator(cursor.peek(), 'POLITE_DESIRE')
+    ) {
+      cursor.index = checkpoint;
+      return false;
+    }
+
+    const desire = this.hasOperator(cursor.peek(), 'POLITE_DESIRE');
+    cursor.consume();
+    consumed = true;
+
+    // "gostaria de apagar…": o "de" do complemento é consumido como parte
+    // do wrapper apenas se NÃO houver ação logo em seguida e o token
+    // seguinte o exigir (verbo no infinitivo).
+    void desire;
+    if (this.hasOperator(cursor.peek(), 'PARTITIVE')) {
+      const after = cursor.peek(1);
+      const afterIsAction = candidatesOfKind(after, this.ctx.concepts, 'ACTION').length > 0;
+      if (afterIsAction) cursor.consume();
+    }
+
+    return consumed;
+  }
+
+  /** "por favor" no fim da frase apenas marca cortesia (vírgula opcional). */
+  private consumeTrailingPoliteness(cursor: SemanticCursor): void {
+    for (;;) {
+      const token = cursor.peek();
+      if (!token) return;
+      if (this.hasOperator(token, 'POLITE_REQUEST')) {
+        cursor.consume();
+        continue;
+      }
+      const isPunct = token.rawTokens.every((rt) => rt.type === 'PUNCT');
+      const next = cursor.peek(1);
+      if (isPunct && next && this.hasOperator(next, 'POLITE_REQUEST')) {
+        cursor.consume();
+        continue;
+      }
+      return;
     }
   }
 
