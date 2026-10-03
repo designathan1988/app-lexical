@@ -92,6 +92,12 @@ export class DomainParser {
   private tempCounter = 0;
   private binder: PropertyBinder;
   diagnostics: Diagnostic[] = [];
+  /**
+   * Consumo por comando: índices globais dos tokens consumidos (invariante
+   * F1.3 — todo token com leitura/literal é consumido por algum nó do AST ou
+   * reportado em diagnóstico).
+   */
+  consumption: Array<{ commandIndex: number; consumedTokenIndices: number[] }> = [];
   private ctx: ParserContext;
 
   constructor(ctx: ParserContext) {
@@ -115,17 +121,46 @@ export class DomainParser {
   parse(tokens: SemanticToken[]): SemanticDocumentAst {
     this.diagnostics = [];
     this.tempCounter = 0;
+    this.consumption = [];
 
-    const groups = this.splitCommands(tokens);
+    const globalIndex = new Map<SemanticToken, number>();
+    tokens.forEach((token, i) => globalIndex.set(token, i));
+
+    const { groups, separators } = this.splitCommands(tokens);
     const commands: SemanticCommand[] = [];
 
-    for (const group of groups) {
-      if (!group.length) continue;
+    groups.forEach((group, groupIndex) => {
+      const separatorTokens = separators[groupIndex] ?? [];
+      if (!group.length) {
+        if (separatorTokens.length) {
+          this.consumption.push({
+            commandIndex: commands.length,
+            consumedTokenIndices: separatorTokens
+              .map((token) => globalIndex.get(token))
+              .filter((i): i is number => i !== undefined)
+              .sort((a, b) => a - b)
+          });
+        }
+        return;
+      }
       const cursor = new SemanticCursor(group);
-      const command = this.parseCommand(cursor);
-      commands.push(command);
-      this.reportUnconsumed(cursor, command);
-    }
+      try {
+        const command = this.parseCommand(cursor);
+        commands.push(command);
+        this.reportUnconsumed(cursor, command);
+      } finally {
+        // Mesmo quando o comando aborta (ParseError), os tokens que o parser
+        // consumiu até ali contam para a invariante de consumo (F1.3).
+        const consumed = [...cursor.consumed, ...separatorTokens];
+        this.consumption.push({
+          commandIndex: commands.length,
+          consumedTokenIndices: consumed
+            .map((token) => globalIndex.get(token))
+            .filter((i): i is number => i !== undefined)
+            .sort((a, b) => a - b)
+        });
+      }
+    });
 
     return { commands };
   }
@@ -173,17 +208,27 @@ export class DomainParser {
     return true;
   }
 
-  private splitCommands(tokens: SemanticToken[]): SemanticToken[][] {
+  private splitCommands(tokens: SemanticToken[]): {
+    groups: SemanticToken[][];
+    /** Conectores usados como fronteira de comando, por grupo encerrado. */
+    separators: SemanticToken[][];
+  } {
     const groups: SemanticToken[][] = [];
+    const separators: SemanticToken[][] = [];
     let current: SemanticToken[] = [];
+
+    const closeGroup = (separator?: SemanticToken) => {
+      groups.push(current);
+      separators.push(separator ? [separator] : []);
+      current = [];
+    };
 
     for (let i = 0; i < tokens.length; i++) {
       const token = tokens[i];
       const raw = token.rawTokens.map((x) => x.raw).join('');
 
       if (raw === ';') {
-        groups.push(current);
-        current = [];
+        closeGroup(token);
         continue;
       }
 
@@ -195,8 +240,7 @@ export class DomainParser {
           (this.hasOperator(next, 'NEGATION') && this.isVerbToken(afterNext));
 
         if (startsCommand) {
-          groups.push(current);
-          current = [];
+          closeGroup(token);
           continue;
         }
       }
@@ -204,8 +248,11 @@ export class DomainParser {
       current.push(token);
     }
 
-    if (current.length) groups.push(current);
-    return groups;
+    if (current.length) {
+      groups.push(current);
+      separators.push([]);
+    }
+    return { groups, separators };
   }
 
   private reportUnconsumed(cursor: SemanticCursor, command: SemanticCommand): void {
@@ -251,11 +298,18 @@ export class DomainParser {
     const action = this.consumeAction(cursor);
 
     if (negated) {
+      // A ação negada é ignorada por inteiro; o span do comando cobre todo o
+      // grupo para que nenhum token fique silenciosamente sem tratamento.
+      const last = cursor.tokens[cursor.tokens.length - 1];
+      const span = {
+        start: startSpan?.start ?? 0,
+        end: last?.span.end ?? startSpan?.end ?? 0
+      };
       return {
         kind: 'NO_OP',
         reason: 'NEGATED_ACTION',
         negatedOperation: action?.operation,
-        span: startSpan
+        span
       };
     }
 

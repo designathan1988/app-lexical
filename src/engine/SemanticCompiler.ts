@@ -8,7 +8,7 @@ import type { ExecutionPlan } from './planning/ExecutionPlan';
 import type { RawToken } from './lexical/RawLexer';
 import type { SemanticToken } from './parser/SemanticToken';
 import type { Diagnostic } from './diagnostics';
-import { diagnostic, normalizeSpan } from './diagnostics';
+import { diagnostic, normalizeSpan, dedupeDiagnostics } from './diagnostics';
 
 import { RawLexer } from './lexical/RawLexer';
 import { expandContractions } from './lexical/GrammarNormalizer';
@@ -32,6 +32,11 @@ export interface CompileTrace {
   grammarIndex: GrammarIndex;
   ast?: SemanticDocumentAst;
   plan?: ExecutionPlan;
+  /**
+   * Consumo por comando (invariante F1.3): índices globais de
+   * `semanticTokens` consumidos pelo parser em cada comando da AST.
+   */
+  consumption?: Array<{ commandIndex: number; consumedTokenIndices: number[] }>;
 }
 
 export interface CompileResult {
@@ -147,12 +152,15 @@ export class SemanticCompiler {
     const parser = new DomainParser(this.makeParserContext(document, discourse));
 
     let ast: SemanticDocumentAst;
+    let consumption: CompileTrace['consumption'] = [];
     try {
       ast = parser.parse(tokens);
+      consumption = parser.consumption;
       diagnostics.push(...parser.diagnostics);
     } catch (error) {
       // Diagnósticos já emitidos pelas camadas internas (ex.: binder) vêm
       // primeiro, preservando sua camada de origem.
+      consumption = parser.consumption;
       diagnostics.push(...parser.diagnostics);
       diagnostics.push(this.toDiagnostic(error));
       ast = { commands: [] };
@@ -167,7 +175,8 @@ export class SemanticCompiler {
         grammaticalTokens: grammatical,
         semanticTokens: tokens,
         grammarIndex: this.grammar,
-        ast
+        ast,
+        consumption
       }
     };
   }
@@ -204,7 +213,9 @@ export class SemanticCompiler {
 
     const merged: ExecutionPlan = {
       ...plan,
-      diagnostics: [...prePlan, ...plan.diagnostics].map((d) => normalizeSpan(d, input.length))
+      diagnostics: dedupeDiagnostics(
+        [...prePlan, ...plan.diagnostics].map((d) => normalizeSpan(d, input.length))
+      )
     };
 
     trace.plan = merged;

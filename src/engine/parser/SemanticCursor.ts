@@ -4,6 +4,8 @@ import type { Span } from '../diagnostics';
 
 export class SemanticCursor {
   index = 0;
+  /** Tokens efetivamente consumidos, na ordem (base da invariante de consumo). */
+  readonly consumed: SemanticToken[] = [];
 
   constructor(public tokens: SemanticToken[]) {}
 
@@ -16,7 +18,9 @@ export class SemanticCursor {
   }
 
   consume(): SemanticToken | undefined {
-    return this.tokens[this.index++];
+    const token = this.tokens[this.index++];
+    if (token) this.consumed.push(token);
+    return token;
   }
 
   rawWord(offset = 0): string | null {

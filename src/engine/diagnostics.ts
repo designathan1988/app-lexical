@@ -97,6 +97,24 @@ export interface Diagnostic {
 }
 
 /**
+ * Remove diagnósticos repetidos: mesmo `(code, start, end)` é um único
+ * problema, reportado uma vez. O primeiro diagnóstico (da camada que o
+ * detectou primeiro, com subcódigo/candidatos) é preservado; os seguintes
+ * são repropagação de camadas externas.
+ */
+export function dedupeDiagnostics(diagnostics: Diagnostic[]): Diagnostic[] {
+  const seen = new Set<string>();
+  const out: Diagnostic[] = [];
+  for (const d of diagnostics) {
+    const key = `${d.code}|${String(d.start)}|${String(d.end)}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(d);
+  }
+  return out;
+}
+
+/**
  * Normaliza o span de um diagnóstico que sai do motor.
  *
  * Invariante (F1.3): todo diagnóstico exposto tem `0 ≤ start ≤ end ≤

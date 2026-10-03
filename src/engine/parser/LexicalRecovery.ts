@@ -89,7 +89,7 @@ export class LexicalRecovery {
         );
         if (allDestructive) {
           diagnostics.push(
-            diagnostic('lexical', 'ERROR', 'UNKNOWN_WORD',
+            diagnostic('morphology', 'ERROR', 'UNKNOWN_WORD',
               `"${word}" parece uma ação destrutiva (${scored
                 .map((s) => s.lexeme.lemma)
                 .join(', ')}); ações destrutivas exigem forma cadastrada exata. ` +
@@ -109,7 +109,7 @@ export class LexicalRecovery {
 
       if (distinctConcepts.size > 1 && scored[0].score - scored[1].score < 0.05) {
         diagnostics.push(
-          diagnostic('lexical', 'ERROR', 'AMBIGUOUS_SENSE',
+          diagnostic('morphology', 'ERROR', 'AMBIGUOUS_SENSE',
             `"${word}" é ambíguo: pode ser ${scored
               .map((s) => `${s.lexeme.lemma} (${s.score.toFixed(2)})`)
               .join(', ')}. Escreva a forma correta.`,
@@ -123,7 +123,7 @@ export class LexicalRecovery {
 
       const best = scored[0];
       diagnostics.push(
-        diagnostic('lexical', 'WARNING', 'PHONETIC_MATCH',
+        diagnostic('morphology', 'WARNING', 'PHONETIC_MATCH',
           `"${word}" não está cadastrada; interpretada como "${best.matchedForm}" ` +
             `(${best.lexeme.id} → ${best.candidates.map((c) => c.conceptId).join('/')}, ` +
             `score ${best.score.toFixed(2)}: similaridade ${best.components.similarity.toFixed(2)}, ` +
@@ -146,7 +146,7 @@ export class LexicalRecovery {
   ): Diagnostic {
     const suggestions = raw.slice(0, 3);
     return diagnostic(
-      'lexical',
+      'morphology',
       'ERROR',
       'UNKNOWN_WORD',
       `"${word}" não está no vocabulário do domínio.` +

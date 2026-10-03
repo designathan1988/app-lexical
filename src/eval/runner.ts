@@ -332,7 +332,14 @@ export function runRecord(kb: KnowledgeBase, rec: EvalRecord): RecordResult {
   }
 }
 
-function runRecordUnsafe(kb: KnowledgeBase, rec: EvalRecord): RecordResult {
+/**
+ * Monta o motor no estado do registro: seed, seleção e discurso, sem executar
+ * `input`. Usado pelo runner e pelos testes de invariantes (F1.3).
+ */
+export function prepareEngine(
+  kb: KnowledgeBase,
+  rec: Pick<EvalRecord, 'seed' | 'selection' | 'discourse' | 'undoBeforeInput'>
+): SemanticEngine {
   const engine = new SemanticEngine(kb);
   seedDocument(engine, rec.seed ?? []);
 
@@ -349,6 +356,11 @@ function runRecordUnsafe(kb: KnowledgeBase, rec: EvalRecord): RecordResult {
   if (rec.undoBeforeInput) {
     engine.undo();
   }
+  return engine;
+}
+
+function runRecordUnsafe(kb: KnowledgeBase, rec: EvalRecord): RecordResult {
+  const engine = prepareEngine(kb, rec);
 
   const beforeTree = treeSignature(engine.store.document, kb.concepts);
   // Índices em pré-ordem ANTES da execução: referências resolvidas devem ser
