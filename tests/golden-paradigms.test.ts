@@ -419,16 +419,16 @@ describe('F2.3 — tabelas golden dos paradigmas', () => {
   });
 
   it('botão: -ão → -ões', () => {
-    const generated = generateForms('LEX_BOTAO', 'botão', PARADIGMS['N_AO_OES']).map(
-      (f) => [f.surface, f.featureKey] as Row
-    );
+    const generated = generateForms('LEX_BOTAO', 'botão', PARADIGMS['N_AO_OES'], {
+      inherent: { Gender: 'Masc' }
+    }).map((f) => [f.surface, f.featureKey] as Row);
     expect(normalize(generated)).toEqual(normalize(BOTAO_ROWS));
   });
 
   it('caixa: +s', () => {
-    const generated = generateForms('LEX_CAIXA', 'caixa', PARADIGMS['N_S']).map(
-      (f) => [f.surface, f.featureKey] as Row
-    );
+    const generated = generateForms('LEX_CAIXA', 'caixa', PARADIGMS['N_S'], {
+      inherent: { Gender: 'Fem' }
+    }).map((f) => [f.surface, f.featureKey] as Row);
     expect(normalize(generated)).toEqual(normalize(CAIXA_ROWS));
   });
 
