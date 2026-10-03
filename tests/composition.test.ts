@@ -34,7 +34,9 @@ describe('Composição — CREATE: verbos × entidades', () => {
   for (const verb of CREATE_VERBS) {
     for (const ent of ENTITIES) {
       cases.push([
-        `${verb} ${ent.plural ? '' : ent.article + ' '}${ent.word}`.trim(),
+        // O plural usa o numeral da tabela ("dois botões"): plural nu não tem
+        // cardinalidade (PARTE IV 3.G) e é recusado.
+        `${verb} ${ent.article} ${ent.word}`,
         ent.concept,
         `${verb} ${ent.word}`
       ]);

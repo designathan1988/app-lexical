@@ -55,11 +55,11 @@ describe('Parser — quantidade', () => {
     expect(cmd.entities[0].quantity).toBe(3);
   });
 
-  it('plural sem numeral não vira quantidade', () => {
-    const ast = analyze('crie botões');
-    const cmd = ast.commands[0];
-    if (cmd.kind !== 'CREATE') throw new Error('expected CREATE');
-    expect(cmd.entities[0].quantity).toBe(1);
+  it('plural sem numeral não vira quantidade (nem inventada): pergunta quantos', () => {
+    const engine = new SemanticEngine(createInitialKnowledgeBase());
+    const result = engine.analyze('crie botões');
+    expect(result.ast.commands.some((c) => c.kind === 'CREATE')).toBe(false);
+    expect(result.diagnostics.find((d) => d.code === 'UNSUPPORTED_OPERATION')?.subcode).toBe('BARE_PLURAL');
   });
 });
 
