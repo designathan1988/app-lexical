@@ -10,6 +10,7 @@ import type {
 import type { ConceptNode } from '../engine/ontology/Concept';
 import { PARADIGMS, generateForms, generateDiminutives } from './paradigms';
 import type { Paradigm, OrthographyRule } from './paradigms';
+import type { DisambiguationRule } from '../engine/syntax/Disambiguator';
 
 /** Override persistido de um paradigma (F2.5): substitui células/regras. */
 export interface ParadigmOverride {
@@ -61,6 +62,8 @@ export interface KnowledgeBase {
   };
   /** Edições de paradigma feitas no painel (F2.5), por id de paradigma. */
   paradigmOverrides?: Record<string, ParadigmOverride>;
+  /** Regras de desambiguação por restrições (estilo CG-3), aplicadas em ordem. */
+  disambiguationRules?: DisambiguationRule[];
 }
 
 // ---------------------------------------------------------------------------
@@ -778,6 +781,51 @@ INITIAL_CONCEPTS['C_RELATIVE_HAVE'] = {
 };
 
 // ---------------------------------------------------------------------------
+// Desambiguação por restrições (dados)
+// ---------------------------------------------------------------------------
+
+/**
+ * Regras iniciais. Cada uma age sobre CLASSES (classe gramatical, tipo de
+ * conceito, operador, marca de clítico), nunca sobre palavras.
+ */
+export const INITIAL_DISAMBIGUATION_RULES: DisambiguationRule[] = [
+  {
+    id: 'DIS-CLITIC-PRONOUN',
+    action: 'SELECT',
+    target: { pos: ['PRONOUN'] },
+    conditions: [{ offset: 0, test: { clitic: true } }],
+    note: 'Token vindo de ênclise ("deixe-os") é pronome objeto, não artigo.'
+  },
+  {
+    id: 'DIS-ARTICLE-BEFORE-NOUN',
+    action: 'REMOVE',
+    target: { pos: ['PRONOUN'] },
+    conditions: [
+      { offset: 0, test: { clitic: true }, negate: true },
+      { offset: 1, test: { conceptKind: ['ENTITY'] } }
+    ],
+    note: 'Antes de núcleo nominal, "o/a/os/as" é artigo.'
+  },
+  {
+    id: 'DIS-VERB-AFTER-DETERMINER',
+    action: 'REMOVE',
+    target: { pos: ['VERB'] },
+    conditions: [{ offset: -1, test: { pos: ['DETERMINER'] }, careful: true }],
+    note: 'Depois de determinante só cabe nome ("a cria"), nunca verbo.'
+  },
+  {
+    id: 'DIS-NOUN-AT-CLAUSE-START',
+    action: 'REMOVE',
+    target: { pos: ['NOUN'] },
+    conditions: [
+      { offset: 0, test: { conceptKind: ['ACTION'] } },
+      { offset: -1, test: { boundary: 'START' } }
+    ],
+    note: 'No início da oração, homógrafo verbo/nome é verbo ("cria um botão").'
+  }
+];
+
+// ---------------------------------------------------------------------------
 // Fábrica
 // ---------------------------------------------------------------------------
 
@@ -796,7 +844,8 @@ export function createInitialKnowledgeBase(): KnowledgeBase {
     defaults: {
       impliedContainmentRelationId: 'C_SPAT_INSIDE',
       textContentPropertyId: 'C_PROP_TEXT_CONTENT'
-    }
+    },
+    disambiguationRules: structuredClone(INITIAL_DISAMBIGUATION_RULES)
   };
 }
 
@@ -809,5 +858,6 @@ export function cloneKnowledgeBase(kb: KnowledgeBase): KnowledgeBase {
     defaults: { ...kb.defaults }
   };
   if (kb.paradigmOverrides) clone.paradigmOverrides = structuredClone(kb.paradigmOverrides);
+  if (kb.disambiguationRules) clone.disambiguationRules = structuredClone(kb.disambiguationRules);
   return clone;
 }

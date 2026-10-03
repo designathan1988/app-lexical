@@ -12,6 +12,11 @@ import { diagnostic, normalizeSpan, dedupeDiagnostics } from './diagnostics';
 
 import { RawLexer } from './lexical/RawLexer';
 import { segmentTokens } from './lexical/Segmenter';
+import {
+  Disambiguator,
+  type DisambiguationRule,
+  type DisambiguationApplication
+} from './syntax/Disambiguator';
 import { MultiwordTrie } from './lexical/MultiwordTrie';
 import { LexicalIndex } from './lexical/LexicalIndex';
 import { SemanticTokenBuilder } from './parser/SemanticTokenBuilder';
@@ -29,6 +34,8 @@ export interface CompileTrace {
   rawTokens: RawToken[];
   grammaticalTokens: RawToken[];
   semanticTokens: SemanticToken[];
+  /** Regras de desambiguação aplicadas (id da regra, token, leituras removidas). */
+  disambiguation?: DisambiguationApplication[];
   grammarIndex: GrammarIndex;
   ast?: SemanticDocumentAst;
   plan?: ExecutionPlan;
@@ -58,6 +65,7 @@ export class SemanticCompiler {
   private lexicalIndex: LexicalIndex;
   private trie: MultiwordTrie;
   private tokenBuilder: SemanticTokenBuilder;
+  private disambiguator: Disambiguator;
   private grammar: GrammarIndex;
   private recovery: LexicalRecovery;
   private settings: EngineSettings;
@@ -75,8 +83,10 @@ export class SemanticCompiler {
     } = {
       impliedContainmentRelationId: 'C_SPAT_INSIDE',
       textContentPropertyId: 'C_PROP_TEXT_CONTENT'
-    }
+    },
+    disambiguationRules: DisambiguationRule[] = []
   ) {
+    this.disambiguator = new Disambiguator(disambiguationRules, concepts);
     this.settings = settings ?? DEFAULT_ENGINE_SETTINGS;
     this.lexicalIndex = new LexicalIndex(surfaceForms, lexemes, this.settings);
     this.trie = new MultiwordTrie(multiwords);
@@ -105,15 +115,29 @@ export class SemanticCompiler {
   /** Constrói tokens semânticos com recuperação aproximada aplicada. */
   private prepare(
     input: string
-  ): { raw: RawToken[]; grammatical: RawToken[]; tokens: SemanticToken[]; diagnostics: Diagnostic[] } {
+  ): {
+    raw: RawToken[];
+    grammatical: RawToken[];
+    tokens: SemanticToken[];
+    diagnostics: Diagnostic[];
+    disambiguation: DisambiguationApplication[];
+  } {
     const raw = this.lexer.lex(input);
     // 3.B — segmentação de contrações e clíticos (mesóclise recusada com span).
     const segmented = segmentTokens(raw);
     const grammatical = segmented.tokens;
     const exact = this.tokenBuilder.build(grammatical);
     const diagnostics: Diagnostic[] = [...segmented.diagnostics];
-    const tokens = this.recovery.apply(exact, diagnostics);
-    return { raw, grammatical, tokens, diagnostics };
+    const recovered = this.recovery.apply(exact, diagnostics);
+    // Camada de desambiguação: regras em dados reduzem as coortes de leituras.
+    const disambiguated = this.disambiguator.run(recovered);
+    return {
+      raw,
+      grammatical,
+      tokens: disambiguated.tokens,
+      diagnostics,
+      disambiguation: disambiguated.applications
+    };
   }
 
   private makeNodeLookup(document: DocumentModel): NodeLookup {
@@ -159,12 +183,14 @@ export class SemanticCompiler {
     const diagnostics: Diagnostic[] = [];
     let ast: SemanticDocumentAst = { commands: [] };
     let consumption: CompileTrace['consumption'] = [];
+    let disambiguation: DisambiguationApplication[] = [];
 
     try {
       const prepared = this.prepare(input);
       raw = prepared.raw;
       grammatical = prepared.grammatical;
       tokens = prepared.tokens;
+      disambiguation = prepared.disambiguation;
       diagnostics.push(...prepared.diagnostics);
 
       const parser = new DomainParser(this.makeParserContext(document, discourse));
@@ -192,6 +218,7 @@ export class SemanticCompiler {
         rawTokens: raw,
         grammaticalTokens: grammatical,
         semanticTokens: tokens,
+        disambiguation,
         grammarIndex: this.grammar,
         ast,
         consumption

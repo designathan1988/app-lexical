@@ -47,7 +47,8 @@ export class SemanticEngine {
       kb.multiwords,
       this.discourse,
       this.settings,
-      kb.defaults
+      kb.defaults,
+      kb.disambiguationRules ?? []
     );
   }
 
