@@ -1,0 +1,21 @@
+{
+  "rules": [
+    {"id":"CG_DET_NOUN","action":"SELECT","target":{"upos":"DET"},"context":[{"offset":1,"upos":["NOUN","ADJ","NUM","PROPN"]}],"note":"determinante precede núcleo nominal","example":"a menina"},
+    {"id":"CG_NOUN_AFTER_DET","action":"SELECT","target":{"upos":"NOUN"},"context":[{"offset":-1,"upos":["DET","NUM"]}],"note":"núcleo nominal depois de determinante","example":"o corte"},
+    {"id":"CG_REL_AFTER_NOUN","action":"SELECT","target":{"upos":"PRON","feats":{"PronType":"Rel"}},"context":[{"offset":-1,"upos":["NOUN","PROPN"]}],"note":"relativo depois de antecedente nominal","example":"livro que li"},
+    {"id":"CG_COMP_AFTER_VERB","action":"SELECT","target":{"upos":"SCONJ"},"context":[{"offset":-1,"upos":["VERB","AUX"]},{"offset":1,"upos":["PRON","DET","NOUN","VERB"]}],"note":"complementizador após verbo matriz","example":"disse que eu iria"},
+    {"id":"CG_COND_INITIAL","action":"SELECT","form":"se","target":{"upos":"SCONJ"},"context":[{"atStart":true},{"offset":1,"upos":["PRON","DET","NOUN","VERB"]}],"note":"conjunção condicional inicial diante de oração","example":"se ele vier"},
+    {"id":"CG_ADP_INFINITIVE","action":"SELECT","target":{"upos":"ADP"},"context":[{"offset":1,"upos":["VERB"],"feats":{"VerbForm":"Inf"}}],"note":"preposição antes de infinitivo","example":"começo a trabalhar"},
+    {"id":"CG_ADP_BETWEEN_VERBS","action":"SELECT","target":{"upos":"ADP"},"context":[{"offset":-1,"upos":["VERB","AUX"]},{"offset":1,"upos":["VERB"]}],"note":"preposição entre verbo matriz e infinitivo","example":"começo a trabalhar"},
+    {"id":"CG_PRON_BEFORE_FINITE","action":"SELECT","target":{"upos":"PRON","feats":{"Clitic":"Yes"}},"context":[{"offset":1,"upos":["VERB","AUX"],"feats":{"VerbForm":"Fin"}}],"note":"clítico antes de verbo finito","example":"o vejo"},
+    {"id":"CG_INT_ADV_INITIAL","action":"SELECT","target":{"upos":"ADV","feats":{"PronType":"Int"}},"context":[{"atStart":true},{"finalForm":"?"}],"note":"advérbio interrogativo em pergunta direta","example":"como você faz?"},
+    {"id":"CG_TEMP_CONJ_INITIAL","action":"SELECT","target":{"upos":"SCONJ"},"context":[{"atStart":true},{"containsForm":","}],"note":"conjunção em oração subordinada inicial separada por vírgula","example":"quando ele chegar, sairemos"},
+    {"id":"CG_ADP_AFTER_NOUN_BEFORE_NP","action":"SELECT","target":{"upos":"ADP"},"context":[{"offset":-1,"upos":["NOUN"]},{"offset":1,"upos":["DET","PRON"]}],"note":"sintagma preposicional após nome e antes de complemento","example":"livro para a menina"},
+    {"id":"CG_NOUN_AFTER_ADP","action":"SELECT","target":{"upos":"NOUN"},"context":[{"offset":-1,"upos":["ADP"]}],"note":"núcleo nominal depois de preposição","example":"de ajuda"},
+    {"id":"CG_NOUN_OBJECT_FINAL","action":"SELECT","target":{"upos":"NOUN"},"context":[{"offset":-1,"upos":["VERB","ADV"]},{"offset":1,"upos":["PUNCT"]}],"note":"nome no fim da oração após verbo ou advérbio","example":"ensina português"},
+    {"id":"CG_ADV_AFTER_VERB","action":"SELECT","target":{"upos":"ADV"},"context":[{"offset":-1,"upos":["VERB","AUX"]}],"note":"advérbio após verbo finito","example":"anda devagar"},
+    {"id":"CG_VERB_AFTER_SUBJECT","action":"SELECT","target":{"upos":"VERB"},"context":[{"offset":-1,"upos":["PRON","NOUN","PROPN"]}],"note":"verbo finito depois de sujeito","example":"ela ajuda"},
+    {"id":"CG_VERB_BEFORE_OBJECT","action":"SELECT","target":{"upos":"VERB"},"context":[{"offset":1,"upos":["DET","NOUN","PRON"]}],"note":"verbo antes de complemento nominal","example":"ajuda crianças"},
+    {"id":"CG_AUX_INFINITIVE","action":"SELECT","target":{"upos":"AUX"},"context":[{"offset":1,"upos":["VERB"],"feats":{"VerbForm":"Inf"}}],"note":"auxiliar diante de infinitivo","example":"vamos estudar"}
+  ]
+}

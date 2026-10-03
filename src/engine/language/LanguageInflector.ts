@@ -3,6 +3,7 @@ import irregularData from '../../knowledge/language/irregular-verbs.json';
 import seedData from '../../knowledge/morphology/seed-roots.json';
 import supplementData from '../../knowledge/language/lexical-supplements.json';
 import futureSubjunctiveData from '../../knowledge/language/future-subjunctive.json';
+import guessData from '../../knowledge/language/guess-rules.json';
 import { PARADIGMS, generateForms, type Paradigm, type ParadigmId } from '../../knowledge/paradigms';
 import { parseFeatureKey, type FeatureBundle } from '../../knowledge/features';
 import type { Lexeme } from '../types';
@@ -24,6 +25,8 @@ const irregular = (irregularData as { verbs: Irregular[]; supplementaryParticipl
 const seeds = (seedData as { entries: Seed[] }).entries;
 const lexicalSupplements = (supplementData as { entries: Array<Seed & { paradigmId: string }> }).entries;
 const futureSubjunctive = (futureSubjunctiveData as { rules: Array<{ paradigm: string; suffixes: string[] }> }).rules;
+const infinitiveEndings = (guessData as unknown as { rules: Array<{ suffix: string; upos: string; feats: { VerbForm?: string } }> }).rules
+  .filter((rule) => rule.upos === 'VERB' && rule.feats.VerbForm === 'Inf');
 const persons: Array<[1 | 2 | 3, 'Sing' | 'Plur']> = [[1, 'Sing'], [2, 'Sing'], [3, 'Sing'], [1, 'Plur'], [2, 'Plur'], [3, 'Plur']];
 const extendedRegularParadigms = Object.fromEntries(futureSubjunctive.flatMap((rule) => Object.values(PARADIGMS)
   .filter((paradigm) => paradigm.id === rule.paradigm || paradigm.id.startsWith(`${rule.paradigm}_`))
@@ -55,8 +58,8 @@ export function suggestParadigm(lemma: string, pos: string): { id: string; rule:
   const example = matching.find((paradigm) => (paradigm as Paradigm & { examples?: string[] }).examples?.includes(lower));
   if (example) return { id: example.id, rule: `EXAMPLE:${example.id}` };
   if (pos === 'VERB') {
-    for (const ending of ['ar', 'er', 'ir']) {
-      if (lower.endsWith(ending)) return { id: `V_${ending.toUpperCase()}`, rule: `ENDING:${ending}` };
+    for (const rule of infinitiveEndings) {
+      if (lower.endsWith(rule.suffix)) return { id: `V_${rule.suffix.toUpperCase()}`, rule: `ENDING:${rule.suffix}` };
     }
   }
   if (matching.length === 1) return { id: matching[0].id, rule: `ENDING:${matching[0].strip}` };

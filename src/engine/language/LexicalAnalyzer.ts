@@ -61,6 +61,10 @@ export class LexicalAnalyzer {
     if (form.includes(' ') && closed.length) {
       return closed.map((entry) => ({ lemma: entry.lemma, upos: entry.upos, feats: entry.feats, origin: 'CLOSED_CLASS', rule: `CLOSED_CLASS:${entry.form}` }));
     }
+    if (form.includes(' ') && !closed.length && /^\p{Lu}/u.test(form)) {
+      return [{ lemma: form, upos: 'NOUN', feats: {}, origin: 'GUESS', rule: 'GUESS_MULTIWORD_NAME' },
+        { lemma: form, upos: 'PROPN', feats: {}, origin: 'GUESS', rule: 'GUESS_MULTIWORD_NAME' }];
+    }
     const parts = contractions.get(form.normalize('NFC').toLocaleLowerCase('pt-BR'));
     if (parts) {
       const partReadings = parts.map((part, index) => {
