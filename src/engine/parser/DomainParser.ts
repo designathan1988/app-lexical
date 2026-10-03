@@ -148,6 +148,10 @@ export class DomainParser {
         const command = this.parseCommand(cursor);
         commands.push(command);
         this.reportUnconsumed(cursor, command);
+      } catch (error) {
+        // Comando abortado: o resto do grupo não pode sumir em silêncio.
+        this.reportLeftovers(cursor);
+        throw error;
       } finally {
         // Mesmo quando o comando aborta (ParseError), os tokens que o parser
         // consumiu até ali contam para a invariante de consumo (F1.3).
@@ -256,10 +260,23 @@ export class DomainParser {
   }
 
   private reportUnconsumed(cursor: SemanticCursor, command: SemanticCommand): void {
-    if (command.kind === 'NO_OP') return;
+    // Um NO_OP cujo span já cobre o grupo inteiro (ex.: ação negada) reportou
+    // tudo o que havia para reportar; os demais deixam sobras.
+    this.reportLeftovers(cursor, command.kind === 'NO_OP' ? command.span : undefined);
+  }
 
+  /**
+   * Reporta tokens que sobraram sem tratamento (fim de comando ou resto de um
+   * comando que abortou). Parte da invariante F1.3: nenhum token com leitura
+   * ou literal desaparece em silêncio. Tokens já cobertos por `coveredSpan`
+   * (o comando que os absorveu) não são repetidos.
+   */
+  private reportLeftovers(cursor: SemanticCursor, coveredSpan?: Span): void {
     const leftovers = cursor.tokens.slice(cursor.index);
     const content = leftovers.filter((token) => {
+      if (coveredSpan && token.span.start >= coveredSpan.start && token.span.end <= coveredSpan.end) {
+        return false;
+      }
       if (token.candidates.length > 0) return true;
       if (token.literal) return true;
       const word = token.rawTokens[0]?.normalized;
