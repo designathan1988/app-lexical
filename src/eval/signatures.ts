@@ -50,7 +50,11 @@ function selectorSig(sel: {
   ordinalIndex?: number;
   quantity?: { mode: 'ONE' } | { mode: 'ALL' } | { mode: 'COUNT'; count: number };
   textEquals?: string;
+  propertyFilter?: { propertyConceptId: string; value: string | number | boolean };
+  direction?: string;
   parent?: unknown;
+  distinctFrom?: unknown;
+  elidedFrom?: ConceptId;
   exclusions?: unknown[];
 }): string {
   const parts: string[] = [];
@@ -59,7 +63,15 @@ function selectorSig(sel: {
   if (sel.quantity?.mode === 'ALL') parts.push('all');
   else if (sel.quantity?.mode === 'COUNT') parts.push(`count=${sel.quantity.count}`);
   if (sel.textEquals !== undefined) parts.push(`text="${sel.textEquals}"`);
+  if (sel.propertyFilter) {
+    parts.push(
+      `prop[${sel.propertyFilter.propertyConceptId}=${String(sel.propertyFilter.value)}]`
+    );
+  }
+  if (sel.direction) parts.push(`dir=${sel.direction}`);
   if (sel.parent) parts.push(`parent[${selectorSig(sel.parent as never)}]`);
+  if (sel.distinctFrom) parts.push(`distinct[${selectorSig(sel.distinctFrom as never)}]`);
+  if (sel.elidedFrom) parts.push(`elided=${sel.elidedFrom}`);
   if (sel.exclusions?.length)
     parts.push(`minus[${(sel.exclusions as never[]).map((e) => selectorSig(e)).join(',')}]`);
   return parts.join(';') || 'any';

@@ -69,6 +69,23 @@ codificam o comportamento-alvo (oráculo) e a maioria FALHA no front-end
 legado na data de escrita — as falhas conhecidas são registradas no
 relatório da fase, nunca "consertadas" ajustando o esperado.
 
+Estado na data de escrita (2026-10-03, front-end legado):
+
+- **12/40 passam** (`morph-01, 04, 10, 18, 19, 28, 29, 30, 32, 37, 38, 39`);
+- **28/40 falham** (`morph-02, 03, 05, 06, 07, 08, 09, 11, 12, 13, 14, 15,
+  16, 17, 20, 21, 22, 23, 24, 25, 26, 27, 31, 33, 34, 35, 36, 40`), cobrindo:
+  concordância de adjetivo com coordenação (02–06), definido plural com
+  filtro (07), ambiguidade singular (08), MWE flexionada (09), pronomes
+  enclíticos (11–14), diminutivos (15–17), pedido indireto (20–23), modo/tempo
+  (24), exclusão (25), PP topicalizado (26–27), borda como grupo (31, já
+  parcial), grupo de texto semântico (33–34), direção (35), comparativo (36),
+  cor composta (40).
+
+A lista exata de falhas conhecidas é verificada por
+`tests/metrics.test.ts` (`KNOWN_MORPH_FAILURES`): qualquer falha fora dela
+quebra a suíte, e qualquer caso dela que passe também (exigindo atualização
+consciente da lista — o oráculo só encolhe).
+
 ### Alterações de esperados existentes
 
 | Data | Registro | Campo | Antes | Depois | Motivo |

@@ -157,8 +157,22 @@ Uma linha por comando, comandos separados por `\n`.
 `selection` (seleção atual), ou `sel:<seletor>`.
 
 Seletor: campos na ordem fixa separados por `;`,
-`<C_ENT_X>[;ord=N][;all][;count=N][;text="…"][;parent[<seletor>]][;minus[<seletor>,…]]`.
-Sem campo nenhum: `any`.
+`<C_ENT_X>[;ord=N][;all][;count=N][;text="…"][;prop[<P>=<valor>]][;dir=<DIREÇÃO>][;parent[<seletor>]][;distinct[<seletor>]][;elided=<C_ENT_X>][;minus[<seletor>,…]]`.
+Sem campo nenhum: `any`. Campos de acordo com o que o seletor realmente tem:
+
+- `ord=N` — ordinal 0-based (negativo conta do fim);
+- `all` — definido plural sem numeral ("os botões"): todos os que casam;
+- `count=N` — numeral;
+- `prop[C_PROP_BG_COLOR=#2563eb]` — filtro de propriedade ("os botões azuis");
+- `dir=RIGHTMOST|LEFTMOST|TOPMOST|BOTTOMMOST` — "da direita", "mais à esquerda";
+- `parent[...]` — posse/contidação ("o botão dentro da caixa");
+- `distinct[...]` — "outro";
+- `elided=C_ENT_X` — elipse (tipo herdado do discurso);
+- `minus[...]` — exclusão ("menos o primeiro").
+
+Quantidade > 1: a entidade criada aparece como `CREATE <tmp> <C_ENT_X> x<N>` uma
+única vez; o plano expande em `CREATE_NODE <tmp>_1 … <tmp>_N` e cada passo
+referencia a instância (`temp:tmp_1_2`).
 
 Exemplo:
 
