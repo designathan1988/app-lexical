@@ -356,6 +356,9 @@ export class DomainParser {
           end: verbToken.span.end,
           layer: 'syntax'
         });
+        // A oração inteira é o relato recusado: seus tokens são cobertos por
+        // esta recusa (invariante de consumo), sem diagnósticos em cascata.
+        cursor.consumeRest();
         throw new ParseError(
           'UNSUPPORTED_OPERATION',
           `"${verbToken.rawTokens.map((t) => t.raw).join(' ')}" não é um comando; use o imperativo.`,
@@ -626,8 +629,10 @@ export class DomainParser {
         end: span.end,
         layer: 'morphology'
       });
-      cursor.consume();
-      return { kind: 'NO_OP', reason: 'UNKNOWN_COMMAND', span };
+      // O NO_OP de comando desconhecido assume a oração inteira: o erro
+      // aponta só a palavra, mas nenhum token do grupo fica sem dono.
+      cursor.consumeRest();
+      return { kind: 'NO_OP', reason: 'UNKNOWN_COMMAND', span: cursor.fullSpan() ?? span };
     }
 
     throw new ParseError(

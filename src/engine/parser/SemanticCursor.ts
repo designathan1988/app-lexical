@@ -42,11 +42,34 @@ export class SemanticCursor {
     return token?.span;
   }
 
-  /** Span que cobre do token em `from` até o atual. */
+  /**
+   * Consome todo o restante do grupo: usado quando um nó do AST assume o
+   * comando inteiro (recusa por verbo desconhecido ou por tempo de relato).
+   */
+  consumeRest(): void {
+    while (!this.eof()) this.consume();
+  }
+
+  /** Span do grupo inteiro de tokens deste cursor. */
+  fullSpan(): Span | undefined {
+    if (!this.tokens.length) return undefined;
+    return {
+      start: Math.min(...this.tokens.map((t) => t.span.start)),
+      end: Math.max(...this.tokens.map((t) => t.span.end))
+    };
+  }
+
+  /**
+   * Span que cobre os tokens de `from` até o atual. Usa mínimo/máximo porque,
+   * após a canonicalização da ordem dos constituintes, tokens adjacentes no
+   * cursor podem vir de posições não adjacentes da entrada.
+   */
   spanFrom(from: number): Span | undefined {
-    const first = this.tokens[from];
-    const last = this.tokens[Math.max(from, this.index - 1)];
-    if (!first) return undefined;
-    return { start: first.span.start, end: (last ?? first).span.end };
+    const slice = this.tokens.slice(from, Math.max(from + 1, this.index));
+    if (!slice.length) return undefined;
+    return {
+      start: Math.min(...slice.map((t) => t.span.start)),
+      end: Math.max(...slice.map((t) => t.span.end))
+    };
   }
 }
