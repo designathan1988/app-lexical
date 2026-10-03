@@ -58,9 +58,11 @@ function selectorSig(sel: {
   distinctFrom?: unknown;
   elidedFrom?: ConceptId;
   exclusions?: unknown[];
+  nodeIds?: string[];
 }): string {
   const parts: string[] = [];
   if (sel.entityConceptId) parts.push(sel.entityConceptId);
+  if (sel.nodeIds) parts.push(`ids[${sel.nodeIds.join(',')}]`);
   if (sel.ordinalIndex !== undefined) parts.push(`ord=${sel.ordinalIndex}`);
   if (sel.quantity?.mode === 'ALL') parts.push('all');
   else if (sel.quantity?.mode === 'COUNT') parts.push(`count=${sel.quantity.count}`);

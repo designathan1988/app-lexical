@@ -1,5 +1,5 @@
 import type { ConceptId, DocumentNodeId, TempNodeId } from '../types';
-import { tempNodeId, type PlanSimulator } from './TempNodes';
+import { tempNodeId, isTempNodeId, tempIdOf, type PlanSimulator } from './TempNodes';
 import type { ConceptNode } from '../ontology/Concept';
 import type { DocumentModel } from '../document/DocumentModel';
 import { ReferenceResolver } from '../document/ReferenceResolver';
@@ -61,6 +61,7 @@ export class ExecutionPlanner {
   build(ast: SemanticDocumentAst): ExecutionPlan {
     const plan: ExecutionPlan = { steps: [], diagnostics: [] };
     this.current = this.document;
+    const pendingSimulation: ExecutionPlan['steps'] = [];
 
     ast.commands.forEach((command, index) => {
       // Cada comando é resolvido contra o estado deixado pelos anteriores da
@@ -97,8 +98,14 @@ export class ExecutionPlanner {
       }
       const produced = plan.steps.slice(stepsBefore);
       const hasError = plan.diagnostics.some((d) => d.severity === 'ERROR');
-      if (this.simulator && index < ast.commands.length - 1 && produced.length && !hasError) {
-        this.simulateCommand(produced);
+      // Simula só na fronteira de ORAÇÃO: objetos coordenados de um mesmo
+      // verbo são uma única predicação, resolvida contra o mesmo estado.
+      if (this.simulator && !hasError) {
+        pendingSimulation.push(...produced);
+        const next = ast.commands[index + 1];
+        if (next !== undefined && next.clause !== command.clause && pendingSimulation.length) {
+          this.simulateCommand(pendingSimulation.splice(0));
+        }
       }
     });
 
@@ -135,6 +142,17 @@ export class ExecutionPlanner {
    * pinte-a"): a referência NEW_ENTITY vira o(s) nó(s) simulado(s).
    */
   private materialize(reference: SemanticReference): SemanticReference {
+    if (reference.kind === 'NODE_SET' && reference.nodeIds.some(isTempNodeId)) {
+      // Grupo de coordenação criado antes na frase.
+      const ids = reference.nodeIds.flatMap((id) => {
+        if (!isTempNodeId(id)) return [id];
+        const temp = tempIdOf(id);
+        return (this.groups.get(temp) ?? [temp])
+          .map((t) => this.simTempMap.get(t))
+          .filter((x): x is DocumentNodeId => Boolean(x));
+      });
+      return { kind: 'NODE_SET', nodeIds: ids };
+    }
     if (reference.kind !== 'NEW_ENTITY') return reference;
     const temps = this.groups.get(reference.tempId) ?? [reference.tempId];
     const ids = temps.map((t) => this.simTempMap.get(t)).filter((id): id is DocumentNodeId => Boolean(id));

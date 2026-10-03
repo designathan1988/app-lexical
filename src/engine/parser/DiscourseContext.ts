@@ -6,6 +6,7 @@ import type {
   TempNodeId
 } from '../types';
 import type { SemanticReference, SemanticSelector } from '../ast/ast';
+import { isTempNodeId, tempIdOf } from '../planning/TempNodes';
 
 export interface Mention {
   reference: SemanticReference;
@@ -82,6 +83,22 @@ export class DiscourseContext {
           ids.length === 1
             ? { kind: 'NODE_ID', nodeId: ids[0] }
             : { kind: 'NODE_SET', nodeIds: ids };
+        this.mentions.push(mention);
+        continue;
+      }
+
+      // Grupo de coordenação criado na frase: ids temporários → nós reais.
+      if (mention.reference.kind === 'NODE_SET' && mention.reference.nodeIds.some(isTempNodeId)) {
+        const ids = mention.reference.nodeIds.flatMap((id) => {
+          if (!isTempNodeId(id)) return [id];
+          const temp = tempIdOf(id);
+          const instances = Object.entries(tempToNode)
+            .filter(([t]) => t.startsWith(`${temp}_`))
+            .map(([, nodeId]) => nodeId);
+          return instances.length ? instances : tempToNode[temp] ? [tempToNode[temp]] : [];
+        });
+        if (!ids.length) continue;
+        mention.reference = { kind: 'NODE_SET', nodeIds: ids };
         this.mentions.push(mention);
         continue;
       }

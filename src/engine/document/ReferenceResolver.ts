@@ -67,6 +67,11 @@ export class ReferenceResolver {
       nodes = nodes.filter((node) => node.entityConceptId === selector.entityConceptId);
     }
 
+    if (selector.nodeIds) {
+      const cited = new Set(selector.nodeIds);
+      nodes = nodes.filter((node) => cited.has(node.id));
+    }
+
     if (selector.textEquals !== undefined) {
       nodes = nodes.filter((node) => node.text === selector.textEquals);
     }

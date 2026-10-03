@@ -178,6 +178,14 @@ export class ClauseCanonicalizer {
       while (j < tokens.length && this.c.isValue(tokens[j])) j++;
       return { kind: 'PREDICATE', end: j };
     }
+    // Predicativo sem preposição antes do objeto: "deixe vermelha a caixa".
+    // (Só é deslocamento se um sintagma nominal vier em seguida — o chamador
+    // verifica.)
+    if (this.c.isValue(tokens[i])) {
+      let j = i;
+      while (j < tokens.length && this.c.isValue(tokens[j])) j++;
+      return { kind: 'PREDICATE', end: j };
+    }
     return null;
   }
 

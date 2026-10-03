@@ -62,6 +62,8 @@ export interface SemanticSelector {
   exclusions?: SemanticSelector[];
   /** Elipse: o tipo foi herdado de uma menção saliente do discurso. */
   elidedFrom?: ConceptId;
+  /** Restringe aos nós citados (ex.: o antecedente saliente de "a outra"). */
+  nodeIds?: string[];
   /** "outro/outra": exige uma instância distinta desta referência. */
   distinctFrom?: SemanticSelector;
   span?: Span;
@@ -159,13 +161,22 @@ export interface NoOpCommandAst {
   span?: Span;
 }
 
-export type SemanticCommand =
+export type SemanticCommand = (
   | CreateCommandAst
   | UpdateCommandAst
   | DeleteCommandAst
   | MoveCommandAst
   | QueryCommandAst
-  | NoOpCommandAst;
+  | NoOpCommandAst
+) & {
+  /**
+   * Índice da oração de origem. Comandos expandidos de objetos coordenados
+   * ("apague a primeira e a terceira caixa") compartilham a oração e são
+   * resolvidos contra o MESMO estado; orações distintas veem o efeito das
+   * anteriores.
+   */
+  clause?: number;
+};
 
 export interface SemanticDocumentAst {
   commands: SemanticCommand[];

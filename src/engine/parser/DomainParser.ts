@@ -38,6 +38,7 @@ import { entriesFor, type GrammarIndex, type GrammarEntry } from './GrammarIndex
 import { ParseError, type Diagnostic, type Span } from '../diagnostics';
 import type { EngineSettings } from '../EngineSettings';
 import { ClauseCanonicalizer, type CanonicalClause } from '../syntax/ClauseCanonicalizer';
+import { tempNodeId } from '../planning/TempNodes';
 
 function candidatesOfKind<K extends ConceptNode['kind']>(
   token: SemanticToken | undefined,
@@ -167,6 +168,39 @@ export class DomainParser {
     });
   }
 
+  /**
+   * Núcleo compartilhado à direita: a partir do cursor (logo após um
+   * sintagma sem núcleo), pula coordenadores e determinantes/ordinais/numerais
+   * e devolve a primeira entidade encontrada — "a primeira e a terceira caixa".
+   */
+  private sharedHeadAhead(
+    cursor: SemanticCursor
+  ): { conceptId: ConceptId; gender?: GrammaticalGender } | null {
+    let i = 0;
+    let crossedCoordinator = false;
+    for (;;) {
+      if (this.isCoordinatorAt(cursor, i)) {
+        crossedCoordinator = true;
+        i++;
+        continue;
+      }
+      const token = cursor.peek(i);
+      if (!token) return null;
+      const isPrefix =
+        this.hasOperator(token, 'DEFINITE_ARTICLE') ||
+        this.hasOperator(token, 'INDEFINITE_ARTICLE') ||
+        this.ordinalOf(token) !== null ||
+        this.cardinalOf(token) !== null;
+      if (isPrefix) {
+        i++;
+        continue;
+      }
+      if (!crossedCoordinator) return null;
+      const entity = candidatesOfKind(token, this.ctx.concepts, 'ENTITY')[0];
+      return entity ? { conceptId: entity.conceptId, gender: entity.morphology?.gender } : null;
+    }
+  }
+
   /** Remove posicionamentos repetidos (mesma origem, relação e alvo). */
   private uniquePlacements(placements: PlacementAst[]): PlacementAst[] {
     const seen = new Set<string>();
@@ -252,6 +286,7 @@ export class DomainParser {
       const diagnosticsBefore = this.diagnostics.length;
       try {
         const produced = this.parseCommand(cursor);
+        for (const command of produced) command.clause = groupIndex;
         commands.push(...produced);
         this.reportUnconsumed(cursor, produced[produced.length - 1]);
       } catch (error) {
@@ -562,7 +597,9 @@ export class DomainParser {
     if (this.hasOperator(cursor.peek(), 'PARTITIVE')) {
       const after = cursor.peek(1);
       const afterIsAction = candidatesOfKind(after, this.ctx.concepts, 'ACTION').length > 0;
-      if (afterIsAction) cursor.consume();
+      // "gostaria de apagar…" (infinitivo) ou "gostaria de uma caixa" (SN).
+      const afterIsNominal = desire && this.startsReference(after) && !this.hasOperator(after, 'PARTITIVE');
+      if (afterIsAction || afterIsNominal) cursor.consume();
     }
 
     return consumed;
@@ -719,6 +756,8 @@ export class DomainParser {
     }
     entities.push(first);
     let current = first;
+    /** Núcleos coordenados no nível superior ("uma caixa e um botão"). */
+    const coordinated: NewEntityAst[] = [first];
 
     while (!cursor.eof()) {
       if (this.hasOperator(cursor.peek(), 'COMITATIVE')) {
@@ -776,6 +815,7 @@ export class DomainParser {
         const sibling = this.parseNewEntity(cursor);
         if (sibling) {
           entities.push(sibling);
+          coordinated.push(sibling);
           current = sibling;
           if (this.distributeAdjacentMutation(cursor, entities)) continue;
           continue;
@@ -831,6 +871,19 @@ export class DomainParser {
       if (this.pushMutation(cursor, current)) continue;
 
       break;
+    }
+
+    // A coordenação é um referente plural para o discurso: "crie uma caixa e
+    // um botão" → "pinte-os" retoma os dois (gênero da coordenação).
+    if (coordinated.length > 1) {
+      const types = new Set(coordinated.map((e) => e.entityConceptId));
+      const agreement = coordinationAgreement(coordinated.map((e) => this.entityAgreement.get(e.tempId)));
+      this.ctx.discourse.stage({
+        reference: { kind: 'NODE_SET', nodeIds: coordinated.map((e) => tempNodeId(e.tempId)) },
+        entityConceptId: types.size === 1 ? coordinated[0].entityConceptId : undefined,
+        gender: agreement.gender,
+        number: 'PLURAL'
+      });
     }
 
     return { kind: 'CREATE', entities, placements: this.uniquePlacements(placements), span: startSpan };
@@ -1682,6 +1735,25 @@ export class DomainParser {
     const head = this.parseEntityHead(cursor);
     if (!head) return null;
 
+    // Plural nu ("crie caixas"): sem determinante nem numeral não há
+    // cardinalidade — o motor pergunta em vez de inventar uma quantidade.
+    if (prefix.definiteness === 'UNSPECIFIED' && prefix.quantity === null && head.number === 'PLURAL') {
+      const span = { start: startSpan?.start ?? head.span.start, end: head.span.end };
+      const message =
+        'Plural sem quantidade: informe quantos (dois, três, …). O motor não inventa uma cardinalidade.';
+      this.emit({
+        severity: 'ERROR',
+        code: 'UNSUPPORTED_OPERATION',
+        subcode: 'BARE_PLURAL',
+        message,
+        span,
+        start: span.start,
+        end: span.end,
+        layer: 'syntax'
+      });
+      throw new ParseError('UNSUPPORTED_OPERATION', message, span);
+    }
+
     const entity = this.parseNewEntityTail(head, cursor, startSpan);
     if (prefix.quantity === 'VAGUE') {
       this.emitVagueQuantifier(startSpan);
@@ -1876,6 +1948,12 @@ export class DomainParser {
       entityConceptId = head.concept.id;
       gender = head.gender;
       number = head.number;
+    } else if (!entityConceptId && this.sharedHeadAhead(cursor)) {
+      // "a primeira e a terceira caixa": o núcleo do último conjunto vale
+      // para os determinantes coordenados antes dele.
+      const shared = this.sharedHeadAhead(cursor)!;
+      entityConceptId = shared.conceptId;
+      gender = shared.gender;
     } else if (!entityConceptId) {
       const salient = this.ctx.discourse.salientEntityConceptId(this.ctx.nodeLookup, this.ctx.countMatches);
       if (!salient) {
@@ -1922,6 +2000,19 @@ export class DomainParser {
     };
 
     if (prefix.ordinal !== null) selector.ordinalIndex = prefix.ordinal;
+
+    // "a outra caixa": a instância distinta da menção saliente desse tipo.
+    if (prefix.other && entityConceptId) {
+      const salient = this.ctx.discourse.salientMentionOfConcept(
+        this.ctx.nodeLookup,
+        this.ctx.countMatches,
+        entityConceptId
+      );
+      const reference = salient?.reference;
+      if (reference?.kind === 'NODE_ID') selector.distinctFrom = { nodeIds: [reference.nodeId] };
+      else if (reference?.kind === 'NODE_SET') selector.distinctFrom = { nodeIds: reference.nodeIds };
+      else if (reference?.kind === 'SELECTOR') selector.distinctFrom = reference.selector;
+    }
 
     const text = cursor.peek()?.literal;
     if (text?.kind === 'TEXT') {
@@ -2336,24 +2427,35 @@ export class DomainParser {
     cursor: SemanticCursor,
     entityConceptId?: ConceptId
   ): AstPropertyMutation | null {
-    const token = cursor.peek();
+    // "com o texto «…»": o artigo antes do nome da propriedade é opcional.
+    const offset = this.hasOperator(cursor.peek(), 'DEFINITE_ARTICLE') ? 1 : 0;
+    const token = cursor.peek(offset);
     if (!token || !entityConceptId) return null;
 
     const entity = this.ctx.concepts[entityConceptId];
     if (entity?.kind !== 'ENTITY') return null;
 
-    const contentCandidate = token.candidates.find((c) => {
+    // Propriedade de conteúdo textual aceita pela entidade — diretamente ou
+    // via grupo cujo binding para TEXT ela aceita ("texto": cor/conteúdo/fonte).
+    let contentPropertyId: ConceptId | undefined;
+    for (const c of token.candidates) {
       const concept = this.ctx.concepts[c.conceptId];
-      return (
-        concept?.kind === 'PROPERTY' &&
-        concept.valueCategories.includes('TEXT') &&
-        entity.capabilities.acceptedPropertyIds.includes(concept.id)
-      );
-    });
-    if (!contentCandidate) return null;
+      const propertyId =
+        concept?.kind === 'PROPERTY' && concept.valueCategories.includes('TEXT')
+          ? concept.id
+          : concept?.kind === 'PROPERTY_GROUP'
+            ? concept.bindingByValueCategory.TEXT
+            : undefined;
+      if (propertyId && entity.capabilities.acceptedPropertyIds.includes(propertyId)) {
+        contentPropertyId = propertyId;
+        break;
+      }
+    }
+    if (!contentPropertyId) return null;
+    const contentCandidate = { conceptId: contentPropertyId };
 
     const checkpoint = cursor.index;
-    cursor.consume();
+    for (let i = 0; i <= offset; i++) cursor.consume();
     if (this.hasOperator(cursor.peek(), 'PARTITIVE')) cursor.consume();
 
     const literal = cursor.peek()?.literal;

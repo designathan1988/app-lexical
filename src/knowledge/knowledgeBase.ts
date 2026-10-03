@@ -742,7 +742,6 @@ export const INITIAL_MULTIWORDS: MultiwordEntry[] = [
   { id: 'MWE_TEXT_COLOR', phrase: 'cor do texto', conceptId: 'C_PROP_TEXT_COLOR' },
   { id: 'MWE_TEXT_COLOR_ALT', phrase: 'cor da letra', conceptId: 'C_PROP_TEXT_COLOR' },
   { id: 'MWE_BORDER_COLOR', phrase: 'cor da borda', conceptId: 'C_PROP_BORDER_COLOR' },
-  { id: 'MWE_TEXT_CONTENT', phrase: 'com o texto', conceptId: 'C_PROP_TEXT_CONTENT' },
   { id: 'MWE_TEXT_WRITTEN', phrase: 'escrito', conceptId: 'C_PROP_TEXT_CONTENT' },
   { id: 'MWE_TEXT_SAYS', phrase: 'que diz', conceptId: 'C_PROP_TEXT_CONTENT' },
   { id: 'MWE_INSIDE', phrase: 'dentro de', conceptId: 'C_SPAT_INSIDE' },
