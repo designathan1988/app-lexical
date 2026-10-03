@@ -43,11 +43,13 @@ export function buildMorphologyData(domainLexemes: Record<LexemeId, Lexeme> = {}
     extraRules: AffixRule[];
     baseRestorations: MorphologyData['restorations'];
     invalidJunctions: MorphologyData['invalidJunctions'];
+    verbalAlternations: MorphologyData['verbalAlternations'];
   };
   return {
     rules: [...(affixRules as { rules: AffixRule[] }).rules, ...stem.extraRules],
     surfaceVariants: stem.surfaceVariants,
     restorations: stem.baseRestorations,
+    verbalAlternations: stem.verbalAlternations,
     invalidJunctions: stem.invalidJunctions,
     semanticFunctions: (semanticFunctions as { functions: MorphologyData['semanticFunctions'] }).functions,
     lexicon,

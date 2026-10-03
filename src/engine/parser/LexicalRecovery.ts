@@ -50,7 +50,32 @@ export class LexicalRecovery {
     const actionSlot = this.actionSlotIndex(tokens);
 
     return tokens.map((token, index) => {
-      if (token.literal || token.candidates.length) return token;
+      if (token.literal) return token;
+
+      if (token.candidates.length) {
+        const evaluative = token.candidates.some((candidate) =>
+          candidate.morphology?.degree === 'DIMINUTIVE' || candidate.morphology?.degree === 'AUGMENTATIVE'
+        );
+        if (evaluative) {
+          const word = token.rawTokens[0]?.normalized ?? '';
+          const derived = (this.morphology?.analyze(word) ?? []).find((analysis) =>
+            analysis.root.domain && token.candidates.some((candidate) => candidate.lexemeId === analysis.root.id) &&
+            analysis.chain.length > 0 && analysis.chain.every((step) => {
+              const fn = this.morphology?.rule(step.rule)?.semantics?.function;
+              return fn === 'DIMINUTIVE' || fn === 'AUGMENTATIVE';
+            })
+          );
+          if (derived && token.candidates.every((candidate) => {
+            const concept = this.concepts[candidate.conceptId];
+            return concept?.kind !== 'ACTION' || !concept.destructive;
+          })) {
+            diagnostics.push(diagnostic('morphology', 'WARNING', 'DERIVED_MATCH',
+              `"${word}" foi interpretado como "${derived.root.lemma}" por derivação avaliativa (${derived.chain.map((step) => step.rule).join(' + ')}).`,
+              token.span, { candidates: token.candidates.map((candidate) => candidate.conceptId) }));
+          }
+        }
+        return token;
+      }
 
       const rawToken = token.rawTokens[0];
       if (!rawToken || rawToken.type !== 'WORD') return token;
@@ -61,6 +86,32 @@ export class LexicalRecovery {
       if (this.isGrammarWord(word)) return token;
 
       const slot = this.expectedSlot(tokens, index, actionSlot);
+      const derived = (this.morphology?.analyze(word) ?? []).find((analysis) =>
+        analysis.root.domain &&
+        analysis.status !== 'HYPOTHESIS_BLOCKED' &&
+        analysis.chain.length > 0 &&
+        analysis.chain.every((step) => {
+          const rule = this.morphology?.rule(step.rule);
+          return rule?.semantics?.function === 'DIMINUTIVE' || rule?.semantics?.function === 'AUGMENTATIVE';
+        })
+      );
+      if (derived) {
+        const candidates = this.lexicalIndex.resolve(derived.root.lemma)
+          .filter((candidate) => candidate.lexeme.id === derived.root.id)
+          .map((candidate) => this.withContextScore(candidate, slot))
+          .filter((candidate) => candidate.components.morphology > 0)
+          .flatMap((candidate) => candidate.candidates)
+          .filter((candidate) => {
+            const concept = this.concepts[candidate.conceptId];
+            return concept?.kind !== 'ACTION' || !concept.destructive;
+          });
+        if (candidates.length) {
+          diagnostics.push(diagnostic('morphology', 'WARNING', 'DERIVED_MATCH',
+            `"${word}" foi interpretado como "${derived.root.lemma}" por derivação avaliativa (${derived.chain.map((step) => step.rule).join(' + ')}).`,
+            token.span, { candidates: candidates.map((candidate) => candidate.conceptId) }));
+          return { ...token, candidates };
+        }
+      }
       const raw = this.lexicalIndex.approximateCandidates(word);
 
       if (!this.settings.approximateEnabled) {

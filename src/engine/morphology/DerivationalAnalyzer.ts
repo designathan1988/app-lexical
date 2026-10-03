@@ -56,6 +56,7 @@ export interface MorphologyData {
   invalidJunctions?: InvalidJunction[];
   surfaceVariants: Array<{ rule: string; surface: string }>;
   restorations: { VERB: Restoration[]; NOMINAL: Restoration[] };
+  verbalAlternations?: Array<{ lemma: string; stems: string[]; source: string }>;
   semanticFunctions: Array<{ id: string; glossTemplate?: string }>;
   lexicon: LexiconEntry[];
   attested: string[];
@@ -104,6 +105,7 @@ export class DerivationalAnalyzer {
   private blocked = new Map<string, string>();
   private glossTemplates = new Map<string, string>();
   private memo = new Map<string, Partial[]>();
+  private alternateStems = new Map<string, string[]>();
 
   constructor(private data: MorphologyData) {
     for (const entry of data.lexicon) {
@@ -111,6 +113,14 @@ export class DerivationalAnalyzer {
       const list = this.byLemma.get(key) ?? [];
       if (!list.some((e) => e.id === entry.id)) list.push(entry);
       this.byLemma.set(key, list);
+    }
+    for (const alternation of data.verbalAlternations ?? []) {
+      for (const stem of alternation.stems) {
+        const key = normalizeWord(stem);
+        const lemmas = this.alternateStems.get(key) ?? [];
+        if (!lemmas.includes(alternation.lemma)) lemmas.push(alternation.lemma);
+        this.alternateStems.set(key, lemmas);
+      }
     }
     for (const rule of data.rules) {
       // Superfície que a busca casa: prefixo para PREFIX/PARASYNTHETIC, sufixo nos demais.
@@ -132,6 +142,10 @@ export class DerivationalAnalyzer {
     return this.byLemma.get(normalizeWord(word)) ?? [];
   }
 
+  rule(id: string): AffixRule | undefined {
+    return this.data.rules.find((rule) => rule.id === id);
+  }
+
   /** Todas as análises da palavra, da mais provável para a menos. */
   analyze(word: string): DerivationAnalysis[] {
     this.memo.clear();
@@ -144,7 +158,7 @@ export class DerivationalAnalyzer {
       }
     }
     const seen = new Set<string>();
-    return out
+    const readings = out
       .sort((a, b) => b.score - a.score || a.chain.length - b.chain.length)
       .filter((a) => {
         const key = `${a.root.id}|${a.chain.map((s) => s.rule).join('>')}`;
@@ -152,6 +166,10 @@ export class DerivationalAnalyzer {
         seen.add(key);
         return true;
       });
+    const best = readings[0];
+    return best
+      ? readings.filter((reading) => reading.score >= best.score - 1.5 && reading.chain.length < best.chain.length + 2)
+      : readings;
   }
 
   /** Flexão nominal desfeita (plural, -ões/-ais/-is): a derivação vem antes da flexão. */
@@ -219,6 +237,22 @@ export class DerivationalAnalyzer {
       if (raw.length < MIN_BASE) return;
       // O acento na vogal antes do sufixo pertence ao sufixo (aceit-á-vel).
       const residue = raw.replace(/[áéí]$/, (v) => normalizeWord(v));
+      if (verbal) {
+        const normalized = normalizeWord(residue);
+        for (const key of [normalized, normalized.replace(/[ai]$/, '')]) {
+          for (const lemma of this.alternateStems.get(key) ?? []) push(lemma, wgt);
+          for (const prefixRule of this.data.rules) {
+            if (prefixRule.process !== 'PREFIX' || !asList(prefixRule.input?.pos).includes('VERB')) continue;
+            for (const prefix of this.surfaces.get(prefixRule.id) ?? []) {
+              const normalizedPrefix = normalizeWord(prefix);
+              if (!key.startsWith(normalizedPrefix)) continue;
+              for (const lemma of this.alternateStems.get(key.slice(normalizedPrefix.length)) ?? []) {
+                push(prefix + lemma, wgt);
+              }
+            }
+          }
+        }
+      }
       const sets = [
         ...(verbal ? this.data.restorations.VERB : []),
         ...(nominal ? this.data.restorations.NOMINAL : [])

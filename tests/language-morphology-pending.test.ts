@@ -51,14 +51,14 @@ describe('pendências da morfologia', () => {
 
   it.each(latinCases)('recupera radical latino em %s', (word, root) => {
     const readings = analyzer.analyze(word);
-    expect(readings.some((r) => normalizeWord(r.root.lemma) === root), word).toBe(true);
+    expect(readings.some((r) => normalizeWord(r.root.lemma) === root), `${word}: ${readings.map((r) => `${r.root.lemma}/${r.chain.map((s) => s.rule).join('+')}`).join(', ')}`).toBe(true);
   });
 
   it('resolve diminutivo de entidade do domínio e avisa', () => {
     const engine = new SemanticEngine(createInitialKnowledgeBase());
     const result = engine.execute('crie um botãozinho azul');
     expect(result.success).toBe(true);
-    expect(result.compile.diagnostics.some((d) => d.code === 'DERIVED_MATCH' && d.severity === 'WARNING')).toBe(true);
+    expect(result.compile.diagnostics.some((d) => d.code === 'DERIVED_MATCH' && d.severity === 'WARNING'), JSON.stringify({ diagnostics: result.compile.diagnostics, readings: engine.analyzeWord('botãozinho'), tokens: result.compile.trace.semanticTokens })).toBe(true);
     expect(treeSignature(engine.store.document, engine.knowledgeBase.concepts)).toBe('C_ENT_BUTTON{C_PROP_BG_COLOR=#2563eb}');
   });
 

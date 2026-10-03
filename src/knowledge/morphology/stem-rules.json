@@ -2,6 +2,15 @@
   "version": "1.0.0",
   "schemaVersion": "1.0.0",
   "description": "Regras de RADICAL para a análise reversa (palavra derivada → base). Complementam affix-rules.json: variantes de superfície dos afixos, regras produtivas que faltavam e as transformações que restauram a base a partir do resíduo. Nenhum par palavra→base é listado aqui: tudo é regra.",
+  "verbalAlternations": [
+    { "lemma": "ver", "stems": ["vis"], "source": "https://www.scielo.br/j/alfa/a/KBB8JSXYhkf3Wb6sXcbG9XJ/" },
+    { "lemma": "ler", "stems": ["leg"], "source": "Exemplo fornecido pelo solicitante; conferir produtividade." },
+    { "lemma": "ouvir", "stems": ["aud", "audit"], "source": "Exemplo fornecido pelo solicitante; conferir produtividade." },
+    { "lemma": "destruir", "stems": ["destrut"], "source": "Exemplo fornecido pelo solicitante; conferir produtividade." },
+    { "lemma": "escrever", "stems": ["escrit", "escrip", "scri", "descri"], "source": "Exemplo fornecido pelo solicitante; conferir produtividade." },
+    { "lemma": "eleger", "stems": ["elei", "eleit"], "source": "Exemplo fornecido pelo solicitante; conferir produtividade." },
+    { "lemma": "dividir", "stems": ["divis"], "source": "Exemplo fornecido pelo solicitante; conferir produtividade." }
+  ],
   "surfaceVariants": [
     {
       "rule": "SUF_EZ",
@@ -90,6 +99,16 @@
     }
   ],
   "extraRules": [
+    {
+      "id": "SUF_IVO_V",
+      "process": "SUFFIX",
+      "form": { "suffix": "ivo" },
+      "input": { "pos": "VERB" },
+      "output": { "pos": "ADJECTIVE" },
+      "semantics": { "function": "RELATIONAL_ADJ" },
+      "productivity": "MEDIUM",
+      "source": "https://www.scielo.br/j/alfa/a/KBB8JSXYhkf3Wb6sXcbG9XJ/"
+    },
     {
       "id": "SUF_ANCA",
       "process": "SUFFIX",
