@@ -58,19 +58,16 @@ describe('A1 — a gramática é dada, não escrita no parser', () => {
 
     for (let i = 0; i < 3; i++) engine.store.createNode('C_ENT_BUTTON');
 
-    // Antes: "salvo" é conhecido (já cadastrado), mas removemos para provar.
-    store.removeSurfaceForm('SF_SALVO');
+    // Antes: "salvo" é conhecido (lema já cadastrado), mas removemos para provar.
+    const lemma = store.kb.lexemes['LEX_SALVO'];
+    store.removeLexeme('LEX_SALVO');
     engine.knowledgeBase = store.kb;
     engine.rebuild();
     expect(engine.execute('apague todos os botões salvo o primeiro').success).toBe(false);
 
-    // Depois: cadastrar apenas o DADO faz funcionar, sem tocar no parser.
-    store.addSurfaceForm({
-      id: 'SF_SALVO',
-      rawText: 'salvo',
-      lexemeId: 'LEX_SALVO',
-      formType: 'CANONICAL'
-    });
+    // Depois: cadastrar apenas o LEMA (dado) faz funcionar — a forma é gerada
+    // a partir dele, sem tocar no parser nem cadastrar formas à mão.
+    store.addLexeme({ ...lemma });
     engine.knowledgeBase = store.kb;
     engine.rebuild();
 

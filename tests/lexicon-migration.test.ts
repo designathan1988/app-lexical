@@ -45,6 +45,17 @@ const ACCEPTED_MORPHOLOGY_CORRECTIONS = new Map<string, { to: Morphology; reason
   ['laranja', { to: { number: 'INVARIANT' }, reason: 'cor-substantivo invariável: "caixas laranja"' }]
 ]);
 
+/**
+ * Lexemas fundidos num único lema com paradigma (mesma forma, mesma
+ * morfologia): "ela/eles/elas" são flexões de "ele".
+ */
+const ACCEPTED_LEXEME_MERGES = new Map<string, string>([
+  ['LEX_ELA', 'LEX_ELE'],
+  ['LEX_ELES', 'LEX_ELE'],
+  ['LEX_ELAS', 'LEX_ELE']
+]);
+const lexemeOf = (id: string) => ACCEPTED_LEXEME_MERGES.get(id) ?? id;
+
 function morphologyCompatible(old: Morphology, current?: Morphology): boolean {
   if (!current) return false;
   if (old.gender && current.gender !== old.gender) return false;
@@ -69,7 +80,7 @@ describe('F2.2 — migração do léxico preserva as formas existentes', () => {
     for (const f of fixture.forms) {
       if (ACCEPTED_REMOVALS.has(f.form)) continue;
       const candidates = index.resolve(f.form);
-      if (!candidates.some((c) => c.lexeme.id === f.lexemeId)) {
+      if (!candidates.some((c) => c.lexeme.id === lexemeOf(f.lexemeId))) {
         missing.push(
           `${f.form} (${RawLexer.normalize(f.form)}) → esperado ${f.lexemeId}, obtido [${candidates
             .map((c) => c.lexeme.id)
@@ -88,7 +99,7 @@ describe('F2.2 — migração do léxico preserva as formas existentes', () => {
       const expected = ACCEPTED_MORPHOLOGY_CORRECTIONS.get(f.form)?.to ?? f.morphology;
       const readable = index
         .resolve(f.form)
-        .filter((c) => c.lexeme.id === f.lexemeId)
+        .filter((c) => c.lexeme.id === lexemeOf(f.lexemeId))
         .some((c) => morphologyCompatible(expected, c.morphology));
       if (!readable) {
         incompatible.push(`${f.form} → ${f.lexemeId} esperava ${JSON.stringify(f.morphology)}`);
