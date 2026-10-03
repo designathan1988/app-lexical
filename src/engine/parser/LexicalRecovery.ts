@@ -107,7 +107,12 @@ export class LexicalRecovery {
         scored.flatMap((s) => s.candidates.map((c) => c.conceptId))
       );
 
-      if (distinctConcepts.size > 1 && scored[0].score - scored[1].score < 0.05) {
+      // Sentidos incompatíveis: entre candidatos empatados (gap pequeno) ou
+      // dentro de um único candidato cuja forma casa com mais de um conceito.
+      const ambiguousSense =
+        distinctConcepts.size > 1 &&
+        (scored.length === 1 || scored[0].score - scored[1].score < 0.05);
+      if (ambiguousSense) {
         diagnostics.push(
           diagnostic('morphology', 'ERROR', 'AMBIGUOUS_SENSE',
             `"${word}" é ambíguo: pode ser ${scored

@@ -86,8 +86,16 @@ A lista exata de falhas conhecidas é verificada por
 quebra a suíte, e qualquer caso dela que passe também (exigindo atualização
 consciente da lista — o oráculo só encolhe).
 
+**Atualização F2.2 (2026-10-03):** os diminutivos produtivos entraram pela
+geração por paradigma e `morph-15`, `morph-16` e `morph-17` passaram —
+removidos da lista (28 → 25 falhas conhecidas). Nenhum esperado foi alterado.
+
 ### Alterações de esperados existentes
 
 | Data | Registro | Campo | Antes | Depois | Motivo |
 |---|---|---|---|---|---|
-| — | — | — | — | — | Nenhuma até o momento |
+| 2026-10-03 | 139 registros de dev/regression (142 leituras) | `readings[].feats` | `Mood=Imp\|VerbForm=Fin`; `Person=3\|Mood=Ind\|…` | `Number=Sing\|Person=3\|Mood=Imp\|VerbForm=Fin`; `Number=Sing\|Person=3\|Mood=Ind\|…` | Justificativa linguística independente do motor: o imperativo de 3ª pessoa ("crie", "apague") e o indicativo de 3ª pessoa ("criou") são SINGULARES e de PESSOA 3 — a anotação anterior, feita sobre a morfologia legada incompleta, omitia pessoa e número. Com a geração por paradigma a análise passou a expressar os traços completos; a expectativa foi completada para descrever a análise CORRETA, não a saída do front-end antigo. |
+
+Nenhuma outra alteração de esperado existente. As alterações acima foram
+feitas nos registros `dev-*`, `reg-*` e `morph-*` listados no commit
+`DATASET:` correspondente.

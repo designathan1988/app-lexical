@@ -102,5 +102,6 @@ export function featuresToMorphology(features: FeatureBundle): Morphology {
     morphology.mood = VERB_FORM_MOOD[features.VerbForm];
   }
   if (features.Tense) morphology.tense = TENSE[features.Tense];
+  if (features.Degree === 'Dim') morphology.degree = 'DIMINUTIVE';
   return morphology;
 }

@@ -148,22 +148,38 @@ export class SemanticCompiler {
     document: DocumentModel,
     discourse: DiscourseContext
   ): { ast: SemanticDocumentAst; diagnostics: Diagnostic[]; trace: CompileTrace } {
-    const { raw, grammatical, tokens, diagnostics } = this.prepare(input);
-    const parser = new DomainParser(this.makeParserContext(document, discourse));
-
-    let ast: SemanticDocumentAst;
+    // Nenhuma exceção escapa do motor: a preparação (lexer, MWE, recuperação)
+    // também roda dentro da captura — um defeito vira INTERNAL_ERROR, nunca
+    // uma exceção para a UI.
+    let raw: RawToken[] = [];
+    let grammatical: RawToken[] = [];
+    let tokens: SemanticToken[] = [];
+    const diagnostics: Diagnostic[] = [];
+    let ast: SemanticDocumentAst = { commands: [] };
     let consumption: CompileTrace['consumption'] = [];
+
     try {
-      ast = parser.parse(tokens);
-      consumption = parser.consumption;
-      diagnostics.push(...parser.diagnostics);
+      const prepared = this.prepare(input);
+      raw = prepared.raw;
+      grammatical = prepared.grammatical;
+      tokens = prepared.tokens;
+      diagnostics.push(...prepared.diagnostics);
+
+      const parser = new DomainParser(this.makeParserContext(document, discourse));
+      try {
+        ast = parser.parse(tokens);
+        consumption = parser.consumption;
+        diagnostics.push(...parser.diagnostics);
+      } catch (error) {
+        // Diagnósticos já emitidos pelas camadas internas (ex.: binder) vêm
+        // primeiro, preservando sua camada de origem.
+        consumption = parser.consumption;
+        diagnostics.push(...parser.diagnostics);
+        diagnostics.push(this.toDiagnostic(error));
+        ast = { commands: [] };
+      }
     } catch (error) {
-      // Diagnósticos já emitidos pelas camadas internas (ex.: binder) vêm
-      // primeiro, preservando sua camada de origem.
-      consumption = parser.consumption;
-      diagnostics.push(...parser.diagnostics);
       diagnostics.push(this.toDiagnostic(error));
-      ast = { commands: [] };
     }
 
     return {

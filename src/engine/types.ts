@@ -72,6 +72,8 @@ export interface Morphology {
   /** `IMPERFECT` = pretérito imperfeito; `PAST` = pretérito perfeito. */
   tense?: 'PRESENT' | 'PAST' | 'IMPERFECT' | 'FUTURE';
   person?: 1 | 2 | 3;
+  /** Grau do diminutivo produtivo (F2.1). */
+  degree?: 'DIMINUTIVE';
 }
 
 export type FormType =
@@ -87,6 +89,10 @@ export interface SurfaceForm {
   lexemeId: LexemeId;
   formType: FormType;
   morphology?: Morphology;
+  /** Chave canônica dos traços (formas geradas por paradigma). */
+  features?: string;
+  /** `true` quando a forma foi gerada na construção do índice (F2.1). */
+  generated?: boolean;
 }
 
 export interface Lexeme {
@@ -94,6 +100,21 @@ export interface Lexeme {
   lemma: string;
   pos: PartOfSpeech;
   senseConceptIds: ConceptId[];
+  /** Classe flexional (F2.1); ausente = sem flexão gerada. */
+  paradigmId?: string;
+  /** Traços inerentes do lexema (ex.: gênero do substantivo). */
+  inherent?: {
+    Gender?: 'Masc' | 'Fem' | 'Neut' | 'Inv';
+    Number?: 'Sing' | 'Plur' | 'Inv';
+  };
+  /** Células sobrescritas (irregularidades), por chave canônica de traços. */
+  irregular?: Record<string, string | string[]>;
+  /** Células desativadas pelo curador. */
+  disabledForms?: string[];
+  /** Derivação (ex.: criação ← criar). */
+  derivedFrom?: LexemeId;
+  /** Habilita diminutivos produtivos (F2.1). */
+  allowsDiminutive?: boolean;
 }
 
 export interface MultiwordEntry {

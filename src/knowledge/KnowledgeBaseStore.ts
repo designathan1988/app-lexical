@@ -211,7 +211,10 @@ export class KnowledgeBaseStore {
           message: `A forma "${form.rawText}" aponta para o lexema inexistente ${form.lexemeId}.`
         });
       }
-      const key = `${form.rawText.toLowerCase()}|${form.lexemeId}`;
+      // Homografia legítima (ex.: "marquem" no imperativo E no subjuntivo,
+      // "cria" no indicativo E no imperativo) não é defeito: só é duplicata
+      // quando repete a MESMA célula (mesma forma, mesmo lexema, mesmos traços).
+      const key = `${form.rawText.toLowerCase()}|${form.lexemeId}|${form.features ?? ''}`;
       if (seenForms.has(key)) {
         issues.push({
           severity: 'WARNING',

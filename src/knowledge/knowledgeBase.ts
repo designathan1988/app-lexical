@@ -8,6 +8,7 @@ import type {
   Morphology
 } from '../engine/types';
 import type { ConceptNode } from '../engine/ontology/Concept';
+import { PARADIGMS, generateForms, generateDiminutives } from './paradigms';
 
 /**
  * Base de conhecimento persistível (JSON-safe): conceitos, lexemas, formas
@@ -311,78 +312,95 @@ export const INITIAL_CONCEPTS: Record<ConceptId, ConceptNode> = {
 // Lexemas
 // ---------------------------------------------------------------------------
 
+interface LexOptions {
+  paradigmId?: string;
+  gender?: 'Masc' | 'Fem';
+  irregular?: Record<string, string | string[]>;
+  disabledForms?: string[];
+  derivedFrom?: LexemeId;
+  allowsDiminutive?: boolean;
+}
+
 function lex(
   id: LexemeId,
   lemma: string,
   pos: PartOfSpeech,
-  senseConceptIds: ConceptId[] = []
+  senseConceptIds: ConceptId[] = [],
+  options: LexOptions = {}
 ): Lexeme {
-  return { id, lemma, pos, senseConceptIds };
+  const lexeme: Lexeme = { id, lemma, pos, senseConceptIds };
+  if (options.paradigmId) lexeme.paradigmId = options.paradigmId;
+  if (options.gender) lexeme.inherent = { Gender: options.gender };
+  if (options.irregular) lexeme.irregular = options.irregular;
+  if (options.disabledForms) lexeme.disabledForms = options.disabledForms;
+  if (options.derivedFrom) lexeme.derivedFrom = options.derivedFrom;
+  if (options.allowsDiminutive) lexeme.allowsDiminutive = true;
+  return lexeme;
 }
 
 export const INITIAL_LEXEMES: Record<LexemeId, Lexeme> = {
   // Verbos — criação
-  LEX_CRIAR: lex('LEX_CRIAR', 'criar', 'VERB', ['C_ACT_CREATE']),
-  LEX_ADICIONAR: lex('LEX_ADICIONAR', 'adicionar', 'VERB', ['C_ACT_CREATE']),
-  LEX_COLOCAR: lex('LEX_COLOCAR', 'colocar', 'VERB', ['C_ACT_CREATE', 'C_ACT_MOVE']),
-  LEX_BOTAR: lex('LEX_BOTAR', 'botar', 'VERB', ['C_ACT_CREATE']),
-  LEX_FAZER: lex('LEX_FAZER', 'fazer', 'VERB', ['C_ACT_CREATE']),
-  LEX_INSERIR: lex('LEX_INSERIR', 'inserir', 'VERB', ['C_ACT_CREATE']),
+  LEX_CRIAR: lex('LEX_CRIAR', 'criar', 'VERB', ['C_ACT_CREATE'], { paradigmId: 'V_AR' }),
+  LEX_ADICIONAR: lex('LEX_ADICIONAR', 'adicionar', 'VERB', ['C_ACT_CREATE'], { paradigmId: 'V_AR' }),
+  LEX_COLOCAR: lex('LEX_COLOCAR', 'colocar', 'VERB', ['C_ACT_CREATE', 'C_ACT_MOVE'], { paradigmId: 'V_AR_CAR' }),
+  LEX_BOTAR: lex('LEX_BOTAR', 'botar', 'VERB', ['C_ACT_CREATE'], { paradigmId: 'V_AR' }),
+  LEX_FAZER: lex('LEX_FAZER', 'fazer', 'VERB', ['C_ACT_CREATE'], { paradigmId: 'V_FAZER' }),
+  LEX_INSERIR: lex('LEX_INSERIR', 'inserir', 'VERB', ['C_ACT_CREATE'], { paradigmId: 'V_IR', irregular: { 'Number=Sing|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres': 'insira', 'Number=Sing|Person=2|Mood=Sub|VerbForm=Fin|Tense=Pres': 'insiras', 'Number=Sing|Person=3|Mood=Sub|VerbForm=Fin|Tense=Pres': 'insira', 'Number=Plur|Person=1|Mood=Sub|VerbForm=Fin|Tense=Pres': 'insiramos', 'Number=Plur|Person=2|Mood=Sub|VerbForm=Fin|Tense=Pres': 'insirais', 'Number=Plur|Person=3|Mood=Sub|VerbForm=Fin|Tense=Pres': 'insiram', 'Number=Sing|Person=3|Mood=Imp|VerbForm=Fin': 'insira', 'Number=Plur|Person=1|Mood=Imp|VerbForm=Fin': 'insiramos', 'Number=Plur|Person=3|Mood=Imp|VerbForm=Fin': 'insiram', 'Number=Sing|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres': 'insiro', 'Number=Sing|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres': 'inseres', 'Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres': 'insere', 'Number=Plur|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres': 'inserimos', 'Number=Plur|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres': 'insereis', 'Number=Plur|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres': 'inserem' } }),
   // Verbos — atualização
-  LEX_MUDAR: lex('LEX_MUDAR', 'mudar', 'VERB', ['C_ACT_UPDATE']),
-  LEX_DEIXAR: lex('LEX_DEIXAR', 'deixar', 'VERB', ['C_ACT_UPDATE']),
-  LEX_ALTERAR: lex('LEX_ALTERAR', 'alterar', 'VERB', ['C_ACT_UPDATE']),
-  LEX_TROCAR: lex('LEX_TROCAR', 'trocar', 'VERB', ['C_ACT_UPDATE']),
-  LEX_PINTAR: lex('LEX_PINTAR', 'pintar', 'VERB', ['C_ACT_UPDATE']),
+  LEX_MUDAR: lex('LEX_MUDAR', 'mudar', 'VERB', ['C_ACT_UPDATE'], { paradigmId: 'V_AR' }),
+  LEX_DEIXAR: lex('LEX_DEIXAR', 'deixar', 'VERB', ['C_ACT_UPDATE'], { paradigmId: 'V_AR' }),
+  LEX_ALTERAR: lex('LEX_ALTERAR', 'alterar', 'VERB', ['C_ACT_UPDATE'], { paradigmId: 'V_AR' }),
+  LEX_TROCAR: lex('LEX_TROCAR', 'trocar', 'VERB', ['C_ACT_UPDATE'], { paradigmId: 'V_AR_CAR' }),
+  LEX_PINTAR: lex('LEX_PINTAR', 'pintar', 'VERB', ['C_ACT_UPDATE'], { paradigmId: 'V_AR' }),
   // Verbos — exclusão
-  LEX_APAGAR: lex('LEX_APAGAR', 'apagar', 'VERB', ['C_ACT_DELETE']),
-  LEX_REMOVER: lex('LEX_REMOVER', 'remover', 'VERB', ['C_ACT_DELETE']),
-  LEX_EXCLUIR: lex('LEX_EXCLUIR', 'excluir', 'VERB', ['C_ACT_DELETE']),
-  LEX_DELETAR: lex('LEX_DELETAR', 'deletar', 'VERB', ['C_ACT_DELETE']),
-  LEX_TIRAR: lex('LEX_TIRAR', 'tirar', 'VERB', ['C_ACT_DELETE']),
+  LEX_APAGAR: lex('LEX_APAGAR', 'apagar', 'VERB', ['C_ACT_DELETE'], { paradigmId: 'V_AR_GAR' }),
+  LEX_REMOVER: lex('LEX_REMOVER', 'remover', 'VERB', ['C_ACT_DELETE'], { paradigmId: 'V_ER' }),
+  LEX_EXCLUIR: lex('LEX_EXCLUIR', 'excluir', 'VERB', ['C_ACT_DELETE'], { paradigmId: 'V_IR', irregular: { 'Number=Sing|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres': 'excluis', 'Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres': 'exclui', 'Number=Plur|Person=1|Mood=Ind|VerbForm=Fin|Tense=Pres': 'excluímos', 'Number=Plur|Person=2|Mood=Ind|VerbForm=Fin|Tense=Pres': 'excluís' } }),
+  LEX_DELETAR: lex('LEX_DELETAR', 'deletar', 'VERB', ['C_ACT_DELETE'], { paradigmId: 'V_AR' }),
+  LEX_TIRAR: lex('LEX_TIRAR', 'tirar', 'VERB', ['C_ACT_DELETE'], { paradigmId: 'V_AR' }),
   // Verbos — movimento
-  LEX_MOVER: lex('LEX_MOVER', 'mover', 'VERB', ['C_ACT_MOVE']),
+  LEX_MOVER: lex('LEX_MOVER', 'mover', 'VERB', ['C_ACT_MOVE'], { paradigmId: 'V_ER' }),
   // Verbos — consulta
-  LEX_SELECIONAR: lex('LEX_SELECIONAR', 'selecionar', 'VERB', ['C_ACT_QUERY']),
-  LEX_MARCAR: lex('LEX_MARCAR', 'marcar', 'VERB', ['C_ACT_QUERY']),
+  LEX_SELECIONAR: lex('LEX_SELECIONAR', 'selecionar', 'VERB', ['C_ACT_QUERY'], { paradigmId: 'V_AR' }),
+  LEX_MARCAR: lex('LEX_MARCAR', 'marcar', 'VERB', ['C_ACT_QUERY'], { paradigmId: 'V_AR_CAR' }),
 
   // Substantivos
-  LEX_BOTAO: lex('LEX_BOTAO', 'botão', 'NOUN', ['C_ENT_BUTTON']),
-  LEX_CAIXA: lex('LEX_CAIXA', 'caixa', 'NOUN', ['C_ENT_CONTAINER']),
-  LEX_CONTAINER: lex('LEX_CONTAINER', 'container', 'NOUN', ['C_ENT_CONTAINER']),
-  LEX_TEXTO: lex('LEX_TEXTO', 'texto', 'NOUN', ['C_ENT_TEXT']),
+  LEX_BOTAO: lex('LEX_BOTAO', 'botão', 'NOUN', ['C_ENT_BUTTON'], { paradigmId: 'N_AO_OES', gender: 'Masc', allowsDiminutive: true }),
+  LEX_CAIXA: lex('LEX_CAIXA', 'caixa', 'NOUN', ['C_ENT_CONTAINER'], { paradigmId: 'N_S', gender: 'Fem', allowsDiminutive: true }),
+  LEX_CONTAINER: lex('LEX_CONTAINER', 'container', 'NOUN', ['C_ENT_CONTAINER'], { paradigmId: 'N_S', gender: 'Masc' }),
+  LEX_TEXTO: lex('LEX_TEXTO', 'texto', 'NOUN', ['C_ENT_TEXT'], { paradigmId: 'N_S', gender: 'Masc' }),
 
   // Propriedades
-  LEX_BORDA: lex('LEX_BORDA', 'borda', 'NOUN', ['C_PROP_GROUP_BORDER']),
-  LEX_FUNDO: lex('LEX_FUNDO', 'fundo', 'NOUN', ['C_PROP_BG_COLOR']),
-  LEX_ROTULO: lex('LEX_ROTULO', 'rótulo', 'NOUN', ['C_PROP_TEXT_CONTENT']),
-  LEX_CONTEUDO: lex('LEX_CONTEUDO', 'conteúdo', 'NOUN', ['C_PROP_TEXT_CONTENT']),
+  LEX_BORDA: lex('LEX_BORDA', 'borda', 'NOUN', ['C_PROP_GROUP_BORDER'], { paradigmId: 'N_S', gender: 'Fem' }),
+  LEX_FUNDO: lex('LEX_FUNDO', 'fundo', 'NOUN', ['C_PROP_BG_COLOR'], { paradigmId: 'N_S', gender: 'Masc' }),
+  LEX_ROTULO: lex('LEX_ROTULO', 'rótulo', 'NOUN', ['C_PROP_TEXT_CONTENT'], { paradigmId: 'N_S', gender: 'Masc' }),
+  LEX_CONTEUDO: lex('LEX_CONTEUDO', 'conteúdo', 'NOUN', ['C_PROP_TEXT_CONTENT'], { paradigmId: 'N_S', gender: 'Masc' }),
 
   // Adjetivos de cor
-  LEX_AZUL: lex('LEX_AZUL', 'azul', 'ADJECTIVE', ['C_VAL_BLUE']),
-  LEX_VERMELHO: lex('LEX_VERMELHO', 'vermelho', 'ADJECTIVE', ['C_VAL_RED']),
-  LEX_VERDE: lex('LEX_VERDE', 'verde', 'ADJECTIVE', ['C_VAL_GREEN']),
-  LEX_AMARELO: lex('LEX_AMARELO', 'amarelo', 'ADJECTIVE', ['C_VAL_YELLOW']),
-  LEX_PRETO: lex('LEX_PRETO', 'preto', 'ADJECTIVE', ['C_VAL_BLACK']),
-  LEX_BRANCO: lex('LEX_BRANCO', 'branco', 'ADJECTIVE', ['C_VAL_WHITE']),
-  LEX_CINZA: lex('LEX_CINZA', 'cinza', 'ADJECTIVE', ['C_VAL_GRAY']),
-  LEX_LARANJA: lex('LEX_LARANJA', 'laranja', 'ADJECTIVE', ['C_VAL_ORANGE']),
-  LEX_ROXO: lex('LEX_ROXO', 'roxo', 'ADJECTIVE', ['C_VAL_PURPLE']),
-  LEX_REDONDO: lex('LEX_REDONDO', 'redondo', 'ADJECTIVE', ['C_VAL_ROUND']),
+  LEX_AZUL: lex('LEX_AZUL', 'azul', 'ADJECTIVE', ['C_VAL_BLUE'], { paradigmId: 'ADJ_L' }),
+  LEX_VERMELHO: lex('LEX_VERMELHO', 'vermelho', 'ADJECTIVE', ['C_VAL_RED'], { paradigmId: 'ADJ_O' }),
+  LEX_VERDE: lex('LEX_VERDE', 'verde', 'ADJECTIVE', ['C_VAL_GREEN'], { paradigmId: 'ADJ_INVARIANT' }),
+  LEX_AMARELO: lex('LEX_AMARELO', 'amarelo', 'ADJECTIVE', ['C_VAL_YELLOW'], { paradigmId: 'ADJ_O' }),
+  LEX_PRETO: lex('LEX_PRETO', 'preto', 'ADJECTIVE', ['C_VAL_BLACK'], { paradigmId: 'ADJ_O', allowsDiminutive: true }),
+  LEX_BRANCO: lex('LEX_BRANCO', 'branco', 'ADJECTIVE', ['C_VAL_WHITE'], { paradigmId: 'ADJ_O' }),
+  LEX_CINZA: lex('LEX_CINZA', 'cinza', 'ADJECTIVE', ['C_VAL_GRAY'], { paradigmId: 'ADJ_INVARIANT' }),
+  LEX_LARANJA: lex('LEX_LARANJA', 'laranja', 'ADJECTIVE', ['C_VAL_ORANGE'], { paradigmId: 'ADJ_INVARIANT' }),
+  LEX_ROXO: lex('LEX_ROXO', 'roxo', 'ADJECTIVE', ['C_VAL_PURPLE'], { paradigmId: 'ADJ_O' }),
+  LEX_REDONDO: lex('LEX_REDONDO', 'redondo', 'ADJECTIVE', ['C_VAL_ROUND'], { paradigmId: 'ADJ_O' }),
 
   // Numerais — ordinais
-  LEX_ORD_1: lex('LEX_ORD_1', 'primeiro', 'NUMERAL', ['C_ORD_1']),
-  LEX_ORD_2: lex('LEX_ORD_2', 'segundo', 'NUMERAL', ['C_ORD_2']),
-  LEX_ORD_3: lex('LEX_ORD_3', 'terceiro', 'NUMERAL', ['C_ORD_3']),
-  LEX_ORD_4: lex('LEX_ORD_4', 'quarto', 'NUMERAL', ['C_ORD_4']),
-  LEX_ORD_5: lex('LEX_ORD_5', 'quinto', 'NUMERAL', ['C_ORD_5']),
-  LEX_ORD_6: lex('LEX_ORD_6', 'sexto', 'NUMERAL', ['C_ORD_6']),
-  LEX_ORD_7: lex('LEX_ORD_7', 'sétimo', 'NUMERAL', ['C_ORD_7']),
-  LEX_ORD_8: lex('LEX_ORD_8', 'oitavo', 'NUMERAL', ['C_ORD_8']),
-  LEX_ORD_9: lex('LEX_ORD_9', 'nono', 'NUMERAL', ['C_ORD_9']),
-  LEX_ORD_10: lex('LEX_ORD_10', 'décimo', 'NUMERAL', ['C_ORD_10']),
-  LEX_ORD_LAST: lex('LEX_ORD_LAST', 'último', 'NUMERAL', ['C_ORD_LAST']),
-  LEX_ORD_PENULTIMATE: lex('LEX_ORD_PENULTIMATE', 'penúltimo', 'NUMERAL', ['C_ORD_PENULTIMATE']),
+  LEX_ORD_1: lex('LEX_ORD_1', 'primeiro', 'NUMERAL', ['C_ORD_1'], { paradigmId: 'ADJ_O' }),
+  LEX_ORD_2: lex('LEX_ORD_2', 'segundo', 'NUMERAL', ['C_ORD_2'], { paradigmId: 'ADJ_O' }),
+  LEX_ORD_3: lex('LEX_ORD_3', 'terceiro', 'NUMERAL', ['C_ORD_3'], { paradigmId: 'ADJ_O' }),
+  LEX_ORD_4: lex('LEX_ORD_4', 'quarto', 'NUMERAL', ['C_ORD_4'], { paradigmId: 'ADJ_O' }),
+  LEX_ORD_5: lex('LEX_ORD_5', 'quinto', 'NUMERAL', ['C_ORD_5'], { paradigmId: 'ADJ_O' }),
+  LEX_ORD_6: lex('LEX_ORD_6', 'sexto', 'NUMERAL', ['C_ORD_6'], { paradigmId: 'ADJ_O' }),
+  LEX_ORD_7: lex('LEX_ORD_7', 'sétimo', 'NUMERAL', ['C_ORD_7'], { paradigmId: 'ADJ_O' }),
+  LEX_ORD_8: lex('LEX_ORD_8', 'oitavo', 'NUMERAL', ['C_ORD_8'], { paradigmId: 'ADJ_O' }),
+  LEX_ORD_9: lex('LEX_ORD_9', 'nono', 'NUMERAL', ['C_ORD_9'], { paradigmId: 'ADJ_O' }),
+  LEX_ORD_10: lex('LEX_ORD_10', 'décimo', 'NUMERAL', ['C_ORD_10'], { paradigmId: 'ADJ_O' }),
+  LEX_ORD_LAST: lex('LEX_ORD_LAST', 'último', 'NUMERAL', ['C_ORD_LAST'], { paradigmId: 'ADJ_O' }),
+  LEX_ORD_PENULTIMATE: lex('LEX_ORD_PENULTIMATE', 'penúltimo', 'NUMERAL', ['C_ORD_PENULTIMATE'], { paradigmId: 'ADJ_O' }),
 
   // Numerais — cardinais
   LEX_CARD_1: lex('LEX_CARD_1', 'um', 'NUMERAL', ['C_CARD_1']),
@@ -456,175 +474,43 @@ const P = 'PLURAL' as const;
  * `stem` é o radical sem a vogal temática: "vermelh" → vermelho/vermelha/
  * vermelhos/vermelhas.
  */
-export function colorForms(id: string, stem: string, lexemeId: LexemeId): SurfaceForm[] {
-  return [
-    sf(`${id}_M_S`, `${stem}o`, lexemeId, 'CANONICAL', { gender: M, number: S }),
-    sf(`${id}_F_S`, `${stem}a`, lexemeId, 'INFLECTION', { gender: F, number: S }),
-    sf(`${id}_M_P`, `${stem}os`, lexemeId, 'INFLECTION', { gender: M, number: P }),
-    sf(`${id}_F_P`, `${stem}as`, lexemeId, 'INFLECTION', { gender: F, number: P })
-  ];
-}
-
-/** Gera as quatro flexões de um ordinal de duas terminações. */
-function ordinalForms(id: string, stem: string, lexemeId: LexemeId): SurfaceForm[] {
-  return [
-    sf(`${id}_M_S`, `${stem}o`, lexemeId, 'CANONICAL', { gender: M, number: S }),
-    sf(`${id}_F_S`, `${stem}a`, lexemeId, 'INFLECTION', { gender: F, number: S }),
-    sf(`${id}_M_P`, `${stem}os`, lexemeId, 'INFLECTION', { gender: M, number: P }),
-    sf(`${id}_F_P`, `${stem}as`, lexemeId, 'INFLECTION', { gender: F, number: P })
-  ];
-}
-
+/**
+ * SurfaceForms MANUAIS: só erro, coloquial, abreviação, sinônimo e exceção
+ * que o paradigma não cobre (F2.2). Toda flexão regular vem de
+ * `generateSurfaceForms`.
+ */
 export const INITIAL_SURFACE_FORMS: SurfaceForm[] = [
-  // --- Verbos (formas canônicas, infinitivas, imperativas e flexionadas) ------
-  sf('SF_CRIAR', 'criar', 'LEX_CRIAR'),
-  sf('SF_CRIE', 'crie', 'LEX_CRIAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-  sf('SF_CRIA', 'cria', 'LEX_CRIAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-  sf('SF_CRIEM', 'criem', 'LEX_CRIAR', 'INFLECTION', { mood: 'IMPERATIVE', number: P }),
-  sf('SF_CRIOU', 'criou', 'LEX_CRIAR', 'INFLECTION'),
-
-  sf('SF_ADICIONAR', 'adicionar', 'LEX_ADICIONAR'),
-  sf('SF_ADICIONE', 'adicione', 'LEX_ADICIONAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-  sf('SF_ADICIONA', 'adiciona', 'LEX_ADICIONAR', 'INFLECTION'),
-
-  sf('SF_COLOCAR', 'colocar', 'LEX_COLOCAR'),
-  sf('SF_COLOQUE', 'coloque', 'LEX_COLOCAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-  sf('SF_COLOQUEM', 'coloquem', 'LEX_COLOCAR', 'INFLECTION', { mood: 'IMPERATIVE', number: P }),
+  // --- Exceções lexicais -------------------------------------------------------
+  // "ponha" é do verbo pôr, mas o léxico do domínio o associa a colocar.
   sf('SF_PONHA', 'ponha', 'LEX_COLOCAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-
-  sf('SF_BOTAR', 'botar', 'LEX_BOTAR'),
-  sf('SF_BOTE', 'bote', 'LEX_BOTAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-
-  sf('SF_FAZER', 'fazer', 'LEX_FAZER'),
-  sf('SF_FACA', 'faça', 'LEX_FAZER', 'INFLECTION', { mood: 'IMPERATIVE' }),
-  sf('SF_FACA_ASCII', 'faca', 'LEX_FAZER', 'MISSPELLING', { mood: 'IMPERATIVE' }),
-
-  sf('SF_INSERIR', 'inserir', 'LEX_INSERIR'),
-  sf('SF_INSIRA', 'insira', 'LEX_INSERIR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-
-  sf('SF_MUDAR', 'mudar', 'LEX_MUDAR'),
-  sf('SF_MUDE', 'mude', 'LEX_MUDAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-  sf('SF_MUDEM', 'mudem', 'LEX_MUDAR', 'INFLECTION', { mood: 'IMPERATIVE', number: P }),
-
-  sf('SF_DEIXAR', 'deixar', 'LEX_DEIXAR'),
-  sf('SF_DEIXE', 'deixe', 'LEX_DEIXAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-  sf('SF_DEIXEM', 'deixem', 'LEX_DEIXAR', 'INFLECTION', { mood: 'IMPERATIVE', number: P }),
-
-  sf('SF_ALTERAR', 'alterar', 'LEX_ALTERAR'),
-  sf('SF_ALTERE', 'altere', 'LEX_ALTERAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-
-  sf('SF_TROCAR', 'trocar', 'LEX_TROCAR'),
-  sf('SF_TROQUE', 'troque', 'LEX_TROCAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-
-  sf('SF_PINTAR', 'pintar', 'LEX_PINTAR'),
-  sf('SF_PINTE', 'pinte', 'LEX_PINTAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-
-  sf('SF_APAGAR', 'apagar', 'LEX_APAGAR'),
-  sf('SF_APAGUE', 'apague', 'LEX_APAGAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-  sf('SF_APAGA', 'apaga', 'LEX_APAGAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-  sf('SF_APAGUEM', 'apaguem', 'LEX_APAGAR', 'INFLECTION', { mood: 'IMPERATIVE', number: P }),
-
-  sf('SF_REMOVER', 'remover', 'LEX_REMOVER'),
-  sf('SF_REMOVA', 'remova', 'LEX_REMOVER', 'INFLECTION', { mood: 'IMPERATIVE' }),
-  sf('SF_REMOVE', 'remove', 'LEX_REMOVER', 'INFLECTION'),
-
-  sf('SF_EXCLUIR', 'excluir', 'LEX_EXCLUIR'),
-  sf('SF_EXCLUA', 'exclua', 'LEX_EXCLUIR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-
-  sf('SF_DELETAR', 'deletar', 'LEX_DELETAR'),
-  sf('SF_DELETE', 'delete', 'LEX_DELETAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-
-  sf('SF_TIRAR', 'tirar', 'LEX_TIRAR'),
-  sf('SF_TIRE', 'tire', 'LEX_TIRAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-
-  sf('SF_MOVER', 'mover', 'LEX_MOVER'),
-  sf('SF_MOVA', 'mova', 'LEX_MOVER', 'INFLECTION', { mood: 'IMPERATIVE' }),
-  sf('SF_MOVE', 'move', 'LEX_MOVER', 'INFLECTION'),
-  sf('SF_MOVAM', 'movam', 'LEX_MOVER', 'INFLECTION', { mood: 'IMPERATIVE', number: P }),
-
-  sf('SF_SELECIONAR', 'selecionar', 'LEX_SELECIONAR'),
-  sf('SF_SELECIONE', 'selecione', 'LEX_SELECIONAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-
-  sf('SF_MARCAR', 'marcar', 'LEX_MARCAR'),
-  sf('SF_MARQUE', 'marque', 'LEX_MARCAR', 'INFLECTION', { mood: 'IMPERATIVE' }),
-
-  // --- Substantivos ----------------------------------------------------------
-  sf('SF_BOTAO', 'botão', 'LEX_BOTAO', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_BOTOES', 'botões', 'LEX_BOTAO', 'INFLECTION', { gender: M, number: P }),
-  sf('SF_BOTAO_ASCII', 'botao', 'LEX_BOTAO', 'COLLOQUIAL', { gender: M, number: S }),
-  sf('SF_BOTOES_ASCII', 'botoes', 'LEX_BOTAO', 'COLLOQUIAL', { gender: M, number: P }),
-
-  sf('SF_CAIXA', 'caixa', 'LEX_CAIXA', 'CANONICAL', { gender: F, number: S }),
-  sf('SF_CAIXAS', 'caixas', 'LEX_CAIXA', 'INFLECTION', { gender: F, number: P }),
-
-  sf('SF_CONTAINER', 'container', 'LEX_CONTAINER', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_CONTAINERS', 'containers', 'LEX_CONTAINER', 'INFLECTION', { gender: M, number: P }),
-
-  sf('SF_TEXTO', 'texto', 'LEX_TEXTO', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_TEXTOS', 'textos', 'LEX_TEXTO', 'INFLECTION', { gender: M, number: P }),
-  // "texto" também nomeia a propriedade de conteúdo: a desambiguação é
-  // estrutural (entidade corrente aceita conteúdo textual? então é propriedade).
+  // "texto" também nomeia a propriedade de conteúdo (sinônimo de conteúdo):
+  // a desambiguação é estrutural (entidade corrente aceita texto?).
   sf('SF_TEXTO_PROP', 'texto', 'LEX_CONTEUDO', 'CANONICAL', { gender: M, number: S }),
 
-  // --- Propriedades ------------------------------------------------------------
-  sf('SF_BORDA', 'borda', 'LEX_BORDA', 'CANONICAL', { gender: F, number: S }),
-  sf('SF_BORDAS', 'bordas', 'LEX_BORDA', 'INFLECTION', { gender: F, number: P }),
-  sf('SF_FUNDO', 'fundo', 'LEX_FUNDO', 'CANONICAL', { gender: M, number: S }),
-  sf('SF_ROTULO', 'rótulo', 'LEX_ROTULO', 'CANONICAL', { gender: M, number: S }),
+  // --- Erros de digitação, formas coloquiais e abreviações --------------------
+  sf('SF_FACA_ASCII', 'faca', 'LEX_FAZER', 'MISSPELLING', { mood: 'IMPERATIVE' }),
+  sf('SF_BOTAO_ASCII', 'botao', 'LEX_BOTAO', 'COLLOQUIAL', { gender: M, number: S }),
+  sf('SF_BOTOES_ASCII', 'botoes', 'LEX_BOTAO', 'COLLOQUIAL', { gender: M, number: P }),
   sf('SF_ROTULO_ASCII', 'rotulo', 'LEX_ROTULO', 'COLLOQUIAL', { gender: M, number: S }),
-  sf('SF_CONTEUDO', 'conteúdo', 'LEX_CONTEUDO', 'CANONICAL', { gender: M, number: S }),
   sf('SF_CONTEUDO_ASCII', 'conteudo', 'LEX_CONTEUDO', 'COLLOQUIAL', { gender: M, number: S }),
-
-  // --- Cores (todas as flexões de gênero e número) -------------------------------
-  // azul é invariante em gênero: apenas singular/plural.
-  sf('SF_AZUL', 'azul', 'LEX_AZUL', 'CANONICAL', { number: S }),
-  sf('SF_AZUIS', 'azuis', 'LEX_AZUL', 'INFLECTION', { number: P }),
   sf('SF_ASUL', 'asul', 'LEX_AZUL', 'MISSPELLING', { number: S }),
-
-  ...colorForms('SF_VERMELHO', 'vermelh', 'LEX_VERMELHO'),
-  ...colorForms('SF_AMARELO', 'amarel', 'LEX_AMARELO'),
-  ...colorForms('SF_PRETO', 'pret', 'LEX_PRETO'),
-  ...colorForms('SF_BRANCO', 'branc', 'LEX_BRANCO'),
-  ...colorForms('SF_ROXO', 'rox', 'LEX_ROXO'),
-  // verde, cinza e laranja são invariantes em gênero
-  sf('SF_VERDE', 'verde', 'LEX_VERDE', 'CANONICAL', { number: S }),
-  sf('SF_VERDES', 'verdes', 'LEX_VERDE', 'INFLECTION', { number: P }),
-  sf('SF_CINZA', 'cinza', 'LEX_CINZA', 'CANONICAL', { number: S }),
-  sf('SF_CINZAS', 'cinzas', 'LEX_CINZA', 'INFLECTION', { number: P }),
-  sf('SF_LARANJA', 'laranja', 'LEX_LARANJA', 'CANONICAL', { number: S }),
-  sf('SF_LARANJAS', 'laranjas', 'LEX_LARANJA', 'INFLECTION', { number: P }),
-
-  ...colorForms('SF_REDONDO', 'redond', 'LEX_REDONDO'),
-
-  // --- Ordinais --------------------------------------------------------------
-  ...ordinalForms('SF_ORD_1', 'primeir', 'LEX_ORD_1'),
-  ...ordinalForms('SF_ORD_2', 'segund', 'LEX_ORD_2'),
-  ...ordinalForms('SF_ORD_3', 'terceir', 'LEX_ORD_3'),
-  ...ordinalForms('SF_ORD_4', 'quart', 'LEX_ORD_4'),
-  ...ordinalForms('SF_ORD_5', 'quint', 'LEX_ORD_5'),
-  ...ordinalForms('SF_ORD_6', 'sext', 'LEX_ORD_6'),
-  ...ordinalForms('SF_ORD_7', 'sétim', 'LEX_ORD_7'),
   sf('SF_ORD_7_ASCII', 'setim', 'LEX_ORD_7', 'MISSPELLING'),
-  ...ordinalForms('SF_ORD_8', 'oitav', 'LEX_ORD_8'),
-  ...ordinalForms('SF_ORD_9', 'non', 'LEX_ORD_9'),
-  ...ordinalForms('SF_ORD_10', 'décim', 'LEX_ORD_10'),
   sf('SF_ORD_10_ASCII', 'decim', 'LEX_ORD_10', 'MISSPELLING'),
-  ...ordinalForms('SF_ORD_LAST', 'últim', 'LEX_ORD_LAST'),
   sf('SF_ORD_LAST_ASCII_S', 'ultimo', 'LEX_ORD_LAST', 'COLLOQUIAL', { gender: M, number: S }),
   sf('SF_ORD_LAST_ASCII_F', 'ultima', 'LEX_ORD_LAST', 'COLLOQUIAL', { gender: F, number: S }),
   sf('SF_ORD_LAST_ASCII_MP', 'ultimos', 'LEX_ORD_LAST', 'COLLOQUIAL', { gender: M, number: P }),
   sf('SF_ORD_LAST_ASCII_FP', 'ultimas', 'LEX_ORD_LAST', 'COLLOQUIAL', { gender: F, number: P }),
-  ...ordinalForms('SF_ORD_PENULTIMATE', 'penúltim', 'LEX_ORD_PENULTIMATE'),
   sf('SF_ORD_PEN_ASCII_S', 'penultimo', 'LEX_ORD_PENULTIMATE', 'COLLOQUIAL', { gender: M, number: S }),
   sf('SF_ORD_PEN_ASCII_F', 'penultima', 'LEX_ORD_PENULTIMATE', 'COLLOQUIAL', { gender: F, number: S }),
+  sf('SF_NAO_ASCII', 'nao', 'LEX_NAO', 'COLLOQUIAL'),
+  sf('SF_CARD_3_ASCII', 'tres', 'LEX_CARD_3', 'COLLOQUIAL'),
 
-  // --- Cardinais ----------------------------------------------------------------
+  // --- Numerais cardinais e quantificadores vagos (classe fechada) ------------
   sf('SF_CARD_1_M', 'um', 'LEX_CARD_1', 'CANONICAL', { gender: M, number: S }),
   sf('SF_CARD_1_F', 'uma', 'LEX_CARD_1', 'INFLECTION', { gender: F, number: S }),
   sf('SF_CARD_2_M', 'dois', 'LEX_CARD_2', 'CANONICAL', { gender: M, number: P }),
   sf('SF_CARD_2_F', 'duas', 'LEX_CARD_2', 'INFLECTION', { gender: F, number: P }),
   sf('SF_CARD_3', 'três', 'LEX_CARD_3', 'CANONICAL'),
-  sf('SF_CARD_3_ASCII', 'tres', 'LEX_CARD_3', 'COLLOQUIAL'),
   sf('SF_CARD_4', 'quatro', 'LEX_CARD_4'),
   sf('SF_CARD_5', 'cinco', 'LEX_CARD_5'),
   sf('SF_CARD_6', 'seis', 'LEX_CARD_6'),
@@ -639,9 +525,8 @@ export const INITIAL_SURFACE_FORMS: SurfaceForm[] = [
   sf('SF_VAGUE_SEVERAL_M', 'vários', 'LEX_VAGUE_SEVERAL', 'CANONICAL', { gender: M, number: P }),
   sf('SF_VAGUE_SEVERAL_F', 'várias', 'LEX_VAGUE_SEVERAL', 'INFLECTION', { gender: F, number: P }),
 
-  // --- Operadores e palavras gramaticais -----------------------------------------
+  // --- Operadores e palavras gramaticais (classe fechada) ---------------------
   sf('SF_NAO', 'não', 'LEX_NAO'),
-  sf('SF_NAO_ASCII', 'nao', 'LEX_NAO', 'COLLOQUIAL'),
   sf('SF_SEM', 'sem', 'LEX_SEM'),
   sf('SF_MENOS', 'menos', 'LEX_MENOS'),
   sf('SF_EXCETO', 'exceto', 'LEX_EXCETO'),
@@ -691,7 +576,6 @@ export const INITIAL_SURFACE_FORMS: SurfaceForm[] = [
   sf('SF_MESMO_M_P', 'mesmos', 'LEX_MESMO', 'INFLECTION', { gender: M, number: P }),
   sf('SF_MESMO_F_P', 'mesmas', 'LEX_MESMO', 'INFLECTION', { gender: F, number: P }),
 
-  // --- Marcas espaciais ------------------------------------------------------------
   sf('SF_DENTRO', 'dentro', 'LEX_DENTRO'),
   sf('SF_DEPOIS', 'depois', 'LEX_DEPOIS'),
   sf('SF_ANTES', 'antes', 'LEX_ANTES'),
@@ -699,6 +583,56 @@ export const INITIAL_SURFACE_FORMS: SurfaceForm[] = [
   sf('SF_DIREITA', 'direita', 'LEX_DIREITA', 'CANONICAL', { gender: F, number: S }),
   sf('SF_ESQUERDA', 'esquerda', 'LEX_ESQUERDA', 'CANONICAL', { gender: F, number: S })
 ];
+
+/**
+ * Gera as SurfaceForms de um lexeme pelo seu paradigma (F2.1/F2.2):
+ * `id = lexemeId#FeatureKey`, formType INFLECTION (ou CANONICAL para o lema),
+ * morfologia completa e `generated: true`. Diminutivos entram para lexemes
+ * com `allowsDiminutive`.
+ */
+export function generateSurfaceForms(
+  lexemes: Record<LexemeId, Lexeme>
+): SurfaceForm[] {
+  const out: SurfaceForm[] = [];
+  for (const lexeme of Object.values(lexemes)) {
+    if (lexeme.paradigmId) {
+      const paradigm = PARADIGMS[lexeme.paradigmId];
+      if (!paradigm) continue;
+      for (const form of generateForms(lexeme.id, lexeme.lemma, paradigm, {
+        inherent: lexeme.inherent,
+        irregular: lexeme.irregular,
+        disabledForms: lexeme.disabledForms
+      })) {
+        out.push({
+          id: `${lexeme.id}#${form.featureKey}`,
+          rawText: form.surface,
+          lexemeId: lexeme.id,
+          formType: form.formType,
+          morphology: form.morphology,
+          features: form.featureKey,
+          generated: true
+        });
+      }
+    }
+    if (lexeme.allowsDiminutive && (lexeme.pos === 'NOUN' || lexeme.pos === 'ADJECTIVE')) {
+      const gender = lexeme.inherent?.Gender === 'Fem' ? 'Fem' : 'Masc';
+      for (const number of ['Sing', 'Plur'] as const) {
+        for (const form of generateDiminutives(lexeme.lemma, gender, number)) {
+          out.push({
+            id: `${lexeme.id}#${form.featureKey}`,
+            rawText: form.surface,
+            lexemeId: lexeme.id,
+            formType: form.formType,
+            morphology: form.morphology,
+            features: form.featureKey,
+            generated: true
+          });
+        }
+      }
+    }
+  }
+  return out;
+}
 
 // Direções espaciais
 INITIAL_LEXEMES['LEX_DIREITA'] = lex('LEX_DIREITA', 'direita', 'ADVERB', ['C_SPAT_RIGHT']);
@@ -761,7 +695,13 @@ INITIAL_CONCEPTS['C_RELATIVE_HAVE'] = {
 
 export function createInitialKnowledgeBase(): KnowledgeBase {
   return {
-    surfaceForms: INITIAL_SURFACE_FORMS.map((s) => ({ ...s })),
+    // Formas geradas do paradigma precedem as manuais (exceções e
+    // sinônimos) na ordem de candidatos: "texto" tem a leitura de entidade
+    // (LEX_TEXTO) antes da de propriedade (LEX_CONTEUDO, sinônimo manual).
+    surfaceForms: [
+      ...generateSurfaceForms(INITIAL_LEXEMES),
+      ...INITIAL_SURFACE_FORMS.map((s) => ({ ...s }))
+    ],
     lexemes: { ...INITIAL_LEXEMES },
     concepts: structuredClone(INITIAL_CONCEPTS),
     multiwords: INITIAL_MULTIWORDS.map((m) => ({ ...m })),

@@ -14,7 +14,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -107,7 +107,7 @@
           {
             "surface": "adicione",
             "lemma": "adicionar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -145,7 +145,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -182,7 +182,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "texto",
@@ -220,7 +220,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botao",
@@ -265,7 +265,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -320,7 +320,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -369,7 +369,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "duas",
@@ -417,7 +417,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "dois",
@@ -465,7 +465,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "dois",
@@ -520,7 +520,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -575,7 +575,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -635,7 +635,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -717,7 +717,7 @@
           {
             "surface": "apague",
             "lemma": "apagar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -762,7 +762,7 @@
           {
             "surface": "apague",
             "lemma": "apagar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -807,7 +807,7 @@
           {
             "surface": "apague",
             "lemma": "apagar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "texto",
@@ -855,7 +855,7 @@
           {
             "surface": "apague",
             "lemma": "apagar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "primeiro",
@@ -914,7 +914,7 @@
           {
             "surface": "apague",
             "lemma": "apagar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "segundo",
@@ -973,7 +973,7 @@
           {
             "surface": "apague",
             "lemma": "apagar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "último",
@@ -1034,7 +1034,7 @@
           {
             "surface": "mude",
             "lemma": "mudar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -1093,7 +1093,7 @@
           {
             "surface": "mude",
             "lemma": "mudar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -1152,7 +1152,7 @@
           {
             "surface": "deixe",
             "lemma": "deixar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "texto",
@@ -1213,7 +1213,7 @@
           {
             "surface": "deixe",
             "lemma": "deixar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "borda",
@@ -1274,7 +1274,7 @@
           {
             "surface": "deixe",
             "lemma": "deixar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "borda",
@@ -1325,7 +1325,7 @@
           {
             "surface": "deixe",
             "lemma": "deixar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "borda",
@@ -1377,7 +1377,7 @@
           {
             "surface": "deixe",
             "lemma": "deixar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "fundo",
@@ -1432,7 +1432,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -1485,7 +1485,7 @@
           {
             "surface": "apague",
             "lemma": "apagar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -1528,7 +1528,7 @@
           {
             "surface": "mova",
             "lemma": "mover",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -1577,7 +1577,7 @@
           {
             "surface": "coloque",
             "lemma": "colocar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -1635,7 +1635,7 @@
           {
             "surface": "mova",
             "lemma": "mover",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -1693,7 +1693,7 @@
           {
             "surface": "mova",
             "lemma": "mover",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -1759,7 +1759,7 @@
           {
             "surface": "mova",
             "lemma": "mover",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -1807,7 +1807,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -1855,7 +1855,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -1915,7 +1915,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -2004,7 +2004,7 @@
           {
             "surface": "deixe",
             "lemma": "deixar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botões",
@@ -2067,7 +2067,7 @@
           {
             "surface": "deixe",
             "lemma": "deixar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botões",
@@ -2139,7 +2139,7 @@
           {
             "surface": "apague",
             "lemma": "apagar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -2200,7 +2200,7 @@
           {
             "surface": "mude",
             "lemma": "mudar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -2261,7 +2261,7 @@
           {
             "surface": "mude",
             "lemma": "mudar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -2321,7 +2321,7 @@
           {
             "surface": "apague",
             "lemma": "apagar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -2371,7 +2371,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -2436,7 +2436,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "dois",
@@ -2510,7 +2510,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -2582,7 +2582,7 @@
           {
             "surface": "mova",
             "lemma": "mover",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -2637,7 +2637,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -2687,7 +2687,7 @@
           {
             "surface": "deixe",
             "lemma": "deixar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "borda",
@@ -2748,7 +2748,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -2807,7 +2807,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -2862,7 +2862,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -2917,7 +2917,7 @@
           {
             "surface": "mude",
             "lemma": "mudar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "texto",
@@ -2977,7 +2977,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -3067,7 +3067,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -3147,7 +3147,7 @@
           {
             "surface": "deixe",
             "lemma": "deixar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -3220,7 +3220,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -3230,7 +3230,7 @@
           {
             "surface": "apague",
             "lemma": "apagar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "caixa",
@@ -3286,7 +3286,7 @@
           {
             "surface": "selecione",
             "lemma": "selecionar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "segundo",
@@ -3340,7 +3340,7 @@
           {
             "surface": "crie",
             "lemma": "criar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -3410,7 +3410,7 @@
           {
             "surface": "apaga",
             "lemma": "apagar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "botão",
@@ -3477,7 +3477,7 @@
           {
             "surface": "apague",
             "lemma": "apagar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "dois",
@@ -3641,7 +3641,7 @@
           {
             "surface": "deixe",
             "lemma": "deixar",
-            "feats": "Mood=Imp|VerbForm=Fin"
+            "feats": "Number=Sing|Person=3|Mood=Imp|VerbForm=Fin"
           },
           {
             "surface": "segundo",

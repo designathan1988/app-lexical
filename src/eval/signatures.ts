@@ -163,6 +163,7 @@ export function featsSignature(m?: Morphology): string {
     }
   }
   if (m.tense) parts.push(`Tense=${TENSE_NAMES[m.tense] ?? m.tense}`);
+  if (m.degree === 'DIMINUTIVE') parts.push('Degree=Dim');
   return parts.join('|');
 }
 
