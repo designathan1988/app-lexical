@@ -438,7 +438,7 @@
     {"id":"der-n073","word":"altoplano","expected":{"status":"HYPOTHESIS_BLOCKED","reason":"NOT_ATTESTED"}},
     {"id":"der-n074","word":"fazimento","expected":{"status":"HYPOTHESIS_BLOCKED","reason":"BLOCKED_BY:feitura"}},
     {"id":"der-n075","word":"trabalhamento","expected":{"status":"HYPOTHESIS_BLOCKED","reason":"BLOCKED_BY:trabalho"}},
-    {"id":"der-n076","word":"querível","expected":{"status":"HYPOTHESIS_BLOCKED","reason":"NOT_ATTESTED"}},
+    {"id":"der-n076","word":"podível","expected":{"status":"HYPOTHESIS_BLOCKED","reason":"BLOCKED_BY:possível"}},
 
     {"id":"der-l001","word":"tomada","expected":{"status":"ANALYZED","chain":[{"rule":"REG_A","from":"tomar","to":"tomada"}],"root":"LEX_TOMAR","pos":"NOUN","gender":"Fem","semantics":"ACTION_OF(tomar)","gloss":"ponto de energia elétrica","lexicalized":{"word":"tomada","gloss":"ponto de energia elétrica"}}},
     {"id":"der-l002","word":"vencimento","expected":{"status":"ANALYZED","chain":[{"rule":"SUF_MENTO","from":"vencer","to":"vencimento"}],"root":"LEX_VENCER","pos":"NOUN","gender":"Masc","semantics":"ACTION_OF(vencer)","gloss":"data em que algo vence","lexicalized":{"word":"vencimento","gloss":"data-limite de pagamento"}}},
