@@ -7,6 +7,8 @@ import { createInitialKnowledgeBase } from '../src/knowledge/knowledgeBase';
 import { treeSignature } from '../src/eval/signatures';
 import { DEV_DATASET, REGRESSION_DATASET, FINAL_V1_DATASET } from '../src/eval/loader';
 import { runRecord } from '../src/eval/runner';
+import closedClassData from '../src/knowledge/language/closed-class.json';
+import seedRootData from '../src/knowledge/morphology/seed-roots.json';
 
 function read(file: string): string {
   return fs.readFileSync(file, 'utf8');
@@ -141,6 +143,25 @@ describe('A1 — a gramática é dada, não escrita no parser', () => {
 
     // Ordinais e cardinais vêm de conceitos de valor, não de tabelas no código.
     expect(grammar.wordsByOperator.get('EXCEPT')).toContain('salvo');
+  });
+});
+
+describe('camada geral — palavras ficam nos dados', () => {
+  it('não contém literal de forma lexical portuguesa com duas ou mais letras', () => {
+    const forms = new Set([
+      ...(closedClassData as { entries: Array<{ form: string }> }).entries.map((entry) => entry.form),
+      ...(seedRootData as { entries: Array<{ lemma: string }> }).entries.map((entry) => entry.lemma),
+      ...Object.values(createInitialKnowledgeBase().lexemes).map((entry) => entry.lemma)
+    ].filter((form) => /^\p{L}{2,}$/u.test(form)));
+    const files = fs.readdirSync('src/engine/language').filter((file) => file.endsWith('.ts'));
+    const violations: string[] = [];
+    for (const file of files) {
+      const source = stripComments(read(path.join('src/engine/language', file)));
+      for (const literal of source.matchAll(/(['"])([^'"\r\n]+)\1/g)) {
+        if (forms.has(literal[2])) violations.push(`${file}: ${literal[2]}`);
+      }
+    }
+    expect(violations).toEqual([]);
   });
 });
 
