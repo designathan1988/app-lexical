@@ -97,34 +97,53 @@ Comandos do construtor preservados, exceto a recuperação derivacional avaliati
 
 ## Correções da verificação oculta
 
-**Estado em 04/10/2026: bloqueado pelas restrições do `AGENTS.md`.** Nenhuma das nove correções foi implementada. O arquivo proíbe novos desvios condicionais e técnicas equivalentes de casamento de padrões, inclusive quando disfarçados em configuração. O pedido exige justamente novas decisões contextuais nos motores ou regras JSON que as codifiquem. Não contornei essa proibição com pares de frases, alterações de gabarito ou mudança de métricas.
+Após a atualização expressa do `AGENTS.md`, regras declarativas com justificativa e controle genérico por categorias linguísticas passaram a ser permitidos. Os itens 1.1–1.9 foram implementados na ordem pedida. Cada item recebeu primeiro um commit `TEST-EXPECTATION` com frases inéditas em `tests/fixtures/sentences-extra-2.json`, seguido da correção. Nenhum teste antigo ou gabarito foi alterado.
 
-| Item | Fonte consultada e decisão exigida | Mecanismo atual e conflito | Regra, frases novas e resultado |
+| Item | Fonte e decisão | Regra de dados ou interface | Resultado focal |
 |---|---|---|---|
-| 1.1 PP nominal | [UD `nmod`](https://universaldependencies.org/u/dep/nmod.html) prende o PP ao nome; [AMR `:poss`](https://github.com/amrisi/amr-guidelines/blob/master/amr.md#possession) representa posse. | `DependencyParser.ts` atribui `obl` ao governador verbal no ramo de caso; `MeaningGraphBuilder.ts` não interpreta `nmod`. Corrigir exige seleção contextual de núcleo e novo tratamento de aresta. | Nenhuma regra ou teste criado; **bloqueado**. |
-| 1.2 Cópula e homografia | [UD `cop`](https://universaldependencies.org/u/dep/cop.html), [UD português](https://universaldependencies.org/pt/index.html) e [CG-3 varredura com barreira](https://edu.visl.dk/cg3/chunked/contexts.html#barrier) sustentam predicativo após advérbio e desambiguação por contexto. | `Tagger.ts` aceita contexto com varredura, mas um novo `SELECT` em `pos-rules.json` seria casamento de padrões em configuração, proibido pelo `AGENTS.md`. As formas de *ser* e *ir* ainda exigem leituras apropriadas. | Nenhuma regra ou teste criado; **bloqueado**. |
-| 1.3 Subordinada copular | [UD `advcl`](https://universaldependencies.org/u/dep/advcl.html) e [UD `cop`](https://universaldependencies.org/u/dep/cop.html) exigem raiz da oração principal e predicativo como núcleo subordinado. | A escolha da raiz e da cópula é fixa em `DependencyParser.ts`; os dados atuais não podem alterar essa escolha. Uma extensão exigiria nova lógica contextual. | Nenhuma regra ou teste criado; **bloqueado**. |
-| 1.4 Enumeração | [UD `conj`](https://universaldependencies.org/u/dep/conj.html) usa o primeiro item como núcleo e os demais como irmãos; [AMR `:opN`](https://github.com/amrisi/amr-guidelines/blob/master/amr.md) usa operações numeradas. | O parser coordena apenas a conjunção explícita; o grafo constrói pares `and` com `op1`/`op2` no código. Não há formato de dados para lista arbitrária com vírgulas. | Nenhuma regra ou teste criado; **bloqueado**. |
-| 1.5 Adjetivos irregulares | [UD português, lemas](https://universaldependencies.org/pt/index.html#lemmas) requer masculino singular. | A raiz *bom* usa `ADJ_O`. Corrigir todas as famílias exige novos paradigmas de transformação por terminação ou formas inteiras declaradas; o primeiro método é casamento de padrão em dados e o segundo criaria pares fixos, ambos proibidos. | Nenhuma regra ou teste criado; **bloqueado**. |
-| 1.6 Advérbio de grau | [UD `advmod`](https://universaldependencies.org/u/dep/advmod.html) permite modificar ADV/ADJ; [AMR `:degree`](https://github.com/amrisi/amr-guidelines/blob/master/amr.md#degree) prende o grau ao conceito modificado. | `DependencyParser.ts` dirige ADV ao verbo, salvo a exceção enfática já codificada. Não há regra de dados que mude a cabeça sintática. | Nenhuma regra ou teste criado; **bloqueado**. |
-| 1.7 PP após `xcomp` | [UD `obl`](https://universaldependencies.org/u/dep/obl.html) e [CG-3 varredura](https://edu.visl.dk/cg3/chunked/contexts.html#scanning) orientam a ligação ao verbo pertinente. | O `governor()` escolhe o verbo anterior; a exceção dependente de duas molduras não é interpretada pelos dados. Implementá-la exige nova escolha contextual. | Nenhuma regra ou teste criado; **bloqueado**. |
-| 1.8 Pronome de tratamento | [Bosque](https://universaldependencies.org/treebanks/pt_bosque/index.html) lista *você* como lema e *vocês* como forma. | `closed-class.json` já tem `vocês → você` com plural, mas `MeaningGraphBuilder.ts` substitui o lema de PRON não clítico pela superfície. Corrigir o conceito exige mudar essa decisão condicional. | Nenhuma regra ou teste criado; **bloqueado** para o grafo. |
-| 1.9 Mensagem do chat | A exigência é da interface do projeto; a distinção semântica entre análise e comando vem do pedido atual. | `useEngine.ts` escolhe entre “Executado” e “Bloqueado” por um ternário. Diferenciar frase geral sem alterar diagnósticos requer uma terceira escolha contextual, proibida. | Nenhuma regra ou teste criado; **bloqueado**. |
+| 1.1 PP nominal | [UD nmod](https://universaldependencies.org/u/dep/nmod.html), [AMR posse](https://github.com/amrisi/amr-guidelines/blob/master/amr.md): PP adjacente a nome é `nmod`; posse aparece no grafo. | `UD_NMOD_GENITIVE`, `UD_NMOD_PREVERBAL_PP` | 6/6 |
+| 1.2 Cópula distante e homógrafos | [UD cop](https://universaldependencies.org/u/dep/cop.html), [CG-3 contextos](https://edu.visl.dk/cg3/chunked/contexts.html): varredura até predicativo com barreiras; movimento conserva leitura lexical. | `CG_COP_SCAN_PREDICATIVE`, `CG_MOTION_PAST_INFINITIVE` | 6/6 |
+| 1.3 Subordinada copular | [UD advcl](https://universaldependencies.org/u/dep/advcl.html), [UD cop](https://universaldependencies.org/u/dep/cop.html), [UD nsubj](https://universaldependencies.org/u/dep/nsubj.html): predicativo subordinado é núcleo e sujeito elíptico retoma o da principal quando cabível. | `UD_ADVCL_COPULAR`, `CG_COP_PARTICIPIAL_ADJECTIVE` | 6/6 |
+| 1.4 Enumeração | [UD conj](https://universaldependencies.org/u/dep/conj.html), [AMR](https://github.com/amrisi/amr-guidelines/blob/master/amr.md): primeiro membro é núcleo sintático; grafo usa operador único com `:opN`. | `UD_LIST_COORDINATION`, `AMR_COORD_AND`, `AMR_COORD_OR` | 6/6 |
+| 1.5 Adjetivos e plural | [Priberam, bom](https://dicionario.priberam.org/bom), [Ciberdúvidas, plural em -r/-z/-l](https://ciberduvidas.iscte-iul.pt/consultorio/perguntas/o-plural-de-nomes-terminados--r--z-e--l/35737), [plural em -m](https://ciberduvidas.iscte-iul.pt/consultorio/perguntas/sobre-a-formacao-do-plural/13422): paradigmas por classe e formas irregulares completas; plural de `jardim` pelo paradigma `N_M_NS`. | `ADJ_BOM`, `ADJ_M_NS`, `ADJ_Z_ES`, `ADJ_R_ES`, `ADJ_L_IS`, `ADJ_IL_IS`, `ADJ_EL_EIS_ACUTE`, `ADJ_S_INV`, `N_M_NS` | 8/8 frases e testes morfológicos |
+| 1.6 Grau | [UD advmod](https://universaldependencies.org/u/dep/advmod.html), [AMR grau](https://github.com/amrisi/amr-guidelines/blob/master/amr.md): ADV de grau modifica ADV ou ADJ seguinte; `:degree` pertence ao conceito modificado. | `LEX_DEGREE_ADVERBS`, `UD_DEGREE_MODIFIER`, `CG_DEGREE_BEFORE_MODIFIER` | 6/6 |
+| 1.7 PP após infinitivo | [UD obl](https://universaldependencies.org/u/dep/obl.html), [CG-3 varredura](https://edu.visl.dk/cg3/chunked/contexts.html): PP segue a moldura do infinitivo próximo, salvo argumento declarado da matriz. | `FRAME_ENSINAR_PARA`, `CG_ADP_BEFORE_NP` | 6/6 |
+| 1.8 Pronome de tratamento | [Bosque](https://universaldependencies.org/treebanks/pt_bosque/index.html), [UD pronome](https://universaldependencies.org/u/pos/PRON.html): conceito canônico é o lema, plural fica em `Number`. | `SEM_TREATMENT_CANONICAL_LEMMA` | 6/6 |
+| 1.9 Resposta do chat | [React, renderização de componentes](https://react.dev/reference/react-dom/server/renderToStaticMarkup): interface distingue frase geral analisada de comando inválido sem alterar compilador ou diagnósticos. | `summarizeChatResult` e `ChatResultAction`; sem nova regra linguística | 6/6 frases, comando inválido preservado |
 
-Não criei `tests/fixtures/sentences-extra-2.json` nem commits `TEST-EXPECTATION` para itens bloqueados: testes vermelhos permanentes violariam a exigência de suíte verde, e declarar as frases como cobertas sem correção falsearia a métrica. Também não há capturas novas nem verificação de console para correções que não existem. O requisito de `extras-2` com ligações e papéis ≥ 95% permanece **não verificado e não atendido**.
+### Frases novas por item
+
+- **1.1:** “O médico do hospital chegou.”; “O livro do professor caiu.”; “O cachorro do vizinho dorme.”; “A carta do diretor chegou.”; “Eu li o livro do médico.”; “Ela gosta do jardim do professor.”
+- **1.2:** “A casa foi muito bonita.”; “O parque foi bem grande.”; “As flores foram pouco bonitas.”; “O médico foi para casa.”; “Nós fomos à escola.”; “Eles foram trabalhar cedo.”
+- **1.3:** “Eu corri porque estava cansado.”; “Ela sorriu porque estava feliz.”; “Porque estava frio, o cachorro dormiu.”; “Quando estava escuro, o médico saiu.”; “Nós saímos quando estava quente.”; “Se a rua for longa, nós voltamos.”
+- **1.4:** “Ela leu jornais, cartas e livros.”; “Eu comprei pão, queijo ou fruta.”; “Médicos, professores e diretores chegaram.”; “A casa é grande, bonita e clara.”; “Ela sorri, canta e dança.”; “Ele viu casa, escola, parque e jardim.”
+- **1.5:** “A casa está boa.”; “As flores são más.”; “Os médicos são felizes.”; “Os jardins são comuns.”; “Os parques são reais.”; “Os médicos são melhores.”; “As flores estão vivas.”; “Os livros são simples.”
+- **1.6:** “Ele corre muito bem.”; “Ela caminha bem devagar.”; “Nós saímos tão cedo.”; “A casa é muito grande.”; “O livro é bem interessante.”; “As flores são pouco bonitas.”
+- **1.7:** “Ela quer voltar para casa.”; “Nós tentamos chegar ao parque.”; “Eles começaram a trabalhar na escola.”; “Eu preciso voltar para o hospital.”; “Os médicos querem caminhar pela rua.”; “A professora ensina a ler para o aluno.”
+- **1.8:** “Vocês caminham.”; “Vocês leem livros.”; “Eu vejo vocês.”; “A professora ensina vocês.”; “Ela fala com vocês.”; “Vocês chegaram cedo.”
+- **1.9:** “O médico lê uma carta.”; “A professora compra livros.”; “Nós vemos o parque.”; “Os alunos comem pão.”; “Ela escreve uma carta.”; “O cachorro corre cedo.”
 
 ### Métricas antes × depois
 
-Nenhum código ou dado linguístico mudou nesta passagem; “depois” identifica o mesmo motor, sem alegar uma segunda medição independente. A linha de base foi executada nesta sessão por `npm test`.
+A linha de base anterior é a saída registrada antes das correções. O extras-2 não existia antes e não recebe valor artificial de base. “Papéis” mede, para cada aresta esperada, o trio conceito de origem, relação e conceito de destino; é uma medida de cobertura dos papéis anotados. “Ligações” mede cabeça **e** relação em todos os tokens.
 
-| Conjunto e métrica | Antes, observado | Depois, código inalterado |
+| Conjunto e métrica | Antes | Depois |
 |---|---:|---:|
 | Gabarito: UPOS | 419/431 | 419/431 |
 | Gabarito: UAS / LAS | 431/431 / 431/431 | 431/431 / 431/431 |
-| Gabarito: Smatch / grafo exato / sentido | 0,9703 / 70/80 / 77/80 | 0,9703 / 70/80 / 77/80 |
+| Gabarito: sujeito / predicado | 80/80 / 80/80 | 80/80 / 80/80 |
+| Gabarito: Smatch médio / exatos / sentidos | 0,9703 / 70/80 / 77/80 | 0,9703 / 70/80 / 77/80 |
 | Extras: UPOS | 77/78 | 77/78 |
 | Extras: UAS / LAS | 78/78 / 78/78 | 78/78 / 78/78 |
-| Extras: Smatch / grafo exato / sentido | 0,9029 / 12/20 / 19/20 | 0,9029 / 12/20 / 19/20 |
-| Extras-2: ligações / papéis | Não medido; arquivo ausente | Não medido; arquivo ausente |
+| Extras: sujeito / predicado | 20/20 / 20/20 | 20/20 / 20/20 |
+| Extras: Smatch médio / exatos / sentidos | 0,9029 / 12/20 / 19/20 | 0,9029 / 12/20 / 19/20 |
+| Extras-2: ligações (LAS) | Inexistente | 346/346 (100%) |
+| Extras-2: papéis esperados | Inexistente | 130/136 (95,59%) |
 
-Verificação real nesta sessão: `npm test` → **39 arquivos, 587/587 testes aprovados**; `npx tsc --noEmit` → saída 0; `npm run build` → saída 0, 129 módulos transformados e bundle principal de 1.236,73 kB, com o aviso existente de chunk acima de 500 kB. As falhas de generalização relatadas na verificação oculta continuam pendentes; a lista anterior de divergências do gabarito também permanece. Para implementar os nove itens, seria necessária uma autorização explícita que altere as proibições do `AGENTS.md`; não presumi essa autorização.
+A saída final observada foi: `npm test` → **41 arquivos e 669/669 testes aprovados**; `npx tsc --noEmit` → **código 0, sem erros**; `npm run build` → **código 0, 136 módulos transformados**, com aviso de chunk acima de 500 kB. O teste de métricas imprime as 346 ligações e os 136 papéis, inclusive as divergências.
+
+### Verificação no navegador e pendências
+
+Em `npm run dev`, Chrome headless em `http://127.0.0.1:5173/` (1440×900) mostrou uma frase de cada item, as abas da análise, e zero erros no console. A frase 1.9 exibiu **“Frase analisada (não é um comando do construtor)”**, o link **“Classes / Sintaxe / Significado”**, a aba Classes e o preview vazio. As nove capturas estão em `research/morfologia/capturas/correcao-1.1.png` até `correcao-1.9.png`. O servidor temporário foi encerrado.
+
+Nenhum item ficou bloqueado pelo `AGENTS.md` atualizado. Persistem as divergências antigas já descritas na seção “Falhas restantes e causas”. No extras-2, seis papéis divergem: `extra2-1.1-04`, `1.1-06`, `1.7-03` (dois papéis), `1.7-04`, `1.7-06`; o limiar requerido ainda é atendido. A verificação oculta continua indisponível neste repositório e deverá ser executada pelo avaliador.
