@@ -10,6 +10,8 @@ import nominalPpData from '../../knowledge/language/nominal-pp-rules.json';
 import copularClauseData from '../../knowledge/language/copular-clause-rules.json';
 import coordinationData from '../../knowledge/language/coordination-rules.json';
 import degreeData from '../../knowledge/language/degree-modifier-rules.json';
+import participialData from '../../knowledge/language/participial-predication-rules.json';
+import nominalizedAdjectiveData from '../../knowledge/language/nominalized-adjective-rules.json';
 import type { TeachableRoot } from '../../knowledge/language/teachableRoot';
 import type { TaggedWord } from './Tagger';
 
@@ -42,7 +44,15 @@ const coordinationLists = (coordinationData as { lists: Array<{
   id: string; separator: string; memberUpos: string[]; relation: string; punctuationRelation: string
 }> }).lists;
 const degreeRules = (degreeData as { classes: Array<{ class: string; lemmas: string[] }>;
+  gradableHeads: Array<{ upos: string; lemmas: string[] }>;
   rules: Array<{ id: string; class: string; headUpos: string[]; relation: string }> });
+const participialRules = (participialData as { rules: Array<{
+  id: string; copulaLemmas: string[]; predicateUpos: string; predicateFeatures: Record<string, string>;
+  relation: string; subjectRelation: string
+}> }).rules;
+const nominalizedAdjectiveRules = (nominalizedAdjectiveData as { rules: Array<{
+  id: string; headUpos: string; precededBy: string[]; excludedFollowerUpos: string[]
+}> }).rules;
 const isSubtype = (actual: string | undefined, expected: string): boolean => {
   for (let current = actual; current; current = typeParents.get(current) ?? undefined) if (current === expected) return true;
   return false;
@@ -57,16 +67,27 @@ export class DependencyParser {
     if (!words.length) return [];
     const pos = (index: number) => words[index]?.selected.upos;
     const feat = (index: number, key: string) => words[index]?.selected.feats[key];
+    const nominalized = (index: number) => nominalizedAdjectiveRules.some((rule) =>
+      pos(index) === rule.headUpos && rule.precededBy.includes(pos(index - 1)) &&
+      !rule.excludedFollowerUpos.includes(pos(index + 1)));
+    const isNominal = (index: number) => nominals.has(pos(index)) || nominalized(index);
     const isFinite = (index: number) => verbal.has(pos(index)) && feat(index, 'VerbForm') !== 'Inf' && feat(index, 'VerbForm') !== 'Ger' && feat(index, 'VerbForm') !== 'Part';
     const comma = words.findIndex((word) => word.form === ',');
     const finite = words.map((_, index) => index).filter(isFinite);
-    const copularPredicates = finite.filter((index) => copulas.has(words[index].selected.lemma)).map((index) => ({
-      copula: index,
-      predicate: words.findIndex((word, candidate) => candidate > index &&
-        (word.selected.upos === 'ADJ' || word.selected.upos === 'NOUN') &&
+    const copularPredicates = finite.map((index) => {
+      const lemma = words[index].selected.lemma;
+      const predicate = words.findIndex((word, candidate) => candidate > index &&
+        ((copulas.has(lemma) && (word.selected.upos === 'ADJ' || word.selected.upos === 'NOUN')) ||
+          participialRules.some((rule) => rule.copulaLemmas.includes(lemma) && word.selected.upos === rule.predicateUpos &&
+            Object.entries(rule.predicateFeatures).every(([key, value]) => word.selected.feats[key] === value))) &&
         !words.slice(index + 1, candidate).some((between) =>
-          verbal.has(between.selected.upos) || between.selected.upos === 'PUNCT' || between.selected.upos === 'SCONJ'))
-    })).filter((entry) => entry.predicate >= 0);
+          verbal.has(between.selected.upos) || between.selected.upos === 'PUNCT' || between.selected.upos === 'SCONJ'));
+      const partRule = predicate >= 0 ? participialRules.find((rule) => rule.copulaLemmas.includes(lemma) &&
+        words[predicate].selected.upos === rule.predicateUpos &&
+        Object.entries(rule.predicateFeatures).every(([key, value]) => words[predicate].selected.feats[key] === value)) : undefined;
+      return { copula: index, predicate, relation: partRule?.relation ?? 'cop', subjectRelation: partRule?.subjectRelation ?? 'nsubj',
+        rule: partRule?.id ?? 'UD_COP_PREDICATE' };
+    }).filter((entry) => entry.predicate >= 0);
     const copula = copularPredicates[0]?.copula;
     let root = finite[0] ?? words.findIndex((word) => word.selected.upos !== 'PUNCT');
     const mainCopula = copularPredicates.find((entry) => {
@@ -127,12 +148,12 @@ export class DependencyParser {
     for (let i = 0; i < words.length; i++) {
       if (pos(i) === 'PUNCT') set(i, root, 'punct', 'UD_PUNCT_ROOT');
       const copular = copularPredicates.find((entry) => entry.copula === i);
-      if (copular) set(i, copular.predicate, 'cop', 'UD_COP_PREDICATE');
+      if (copular) set(i, copular.predicate, copular.relation, copular.rule);
     }
 
     for (let i = 0; i < words.length; i++) {
       if (pos(i) === 'DET' || pos(i) === 'NUM') {
-        const head = nearestRight(i, (candidate) => pos(candidate) === 'NOUN' || pos(candidate) === 'PROPN', i + 4);
+        const head = nearestRight(i, (candidate) => isNominal(candidate), i + 4);
         if (head >= 0) set(i, head, pos(i) === 'NUM' ? 'nummod' : 'det', pos(i) === 'NUM' ? 'UD_NUMMOD' : 'UD_DET');
       }
       if (pos(i) === 'PRON' && feat(i, 'PronType') === 'Int' && pos(i + 1) === 'NOUN') {
@@ -150,8 +171,9 @@ export class DependencyParser {
 
     for (let i = 0; i < words.length; i++) {
       if (pos(i) !== 'ADJ' || i === root || assigned(i) || copularPredicates.some((entry) => entry.predicate === i)) continue;
-      const nominalLeft = nearestLeft(i, (candidate) => nominals.has(pos(candidate)));
-      const nominalRight = nearestRight(i, (candidate) => nominals.has(pos(candidate)));
+      if (nominalized(i)) continue;
+      const nominalLeft = nearestLeft(i, (candidate) => isNominal(candidate));
+      const nominalRight = nearestRight(i, (candidate) => isNominal(candidate));
       const head = nominalLeft === i - 1 ? nominalLeft : nominalRight === i + 1 ? nominalRight : -1;
       if (head >= 0) set(i, head, 'amod', 'UD_AMOD_ADJACENT_NOMINAL');
     }
@@ -159,7 +181,7 @@ export class DependencyParser {
     for (let i = 0; i < words.length; i++) {
       if (pos(i) !== 'ADP') continue;
       const nextVerb = nearestRight(i, (candidate) => verbal.has(pos(candidate)), i + 3);
-      const nextNominal = nearestRight(i, (candidate) => nominals.has(pos(candidate)), i + 4);
+      const nextNominal = nearestRight(i, (candidate) => isNominal(candidate), i + 4);
       if (nextVerb >= 0 && (nextNominal < 0 || nextVerb < nextNominal)) set(i, nextVerb, 'mark', 'UD_XCOMP_MARK');
       else if (nextNominal >= 0) set(i, nextNominal, 'case', 'UD_CASE');
     }
@@ -253,7 +275,7 @@ export class DependencyParser {
       const end = clause === root && comma < 0 ? words.length : clause === root ? words.length : Math.min(words.length, nearestRight(clause, (candidate) => pos(candidate) === 'PUNCT') + 1 || words.length);
       const before = [] as number[];
       for (let i = start; i < head; i++) {
-        if (!nominals.has(pos(i)) || assigned(i) || feat(i, 'Clitic') === 'Yes') continue;
+        if (!isNominal(i) || assigned(i) || feat(i, 'Clitic') === 'Yes') continue;
         if (nearestLeft(i, (candidate) => pos(candidate) === 'ADP' && arcs[candidate].head === i + 1) >= 0) continue;
         before.push(i);
       }
@@ -261,16 +283,19 @@ export class DependencyParser {
       const finiteFeats = words[agreementHead]?.selected.feats ?? {};
       const agreement = (candidate: number): number => {
         const candidateFeats = words[candidate].selected.feats;
-        const person = candidateFeats.Person ?? (nominals.has(pos(candidate)) ? '3' : undefined);
+        const person = candidateFeats.Person ?? (isNominal(candidate) ? '3' : undefined);
         const number = candidateFeats.Number;
         return (finiteFeats.Person && person ? (finiteFeats.Person === person ? 2 : -2) : 0) +
           (finiteFeats.Number && number ? (finiteFeats.Number === number ? 1 : -1) : 0);
       };
       const question = words.some((word) => word.form === '?' || word.selected.feats.PronType === 'Int');
       const subject = before.length ? [...before].sort((a, b) => agreement(b) - agreement(a) || b - a)[0]
-        : question && clause === root ? nearestRight(head, (candidate) => candidate < end && nominals.has(pos(candidate)) && !assigned(candidate))
+        : question && clause === root ? nearestRight(head, (candidate) => candidate < end && isNominal(candidate) && !assigned(candidate))
           : -1;
-      if (subject !== undefined && subject >= 0 && subject < end && subject !== root) set(subject, head, 'nsubj', 'UD_NSUBJ_AGREEMENT');
+      if (subject !== undefined && subject >= 0 && subject < end && subject !== root) {
+        const copular = copularPredicates.find((entry) => entry.predicate === head);
+        set(subject, head, copular?.subjectRelation ?? 'nsubj', 'UD_NSUBJ_AGREEMENT');
+      }
       if (clause !== root && arcs[clause].deprel === 'acl:relcl') {
         const relative = nearestLeft(clause, (candidate) => feat(candidate, 'PronType') === 'Rel' && !assigned(candidate));
         if (relative >= 0) {
@@ -281,7 +306,7 @@ export class DependencyParser {
     }
 
     for (let i = 0; i < words.length; i++) {
-      if (!nominals.has(pos(i)) || assigned(i) || i === root) continue;
+      if (!isNominal(i) || assigned(i) || i === root) continue;
       const caseMarker = nearestLeft(i, (candidate) => pos(candidate) === 'ADP' && arcs[candidate].head === i + 1);
       if (caseMarker >= 0) {
         const nominalHead = nearestLeft(caseMarker, (candidate) => pos(candidate) === 'NOUN' || pos(candidate) === 'PROPN');
@@ -313,6 +338,7 @@ export class DependencyParser {
     for (let i = 0; i < words.length; i++) {
       if (pos(i) !== 'ADV' || assigned(i)) continue;
       const degreeRule = degreeRules.rules.find((rule) => rule.headUpos.includes(pos(i + 1)) &&
+        (pos(i + 1) === 'ADJ' || degreeRules.gradableHeads.some((entry) => entry.upos === pos(i + 1) && entry.lemmas.includes(words[i + 1].selected.lemma))) &&
         degreeRules.classes.some((entry) => entry.class === rule.class && entry.lemmas.includes(words[i].selected.lemma)));
       if (degreeRule) { set(i, i + 1, degreeRule.relation, degreeRule.id); continue; }
       const emphatic = (adjunctData as { adverbs: Array<{ form?: string; role: string }> }).adverbs.some((entry) => entry.form === words[i].selected.lemma && entry.role === 'emph');

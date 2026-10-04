@@ -1,0 +1,11 @@
+{
+  "id": "SEM_GUESSED_VERB_DEFAULT",
+  "forOrigin": "GUESS",
+  "forUpos": "VERB",
+  "forVerbForm": "Fin",
+  "syntax": [{ "ARG0": "nsubj", "ARG1": "obj" }],
+  "defaultTemplate": true,
+  "source": "https://universaldependencies.org/u/dep/nsubj.html; https://universaldependencies.org/u/dep/obj.html; https://universaldependencies.org/pt/index.html",
+  "note": "Verbo finito regular ainda não ensinado usa o lema reconstruído e papéis básicos provisórios; o diagnóstico informa que a moldura é incerta.",
+  "example": "Ela costurou a roupa."
+}

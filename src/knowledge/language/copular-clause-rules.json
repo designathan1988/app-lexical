@@ -3,7 +3,7 @@
     {
       "id": "UD_ADVCL_COPULAR",
       "markerForms": ["porque", "quando", "se"],
-      "predicateUpos": ["ADJ", "NOUN"],
+      "predicateUpos": ["ADJ", "NOUN", "VERB"],
       "relation": "advcl",
       "semanticSubjectRole": "ARG1",
       "source": "https://universaldependencies.org/u/dep/advcl.html; https://universaldependencies.org/u/dep/cop.html",

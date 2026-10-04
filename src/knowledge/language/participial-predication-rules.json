@@ -1,0 +1,28 @@
+{
+  "rules": [
+    {
+      "id": "UD_RESULTATIVE_PARTICIPLE",
+      "copulaLemmas": ["estar", "ficar", "parecer"],
+      "predicateUpos": "VERB",
+      "predicateFeatures": { "VerbForm": "Part" },
+      "relation": "cop",
+      "subjectRelation": "nsubj",
+      "semanticSubjectRole": "ARG1",
+      "source": "https://universaldependencies.org/u/dep/cop.html; https://universaldependencies.org/u/dep/aux-pass.html; https://dicionario.priberam.org/parecer",
+      "note": "Predicação de estado resultante com particípio como núcleo; distingue-se da passiva analítica orientada ao evento.",
+      "example": "A porta estava fechada."
+    },
+    {
+      "id": "UD_ANALYTIC_PASSIVE_PARTICIPLE",
+      "copulaLemmas": ["ser"],
+      "predicateUpos": "VERB",
+      "predicateFeatures": { "VerbForm": "Part" },
+      "relation": "aux:pass",
+      "subjectRelation": "nsubj:pass",
+      "semanticSubjectRole": "ARG1",
+      "source": "https://universaldependencies.org/pt/index.html; https://universaldependencies.org/u/dep/aux-pass.html",
+      "note": "Na passiva analítica com ser, o particípio verbal é núcleo e o paciente é sujeito passivo.",
+      "example": "As janelas foram lavadas."
+    }
+  ]
+}

@@ -3,10 +3,28 @@
     {
       "id": "LEX_DEGREE_ADVERBS",
       "class": "DEGREE",
-      "lemmas": ["muito", "bem", "tão", "pouco"],
+      "lemmas": ["muito", "bem", "tão", "pouco", "bastante", "demais", "tanto", "meio", "quase", "mais", "menos"],
       "source": "https://universaldependencies.org/u/dep/advmod.html; https://github.com/amrisi/amr-guidelines/blob/master/amr.md#degree",
       "note": "intensificadores e atenuadores podem modificar um adjetivo ou outro advérbio",
       "example": "Ele corre muito bem."
+    },
+    {
+      "id": "LEX_VERBAL_DEGREE_ADVERBS",
+      "class": "VERBAL_DEGREE",
+      "lemmas": ["muito", "pouco", "bastante", "demais", "tanto", "mais", "menos"],
+      "source": "https://universaldependencies.org/u/dep/advmod.html; https://universaldependencies.org/pt/pos/ADV.html",
+      "note": "Intensificadores de quantidade podem graduar diretamente o predicado verbal; advérbios de maneira como bem conservam leitura de maneira junto ao verbo.",
+      "example": "Ela dormiu muito ontem."
+    }
+  ],
+  "gradableHeads": [
+    {
+      "id": "LEX_GRADABLE_ADVERBS",
+      "upos": "ADV",
+      "lemmas": ["bem", "mal", "devagar", "cedo", "tarde", "rápido", "alto", "baixo"],
+      "source": "https://universaldependencies.org/u/dep/advmod.html; https://universaldependencies.org/pt/pos/ADV.html",
+      "note": "Advérbios de maneira, qualidade e posição relativa no tempo aceitam gradação; dêiticos de tempo e lugar não pertencem a esta classe.",
+      "example": "Ela saiu tão cedo."
     }
   ],
   "rules": [
@@ -14,11 +32,23 @@
       "id": "UD_DEGREE_MODIFIER",
       "class": "DEGREE",
       "headUpos": ["ADV", "ADJ"],
+      "semanticHeadUpos": ["ADV", "ADJ"],
       "relation": "advmod",
       "semanticRole": "degree",
       "source": "https://universaldependencies.org/u/dep/advmod.html; https://github.com/amrisi/amr-guidelines/blob/master/amr.md#degree",
       "note": "o advérbio de grau depende do modificador adjacente e o grau modifica esse conceito no grafo",
       "example": "Nós saímos tão cedo."
+    },
+    {
+      "id": "SEM_VERBAL_DEGREE",
+      "class": "VERBAL_DEGREE",
+      "headUpos": [],
+      "semanticHeadUpos": ["VERB", "AUX"],
+      "relation": "advmod",
+      "semanticRole": "degree",
+      "source": "https://universaldependencies.org/u/dep/advmod.html; https://github.com/amrisi/amr-guidelines/blob/master/amr.md#degree",
+      "note": "Modificador quantitativo ligado ao verbo gradua o evento e não o adjunto dêitico seguinte.",
+      "example": "Nós estudamos pouco agora."
     }
   ]
 }

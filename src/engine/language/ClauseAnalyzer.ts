@@ -13,7 +13,7 @@ export interface ClauseAnalysis {
 export class ClauseAnalyzer {
   analyze(words: TaggedWord[], arcs: DependencyArc[]): ClauseAnalysis {
     const root = arcs.find((arc) => arc.head === 0)?.id ?? 1;
-    const subjectHead = arcs.find((arc) => arc.head === root && arc.deprel === 'nsubj')?.id;
+    const subjectHead = arcs.find((arc) => arc.head === root && (arc.deprel === 'nsubj' || arc.deprel === 'nsubj:pass'))?.id;
     const subject = subjectHead
       ? [subjectHead, ...arcs.filter((arc) => arc.head === subjectHead && arc.deprel === 'conj').map((arc) => arc.id)].sort((a, b) => a - b)
       : [];
@@ -33,7 +33,8 @@ export class ClauseAnalyzer {
       }
     }
     const completePredicate = arcs.filter((arc) => arc.deprel !== 'punct' && !subjectSubtree.has(arc.id)).map((arc) => arc.id);
-    const finite = words[(copula ?? root) - 1]?.selected.feats ?? {};
+    const passiveAuxiliary = arcs.find((arc) => arc.head === root && arc.deprel === 'aux:pass')?.id;
+    const finite = words[(copula ?? passiveAuxiliary ?? root) - 1]?.selected.feats ?? {};
     const initialClitic = words[0]?.selected.feats.Clitic === 'Yes' && arcs[0]?.head === root && arcs[0]?.deprel === 'obj';
     const jussive = finite.Mood === 'Sub' && words[0]?.selected.upos === 'SCONJ' && words.some((word) => word.form === '!');
     const mode = words.some((word) => word.form === '?' || word.selected.feats.PronType === 'Int') ? 'interrogative'

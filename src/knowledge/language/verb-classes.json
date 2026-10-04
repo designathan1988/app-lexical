@@ -1,6 +1,14 @@
 {
   "classes": [
     {
+      "id": "LEX_PHYSICAL_RESULTATIVE_PARTICIPLES",
+      "class": "PHYSICAL_RESULTATIVE",
+      "lemmas": ["molhar", "fechar", "quebrar", "parar", "lavar", "pintar", "abrir"],
+      "source": "https://universaldependencies.org/u/feat/VerbForm.html; https://universaldependencies.org/u/dep/cop.html",
+      "note": "Particípios de mudança material podem predicar o estado resultante e conservar a leitura verbal; adjetivos lexicais de qualidade continuam disponíveis para outros predicativos.",
+      "example": "Ela saiu porque estava molhada."
+    },
+    {
       "id": "LEX_MOTION_VERBS",
       "class": "MOTION",
       "lemmas": ["ir"],

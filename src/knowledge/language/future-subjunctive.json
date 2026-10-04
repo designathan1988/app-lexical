@@ -4,6 +4,7 @@
     {"paradigm":"V_ER","suffixes":["er","eres","er","ermos","erdes","erem"],"note":"futuro do subjuntivo regular em -er"},
     {"paradigm":"V_IR","suffixes":["ir","ires","ir","irmos","irdes","irem"],"note":"futuro do subjuntivo regular em -ir"},
     {"id":"V_SER_SUB_FUT","paradigm":"V_SER","suffixes":["for","fores","for","formos","fordes","forem"],"source":"https://www.portaldalinguaportuguesa.org/?action=lemma&id=121230&template=print","note":"futuro do subjuntivo irregular de ser, gerado como células do paradigma","example":"Se a rua for longa, nós voltamos."},
-    {"id":"V_IR_VERB_SUB_FUT","paradigm":"V_IR_VERB","suffixes":["for","fores","for","formos","fordes","forem"],"source":"https://dicionario.priberam.org/conjugar/fores","note":"futuro do subjuntivo irregular de ir, homógrafo ao de ser","example":"Se ele for à escola, nós vamos."}
+    {"id":"V_IR_VERB_SUB_FUT","paradigm":"V_IR_VERB","suffixes":["for","fores","for","formos","fordes","forem"],"source":"https://dicionario.priberam.org/conjugar/fores","note":"futuro do subjuntivo irregular de ir, homógrafo ao de ser","example":"Se ele for à escola, nós vamos."},
+    {"id":"V_ESTAR_SUB_FUT","paradigm":"V_ESTAR","suffixes":["estiver","estiveres","estiver","estivermos","estiverdes","estiverem"],"source":"https://dicionario.priberam.org/conjugar/estar","note":"futuro do subjuntivo irregular de estar gerado pelas células completas do paradigma","example":"Se estiver fechada, a porta abre."}
   ]
 }

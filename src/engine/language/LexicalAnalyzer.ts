@@ -6,7 +6,7 @@ import copulaData from '../../knowledge/language/copulas.json';
 import { createDerivationalAnalyzer } from '../../knowledge/morphology';
 import type { Lexeme } from '../types';
 import type { TeachableRoot } from '../../knowledge/language/teachableRoot';
-import { LanguageInflector } from './LanguageInflector';
+import { LanguageInflector, LANGUAGE_PARADIGMS } from './LanguageInflector';
 import { closedClassReadings } from './ClosedClassLexicon';
 import { tokenizeSentence, type LanguageWord, type MultiwordToken } from './Tokenizer';
 
@@ -33,7 +33,7 @@ export interface LexicalAnalysis {
 const seeds = [...(seedData as { entries: Array<{ lemma: string; gender?: string }> }).entries,
   ...(supplementData as { entries: Array<{ lemma: string; gender?: string }> }).entries];
 const genderByLemma = new Map(seeds.filter((entry) => entry.gender).map((entry) => [entry.lemma, entry.gender!]));
-const guessRules = (guessData as unknown as { rules: Array<{ id: string; suffix: string; upos: string; feats: Record<string, string> }> }).rules;
+const guessRules = (guessData as unknown as { rules: Array<{ id: string; suffix: string; paradigm?: string; upos: string; feats: Record<string, string> }> }).rules;
 const contractions = new Map((contractionsData as { entries: Array<{ form: string; parts: string[] }> }).entries.map((entry) => [entry.form, entry.parts] as const));
 const copulaClass = copulaData as { id: string; lemmas: string[]; upos: string };
 
@@ -122,7 +122,11 @@ export class LexicalAnalyzer {
       if (!readings.length) {
         const normalized = word.form.normalize('NFC').toLocaleLowerCase('pt-BR');
         const guesses = guessRules.filter((rule) => normalized.endsWith(rule.suffix));
-        for (const guess of guesses) readings.push({ lemma: normalized, upos: guess.upos, feats: guess.feats, origin: 'GUESS', rule: guess.id });
+        for (const guess of guesses) {
+          const paradigm = guess.paradigm ? LANGUAGE_PARADIGMS[guess.paradigm] : undefined;
+          const lemma = paradigm?.strip ? normalized.slice(0, -guess.suffix.length) + paradigm.strip : normalized;
+          readings.push({ lemma, upos: guess.upos, feats: guess.feats, origin: 'GUESS', rule: guess.id });
+        }
         if (!guesses.length) readings.push({ lemma: normalized, upos: /\p{L}/u.test(normalized) ? 'NOUN' : 'PUNCT', feats: {}, origin: 'GUESS', rule: 'GUESS_DEFAULT' });
       }
       return { ...word, readings };

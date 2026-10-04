@@ -12,6 +12,7 @@ import degreeData from '../../knowledge/language/degree-modifier-rules.json';
 import pronounConceptData from '../../knowledge/language/pronoun-concept-rules.json';
 import copularClauseData from '../../knowledge/language/copular-clause-rules.json';
 import frameObliqueData from '../../knowledge/language/frame-oblique-cases.json';
+import defaultVerbFrameData from '../../knowledge/language/default-verb-frame.json';
 import type { DependencyArc } from './DependencyParser';
 import type { ClauseAnalysis } from './ClauseAnalyzer';
 import type { TaggedWord } from './Tagger';
@@ -56,7 +57,7 @@ const coercions = (coercionData as { rules: Array<{ id: string; from: string; to
 const nominalPpRules = (nominalPpData as { rules: Array<{ id: string; semanticRole: string }> }).rules;
 const coordination = coordinationData as { operators: Array<{ id: string; form: string; concept: string }>; defaultOperator: string };
 const degreeRules = degreeData as { classes: Array<{ class: string; lemmas: string[] }>;
-  rules: Array<{ id: string; class: string; headUpos: string[]; semanticRole: string }> };
+  rules: Array<{ id: string; class: string; headUpos: string[]; semanticHeadUpos: string[]; semanticRole: string }> };
 const pronounConceptRules = (pronounConceptData as { rules: Array<{
   id: string; lemmas: string[]; conceptSource: string
 }> }).rules;
@@ -66,6 +67,8 @@ const copularClauseRules = (copularClauseData as { rules: Array<{
 const frameObliqueCases = (frameObliqueData as { entries: Array<{
   id?: string; frame: string; preposition: string; semanticRole?: string
 }> }).entries;
+const defaultVerbFrame = defaultVerbFrameData as { id: string; forOrigin: string; forUpos: string;
+  forVerbForm: string; syntax: Array<Record<string, string>>; defaultTemplate: boolean };
 
 function isSubtype(actual: string | undefined, expected: string): boolean {
   for (let cursor = actual; cursor; cursor = typeParents.get(cursor) ?? undefined) if (cursor === expected) return true;
@@ -147,7 +150,17 @@ export class MeaningGraphBuilder {
       const lemma = words[index].selected.lemma;
       const candidates = [...frames, ...this.languageRoots.map((root) => root.frame).filter((frame): frame is NonNullable<typeof frame> => Boolean(frame))]
         .filter((frame) => frame.id.startsWith(`${lemma}.`));
-      if (!candidates.length) return undefined;
+      if (!candidates.length) {
+        const reading = words[index].selected;
+        if (reading.origin === defaultVerbFrame.forOrigin && reading.upos === defaultVerbFrame.forUpos &&
+          reading.feats.VerbForm === defaultVerbFrame.forVerbForm) {
+          const fallback = { id: lemma, syntax: defaultVerbFrame.syntax, defaultTemplate: defaultVerbFrame.defaultTemplate };
+          diagnostics.push({ code: 'UNCERTAIN_FRAME', alternatives: [lemma] });
+          trace.push({ rule: defaultVerbFrame.id, token: index + 1, detail: `${lemma}:ARG0=nsubj,ARG1=obj` });
+          return fallback;
+        }
+        return undefined;
+      }
       const seedOrder = seeds.find((entry) => entry.lemma === lemma && entry.pos === 'VERB')?.senses?.map((sense) => sense.id) ?? [];
       const interrogativeRoles = arcs.filter((item) => item.head === index + 1 && item.deprel === 'advmod')
         .map((arc) => adjuncts.interrogatives.find((item) => item.form === words[arc.id - 1].selected.lemma)?.role)
@@ -250,16 +263,17 @@ export class MeaningGraphBuilder {
     let root = content(Math.max(rootIndex, 0));
     for (let index = 0; index < words.length; index++) {
       const relation = arcs[index].deprel;
-      if (!['root', 'nsubj', 'obj', 'obl', 'nmod', 'xcomp', 'ccomp', 'advcl', 'acl:relcl', 'conj'].includes(relation)) continue;
+      if (!['root', 'nsubj', 'nsubj:pass', 'obj', 'obl', 'nmod', 'xcomp', 'ccomp', 'advcl', 'acl:relcl', 'conj'].includes(relation)) continue;
       if (relation === 'root') continue;
       const headIndex = arcs[index].head - 1;
       if (headIndex < 0) continue;
       const head = content(headIndex);
-      if (relation === 'nsubj') {
+      if (relation === 'nsubj' || relation === 'nsubj:pass') {
         const copularPredicate = words[headIndex].selected.upos === 'ADJ' || arcs.some((arc) => arc.head === headIndex + 1 && arc.deprel === 'cop');
         const antecedent = relativeAntecedent(index, headIndex);
         const frame = selectedFrames.get(headIndex);
-        const role = preferredRole(frame, 'nsubj', copularPredicate ? 'ARG1' : 'ARG0');
+        const role = relation === 'nsubj:pass' || (copularPredicate && words[headIndex].selected.feats.VerbForm === 'Part')
+          ? 'ARG1' : preferredRole(frame, 'nsubj', copularPredicate ? 'ARG1' : 'ARG0');
         edge(head, role, content(antecedent >= 0 ? antecedent : index), antecedent >= 0 ? 'SEM_RELATIVE_SUBJECT' : frame ? `FRAME:${frame.id}:${role}` : 'SEM_SUBJECT_FALLBACK');
       } else if (relation === 'obj') {
         const antecedent = relativeAntecedent(index, headIndex);
@@ -307,7 +321,7 @@ export class MeaningGraphBuilder {
       const headIndex = arc.head - 1;
       if (headIndex < 0) continue;
       const reading = words[index].selected;
-      const degreeRule = degreeRules.rules.find((rule) => rule.headUpos.includes(words[headIndex].selected.upos) &&
+      const degreeRule = degreeRules.rules.find((rule) => rule.semanticHeadUpos.includes(words[headIndex].selected.upos) &&
         degreeRules.classes.some((entry) => entry.class === rule.class && entry.lemmas.includes(reading.lemma)));
       if (degreeRule) {
         attr(content(headIndex), degreeRule.semanticRole, reading.lemma, degreeRule.id);

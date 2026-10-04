@@ -1,0 +1,13 @@
+{
+  "rules": [
+    {
+      "id": "UD_NOMINALIZED_ADJECTIVE",
+      "headUpos": "ADJ",
+      "precededBy": ["DET", "ADP"],
+      "excludedFollowerUpos": ["NOUN", "PROPN"],
+      "source": "https://universaldependencies.org/u/pos/ADJ.html; https://universaldependencies.org/u/dep/nsubj.html; https://universaldependencies.org/u/dep/obl.html",
+      "note": "Adjetivo sem substantivo expresso pode encabeçar um sintagma nominal e manter a classe ADJ nas funções de sujeito, objeto ou oblíquo.",
+      "example": "Os pobres caminham."
+    }
+  ]
+}
