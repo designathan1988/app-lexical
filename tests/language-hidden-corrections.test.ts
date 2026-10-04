@@ -17,6 +17,7 @@ const nominalPhrases = sentences.filter((sentence) => sentence.id.startsWith('ex
 const copularSentences = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.2-')).slice(0, 3);
 const movementSentences = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.2-')).slice(3);
 const subordinateCopulas = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.3-'));
+const enumerations = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.4-'));
 
 describe('correções da verificação oculta — sintagmas nominais', () => {
   it.each(nominalPhrases)('$id: liga o PP ao nome e preserva a posse no grafo', (sentence) => {
@@ -53,6 +54,23 @@ describe('correções da verificação oculta — subordinada copular', () => {
     expect(analysis.meaningGraph.edges, sentence.id).toContainEqual(expect.objectContaining({
       from: analysis.meaningGraph.root, role: expectedRole, to: subordinateNode!.id
     }));
+  });
+});
+
+describe('correções da verificação oculta — enumerações', () => {
+  it.each(enumerations)('$id: coordena todos os itens sob o primeiro núcleo', (sentence) => {
+    const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence(sentence.text);
+    expect(analysis.dependencies.map((arc) => ({ rel: arc.deprel, head: arc.head, dep: arc.id })), sentence.id)
+      .toEqual(sentence.dependencies);
+    expect(analysis.clause.subject, sentence.id).toEqual((sentence as Sentence & { subject: number[] }).subject);
+    expect(analysis.clause.predicate, sentence.id).toEqual((sentence as Sentence & { predicate: number[] }).predicate);
+    const expectedGraph = parseGraph(sentence.meaningGraph);
+    const expectedCoordination = expectedGraph.nodes.find((node) => node.concept === 'and' || node.concept === 'or')!;
+    const actualCoordination = analysis.meaningGraph.nodes.filter((node) => node.concept === 'and' || node.concept === 'or');
+    expect(actualCoordination, sentence.id).toHaveLength(1);
+    expect(actualCoordination[0].concept, sentence.id).toBe(expectedCoordination.concept);
+    expect(analysis.meaningGraph.edges.filter((edge) => edge.from === actualCoordination[0].id && edge.role.startsWith('op')), sentence.id)
+      .toHaveLength(expectedGraph.edges.filter((edge) => edge.from === expectedCoordination.id && edge.role.startsWith('op')).length);
   });
 });
 
