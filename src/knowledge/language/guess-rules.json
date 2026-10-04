@@ -5,6 +5,15 @@
     {"id":"GUESS_NOUN_DADE","suffix":"dade","upos":"NOUN","feats":{"Gender":"Fem"},"note":"substantivo abstrato"},
     {"id":"GUESS_VERB_AR","suffix":"ar","upos":"VERB","feats":{"VerbForm":"Inf"},"note":"infinitivo da primeira conjugação"},
     {"id":"GUESS_VERB_ER","suffix":"er","upos":"VERB","feats":{"VerbForm":"Inf"},"note":"infinitivo da segunda conjugação"},
-    {"id":"GUESS_VERB_IR","suffix":"ir","upos":"VERB","feats":{"VerbForm":"Inf"},"note":"infinitivo da terceira conjugação"}
+    {"id":"GUESS_VERB_IR","suffix":"ir","upos":"VERB","feats":{"VerbForm":"Inf"},"note":"infinitivo da terceira conjugação"},
+    {"id":"GUESS_FIN_AMOS_PRES","suffix":"amos","upos":"VERB","feats":{"Number":"Plur","Person":"1","Mood":"Ind","VerbForm":"Fin","Tense":"Pres"},"note":"primeira pessoa plural regular do presente"},
+    {"id":"GUESS_FIN_AMOS_PAST","suffix":"amos","upos":"VERB","feats":{"Number":"Plur","Person":"1","Mood":"Ind","VerbForm":"Fin","Tense":"Past"},"note":"primeira pessoa plural regular do pretérito; forma sincrética"},
+    {"id":"GUESS_FIN_EMOS_PRES","suffix":"emos","upos":"VERB","feats":{"Number":"Plur","Person":"1","Mood":"Ind","VerbForm":"Fin","Tense":"Pres"},"note":"primeira pessoa plural regular do presente"},
+    {"id":"GUESS_FIN_IMOS_PRES","suffix":"imos","upos":"VERB","feats":{"Number":"Plur","Person":"1","Mood":"Ind","VerbForm":"Fin","Tense":"Pres"},"note":"primeira pessoa plural regular do presente"},
+    {"id":"GUESS_FIN_EI_FUT","suffix":"ei","upos":"VERB","feats":{"Number":"Sing","Person":"1","Mood":"Ind","VerbForm":"Fin","Tense":"Fut"},"note":"primeira pessoa singular do futuro"},
+    {"id":"GUESS_FIN_EI_PAST","suffix":"ei","upos":"VERB","feats":{"Number":"Sing","Person":"1","Mood":"Ind","VerbForm":"Fin","Tense":"Past"},"note":"primeira pessoa singular do pretérito da primeira conjugação"},
+    {"id":"GUESS_FIN_OU_PAST","suffix":"ou","upos":"VERB","feats":{"Number":"Sing","Person":"3","Mood":"Ind","VerbForm":"Fin","Tense":"Past"},"note":"terceira pessoa singular do pretérito da primeira conjugação"},
+    {"id":"GUESS_FIN_ARAM_PAST","suffix":"aram","upos":"VERB","feats":{"Number":"Plur","Person":"3","Mood":"Ind","VerbForm":"Fin","Tense":"Past"},"note":"terceira pessoa plural do pretérito da primeira conjugação"},
+    {"id":"GUESS_FIN_IRAM_PAST","suffix":"iram","upos":"VERB","feats":{"Number":"Plur","Person":"3","Mood":"Ind","VerbForm":"Fin","Tense":"Past"},"note":"terceira pessoa plural do pretérito da terceira conjugação"}
   ]
 }

@@ -94,7 +94,7 @@
     {"form":"e","lemma":"e","upos":"CCONJ","feats":{},"note":"coordenação aditiva"},
     {"form":"ou","lemma":"ou","upos":"CCONJ","feats":{},"note":"coordenação alternativa"},
     {"form":"mas","lemma":"mas","upos":"CCONJ","feats":{},"note":"coordenação adversativa"},
-    {"form":"nem","lemma":"nem","upos":"CCONJ","feats":{},"note":"coordenação negativa"},
+    {"form":"nem","lemma":"nem","upos":"CCONJ","feats":{"Polarity":"Neg"},"note":"coordenação negativa"},
     {"form":"nem","lemma":"nem","upos":"ADV","feats":{"Polarity":"Neg"},"note":"advérbio focal negativo"},
     {"form":"porque","lemma":"porque","upos":"SCONJ","feats":{},"note":"conjunção causal"},
     {"form":"se","lemma":"se","upos":"SCONJ","feats":{},"note":"conjunção condicional"},

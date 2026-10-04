@@ -4091,9 +4091,15 @@
       "senses": [
         {
           "id": "mandar.MANDAR",
-          "gloss": "ordenar; enviar",
+          "gloss": "enviar algo a alguém",
           "semanticType": "COMUNICACAO",
           "frame": "mandar.MANDAR"
+        },
+        {
+          "id": "mandar.ORDENAR",
+          "gloss": "ordenar que alguém faça algo",
+          "semanticType": "COMUNICACAO",
+          "frame": "mandar.ORDENAR"
         }
       ],
       "confidence": "HIGH"

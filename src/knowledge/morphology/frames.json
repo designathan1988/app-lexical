@@ -5223,6 +5223,22 @@
       ]
     },
     {
+      "id": "mandar.ORDENAR",
+      "roles": {
+        "ARG0": { "label": "quem ordena", "prefers": ["PESSOA"] },
+        "ARG1": { "label": "ação ordenada", "prefers": ["ACAO"] },
+        "ARG2": { "label": "quem recebe a ordem", "prefers": ["PESSOA"] }
+      },
+      "syntax": [
+        { "ARG0": "nsubj" },
+        { "ARG1": "xcomp" },
+        { "ARG2": "obj" }
+      ],
+      "control": "OBJECT",
+      "complement": "xcomp",
+      "examples": ["Eu mando o menino cantar."]
+    },
+    {
       "id": "doar.DOAR",
       "roles": {
         "ARG0": {

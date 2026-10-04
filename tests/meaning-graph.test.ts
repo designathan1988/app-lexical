@@ -27,6 +27,37 @@ describe('comparação de grafos por triplas', () => {
 });
 
 describe('grafo de significado', () => {
+  it('expressa imperativo, pergunta, negação e cópula em frases novas', () => {
+    const engine = new SemanticEngine(createInitialKnowledgeBase());
+    const command = engine.analyzeSentence('Coma pão!').meaningGraph;
+    expect(command.attributes).toContainEqual(expect.objectContaining({ role: 'mode', value: 'imperative' }));
+    expect(command.edges.some((edge) => edge.role === 'ARG0' &&
+      command.nodes.find((node) => node.id === edge.to)?.concept === 'você')).toBe(true);
+
+    const question = engine.analyzeSentence('Quem bebe água?').meaningGraph;
+    expect(question.edges.some((edge) => edge.role === 'ARG0' &&
+      question.nodes.find((node) => node.id === edge.to)?.concept === 'amr-unknown')).toBe(true);
+
+    const negative = engine.analyzeSentence('Não bebo água.').meaningGraph;
+    expect(negative.attributes).toContainEqual(expect.objectContaining({ role: 'polarity', value: '-' }));
+
+    const copular = engine.analyzeSentence('A casa é bonita.').meaningGraph;
+    const house = copular.nodes.find((node) => node.concept === 'casa');
+    expect(copular.nodes.find((node) => node.id === copular.root)?.concept).toBe('bonito');
+    expect(copular.edges).toContainEqual(expect.objectContaining({ from: copular.root, role: 'ARG1', to: house!.id }));
+  });
+
+  it('coordena predicados preservando o sujeito compartilhado', () => {
+    const graph = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Ela canta e dança.').meaningGraph;
+    const conjunction = graph.nodes.find((node) => node.concept === 'and');
+    const subject = graph.nodes.find((node) => node.concept === 'ela');
+    const predicates = graph.nodes.filter((node) => node.concept.startsWith('cantar.') || node.concept.startsWith('dançar.'));
+    expect(conjunction && subject).toBeTruthy();
+    expect(predicates).toHaveLength(2);
+    expect(graph.edges.filter((edge) => predicates.some((node) => node.id === edge.from) &&
+      edge.role === 'ARG0' && edge.to === subject!.id)).toHaveLength(2);
+  });
+
   it('prefere tipo semântico específico sem diagnosticar empate com ancestral genérico', () => {
     const graph = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Eu tomo café.').meaningGraph;
     expect(graph.nodes.find((node) => node.id === graph.root)?.concept).toBe('tomar.INGERIR');
@@ -136,6 +167,11 @@ describe('grafo de significado', () => {
     const boy = graph.nodes.find((node) => node.concept === 'menino');
     expect(singer && boy).toBeTruthy();
     expect(graph.edges).toContainEqual(expect.objectContaining({ from: singer!.id, role: 'ARG0', to: boy!.id }));
+    const sending = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Eu mando flores para ela.').meaningGraph;
+    const flowers = sending.nodes.find((node) => node.concept === 'flor');
+    expect(sending.nodes.find((node) => node.id === sending.root)?.concept).toBe('mandar.MANDAR');
+    expect(flowers).toBeDefined();
+    expect(sending.edges).toContainEqual(expect.objectContaining({ from: sending.root, role: 'ARG1', to: flowers!.id }));
   });
 
   it('atinge F1 médio, grafos exatos e sentidos no gabarito', () => {
