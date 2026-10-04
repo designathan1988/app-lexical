@@ -14,6 +14,7 @@ type Sentence = {
   dependencies: Array<{ rel: string; head: number; dep: number }>;
   meaningGraph: string;
   degree?: { modifier: number; head: number };
+  ppFrame?: string;
 };
 
 const sentences = (fixture as { sentences: Sentence[] }).sentences;
@@ -24,6 +25,7 @@ const subordinateCopulas = sentences.filter((sentence) => sentence.id.startsWith
 const enumerations = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.4-'));
 const adjectiveSentences = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.5-'));
 const degreeSentences = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.6-'));
+const postInfinitivePps = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.7-'));
 
 describe('correções da verificação oculta — sintagmas nominais', () => {
   it.each(nominalPhrases)('$id: liga o PP ao nome e preserva a posse no grafo', (sentence) => {
@@ -139,6 +141,18 @@ describe('correções da verificação oculta — advérbios de grau', () => {
     expect(analysis.meaningGraph.attributes, sentence.id).toContainEqual(expect.objectContaining({
       from: modified!.id, role: 'degree', value: sentence.tokens[degree.modifier - 1].lemma
     }));
+  });
+});
+
+describe('correções da verificação oculta — PP após complemento infinitivo', () => {
+  it.each(postInfinitivePps)('$id: escolhe o verbo pela moldura e pela proximidade', (sentence) => {
+    const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence(sentence.text);
+    const expected = sentence.dependencies.find((arc) => arc.rel === 'obl')!;
+    expect(analysis.dependencies[expected.dep - 1], sentence.id)
+      .toMatchObject({ head: expected.head, deprel: 'obl' });
+    expect(analysis.dependencies[expected.dep - 1].rule, sentence.id).toBeTruthy();
+    expect(analysis.trace.dependencies[expected.dep - 1].rule, sentence.id)
+      .toContain(sentence.ppFrame ?? analysis.dependencies[expected.dep - 1].rule);
   });
 });
 
