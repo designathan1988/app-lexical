@@ -1,4 +1,8 @@
 import copulaData from '../../knowledge/language/copulas.json';
+import adjunctData from '../../knowledge/language/adjunct-roles.json';
+import pragmaticsData from '../../knowledge/language/pragmatics.json';
+import seedData from '../../knowledge/morphology/seed-roots.json';
+import supplementData from '../../knowledge/language/lexical-supplements.json';
 import type { TaggedWord } from './Tagger';
 
 export interface DependencyArc {
@@ -9,6 +13,12 @@ export interface DependencyArc {
 }
 
 const copulas = new Set((copulaData as { lemmas: string[] }).lemmas);
+const markers = (adjunctData as { markers: Array<{ form: string }> }).markers;
+const pragmaticExpressions = (pragmaticsData as { expressions: Array<{ id: string; form: string; relation: string }> }).expressions;
+const typeByLemma = new Map([
+  ...(seedData as { entries: Array<{ lemma: string; senses?: Array<{ semanticType?: string }> }> }).entries.map((entry) => [entry.lemma, entry.senses?.[0]?.semanticType] as const),
+  ...(supplementData as { entries: Array<{ lemma: string; semanticType?: string }> }).entries.map((entry) => [entry.lemma, entry.semanticType] as const)
+]);
 const nominals = new Set(['NOUN', 'PROPN', 'PRON']);
 const verbal = new Set(['VERB', 'AUX']);
 
@@ -98,7 +108,10 @@ export class DependencyParser {
         const antecedent = relative ? nearestLeft(marker, (candidate) => pos(candidate) === 'NOUN') : -1;
         if (relative && antecedent >= 0) set(i, antecedent, 'acl:relcl', 'UD_RELATIVE');
         else if (comma >= 0 && i < comma || (marker === 0 && comma >= 0)) set(i, root, 'advcl', 'UD_ADVCL_INITIAL');
-        else if (marker > root && pos(marker) === 'SCONJ') set(i, root, 'ccomp', 'UD_CCOMP');
+        else if (marker > root && pos(marker) === 'SCONJ') {
+          const adjunctMarker = markers.some((entry) => entry.form === words[marker].selected.lemma);
+          set(i, root, adjunctMarker ? 'advcl' : 'ccomp', adjunctMarker ? 'UD_ADVCL_MARKER' : 'UD_CCOMP');
+        }
         else set(i, root, 'advcl', 'UD_ADVCL');
       } else if (feat(i, 'VerbForm') === 'Inf' && precedingVerb >= 0) {
         set(i, precedingVerb, 'xcomp', 'UD_XCOMP');
@@ -109,6 +122,17 @@ export class DependencyParser {
       if (pos(i) !== 'SCONJ' || assigned(i)) continue;
       const next = nearestRight(i, (candidate) => verbal.has(pos(candidate)), i + 4);
       if (next >= 0) set(i, next, 'mark', 'UD_MARK');
+    }
+
+    for (let i = 0; i < words.length; i++) {
+      for (const expression of pragmaticExpressions) {
+        const parts = expression.form.split(' ');
+        const single = words[i].form.normalize('NFC').toLocaleLowerCase('pt-BR') === expression.form;
+        const sequence = parts.every((part, offset) => words[i + offset]?.form.normalize('NFC').toLocaleLowerCase('pt-BR') === part);
+        if (!single && !sequence) continue;
+        set(i, root, expression.relation, expression.id);
+        if (sequence) for (let offset = 1; offset < parts.length; offset++) set(i + offset, i, 'fixed', `${expression.id}_FIXED`);
+      }
     }
 
     const clauses = words.map((_, index) => index).filter((index) => index === root || arcs[index].deprel === 'ccomp' || arcs[index].deprel === 'advcl' || arcs[index].deprel === 'acl:relcl');
@@ -133,7 +157,10 @@ export class DependencyParser {
       if (subject !== undefined && subject >= 0 && subject < end && subject !== root) set(subject, head, 'nsubj', 'UD_NSUBJ_AGREEMENT');
       if (clause !== root && arcs[clause].deprel === 'acl:relcl') {
         const relative = nearestLeft(clause, (candidate) => feat(candidate, 'PronType') === 'Rel' && !assigned(candidate));
-        if (relative >= 0) set(relative, clause, subject >= 0 ? 'obj' : 'nsubj', subject >= 0 ? 'UD_RELATIVE_OBJECT' : 'UD_RELATIVE_SUBJECT');
+        if (relative >= 0) {
+          if (pos(relative) === 'ADV') set(relative, clause, 'advmod', 'UD_RELATIVE_ADVERB');
+          else set(relative, clause, subject >= 0 ? 'obj' : 'nsubj', subject >= 0 ? 'UD_RELATIVE_OBJECT' : 'UD_RELATIVE_SUBJECT');
+        }
       }
     }
 
@@ -143,11 +170,17 @@ export class DependencyParser {
       if (caseMarker >= 0) set(i, governor(caseMarker), 'obl', 'UD_OBL_CASE');
       else {
         const followingXcomp = words[i].selected.feats.Clitic === 'Yes' && arcs[i + 1]?.deprel === 'xcomp' ? i + 1 : -1;
-        set(i, followingXcomp >= 0 ? followingXcomp : governor(i), 'obj', followingXcomp >= 0 ? 'UD_CLITIC_XCOMP' : 'UD_OBJ');
+        const temporal = typeByLemma.get(words[i].selected.lemma) === 'TEMPO';
+        set(i, followingXcomp >= 0 ? followingXcomp : governor(i), temporal ? 'obl' : 'obj', followingXcomp >= 0 ? 'UD_CLITIC_XCOMP' : temporal ? 'UD_TEMPORAL_OBLIQUE' : 'UD_OBJ');
       }
     }
     for (let i = 0; i < words.length; i++) {
       if (pos(i) !== 'ADV' || assigned(i)) continue;
+      const emphatic = (adjunctData as { adverbs: Array<{ form?: string; role: string }> }).adverbs.some((entry) => entry.form === words[i].selected.lemma && entry.role === 'emph');
+      if (emphatic) {
+        const target = nearestRight(i, (candidate) => nominals.has(pos(candidate)), i + 3);
+        if (target >= 0) { set(i, target, 'advmod:emph', 'UD_EMPHATIC_ADVERB'); continue; }
+      }
       const left = governor(i);
       set(i, left, 'advmod', 'UD_ADVMOD');
     }

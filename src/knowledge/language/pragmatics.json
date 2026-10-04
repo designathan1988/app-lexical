@@ -1,0 +1,5 @@
+{
+  "expressions": [
+    {"id":"PRAG_POLITE_REQUEST","form":"por favor","relation":"discourse","attribute":{"role":"polite","value":"+"},"note":"expressão de cortesia sem argumento proposicional"}
+  ]
+}

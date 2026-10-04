@@ -30,6 +30,11 @@ describe('grafo de significado', () => {
     expect(engine.store.document.nodes.size).toBe(0);
   });
 
+  it('representa expressão de cortesia como atributo pragmático', () => {
+    const graph = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Me ajuda, por favor.').meaningGraph;
+    expect(graph.attributes).toContainEqual(expect.objectContaining({ role: 'polite', value: '+' }));
+  });
+
   it('reutiliza o nó do sujeito no complemento de controle', () => {
     const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Eu quero tomar café.');
     const graph = analysis.meaningGraph;

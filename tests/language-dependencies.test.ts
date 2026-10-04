@@ -25,6 +25,7 @@ function measure(sentences: Sentence[]) {
   let subjectHit = 0;
   let predicateHit = 0;
   const failures: string[] = [];
+  const clauseFailures: string[] = [];
   for (const sentence of sentences) {
     const tagged = tagger.tagForms(sentence.tokens.map((token) => token.form));
     const parsed = parser.parse(tagged.words);
@@ -37,17 +38,31 @@ function measure(sentences: Sentence[]) {
       else failures.push(`${sentence.id}:${expected.dep} ${expected.head}/${expected.rel}→${actual.head}/${actual.deprel}`);
     }
     if (JSON.stringify(clause.subject) === JSON.stringify(sentence.subject)) subjectHit++;
+    else clauseFailures.push(`${sentence.id}:sujeito ${JSON.stringify(sentence.subject)}→${JSON.stringify(clause.subject)}`);
     if (JSON.stringify(clause.predicate) === JSON.stringify(sentence.predicate)) predicateHit++;
+    else clauseFailures.push(`${sentence.id}:predicado ${JSON.stringify(sentence.predicate)}→${JSON.stringify(clause.predicate)}`);
   }
   const metrics = {
     uas: correctHead / total, las: correctArc / total,
     subject: subjectHit / sentences.length, predicate: predicateHit / sentences.length
   };
-  console.info('Dependências', JSON.stringify(metrics), 'falhas:', failures.join(', '));
+  console.info('Dependências', JSON.stringify(metrics), 'falhas:', failures.join(', '), 'orações:', clauseFailures.join(', '));
   return metrics;
 }
 
 describe('dependências UD e estrutura da oração', () => {
+  it('marca causal, relativo locativo, tempo sem preposição e cortesia por função', () => {
+    const ids = ['sent-066', 'sent-069', 'sent-073', 'sent-079'];
+    const expected = new Map([['sent-066', [4, 'advcl']], ['sent-069', [3, 'advmod']],
+      ['sent-073', [6, 'obl']], ['sent-079', [4, 'discourse']]] as Array<[string, [number, string]]>);
+    for (const sentence of (gold as { sentences: Sentence[] }).sentences.filter((item) => ids.includes(item.id))) {
+      const tagged = tagger.tagForms(sentence.tokens.map((token) => token.form));
+      const arcs = parser.parse(tagged.words);
+      const [index, relation] = expected.get(sentence.id)!;
+      expect(arcs[index - 1].deprel, sentence.id).toBe(relation);
+    }
+  });
+
   it('atinge UAS, LAS, sujeito e predicado no gabarito', () => {
     const m = measure((gold as { sentences: Sentence[] }).sentences);
     expect(m.uas).toBeGreaterThanOrEqual(0.90);

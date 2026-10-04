@@ -19,7 +19,9 @@ export class ClauseAnalyzer {
       : [];
     const copula = arcs.find((arc) => arc.head === root && arc.deprel === 'cop')?.id;
     const predicateHead = copula ?? root;
-    const predicate = [predicateHead, ...arcs.filter((arc) => arc.head === predicateHead && arc.deprel === 'xcomp').map((arc) => arc.id)].sort((a, b) => a - b);
+    const predicate = [predicateHead, ...arcs.filter((arc) => arc.head === predicateHead &&
+      (arc.deprel === 'xcomp' || arc.deprel === 'conj' && ['VERB', 'AUX'].includes(words[arc.id - 1]?.selected.upos))
+    ).map((arc) => arc.id)].sort((a, b) => a - b);
     const subjectSubtree = new Set(subject);
     for (let changed = true; changed;) {
       changed = false;

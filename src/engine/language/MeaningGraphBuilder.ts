@@ -4,6 +4,7 @@ import semanticTypes from '../../knowledge/morphology/semantic-types.json';
 import supplementData from '../../knowledge/language/lexical-supplements.json';
 import adjunctData from '../../knowledge/language/adjunct-roles.json';
 import pronounData from '../../knowledge/language/implicit-pronouns.json';
+import pragmaticsData from '../../knowledge/language/pragmatics.json';
 import type { DependencyArc } from './DependencyParser';
 import type { ClauseAnalysis } from './ClauseAnalyzer';
 import type { TaggedWord } from './Tagger';
@@ -43,6 +44,7 @@ const adjuncts = adjunctData as {
   adverbs: Array<{ id: string; form?: string; semanticType?: string; role: string; polarity?: string }>;
 };
 const pronouns = pronounData as { entries: Array<{ person: string; number: string; form: string }>; imperativeSubject: string; unknownConcept: string };
+const pragmaticExpressions = (pragmaticsData as { expressions: Array<{ id: string; form: string; attribute: { role: string; value: string } }> }).expressions;
 
 function isSubtype(actual: string | undefined, expected: string): boolean {
   for (let cursor = actual; cursor; cursor = typeParents.get(cursor) ?? undefined) if (cursor === expected) return true;
@@ -255,6 +257,14 @@ export class MeaningGraphBuilder {
     if (clause.polarity === 'negative') attr(root, 'polarity', '-', 'SEM_POLARITY');
     if (clause.mode === 'interrogative' && !words.some((word) => word.selected.feats.PronType === 'Int')) attr(root, 'mode', 'interrogative', 'SEM_YES_NO_QUESTION');
     if (clause.mode === 'imperative') attr(root, 'mode', 'imperative', 'SEM_IMPERATIVE');
+    for (let index = 0; index < words.length; index++) {
+      for (const expression of pragmaticExpressions) {
+        const parts = expression.form.split(' ');
+        const single = words[index].form.normalize('NFC').toLocaleLowerCase('pt-BR') === expression.form;
+        const sequence = parts.every((part, offset) => words[index + offset]?.form.normalize('NFC').toLocaleLowerCase('pt-BR') === part);
+        if (single || sequence) attr(root, expression.attribute.role, expression.attribute.value, expression.id);
+      }
+    }
     if (clause.mode === 'declarative' && !clause.subject.length && words[rootIndex]?.selected.feats.Person === '1' && words[rootIndex]?.selected.feats.Number === 'Plur' && childIndices(rootIndex, 'xcomp').length) {
       attr(root, 'mode', 'hortative', 'SEM_HORTATIVE');
     }
