@@ -316,7 +316,9 @@ export class MeaningGraphBuilder {
       const feats = words[predicate]?.selected.feats ?? {};
       const mode = clause.mode === 'imperative';
       const subject = implicit(feats.Person ?? '3', feats.Number ?? 'Sing', mode);
-      edge(content(rootIndex), 'ARG0', subject, mode ? 'SEM_IMPERATIVE_SUBJECT' : 'SEM_IMPLICIT_SUBJECT');
+      const copularPredicate = words[rootIndex].selected.upos === 'ADJ' || childIndices(rootIndex, 'cop').length > 0;
+      const role = mode ? 'ARG0' : preferredRole(selectedFrames.get(rootIndex), 'nsubj', copularPredicate ? 'ARG1' : 'ARG0');
+      edge(content(rootIndex), role, subject, mode ? 'SEM_IMPERATIVE_SUBJECT' : 'SEM_IMPLICIT_SUBJECT');
     }
     if (clause.polarity === 'negative') attr(root, 'polarity', '-', 'SEM_POLARITY');
     if (clause.mode === 'interrogative' && !words.some((word) => word.selected.feats.PronType === 'Int')) attr(root, 'mode', 'interrogative', 'SEM_YES_NO_QUESTION');
