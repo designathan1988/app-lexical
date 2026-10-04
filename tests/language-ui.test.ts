@@ -5,6 +5,9 @@ import { SemanticEngine } from '../src/engine/SemanticEngine';
 import { createInitialKnowledgeBase } from '../src/knowledge/knowledgeBase';
 import { SentenceAnalysisViews } from '../src/ui/components/SentenceAnalysisViews';
 import { SentenceAnalysisSection } from '../src/ui/components/admin/SentenceAnalysisSection';
+import { summarizeChatResult } from '../src/ui/useEngine';
+import { ChatResultAction } from '../src/ui/components/ChatResultAction';
+import extra2 from './fixtures/sentences-extra-2.json';
 
 const engine = new SemanticEngine(createInitialKnowledgeBase());
 const analysis = engine.analyzeSentence('Eu quero tomar café.');
@@ -55,5 +58,38 @@ describe('vistas da análise geral', () => {
     expect(html).toContain('Lema esperado');
     expect(html).toContain('Traços esperados');
     expect(html).toContain('Sentido esperado');
+  });
+});
+
+describe('chat de frases gerais', () => {
+  const phrases = extra2.sentences.filter((sentence) => sentence.id.startsWith('extra2-1.9-'));
+
+  it('registra pelo menos seis frases inéditas no segundo conjunto extra', () => {
+    expect(phrases.length).toBeGreaterThanOrEqual(6);
+  });
+
+  for (const phrase of phrases) {
+    it(`apresenta análise sem executar ${phrase.id}`, () => {
+      const before = JSON.stringify(engine.store.document);
+      const result = engine.execute(phrase.text);
+      const summary = summarizeChatResult(result, engine.analyzeSentence(phrase.text));
+      expect(summary).toEqual({
+        text: 'Frase analisada (não é um comando do construtor)',
+        analysisOnly: true
+      });
+      expect(result.compile.diagnostics.length).toBeGreaterThan(0);
+      expect(result.execution.mutations).toHaveLength(0);
+      expect(JSON.stringify(engine.store.document)).toBe(before);
+      const html = renderToStaticMarkup(React.createElement(ChatResultAction, { result, analysisOnly: summary.analysisOnly, onInspect: () => undefined }));
+      expect(html).toContain('Classes / Sintaxe / Significado');
+    });
+  }
+
+  it('mantém bloqueio e diagnósticos para comando inválido do construtor', () => {
+    const result = engine.execute('crie uma caixa estranha');
+    const summary = summarizeChatResult(result, engine.analyzeSentence(result.input));
+    expect(summary.analysisOnly).toBe(false);
+    expect(summary.text).toContain('Bloqueado:');
+    expect(result.compile.diagnostics.some((diagnostic) => diagnostic.code === 'UNKNOWN_WORD')).toBe(true);
   });
 });
