@@ -16,6 +16,7 @@ import { LanguageTagger } from './language/Tagger';
 import { DependencyParser } from './language/DependencyParser';
 import { ClauseAnalyzer } from './language/ClauseAnalyzer';
 import { toConllu } from './language/Conllu';
+import { MeaningGraphBuilder } from './language/MeaningGraphBuilder';
 import type { SentenceAnalysis } from './language/SentenceAnalysis';
 
 export interface CommandResult {
@@ -99,14 +100,32 @@ export class SemanticEngine {
     const tokenization = tokenizeSentence(text);
     const tagger = new LanguageTagger(new LexicalAnalyzer(this.knowledgeBase.lexemes));
     const tagged = tagger.tagForms(tokenization.words.map((word) => word.form));
+    for (const multiword of tokenization.multiwords) {
+      const first = tagged.words[multiword.from - 1];
+      const second = tagged.words[multiword.from];
+      const adposition = first?.readings.find((reading) => reading.upos === 'ADP');
+      const determiner = second?.readings.find((reading) => reading.upos === 'DET');
+      if (!adposition || !determiner) continue;
+      for (const [word, selected, rule, index] of [
+        [first, adposition, 'CONTRACTION_ADP', multiword.from - 1],
+        [second, determiner, 'CONTRACTION_DET', multiword.from]
+      ] as const) {
+        const removed = word.readings.filter((reading) => reading !== selected);
+        word.readings = [selected];
+        word.selected = selected;
+        if (removed.length) tagged.trace.push({ rule, index, removed });
+      }
+    }
     const dependencies = new DependencyParser().parse(tagged.words);
     const clause = new ClauseAnalyzer().analyze(tagged.words, dependencies);
+    const meaningGraph = new MeaningGraphBuilder().build(tagged.words, dependencies, clause);
     return {
       text,
       words: tagged.words,
       multiwords: tokenization.multiwords,
       dependencies,
       clause,
+      meaningGraph,
       conllu: toConllu(text, tagged.words, dependencies, tokenization.multiwords),
       trace: { tagging: tagged.trace, dependencies: dependencies.map((arc) => ({ id: arc.id, rule: arc.rule })) }
     };

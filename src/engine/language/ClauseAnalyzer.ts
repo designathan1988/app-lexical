@@ -32,8 +32,9 @@ export class ClauseAnalyzer {
     }
     const completePredicate = arcs.filter((arc) => arc.deprel !== 'punct' && !subjectSubtree.has(arc.id)).map((arc) => arc.id);
     const finite = words[(copula ?? root) - 1]?.selected.feats ?? {};
+    const initialClitic = words[0]?.selected.feats.Clitic === 'Yes' && arcs[0]?.head === root && arcs[0]?.deprel === 'obj';
     const mode = words.some((word) => word.form === '?') ? 'interrogative'
-      : finite.Mood === 'Imp' && !subject.length ? 'imperative'
+      : (finite.Mood === 'Imp' || initialClitic) && !subject.length ? 'imperative'
         : 'declarative';
     const polarity = words.some((word) => word.selected.feats.Polarity === 'Neg') ? 'negative' : 'positive';
     const implicitSubject = !subject.length && finite.Person && finite.Number && mode !== 'imperative'

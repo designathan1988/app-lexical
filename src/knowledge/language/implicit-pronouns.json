@@ -1,0 +1,12 @@
+{
+  "entries": [
+    {"person":"1","number":"Sing","form":"eu","note":"sujeito oculto de primeira pessoa singular"},
+    {"person":"1","number":"Plur","form":"nós","note":"sujeito oculto de primeira pessoa plural"},
+    {"person":"2","number":"Sing","form":"tu","note":"sujeito oculto de segunda pessoa singular"},
+    {"person":"2","number":"Plur","form":"vós","note":"sujeito oculto de segunda pessoa plural"},
+    {"person":"3","number":"Sing","form":"ele","note":"sujeito oculto de terceira pessoa singular"},
+    {"person":"3","number":"Plur","form":"eles","note":"sujeito oculto de terceira pessoa plural"}
+  ],
+  "imperativeSubject":"você",
+  "unknownConcept":"amr-unknown"
+}

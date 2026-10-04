@@ -60,6 +60,8 @@
     {"form":"como","lemma":"como","upos":"ADV","feats":{"PronType":"Int"},"note":"interrogativo de modo"},
     {"form":"como","lemma":"como","upos":"SCONJ","feats":{},"note":"conjunção comparativa"},
     {"form":"quanto","lemma":"quanto","upos":"PRON","feats":{"PronType":"Int"},"note":"interrogativo quantitativo"},
+    {"form":"quantos","lemma":"quanto","upos":"PRON","feats":{"PronType":"Int","Gender":"Masc","Number":"Plur"},"note":"interrogativo quantitativo plural"},
+    {"form":"quantas","lemma":"quanto","upos":"PRON","feats":{"PronType":"Int","Gender":"Fem","Number":"Plur"},"note":"interrogativo quantitativo plural"},
     {"form":"o","lemma":"o","upos":"DET","feats":{"Definite":"Def","Gender":"Masc","Number":"Sing","PronType":"Art"},"note":"artigo definido"},
     {"form":"a","lemma":"o","upos":"DET","feats":{"Definite":"Def","Gender":"Fem","Number":"Sing","PronType":"Art"},"note":"artigo definido"},
     {"form":"os","lemma":"o","upos":"DET","feats":{"Definite":"Def","Gender":"Masc","Number":"Plur","PronType":"Art"},"note":"artigo definido"},

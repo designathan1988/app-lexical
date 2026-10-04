@@ -91,7 +91,16 @@ export class LanguageInflector {
       const key = `${entry.lemma}|${paradigm.id}`;
       if (seen.has(key)) continue;
       seen.add(key);
-      const forms = generateForms(key, entry.lemma, paradigm);
+      const baseInfinitive = paradigm.fullForm
+        ? paradigm.cells.find((cell) => cell.feats.VerbForm === 'Inf')?.suffix
+        : undefined;
+      const prefix = baseInfinitive && entry.lemma !== baseInfinitive && entry.lemma.endsWith(baseInfinitive)
+        ? entry.lemma.slice(0, -baseInfinitive.length)
+        : '';
+      const forms = generateForms(key, entry.lemma, paradigm).map((form) => ({
+        ...form,
+        surface: prefix ? prefix + form.surface : form.surface
+      }));
       const supplements = irregular.supplementaryParticiples.find((item) => item.lemma === entry.lemma);
       for (const form of forms) {
         this.add(form.surface, { lemma: entry.lemma, pos: entry.pos, features: form.featureKey, paradigm: paradigm.id, rule: `PARADIGM:${paradigm.id}` });

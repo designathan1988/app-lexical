@@ -21,6 +21,14 @@ describe('comparação de grafos por triplas', () => {
 });
 
 describe('grafo de significado', () => {
+  it('trata entrada vazia sem lançar nem alterar o documento', () => {
+    const engine = new SemanticEngine(createInitialKnowledgeBase());
+    const analysis = engine.analyzeSentence('');
+    expect(analysis.meaningGraph.nodes).toEqual([]);
+    expect(analysis.meaningGraph.penman).toBe('');
+    expect(engine.store.document.nodes.size).toBe(0);
+  });
+
   it('reutiliza o nó do sujeito no complemento de controle', () => {
     const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Eu quero tomar café.');
     const graph = analysis.meaningGraph;
@@ -39,6 +47,7 @@ describe('grafo de significado', () => {
     let exact = 0;
     let senses = 0;
     const failures: string[] = [];
+    const senseFailures: string[] = [];
     for (const sentence of sentences) {
       const actual = engine.analyzeSentence(sentence.text).meaningGraph;
       const f1 = smatchF1(actual.penman, sentence.meaningGraph);
@@ -47,9 +56,10 @@ describe('grafo de significado', () => {
       else failures.push(`${sentence.id}:${f1.toFixed(3)}`);
       const expectedSense = sentence.meaningGraph.match(/[\p{L}]+\.[A-Z_]+/u)?.[0];
       if (!expectedSense || actual.nodes.some((node) => node.concept === expectedSense)) senses++;
+      else senseFailures.push(`${sentence.id}:${expectedSense}→${actual.nodes.map((node) => node.concept).join('/')}`);
     }
     console.info('Grafo', 'Smatch médio', sum / sentences.length, 'exatos', exact, '/', sentences.length,
-      'sentidos', senses, '/', sentences.length, 'falhas:', failures.join(', '));
+      'sentidos', senses, '/', sentences.length, 'falhas:', failures.join(', '), 'sentidos errados:', senseFailures.join(', '));
     expect(sum / sentences.length).toBeGreaterThanOrEqual(0.85);
     expect(exact / sentences.length).toBeGreaterThanOrEqual(0.70);
     expect(senses / sentences.length).toBeGreaterThanOrEqual(0.90);

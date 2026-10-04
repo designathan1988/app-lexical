@@ -1,11 +1,13 @@
 {
   "entries": [
-    {"lemma":"ajuda","pos":"NOUN","gender":"Fem","paradigmId":"N_S","note":"substantivo do gabarito e do uso geral"},
-    {"lemma":"menina","pos":"NOUN","gender":"Fem","paradigmId":"N_S","note":"substantivo regular em -a"},
-    {"lemma":"pássaro","pos":"NOUN","gender":"Masc","paradigmId":"N_S","note":"substantivo regular em -o"},
-    {"lemma":"deixar","pos":"VERB","paradigmId":"V_AR","note":"verbo regular"},
-    {"lemma":"brilhar","pos":"VERB","paradigmId":"V_AR","note":"verbo regular"},
-    {"lemma":"voar","pos":"VERB","paradigmId":"V_AR","note":"verbo regular"},
+    {"lemma":"ajuda","pos":"NOUN","gender":"Fem","semanticType":"ABSTRATO","paradigmId":"N_S","note":"substantivo do gabarito e do uso geral"},
+    {"lemma":"menina","pos":"NOUN","gender":"Fem","semanticType":"PESSOA","paradigmId":"N_S","note":"substantivo regular em -a"},
+    {"lemma":"pássaro","pos":"NOUN","gender":"Masc","semanticType":"ANIMAL","paradigmId":"N_S","note":"substantivo regular em -o"},
+    {"lemma":"deixar","pos":"VERB","sense":"deixar.CESSAR","paradigmId":"V_AR","note":"verbo regular; cessação de ação"},
+    {"lemma":"brilhar","pos":"VERB","sense":"brilhar.BRILHAR","paradigmId":"V_AR","note":"verbo regular; emissão de luz"},
+    {"lemma":"voar","pos":"VERB","sense":"voar.VOAR","paradigmId":"V_AR","note":"verbo regular"},
+    {"lemma":"fumar","pos":"VERB","sense":"fumar.FUMAR","paradigmId":"V_AR","note":"verbo regular"},
+    {"lemma":"chover","pos":"VERB","sense":"chover.CHOVER","paradigmId":"V_ER","note":"verbo impessoal em uso meteorológico"},
     {"lemma":"português","pos":"NOUN","gender":"Masc","paradigmId":"N_S","note":"nome de idioma, homógrafo do adjetivo"},
     {"lemma":"bom","pos":"ADJECTIVE","gender":"Masc","paradigmId":"ADJ_UNIFORM","note":"adjetivo; formas irregulares futuras exigem paradigma próprio"}
   ]

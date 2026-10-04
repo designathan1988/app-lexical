@@ -1,0 +1,31 @@
+{
+  "prepositions": [
+    {"id":"ADJ_EM_LUGAR","form":"em","semanticType":"LUGAR","role":"LOC","note":"localização"},
+    {"id":"ADJ_A_LUGAR","form":"a","semanticType":"LUGAR","role":"LOC","note":"direção ou localização"},
+    {"id":"ADJ_DE_TEMPO","form":"de","semanticType":"TEMPO","role":"TIME","note":"período de tempo"},
+    {"id":"ADJ_A_TEMPO","form":"a","semanticType":"TEMPO","role":"TIME","note":"tempo marcado por crase"},
+    {"id":"ADJ_COM_PESSOA","form":"com","semanticType":"PESSOA","role":"COM","note":"companhia"},
+    {"id":"ADJ_COM_SER_VIVO","form":"com","semanticType":"SER_VIVO","role":"COM","note":"companhia"},
+    {"id":"ADJ_EM_TEMPO","form":"em","semanticType":"TEMPO","role":"TIME","note":"localização temporal"},
+    {"id":"ADJ_EM_ENTIDADE","form":"em","semanticType":"ENTIDADE","role":"LOC","note":"localização com referente concreto ou institucional"},
+    {"id":"ADJ_A_ENTIDADE","form":"a","semanticType":"ENTIDADE","role":"LOC","note":"direção ou localização com referente"}
+  ],
+  "markers": [
+    {"id":"MARK_CONDITION","form":"se","role":"condition","note":"oração condicional"},
+    {"id":"MARK_CAUSE","form":"porque","role":"cause","note":"oração causal"},
+    {"id":"MARK_TIME","form":"quando","role":"TIME","note":"oração temporal"}
+  ],
+  "interrogatives": [
+    {"id":"INT_LOC","form":"onde","role":"LOC","semanticType":"LUGAR","note":"pergunta locativa"},
+    {"id":"INT_TIME","form":"quando","role":"TIME","semanticType":"TEMPO","note":"pergunta temporal"},
+    {"id":"INT_MANNER","form":"como","role":"MANNER","semanticType":"QUALIDADE","note":"pergunta de modo"}
+  ],
+  "adverbs": [
+    {"id":"ADV_EMPH","form":"nem","role":"emph","note":"foco enfático negativo"},
+    {"id":"ADV_NEG_FREQ","form":"nunca","role":"freq","polarity":"negative","note":"frequência negativa"},
+    {"id":"ADV_MUITO","form":"muito","role":"degree","note":"grau"},
+    {"id":"ADV_TIME","semanticType":"TEMPO","role":"TIME","note":"adjunto temporal"},
+    {"id":"ADV_MANNER","semanticType":"QUALIDADE","role":"MANNER","note":"adjunto de modo"},
+    {"id":"ADV_DEGREE","semanticType":"QUANTIDADE","role":"degree","note":"adjunto de grau"}
+  ]
+}

@@ -61,6 +61,13 @@ export class DependencyParser {
         const head = nearestRight(i, (candidate) => pos(candidate) === 'NOUN' || pos(candidate) === 'PROPN', i + 4);
         if (head >= 0) set(i, head, pos(i) === 'NUM' ? 'nummod' : 'det', pos(i) === 'NUM' ? 'UD_NUMMOD' : 'UD_DET');
       }
+      if (pos(i) === 'PRON' && feat(i, 'PronType') === 'Int' && pos(i + 1) === 'NOUN') {
+        set(i, i + 1, 'det', 'UD_INTERROGATIVE_DET');
+      }
+      if ((pos(i) === 'DET' || pos(i) === 'PRON') && pos(i + 1) === 'PRON' && feat(i + 1, 'PronType') === 'Int' && pos(i + 2) !== 'NOUN') {
+        set(i, root, 'obj', 'UD_INTERROGATIVE_FIXED_HEAD');
+        set(i + 1, i, 'fixed', 'UD_INTERROGATIVE_FIXED');
+      }
     }
 
     for (let i = 0; i < words.length; i++) {
@@ -115,7 +122,7 @@ export class DependencyParser {
       const end = clause === root && comma < 0 ? words.length : clause === root ? words.length : Math.min(words.length, nearestRight(clause, (candidate) => pos(candidate) === 'PUNCT') + 1 || words.length);
       const before = [] as number[];
       for (let i = start; i < head; i++) {
-        if (!nominals.has(pos(i)) || assigned(i)) continue;
+        if (!nominals.has(pos(i)) || assigned(i) || feat(i, 'Clitic') === 'Yes') continue;
         if (nearestLeft(i, (candidate) => pos(candidate) === 'ADP' && arcs[candidate].head === i + 1) >= 0) continue;
         before.push(i);
       }
@@ -134,7 +141,10 @@ export class DependencyParser {
       if (!nominals.has(pos(i)) || assigned(i) || i === root) continue;
       const caseMarker = nearestLeft(i, (candidate) => pos(candidate) === 'ADP' && arcs[candidate].head === i + 1);
       if (caseMarker >= 0) set(i, governor(caseMarker), 'obl', 'UD_OBL_CASE');
-      else set(i, governor(i), 'obj', 'UD_OBJ');
+      else {
+        const followingXcomp = words[i].selected.feats.Clitic === 'Yes' && arcs[i + 1]?.deprel === 'xcomp' ? i + 1 : -1;
+        set(i, followingXcomp >= 0 ? followingXcomp : governor(i), 'obj', followingXcomp >= 0 ? 'UD_CLITIC_XCOMP' : 'UD_OBJ');
+      }
     }
     for (let i = 0; i < words.length; i++) {
       if (pos(i) !== 'ADV' || assigned(i)) continue;
