@@ -35,6 +35,19 @@ describe('grafo de significado', () => {
     expect(graph.attributes).toContainEqual(expect.objectContaining({ role: 'polite', value: '+' }));
   });
 
+  it('preserva o papel locativo depois de expandir uma contração', () => {
+    const graph = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Nós estudamos na escola.').meaningGraph;
+    const school = graph.nodes.find((node) => node.concept === 'escola');
+    expect(school).toBeDefined();
+    expect(graph.edges.some((edge) => edge.to === school!.id && edge.role === 'LOC')).toBe(true);
+  });
+
+  it('não cria pronome espúrio ao expandir crase temporal', () => {
+    const graph = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('A lua brilha à noite.').meaningGraph;
+    expect(graph.nodes.some((node) => node.concept === 'ela')).toBe(false);
+    expect(graph.edges.some((edge) => edge.role === 'TIME' && graph.nodes.find((node) => node.id === edge.to)?.concept === 'noite')).toBe(true);
+  });
+
   it('reutiliza o nó do sujeito no complemento de controle', () => {
     const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Eu quero tomar café.');
     const graph = analysis.meaningGraph;

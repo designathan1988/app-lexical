@@ -98,19 +98,20 @@ export class SemanticEngine {
   /** Analisa uma frase do português sem executar operações no documento. */
   analyzeSentence(text: string): SentenceAnalysis {
     const tokenization = tokenizeSentence(text);
-    const tagger = new LanguageTagger(new LexicalAnalyzer(this.knowledgeBase.lexemes, this.knowledgeBase.languageRoots));
+    const lexical = new LexicalAnalyzer(this.knowledgeBase.lexemes, this.knowledgeBase.languageRoots);
+    const tagger = new LanguageTagger(lexical);
     const tagged = tagger.tagForms(tokenization.words.map((word) => word.form));
     for (const multiword of tokenization.multiwords) {
       const first = tagged.words[multiword.from - 1];
       const second = tagged.words[multiword.from];
-      const adposition = first?.readings.find((reading) => reading.upos === 'ADP');
-      const determiner = second?.readings.find((reading) => reading.upos === 'DET');
+      const adposition = first && lexical.analyzeSurface(first.form).find((reading) => reading.upos === 'ADP');
+      const determiner = second && lexical.analyzeSurface(second.form).find((reading) => reading.upos === 'DET');
       if (!adposition || !determiner) continue;
       for (const [word, selected, rule, index] of [
         [first, adposition, 'CONTRACTION_ADP', multiword.from - 1],
         [second, determiner, 'CONTRACTION_DET', multiword.from]
       ] as const) {
-        const removed = word.readings.filter((reading) => reading !== selected);
+        const removed = lexical.analyzeSurface(word.form).filter((reading) => reading !== selected);
         word.readings = [selected];
         word.selected = selected;
         if (removed.length) tagged.trace.push({ rule, index, removed });

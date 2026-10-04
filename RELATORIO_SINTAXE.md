@@ -47,7 +47,7 @@ As 80 frases do gabarito contêm 431 tokens para UPOS e dependências; as 20 ext
 | Grafo exato (F1 = 1) | 62/80 (77,5%) | 12/20 (60%) |
 | Sentido esperado presente | 74/80 (92,5%) | 19/20 (95%) |
 
-Fase 1: os três casos de ruído, as dez palavras de radical latino fora dos dados e os dois comandos de domínio passaram. Fase 2: 40 formas de classe fechada, seis contrações e os demais casos somam 49 testes aprovados. Fase 3: **258/258** casos de flexão. Fase 4: os limiares de UPOS foram atingidos. Fase 5: os limiares de UAS, LAS, sujeito e predicado foram atingidos. Fase 6: os três limiares de grafo foram atingidos **no gabarito**; nas extras, grafos exatos ficaram em 60%, sem limiar exigido nessa fase. Fase 8: `surfar` gerou 53 formas e 11 hipóteses derivacionais na vista de rede; `surfista` aparece como `AGENT_OF(surfar)`.
+Fase 1: os três casos de ruído, as dez palavras de radical latino fora dos dados e os dois comandos de domínio passaram. Fase 2: 40 formas iniciais e 34 formas adicionais de classe fechada, seis contrações e os demais casos somam 83 testes aprovados. Fase 3: **258/258** casos de flexão. Fase 4: os limiares de UPOS foram atingidos; `SELECT`, `REMOVE` e desempate por ordem são rastreados. Fase 5: os limiares de UAS, LAS, sujeito e predicado foram atingidos. Fase 6: os três limiares de grafo foram atingidos **no gabarito**; nas extras, grafos exatos ficaram em 60%, sem limiar exigido nessa fase. Fase 8: `surfar` gerou 53 formas e 11 hipóteses derivacionais na vista de rede; `surfista` aparece como `AGENT_OF(surfar)`.
 
 ## Falhas restantes e causas
 
@@ -73,6 +73,6 @@ No Chrome local, `http://127.0.0.1:5173/`, foram verificados: chat → “Eu que
 
 ## Verificação final
 
-Saída final observada após o relatório, o ajuste de `AUX` e a correção de concordância: `npm test` → **38 arquivos aprovados, 509 testes aprovados (509)**, sem falhas; `npx tsc --noEmit` → código de saída `0`; `npm run build` → código de saída `0`, 124 módulos transformados, bundle principal de 1.208,16 kB; `git diff --check` → código de saída `0`. O Vite emitiu aviso de chunk acima de 500 kB; o limite não foi afrouxado.
+Saída final observada após a ampliação das classes fechadas e o trace de desambiguação: `npm test` → **38 arquivos aprovados, 546 testes aprovados (546)**, sem falhas; `npx tsc --noEmit` → código de saída `0`; `npm run build` → código de saída `0`, 124 módulos transformados, bundle principal de 1.211,98 kB. O Vite emitiu aviso de chunk acima de 500 kB; o limite não foi afrouxado.
 
 Comandos do construtor preservados, exceto a recuperação derivacional avaliativa solicitada (`DERIVED_MATCH`); a suíte antiga de 413 testes permaneceu verde. Não houve instalação de dependências de runtime, uso de rede em tempo de execução, `eval`, `new Function` ou aleatoriedade na camada nova.

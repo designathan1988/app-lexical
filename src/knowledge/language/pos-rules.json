@@ -1,6 +1,8 @@
 {
+  "fallbackRuleId": "CG_DEFAULT_ORDER",
   "rules": [
     {"id":"CG_DET_NOUN","action":"SELECT","target":{"upos":"DET"},"context":[{"offset":1,"upos":["NOUN","ADJ","NUM","PROPN"]}],"note":"determinante precede núcleo nominal","example":"a menina"},
+    {"id":"CG_REMOVE_VERB_AFTER_DET","action":"REMOVE","target":{"upos":"VERB"},"context":[{"offset":-1,"upos":["DET"]}],"note":"homógrafo verbal após determinante perde a leitura de verbo","example":"o corte"},
     {"id":"CG_NOUN_AFTER_DET","action":"SELECT","target":{"upos":"NOUN"},"context":[{"offset":-1,"upos":["DET","NUM"]}],"note":"núcleo nominal depois de determinante","example":"o corte"},
     {"id":"CG_REL_AFTER_NOUN","action":"SELECT","target":{"upos":"PRON","feats":{"PronType":"Rel"}},"context":[{"offset":-1,"upos":["NOUN","PROPN"]}],"note":"relativo depois de antecedente nominal","example":"livro que li"},
     {"id":"CG_REL_ADV_AFTER_NOUN","action":"SELECT","target":{"upos":"ADV","feats":{"PronType":"Rel"}},"context":[{"offset":-1,"upos":["NOUN","PROPN"]}],"note":"advérbio relativo depois de antecedente nominal","example":"casa onde moro"},

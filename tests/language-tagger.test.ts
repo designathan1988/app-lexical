@@ -56,4 +56,11 @@ describe('desambiguação de classe por regras', () => {
     expect(tagged.words[0].selected.upos).toBe('DET');
     expect(tagged.trace.some((event) => event.rule && event.removed.length)).toBe(true);
   });
+
+  it('registra REMOVE e a escolha determinística por ordem', () => {
+    const noun = tagger.tagForms(['O', 'corte', '.']);
+    expect(noun.trace.some((event) => event.rule === 'CG_REMOVE_VERB_AFTER_DET' && event.removed.some((reading) => reading.upos === 'VERB')), JSON.stringify(noun)).toBe(true);
+    const ambiguous = tagger.tagForms(['a']);
+    expect(ambiguous.trace.some((event) => event.rule === 'CG_DEFAULT_ORDER' && event.removed.length > 0)).toBe(true);
+  });
 });

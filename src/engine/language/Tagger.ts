@@ -42,6 +42,7 @@ export interface TaggingResult {
 }
 
 const rules = (rulesData as unknown as { rules: Rule[] }).rules;
+const fallbackRuleId = (rulesData as { fallbackRuleId?: string }).fallbackRuleId ?? 'CG_DEFAULT_ORDER';
 const copulas = new Set((copulaData as { lemmas: string[] }).lemmas);
 
 function readingMatches(reading: LexicalReading, target: { upos: string; feats?: Record<string, string>; lemmaClass?: string }): boolean {
@@ -94,6 +95,14 @@ export class LanguageTagger {
         word.selected = kept[0];
         trace.push({ rule: rule.id, index, removed });
       }
+    }
+    for (let index = 0; index < words.length; index++) {
+      const word = words[index];
+      if (word.readings.length < 2) continue;
+      const removed = word.readings.slice(1);
+      word.readings = [word.readings[0]];
+      word.selected = word.readings[0];
+      trace.push({ rule: fallbackRuleId, index, removed });
     }
     return { words, trace };
   }

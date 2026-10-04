@@ -22,6 +22,20 @@ const forms: Array<[string, string, string]> = [
 ];
 
 describe('classes fechadas e tokenização', () => {
+  it.each([
+    ['si', 'PRON'], ['comigo', 'PRON'], ['contigo', 'PRON'], ['lhes', 'PRON'],
+    ['meus', 'DET'], ['minhas', 'DET'], ['teu', 'DET'], ['tua', 'DET'],
+    ['nossos', 'DET'], ['estas', 'DET'], ['aqueles', 'DET'],
+    ['todas', 'DET'], ['alguns', 'DET'], ['nenhum', 'DET'], ['qualquer', 'DET'],
+    ['onze', 'NUM'], ['doze', 'NUM'], ['vinte', 'NUM'], ['trinta', 'NUM'], ['mil', 'NUM'],
+    ['desde', 'ADP'], ['contra', 'ADP'], ['após', 'ADP'], ['durante', 'ADP'],
+    ['porém', 'CCONJ'], ['portanto', 'CCONJ'], ['caso', 'SCONJ'],
+    ['agora', 'ADV'], ['sempre', 'ADV'], ['talvez', 'ADV'], ['aí', 'ADV'], ['ali', 'ADV'],
+    ['mais', 'ADV'], ['menos', 'ADV']
+  ] as Array<[string, string]>)('inclui forma fechada adicional %s', (form, upos) => {
+    expect(closedClassReadings(form).some((reading) => reading.upos === upos)).toBe(true);
+  });
+
   it.each(forms)('reconhece %s como %s/%s', (form, lemma, upos) => {
     expect(closedClassReadings(form)).toContainEqual(expect.objectContaining({ lemma, upos }));
   });
