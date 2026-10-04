@@ -1,6 +1,7 @@
 import { useSyncExternalStore, useCallback, useState } from 'react';
 import { SemanticEngine, type CommandResult } from '../engine/SemanticEngine';
 import { KnowledgeBaseStore } from '../knowledge/KnowledgeBaseStore';
+import { IndexedDbKnowledgeBaseBackend } from '../knowledge/IndexedDbKnowledgeBaseBackend';
 
 export interface ChatEntry {
   id: number;
@@ -19,6 +20,26 @@ export interface AppContext {
 }
 
 let context: AppContext | null = null;
+let pendingContext: Promise<AppContext> | null = null;
+
+/** Inicializa a base persistida antes da primeira renderização. */
+export function initializeContext(): Promise<AppContext> {
+  if (context) return Promise.resolve(context);
+  if (pendingContext) return pendingContext;
+  pendingContext = (async () => {
+    const store = new KnowledgeBaseStore();
+    try {
+      const backend = await IndexedDbKnowledgeBaseBackend.open();
+      await store.attachBackend(backend);
+    } catch (error) {
+      store.lastPersistError = `IndexedDB indisponível; usando o armazenamento local limitado: ${(error as Error).message}`;
+    }
+    const engine = new SemanticEngine(store.kb, store.settings);
+    context = { engine, store };
+    return context;
+  })();
+  return pendingContext;
+}
 
 export function getContext(): AppContext {
   if (!context) {

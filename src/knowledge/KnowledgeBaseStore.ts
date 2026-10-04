@@ -16,6 +16,7 @@ import { LANGUAGE_PARADIGMS, suggestParadigm } from '../engine/language/Language
 import type { TeachableRoot, TeachRootInput } from './language/teachableRoot';
 import frameData from './morphology/frames.json';
 import semanticTypes from './morphology/semantic-types.json';
+import type { KnowledgeBaseBackend, PersistedKnowledgeBase } from './KnowledgeBaseBackend';
 
 export type { EngineSettings };
 export const DEFAULT_SETTINGS: EngineSettings = DEFAULT_ENGINE_SETTINGS;
@@ -101,6 +102,8 @@ export class KnowledgeBaseStore {
   private versionCounter = 0;
   private trainingCounter = 0;
   private persistEnabled = true;
+  private backend?: KnowledgeBaseBackend;
+  private pendingPersistence: Promise<void> = Promise.resolve();
 
   constructor(initial?: KnowledgeBase, opts: { persist?: boolean } = {}) {
     const persist = opts.persist ?? true;
@@ -208,19 +211,81 @@ export class KnowledgeBaseStore {
     this.emit();
   }
 
+  /** Lê a base transacional antes de a interface ser montada; migra a cópia local antiga se o banco estiver vazio. */
+  async attachBackend(backend: KnowledgeBaseBackend): Promise<void> {
+    const saved = await backend.load();
+    let mergedRoots = false;
+    if (saved) {
+      this.kb = this.adoptKnowledgeBase(saved.knowledgeBase, saved.dataVersion);
+      for (const root of this.readSavedLanguageRoots()) {
+        if (!this.kb.languageRoots.some((item) => item.id === root.id)) {
+          this.kb.languageRoots.push(root);
+          mergedRoots = true;
+        }
+      }
+      this.settings = { ...DEFAULT_SETTINGS, ...saved.settings };
+      this.versions = saved.versions ?? [];
+      this.training = saved.training ?? [];
+      this.versionCounter = this.versions.length;
+      this.trainingCounter = this.training.length;
+    }
+    this.backend = backend;
+    this.persistEnabled = true;
+    if (saved) {
+      this.lastPersistError = null;
+      if (mergedRoots) {
+        this.persist();
+        await this.flushPersistence();
+      }
+      return;
+    }
+    this.persist();
+    try {
+      await this.flushPersistence();
+    } catch (error) {
+      this.lastPersistError = `Falha ao migrar a base para IndexedDB: ${(error as Error).message}`;
+    }
+  }
+
+  /** Aguarda a transação mais recente; rejeita quando o banco não confirmou a gravação. */
+  flushPersistence(): Promise<void> {
+    return this.pendingPersistence;
+  }
+
+  private persistencePayload(): PersistedKnowledgeBase {
+    return {
+      dataVersion: KB_DATA_VERSION,
+      knowledgeBase: this.kb,
+      settings: this.settings,
+      versions: this.versions,
+      training: this.training
+    };
+  }
+
   private persist(): void {
     if (!this.persistEnabled) return;
     const rootResult = safeSetItem(LANGUAGE_ROOTS_KEY, JSON.stringify({
       dataVersion: KB_DATA_VERSION,
       roots: this.kb.languageRoots
     }));
-    const payload = JSON.stringify({
-      dataVersion: KB_DATA_VERSION,
-      knowledgeBase: this.kb,
-      settings: this.settings,
-      versions: this.versions,
-      training: this.training
-    });
+    if (this.backend) {
+      const backend = this.backend;
+      const payload = structuredClone(this.persistencePayload());
+      const previous = this.pendingPersistence;
+      const writing = previous.then(() => backend.save(payload), () => backend.save(payload));
+      this.pendingPersistence = writing.then(
+        () => { this.lastPersistError = null; },
+        (error: Error) => {
+          this.lastPersistError = `Falha ao salvar a base no IndexedDB: ${error.message}`;
+          throw error;
+        }
+      );
+      void this.pendingPersistence.catch((error: Error) => {
+        this.lastPersistError = `Falha ao salvar a base no IndexedDB: ${error.message}`;
+      });
+      return;
+    }
+    const payload = JSON.stringify(this.persistencePayload());
     const result = safeSetItem(STORAGE_KEY, payload);
     this.lastPersistError = !rootResult.ok
       ? `Falha ao salvar raízes ensinadas: ${rootResult.reason}`

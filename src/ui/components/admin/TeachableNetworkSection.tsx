@@ -44,23 +44,28 @@ export function TeachableNetworkSection({ store, onChange }: Props) {
   const [frameTemplateId, setFrameTemplateId] = useState(frames[0]?.id ?? '');
   const [selectedId, setSelectedId] = useState(store.kb.languageRoots[0]?.id ?? '');
   const [message, setMessage] = useState('');
+  const [saving, setSaving] = useState(false);
   const suggestion = useMemo(() => suggestParadigm(lemma.trim().toLocaleLowerCase('pt-BR'), pos), [lemma, pos]);
   const selectedParadigm = paradigmId || suggestion?.id || '';
   const root = store.kb.languageRoots.find((item) => item.id === selectedId);
   const network = root ? buildNetworkView(root, store.kb) : null;
   const paradigms = Object.values(LANGUAGE_PARADIGMS).filter((item) => item.pos === pos);
 
-  const teach = () => {
+  const teach = async () => {
+    let added = false;
     try {
+      setSaving(true);
       const taught = store.teachRoot({ lemma, pos, paradigmId: selectedParadigm, gloss, semanticType, ...(pos === 'VERB' ? { frameTemplateId } : {}) });
+      added = true;
       setSelectedId(taught.id);
-      setMessage(store.lastPersistError
-        ? `Raiz “${taught.lemma}” salva separadamente. O histórico completo excedeu a cota local.`
-        : `Raiz “${taught.lemma}” ensinada e salva na base.`);
       setView('network');
       onChange();
+      await store.flushPersistence();
+      setMessage(`Raiz “${taught.lemma}” e histórico completo salvos na base local.`);
     } catch (error) {
-      setMessage((error as Error).message);
+      setMessage(added ? `A gravação completa falhou: ${(error as Error).message}` : (error as Error).message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -79,7 +84,7 @@ export function TeachableNetworkSection({ store, onChange }: Props) {
       <label>Glosa do sentido<input value={gloss} onChange={(event) => setGloss(event.target.value)} placeholder="descreva o significado" /></label>
       <label>Tipo semântico<select value={semanticType} onChange={(event) => setSemanticType(event.target.value)}>{types.map((item) => <option key={item.id} value={item.id}>{item.id} — {item.definition}</option>)}</select></label>
       {pos === 'VERB' && <label>Moldura verbal existente<select value={frameTemplateId} onChange={(event) => setFrameTemplateId(event.target.value)}>{frames.map((item) => <option key={item.id} value={item.id}>{item.id}</option>)}</select></label>}
-      <button className="primary" onClick={teach}>Ensinar palavra</button>
+      <button className="primary" onClick={teach} disabled={saving}>{saving ? 'Salvando…' : 'Ensinar palavra'}</button>
     </div> : <div>
       <label className="network-select">Raiz<select value={selectedId} onChange={(event) => setSelectedId(event.target.value)}><option value="">Escolha uma raiz</option>{store.kb.languageRoots.map((item) => <option key={item.id} value={item.id}>{item.lemma}</option>)}</select></label>
       {network ? <>

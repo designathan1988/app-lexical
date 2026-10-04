@@ -77,6 +77,7 @@ export function AdminPanel({ engine, store, onChange }: Props) {
 
       <main className="admin-body">
         {store.migrationNotice && <p className="ok">{store.migrationNotice}</p>}
+        {store.lastPersistError && <p className="err" role="alert">{store.lastPersistError}</p>}
         {tab === 'dados' && <DataSection engine={engine} store={store} onChange={bump} />}
         {tab === 'paradigmas' && <ParadigmSection engine={engine} store={store} onChange={bump} />}
         {tab === 'morfologia' && <MorphologySection engine={engine} />}
