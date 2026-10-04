@@ -35,6 +35,8 @@ describe('vistas da análise geral', () => {
     expect(html).toContain('tomar.INGERIR');
     expect(html).toContain('PENMAN');
     expect(html).toContain('ARG0');
+    expect(html).toContain('SENSE_PREFERENCE');
+    expect(html).toContain('FRAME:tomar.INGERIR:ARG1');
   });
 
   it('oferece texto livre e comparação do gabarito no painel', () => {

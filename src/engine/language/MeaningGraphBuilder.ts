@@ -136,6 +136,7 @@ export class MeaningGraphBuilder {
       const scored = candidates.map((frame, order) => {
         let score = 0;
         const appliedCoercions: Array<{ rule: string; token: number; detail: string }> = [];
+        const preferences: Array<{ rule: string; token: number; detail: string }> = [];
         for (const arc of arcs.filter((item) => item.head === index + 1)) {
           if (!['nsubj', 'obj', 'obl', 'xcomp', 'ccomp'].includes(arc.deprel)) continue;
           const role = arc.deprel === 'nsubj' ? preferredRole(frame, arc.deprel, 'ARG0')
@@ -144,13 +145,16 @@ export class MeaningGraphBuilder {
           const argumentType = arc.deprel === 'xcomp' ? 'ACAO' : arc.deprel === 'ccomp' ? 'INFORMACAO' : typeOf(arc.id - 1);
           const prefers = frame.roles?.[role]?.prefers ?? [];
           const coercedType = coercions.find((item) => isSubtype(argumentType, item.from) && interrogativeRoles.includes(item.contextRole) && prefers.some((type) => isSubtype(item.to, type)));
-          const distances = prefers.map((type) => subtypeDistance(argumentType, type))
-            .filter((distance): distance is number => distance !== undefined);
-          if (distances.length) {
+          const matches = prefers.map((type) => ({ type, distance: subtypeDistance(argumentType, type) }))
+            .filter((match): match is { type: string; distance: number } => match.distance !== undefined)
+            .sort((a, b) => a.distance - b.distance);
+          if (matches.length) {
             score += 2;
             if ((arc.deprel === 'obj' || arc.deprel === 'obl') && isSubtype(argumentType, 'OBJETO')) {
-              score += 1 / (1 + Math.min(...distances));
+              score += 1 / (1 + matches[0].distance);
             }
+            preferences.push({ rule: 'SENSE_PREFERENCE', token: arc.id,
+              detail: `${frame.id}:${role}:${argumentType}→${matches[0].type}:dist=${matches[0].distance}` });
           }
           else if (coercedType) score += 2;
           else if (prefers.length) score -= 1;
@@ -163,11 +167,12 @@ export class MeaningGraphBuilder {
           const interrogative = adjuncts.interrogatives.find((item) => item.form === words[arc.id - 1].selected.lemma);
           if (interrogative && Object.values(frame.roles ?? {}).some((role) => role.prefers?.includes(interrogative.semanticType))) score += 2;
         }
-        return { frame, score, order: seedOrder.indexOf(frame.id) >= 0 ? seedOrder.indexOf(frame.id) : order + seedOrder.length, appliedCoercions };
+        return { frame, score, order: seedOrder.indexOf(frame.id) >= 0 ? seedOrder.indexOf(frame.id) : order + seedOrder.length, appliedCoercions, preferences };
       }).sort((a, b) => b.score - a.score || a.order - b.order);
       if (scored.length > 1 && scored[0].score === scored[1].score) diagnostics.push({ code: 'AMBIGUOUS_SENSE', alternatives: scored.filter((item) => item.score === scored[0].score).map((item) => item.frame.id) });
       if (scored[0].frame.defaultTemplate) diagnostics.push({ code: 'UNCERTAIN_FRAME', alternatives: [scored[0].frame.id] });
       trace.push(...scored[0].appliedCoercions);
+      trace.push(...scored[0].preferences);
       trace.push({ rule: 'SENSE_FRAME_PREF', token: index + 1, detail: scored.map((item) => `${item.frame.id} (${item.score})`).join(' > ') });
       return scored[0].frame;
     };
@@ -224,10 +229,14 @@ export class MeaningGraphBuilder {
       if (relation === 'nsubj') {
         const copularPredicate = words[headIndex].selected.upos === 'ADJ' || arcs.some((arc) => arc.head === headIndex + 1 && arc.deprel === 'cop');
         const antecedent = relativeAntecedent(index, headIndex);
-        edge(head, preferredRole(selectedFrames.get(headIndex), 'nsubj', copularPredicate ? 'ARG1' : 'ARG0'), content(antecedent >= 0 ? antecedent : index), antecedent >= 0 ? 'SEM_RELATIVE_SUBJECT' : 'SEM_SUBJECT_FRAME');
+        const frame = selectedFrames.get(headIndex);
+        const role = preferredRole(frame, 'nsubj', copularPredicate ? 'ARG1' : 'ARG0');
+        edge(head, role, content(antecedent >= 0 ? antecedent : index), antecedent >= 0 ? 'SEM_RELATIVE_SUBJECT' : frame ? `FRAME:${frame.id}:${role}` : 'SEM_SUBJECT_FALLBACK');
       } else if (relation === 'obj') {
         const antecedent = relativeAntecedent(index, headIndex);
-        edge(head, preferredRole(selectedFrames.get(headIndex), 'obj', 'ARG1'), content(antecedent >= 0 ? antecedent : index), antecedent >= 0 ? 'SEM_RELATIVE_OBJECT' : 'SEM_OBJECT_FRAME');
+        const frame = selectedFrames.get(headIndex);
+        const role = preferredRole(frame, 'obj', 'ARG1');
+        edge(head, role, content(antecedent >= 0 ? antecedent : index), antecedent >= 0 ? 'SEM_RELATIVE_OBJECT' : frame ? `FRAME:${frame.id}:${role}` : 'SEM_OBJECT_FALLBACK');
       } else if (relation === 'obl') {
         const assignment = roleForOblique(headIndex, index);
         edge(head, assignment.role, content(index), assignment.rule);
