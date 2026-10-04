@@ -320,8 +320,16 @@ export class DependencyParser {
       };
       const question = words.some((word, index) => word.form === '?' ||
         word.selected.feats.PronType === 'Int' && !embeddedInterrogatives.some((entry) => entry.marker === index));
+      const embeddedAdverb = embeddedInterrogatives.some((entry) => entry.clause === clause && pos(entry.marker) === 'ADV');
+      const clauseLemma = words[head].selected.lemma;
+      const clauseFrames = [...frames, ...this.languageRoots.map((entry) => entry.frame)
+        .filter((frame): frame is NonNullable<typeof frame> => Boolean(frame))]
+        .filter((frame) => frame.id.startsWith(`${clauseLemma}.`));
+      const intransitiveClause = clauseFrames.length > 0 && clauseFrames.every((frame) =>
+        !frame.syntax?.some((mapping) => Object.values(mapping).includes('obj')));
       const subject = before.length ? [...before].sort((a, b) => agreement(b) - agreement(a) || b - a)[0]
         : question && clause === root ? nearestRight(head, (candidate) => candidate < end && isNominal(candidate) && !assigned(candidate))
+          : embeddedAdverb && intransitiveClause ? nearestRight(head, (candidate) => candidate < end && isNominal(candidate) && !assigned(candidate))
           : -1;
       if (subject !== undefined && subject >= 0 && subject < end && subject !== root) {
         const copular = copularPredicates.find((entry) => entry.predicate === head);
@@ -331,7 +339,10 @@ export class DependencyParser {
         const relative = nearestLeft(clause, (candidate) => feat(candidate, 'PronType') === 'Rel' && !assigned(candidate));
         if (relative >= 0) {
           if (pos(relative) === 'ADV') set(relative, clause, 'advmod', 'UD_RELATIVE_ADVERB');
-          else set(relative, clause, subject >= 0 ? 'obj' : 'nsubj', subject >= 0 ? 'UD_RELATIVE_OBJECT' : 'UD_RELATIVE_SUBJECT');
+          else {
+            const objectRelative = subject >= 0 || finiteFeats.Person !== undefined && finiteFeats.Person !== '3';
+            set(relative, clause, objectRelative ? 'obj' : 'nsubj', objectRelative ? 'UD_RELATIVE_OBJECT' : 'UD_RELATIVE_SUBJECT');
+          }
         }
       }
     }
@@ -342,6 +353,11 @@ export class DependencyParser {
       } else {
         const overtSubject = arcs.some((arc) => arc.head === entry.clause + 1 && arc.deprel === 'nsubj');
         set(entry.marker, entry.clause, overtSubject ? entry.rule.nominalObjectRelation : entry.rule.nominalSubjectRelation, entry.rule.id);
+        const preceding = entry.marker - 1;
+        if (preceding >= 0 && (pos(preceding) === 'DET' || pos(preceding) === 'PRON') &&
+          arcs[preceding].deprel === 'obj' && arcs[preceding].head === root + 1) {
+          set(preceding, entry.marker, 'fixed', `${entry.rule.id}_FIXED`);
+        }
       }
     }
 

@@ -175,7 +175,9 @@ export class MeaningGraphBuilder {
             : arc.deprel === 'obj' ? preferredRole(frame, arc.deprel, 'ARG1')
               : arc.deprel === 'obl' ? preferredRole(frame, arc.deprel, 'ARG2')
                 : preferredRole(frame, arc.deprel, 'ARG1');
-          const argumentType = arc.deprel === 'xcomp' ? 'ACAO' : arc.deprel === 'ccomp' ? 'INFORMACAO' : typeOf(arc.id - 1);
+          const antecedent = relativeAntecedent(arc.id - 1, index);
+          const argumentType = arc.deprel === 'xcomp' ? 'ACAO' : arc.deprel === 'ccomp' ? 'INFORMACAO'
+            : typeOf(antecedent >= 0 ? antecedent : arc.id - 1);
           const prefers = frame.roles?.[role]?.prefers ?? [];
           const coercedType = coercions.find((item) => isSubtype(argumentType, item.from) && interrogativeRoles.includes(item.contextRole) && prefers.some((type) => isSubtype(item.to, type)));
           const matches = prefers.map((type) => ({ type, distance: subtypeDistance(argumentType, type) }))
