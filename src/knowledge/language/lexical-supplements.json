@@ -1,6 +1,7 @@
 {
   "entries": [
     {"lemma":"ajuda","pos":"NOUN","gender":"Fem","semanticType":"ABSTRATO","paradigmId":"N_S","note":"substantivo do gabarito e do uso geral"},
+    {"lemma":"aluno","pos":"NOUN","gender":"Masc","semanticType":"PESSOA","paradigmId":"N_S","note":"substantivo regular em -o"},
     {"lemma":"menina","pos":"NOUN","gender":"Fem","semanticType":"PESSOA","paradigmId":"N_S","note":"substantivo regular em -a"},
     {"lemma":"pássaro","pos":"NOUN","gender":"Masc","semanticType":"ANIMAL","paradigmId":"N_S","note":"substantivo regular em -o"},
     {"lemma":"deixar","pos":"VERB","sense":"deixar.CESSAR","paradigmId":"V_AR","note":"verbo regular; cessação de ação"},

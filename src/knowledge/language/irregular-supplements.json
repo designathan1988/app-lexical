@@ -1,0 +1,10 @@
+{
+  "entries": [
+    {
+      "lemma": "sorrir",
+      "form": "sorri",
+      "features": "Number=Sing|Person=3|Mood=Ind|VerbForm=Fin|Tense=Pres",
+      "note": "presente do indicativo com alternância da vogal do radical"
+    }
+  ]
+}

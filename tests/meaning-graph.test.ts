@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import gold from '../research/morfologia/tests-sentences.json';
+import extras from './fixtures/sentences-extra.json';
 import { SemanticEngine } from '../src/engine/SemanticEngine';
 import { createInitialKnowledgeBase } from '../src/knowledge/knowledgeBase';
 import { smatchF1 } from '../src/eval/graphMatch';
@@ -63,5 +64,28 @@ describe('grafo de significado', () => {
     expect(sum / sentences.length).toBeGreaterThanOrEqual(0.85);
     expect(exact / sentences.length).toBeGreaterThanOrEqual(0.70);
     expect(senses / sentences.length).toBeGreaterThanOrEqual(0.90);
+  });
+
+  it('mede grafos e sentidos nas vinte frases extras', () => {
+    const engine = new SemanticEngine(createInitialKnowledgeBase());
+    const entries = (extras as { sentences: Array<{ text: string; meaningGraph: string }> }).sentences;
+    let sum = 0;
+    let exact = 0;
+    let senses = 0;
+    const failures: string[] = [];
+    const senseFailures: string[] = [];
+    for (let index = 0; index < entries.length; index++) {
+      const sentence = entries[index];
+      const graph = engine.analyzeSentence(sentence.text).meaningGraph;
+      const f1 = smatchF1(graph.penman, sentence.meaningGraph);
+      sum += f1;
+      if (f1 === 1) exact++;
+      else failures.push(`extra-${String(index + 1).padStart(3, '0')}:${f1.toFixed(3)}`);
+      const expectedSense = sentence.meaningGraph.match(/[\p{L}]+\.[A-Z_]+/u)?.[0];
+      if (!expectedSense || graph.nodes.some((node) => node.concept === expectedSense)) senses++;
+      else senseFailures.push(`extra-${String(index + 1).padStart(3, '0')}:${expectedSense}`);
+    }
+    console.info('Grafo extras', 'Smatch médio', sum / entries.length, 'exatos', exact, '/', entries.length, 'sentidos', senses, '/', entries.length, 'falhas:', failures.join(', '), 'sentidos errados:', senseFailures.join(', '));
+    expect(entries.length).toBe(20);
   });
 });

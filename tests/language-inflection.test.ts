@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import gold from '../research/morfologia/tests-inflection.json';
 import sentences from '../research/morfologia/tests-sentences.json';
+import extraSentences from './fixtures/sentences-extra.json';
 import { LanguageInflector } from '../src/engine/language/LanguageInflector';
 import { LexicalAnalyzer } from '../src/engine/language/LexicalAnalyzer';
 
@@ -40,6 +41,9 @@ describe('flexão e índice inverso', () => {
     const analyzer = new LexicalAnalyzer();
     let total = 0;
     let hits = 0;
+    let lemmaHits = 0;
+    let featureHits = 0;
+    let featureTotal = 0;
     const failures: string[] = [];
     for (const sentence of (sentences as { sentences: Array<{ id: string; text: string; tokens: Array<{ form: string; lemma: string; pos: string; feats?: string }> }> }).sentences) {
       for (let index = 0; index < sentence.tokens.length; index++) {
@@ -47,6 +51,11 @@ describe('flexão e índice inverso', () => {
         if (expected.pos === 'PUNCT') continue;
         total++;
         const candidates = analyzer.analyzeSurface(expected.form);
+        if (candidates.some((reading) => reading.lemma === expected.lemma)) lemmaHits++;
+        if (expected.feats) {
+          featureTotal++;
+          if (candidates.some((reading) => Object.entries(Object.fromEntries(expected.feats!.split('|').map((feature) => feature.split('=')))).every(([key, value]) => reading.feats[key] === value))) featureHits++;
+        }
         const correct = candidates.some((reading) => reading.lemma === expected.lemma &&
           (!expected.feats || Object.entries(Object.fromEntries(expected.feats.split('|').map((feature) => feature.split('=')))).every(([key, value]) => reading.feats[key] === value)));
         if (correct) hits++;
@@ -54,6 +63,41 @@ describe('flexão e índice inverso', () => {
       }
     }
     console.info('Leitura lexical no gabarito', hits, '/', total, 'falhas:', failures.join(', '));
+    console.info('Lema gabarito', lemmaHits, '/', total, 'traços gabarito', featureHits, '/', featureTotal);
     expect(hits / total).toBeGreaterThanOrEqual(0.99);
+  });
+
+  it('mede lema e traços disponíveis nas frases extras', () => {
+    const analyzer = new LexicalAnalyzer();
+    let total = 0;
+    let lemmaHits = 0;
+    let featureTotal = 0;
+    let featureHits = 0;
+    const featureFailures: string[] = [];
+    for (const sentence of (extraSentences as { sentences: Array<{ tokens: Array<{ form: string; lemma: string; pos: string; feats?: string }> }> }).sentences) {
+      for (const expected of sentence.tokens) {
+        if (expected.pos === 'PUNCT') continue;
+        total++;
+        const candidates = analyzer.analyzeSurface(expected.form);
+        if (candidates.some((reading) => reading.lemma === expected.lemma)) lemmaHits++;
+        if (expected.feats) {
+          featureTotal++;
+          if (candidates.some((reading) => Object.entries(Object.fromEntries(expected.feats!.split('|').map((feature) => feature.split('=')))).every(([key, value]) => reading.feats[key] === value))) featureHits++;
+          else featureFailures.push(`${expected.form}:${expected.feats}`);
+        }
+      }
+    }
+    console.info('Lema extras', lemmaHits, '/', total, 'traços extras', featureHits, '/', featureTotal, 'falhas:', featureFailures.join(', '));
+    expect(total).toBeGreaterThan(0);
+  });
+
+  it('preserva a flexão irregular de sorrir e o gênero nominal de aluno', () => {
+    const analyzer = new LexicalAnalyzer();
+    expect(analyzer.analyzeSurface('sorri')).toContainEqual(expect.objectContaining({
+      lemma: 'sorrir', feats: expect.objectContaining({ Number: 'Sing', Person: '3', Mood: 'Ind', Tense: 'Pres' })
+    }));
+    expect(analyzer.analyzeSurface('aluno')).toContainEqual(expect.objectContaining({
+      lemma: 'aluno', feats: expect.objectContaining({ Gender: 'Masc', Number: 'Sing' })
+    }));
   });
 });

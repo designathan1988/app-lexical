@@ -4,6 +4,7 @@ import seedData from '../../knowledge/morphology/seed-roots.json';
 import supplementData from '../../knowledge/language/lexical-supplements.json';
 import futureSubjunctiveData from '../../knowledge/language/future-subjunctive.json';
 import guessData from '../../knowledge/language/guess-rules.json';
+import irregularSupplementsData from '../../knowledge/language/irregular-supplements.json';
 import { PARADIGMS, generateForms, type Paradigm, type ParadigmId } from '../../knowledge/paradigms';
 import { parseFeatureKey, type FeatureBundle } from '../../knowledge/features';
 import type { Lexeme } from '../types';
@@ -28,6 +29,7 @@ const lexicalSupplements = (supplementData as { entries: Array<Seed & { paradigm
 const futureSubjunctive = (futureSubjunctiveData as { rules: Array<{ paradigm: string; suffixes: string[] }> }).rules;
 const infinitiveEndings = (guessData as unknown as { rules: Array<{ suffix: string; upos: string; feats: { VerbForm?: string } }> }).rules
   .filter((rule) => rule.upos === 'VERB' && rule.feats.VerbForm === 'Inf');
+const irregularSupplements = (irregularSupplementsData as { entries: Array<{ lemma: string; form: string; features: string }> }).entries;
 const persons: Array<[1 | 2 | 3, 'Sing' | 'Plur']> = [[1, 'Sing'], [2, 'Sing'], [3, 'Sing'], [1, 'Plur'], [2, 'Plur'], [3, 'Plur']];
 const extendedRegularParadigms = Object.fromEntries(futureSubjunctive.flatMap((rule) => Object.values(PARADIGMS)
   .filter((paradigm) => paradigm.id === rule.paradigm || paradigm.id.startsWith(`${rule.paradigm}_`))
@@ -111,6 +113,9 @@ export class LanguageInflector {
           lemma: entry.lemma, pos: entry.pos, features, paradigm: paradigm.id, rule: `PARTICIPLE:${paradigm.id}`
         });
       }
+      for (const variant of irregularSupplements.filter((item) => item.lemma === entry.lemma)) {
+        this.add(variant.form, { lemma: entry.lemma, pos: entry.pos, features: variant.features, paradigm: paradigm.id, rule: `IRREGULAR:${paradigm.id}` });
+      }
     }
   }
 
@@ -131,7 +136,8 @@ export class LanguageInflector {
     const generated = generateForms(lemma, lemma, paradigm)
       .filter((form) => form.featureKey === features)
       .map((form) => form.surface);
-    return [...new Set([...generated, ...(supplement?.variants[features] ?? [])])];
+    return [...new Set([...generated, ...(supplement?.variants[features] ?? []), ...irregularSupplements
+      .filter((item) => item.lemma === lemma && item.features === features).map((item) => item.form)])];
   }
 
   lemmatize(form: string): InflectionReading[] {
