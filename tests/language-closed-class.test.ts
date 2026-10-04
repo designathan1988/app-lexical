@@ -29,7 +29,8 @@ describe('classes fechadas e tokenização', () => {
     const numerals = (seedRoots as { entries: Array<{ id: string; lemma: string; pos: string }> }).entries
       .filter((entry) => entry.pos === 'NUMERAL');
     const missing = numerals.filter((entry) => !closedClassReadings(entry.lemma)
-      .some((reading) => reading.upos === 'NUM' && reading.feats.NumType === (entry.id.startsWith('LEX_ORD_') ? 'Ord' : 'Card')));
+      .some((reading) => reading.upos === (entry.id.startsWith('LEX_ORD_') ? 'ADJ' : 'NUM') &&
+        reading.feats.NumType === (entry.id.startsWith('LEX_ORD_') ? 'Ord' : 'Card')));
     console.info('Numerais fechados', numerals.length - missing.length, '/', numerals.length,
       'ausentes:', missing.map((entry) => entry.lemma).join(', '));
     expect(missing.map((entry) => entry.lemma)).toEqual([]);

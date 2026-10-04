@@ -57,6 +57,15 @@ Onde a divergência era erro do **teste**, o teste mudou; onde era erro da
   `PronType=Int` na classe `DET`:
   https://universaldependencies.org/treebanks/pt_bosque/index.html.
 
+## Correção da expectativa de cobertura dos numerais
+
+- `tests/language-closed-class.test.ts`: a expectativa recém-adicionada
+  inicialmente exigia `NUM` para os ordinais das raízes do projeto. A diretriz
+  UD classifica cardinais como `NUM` e ordinais portugueses como `ADJ`, com
+  `NumType=Ord`. A verificação continua cobrindo as 48 raízes numéricas; muda
+  apenas a classe esperada dos dez ordinais. Fonte:
+  https://universaldependencies.org/pt/pos/NUM.html.
+
 ## Correções feitas nos **dados** (não nos testes)
 
 
