@@ -44,6 +44,20 @@ describe('flexão e índice inverso', () => {
     expect(missing.map((entry) => entry.lemma)).toEqual([]);
   });
 
+  it('expõe palpite verbal com traços para formas finitas desconhecidas', () => {
+    const analyzer = new LexicalAnalyzer();
+    for (const [form, person, number, tense] of [
+      ['frandelamos', '1', 'Plur', 'Pres'],
+      ['zorbirei', '1', 'Sing', 'Fut'],
+      ['murlou', '3', 'Sing', 'Past']
+    ]) {
+      expect(analyzer.analyzeSurface(form), form).toContainEqual(expect.objectContaining({
+        upos: 'VERB', origin: 'GUESS',
+        feats: expect.objectContaining({ Person: person, Number: number, Mood: 'Ind', Tense: tense, VerbForm: 'Fin' })
+      }));
+    }
+  });
+
   it('gera leituras com traços para raízes com paradigma declarado', () => {
     const entries = (seedRoots as { entries: Array<{ lemma: string; pos: string; inflection?: { paradigmId: string } }> }).entries;
     const missing = entries.filter((entry) => entry.inflection && !inflector.lemmatize(entry.lemma)
