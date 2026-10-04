@@ -3,6 +3,7 @@ import { tokenizeSentence } from '../src/engine/language/Tokenizer';
 import { closedClassReadings } from '../src/engine/language/ClosedClassLexicon';
 import { SemanticEngine } from '../src/engine/SemanticEngine';
 import { createInitialKnowledgeBase } from '../src/knowledge/knowledgeBase';
+import seedRoots from '../src/knowledge/morphology/seed-roots.json';
 
 const forms: Array<[string, string, string]> = [
   ['eu', 'eu', 'PRON'], ['tu', 'tu', 'PRON'], ['ele', 'ele', 'PRON'],
@@ -24,6 +25,16 @@ const forms: Array<[string, string, string]> = [
 ];
 
 describe('classes fechadas e tokenização', () => {
+  it('cobre no léxico fechado os numerais por extenso das raízes do projeto', () => {
+    const numerals = (seedRoots as { entries: Array<{ id: string; lemma: string; pos: string }> }).entries
+      .filter((entry) => entry.pos === 'NUMERAL');
+    const missing = numerals.filter((entry) => !closedClassReadings(entry.lemma)
+      .some((reading) => reading.upos === 'NUM' && reading.feats.NumType === (entry.id.startsWith('LEX_ORD_') ? 'Ord' : 'Card')));
+    console.info('Numerais fechados', numerals.length - missing.length, '/', numerals.length,
+      'ausentes:', missing.map((entry) => entry.lemma).join(', '));
+    expect(missing.map((entry) => entry.lemma)).toEqual([]);
+  });
+
   it.each([
     ['si', 'PRON'], ['comigo', 'PRON'], ['contigo', 'PRON'], ['lhes', 'PRON'],
     ['meus', 'DET'], ['minhas', 'DET'], ['teu', 'DET'], ['tua', 'DET'],
