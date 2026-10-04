@@ -55,6 +55,7 @@ describe('dependências UD e estrutura da oração', () => {
     const engine = new SemanticEngine(createInitialKnowledgeBase());
     expect(engine.analyzeSentence('Quem chegou').clause.mode).toBe('interrogative');
     expect(engine.analyzeSentence('Ninguém chegou.').clause.polarity).toBe('negative');
+    expect(engine.analyzeSentence('Nem eu canto.').clause.polarity).toBe('negative');
   });
 
   it('registra pela moldura quando o oblíquo é argumento ou adjunto', () => {
