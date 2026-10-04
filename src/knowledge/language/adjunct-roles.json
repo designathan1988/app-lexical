@@ -6,6 +6,7 @@
     {"id":"ADJ_A_TEMPO","form":"a","semanticType":"TEMPO","role":"TIME","note":"tempo marcado por crase"},
     {"id":"ADJ_COM_PESSOA","form":"com","semanticType":"PESSOA","role":"COM","note":"companhia"},
     {"id":"ADJ_COM_SER_VIVO","form":"com","semanticType":"SER_VIVO","role":"COM","note":"companhia"},
+    {"id":"ADJ_COM_NOMINALIZED_ADJECTIVE","form":"com","headUpos":"ADJ","requiresDeterminer":true,"role":"COM","source":"https://universaldependencies.org/u/pos/ADJ.html; https://universaldependencies.org/u/dep/obl.html","note":"Adjetivo com determinante pode encabeçar sintagma nominal; com introduz acompanhante dessa entidade, independentemente do tipo lexical abstrato da propriedade.","example":"O médico falou com o velho."},
     {"id":"ADJ_EM_TEMPO","form":"em","semanticType":"TEMPO","role":"TIME","note":"localização temporal"},
     {"id":"ADJ_EM_ENTIDADE","form":"em","semanticType":"ENTIDADE","role":"LOC","note":"localização com referente concreto ou institucional"},
     {"id":"ADJ_A_ENTIDADE","form":"a","semanticType":"ENTIDADE","role":"LOC","note":"direção ou localização com referente"},

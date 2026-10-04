@@ -46,7 +46,8 @@ const supplements = (supplementData as { entries: Array<{ lemma: string; semanti
 const frames = (frameData as unknown as { frames: Frame[] }).frames;
 const typeParents = new Map((semanticTypes as { types: Array<{ id: string; isA: string | null }> }).types.map((item) => [item.id, item.isA]));
 const adjuncts = adjunctData as {
-  prepositions: Array<{ id: string; form: string; semanticType: string; role: string; priority?: string }>;
+  prepositions: Array<{ id: string; form: string; semanticType?: string; headUpos?: string;
+    requiresDeterminer?: boolean; role: string; priority?: string }>;
   markers: Array<{ id: string; form: string; role: string; feats?: Record<string, string> }>;
   interrogatives: Array<{ id: string; form: string; role: string; semanticType: string }>;
   adverbs: Array<{ id: string; form?: string; semanticType?: string; role: string; polarity?: string }>;
@@ -249,12 +250,15 @@ export class MeaningGraphBuilder {
       const hasObject = childIndices(head, 'obj').length > 0;
       const frameCase = frameObliqueCases.find((entry) => entry.frame === frame?.id && entry.preposition === preposition && entry.semanticRole);
       if (frameCase?.semanticRole) return { role: frameCase.semanticRole, rule: frameCase.id ?? `FRAME:${frame?.id}:${frameCase.semanticRole}` };
-      const directionalAdjunct = adjuncts.prepositions.find((item) => item.priority === 'BEFORE_FRAME'
-        && item.form === preposition && isSubtype(type, item.semanticType));
+      const matchesAdjunct = (item: typeof adjuncts.prepositions[number]) => item.form === preposition &&
+        (!item.semanticType || isSubtype(type, item.semanticType)) &&
+        (!item.headUpos || words[target].selected.upos === item.headUpos) &&
+        (!item.requiresDeterminer || childIndices(target, 'det').length > 0);
+      const directionalAdjunct = adjuncts.prepositions.find((item) => item.priority === 'BEFORE_FRAME' && matchesAdjunct(item));
       if (directionalAdjunct) return { role: directionalAdjunct.role, rule: directionalAdjunct.id };
       if (frame?.roles?.ARG2 && hasObject && isSubtype(type, frame.roles.ARG2.prefers?.[0] ?? '_')) return { role: 'ARG2', rule: `FRAME:${frame.id}:ARG2` };
       if (frame?.roles?.ARG1 && !hasObject && frame.roles.ARG1.prefers?.some((pref) => isSubtype(type, pref)) && !isSubtype(type, 'TEMPO') && !isSubtype(type, 'LUGAR')) return { role: 'ARG1', rule: `FRAME:${frame.id}:ARG1` };
-      const rule = adjuncts.prepositions.find((item) => item.form === preposition && isSubtype(type, item.semanticType));
+      const rule = adjuncts.prepositions.find(matchesAdjunct);
       if (rule) return { role: rule.role, rule: rule.id };
       if (isSubtype(type, 'TEMPO')) return { role: 'TIME', rule: 'SEM_TYPE_TIME' };
       if (isSubtype(type, 'LUGAR')) return { role: 'LOC', rule: 'SEM_TYPE_LOC' };
