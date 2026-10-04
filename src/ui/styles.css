@@ -239,6 +239,8 @@ textarea { font-family: var(--mono); font-size: 12px; width: 100%; }
 .sentence-gold-header h3 { margin: 0; font-size: 15px; }
 .sentence-gold-list { overflow-x: auto; }
 .sentence-gold-list .data-table { min-width: 800px; }
+.sentence-gold-list .diff { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sentence-gold-list .diff pre { white-space: pre-wrap; overflow-wrap: anywhere; }
 .network-form { max-width: 650px; padding: 16px 0; }
 .network-form small { color: var(--muted); }
 .network-form button { justify-self: start; }

@@ -62,7 +62,7 @@ Fase 1: os três casos de ruído, as dez palavras de radical latino fora dos dad
 
 ## Interface e capturas
 
-No Chrome local, `http://127.0.0.1:5173/`, foram verificados: chat → “Eu quero tomar café.” → Classes/Sintaxe/Significado; painel → texto livre; lista de 80 frases com métricas e diff; cinco frases do gabarito e cinco frases novas; ensino de `surfar`, análise de “Nós surfamos ontem.” e restauração após recarga. A vista móvel foi ajustada após uma captura revelar a navegação lateral larga. O primeiro carregamento expôs um favicon ausente (404); foi adicionado `public/favicon.svg`. Na sessão limpa final, o ícone respondeu `200` e não houve erros ou avisos no console. Após as mudanças recentes, a análise do exemplo foi conferida outra vez no Chrome pela porta local 5174: classes, árvore, sujeito, predicado completo e reentrância no PENMAN; cinco frases do gabarito e cinco frases novas mostraram grafo e trace sem erro no console. O plugin Browser não estava disponível; foi usado Playwright já presente no ambiente com Chrome local, sem instalação.
+No Chrome local, `http://127.0.0.1:5173/`, foram verificados: chat → “Eu quero tomar café.” → Classes/Sintaxe/Significado; painel → texto livre; lista de 80 frases com métricas e diff; cinco frases do gabarito e cinco frases novas; ensino de `surfar`, análise de “Nós surfamos ontem.” e restauração após recarga. A vista móvel foi ajustada após uma captura revelar a navegação lateral larga. O primeiro carregamento expôs um favicon ausente (404); foi adicionado `public/favicon.svg`. Na sessão limpa final, o ícone respondeu `200` e não houve erros ou avisos no console. Após as mudanças recentes, a análise do exemplo foi conferida outra vez no Chrome pela porta local 5174: classes, árvore, sujeito, predicado completo e reentrância no PENMAN; cinco frases do gabarito e cinco frases novas mostraram grafo e trace sem erro no console. O painel foi novamente aberto no Chrome: exibiu 80 linhas e as nove métricas pedidas; o diff expandido mostra valores esperados e obtidos de lema, traços, UPOS, dependências, sujeito, predicado, sentido e grafo, sem erro de console. O plugin Browser não estava disponível; foi usado Playwright já presente no ambiente com Chrome local, sem instalação.
 
 O novo armazenamento foi verificado no Chrome com o `localStorage` quase cheio: o IndexedDB confirmou uma transação com duas versões e a raiz `surfar`; a recarga preservou ambos. A aplicação não requer servidor SQL nem dependência nova para esse cenário local.
 
@@ -70,6 +70,7 @@ O novo armazenamento foi verificado no Chrome com o `localStorage` quase cheio: 
 ![Árvore UD e CoNLL-U](research/morfologia/capturas/analise-sintaxe.png)
 ![Grafo e reentrância](research/morfologia/capturas/analise-significado.png)
 ![Comparação do gabarito](research/morfologia/capturas/gabarito.png)
+![Diff detalhado de uma falha](research/morfologia/capturas/gabarito-diff.png)
 ![Vista móvel](research/morfologia/capturas/mobile-classes.png)
 ![Rede ensinada](research/morfologia/capturas/rede-surfar.png)
 ![Frase com raiz ensinada](research/morfologia/capturas/surfar-frase.png)
@@ -82,7 +83,7 @@ O novo armazenamento foi verificado no Chrome com o `localStorage` quase cheio: 
 |---|---|
 | Suíte antiga e nova, TypeScript e build | Saída dos três comandos na seção seguinte; os testes antigos continuam na suíte. |
 | Limiares no gabarito e nas extras | Tabela de números medidos acima e saídas impressas por `language-inflection`, `language-tagger`, `language-dependencies` e `meaning-graph`. Os dez grafos não exatos permanecem identificados. |
-| Exemplo completo no painel | Verificação no Chrome de classes, sujeito, predicado, árvore e PENMAN com o mesmo nó `eu` nos dois `ARG0`; capturas das três vistas. |
+| Exemplo completo e gabarito no painel | Verificação no Chrome de classes, sujeito, predicado, árvore e PENMAN com o mesmo nó `eu` nos dois `ARG0`; 80 linhas com nove métricas e diff aberto; capturas das vistas e do diff. |
 | Nenhuma forma lexical portuguesa literal no TypeScript geral | Teste específico em `tests/architecture.test.ts` inspeciona todos os `.ts` de `src/engine/language/` contra formas do léxico, classes fechadas e domínio. |
 | Nenhuma base externa ou dependência de runtime nova | Paradigmas e irregulares em `src/` têm o mesmo conteúdo SHA-256 dos arquivos de `research/morfologia/` já fornecidos; os demais JSON foram digitados para as regras desta entrega. `package.json` não mudou desde `591733f`. Busca no motor geral não encontrou chamadas `fetch`, `XMLHttpRequest` ou `WebSocket`; URLs em radicais são apenas referências. |
 | Comandos do construtor preservados | Suíte de 413 testes de partida permanece integrada e verde; os testes de domínio e de arquitetura continuam aprovados. A única alteração funcional do domínio é `DERIVED_MATCH`, testada. |
@@ -90,6 +91,6 @@ O novo armazenamento foi verificado no Chrome com o `localStorage` quase cheio: 
 
 ## Verificação final
 
-Saída observada após a auditoria do trace semântico: `npm test` → **39 arquivos aprovados, 583 testes aprovados (583)**, sem falhas; `npx tsc --noEmit` → código de saída `0`; `npm run build` → código de saída `0`, 129 módulos transformados, bundle principal de 1.233,96 kB. O Vite emitiu aviso de chunk acima de 500 kB; o limite não foi afrouxado. A vista renderizada também verifica o ID da moldura e o registro da preferência semântica.
+Saída observada após a comparação completa no painel: `npm test` → **39 arquivos aprovados, 584 testes aprovados (584)**, sem falhas; `npx tsc --noEmit` → código de saída `0`; `npm run build` → código de saída `0`, 129 módulos transformados, bundle principal de 1.235,96 kB. O Vite emitiu aviso de chunk acima de 500 kB; o limite não foi afrouxado. A vista renderizada também verifica o ID da moldura e o registro da preferência semântica.
 
 Comandos do construtor preservados, exceto a recuperação derivacional avaliativa solicitada (`DERIVED_MATCH`); a suíte antiga de 413 testes permaneceu verde. Não houve instalação de dependências de runtime, uso de rede em tempo de execução, `eval`, `new Function` ou aleatoriedade na camada nova.
