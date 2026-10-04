@@ -1,0 +1,13 @@
+{
+  "rules": [
+    {
+      "id": "UD_ADVCL_COPULAR",
+      "markerForms": ["porque", "quando", "se"],
+      "predicateUpos": ["ADJ", "NOUN"],
+      "relation": "advcl",
+      "source": "https://universaldependencies.org/u/dep/advcl.html; https://universaldependencies.org/u/dep/cop.html",
+      "note": "O predicativo é o núcleo da subordinada copular e depende do predicado da oração principal; a cópula e o marcador dependem dele.",
+      "example": "Eu corri porque estava cansado."
+    }
+  ]
+}

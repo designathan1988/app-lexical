@@ -7,6 +7,7 @@ import frameData from '../../knowledge/morphology/frames.json';
 import semanticTypes from '../../knowledge/morphology/semantic-types.json';
 import obliqueCasesData from '../../knowledge/language/frame-oblique-cases.json';
 import nominalPpData from '../../knowledge/language/nominal-pp-rules.json';
+import copularClauseData from '../../knowledge/language/copular-clause-rules.json';
 import type { TeachableRoot } from '../../knowledge/language/teachableRoot';
 import type { TaggedWord } from './Tagger';
 
@@ -32,6 +33,9 @@ const obliqueCases = (obliqueCasesData as { entries: Array<{ frame: string; role
 const nominalPpRules = (nominalPpData as { rules: Array<{
   id: string; prepositions: string[]; scope: string; barrierUpos: string[]; relation: string
 }> }).rules;
+const copularClauseRules = (copularClauseData as { rules: Array<{
+  id: string; markerForms: string[]; predicateUpos: string[]; relation: string
+}> }).rules;
 const isSubtype = (actual: string | undefined, expected: string): boolean => {
   for (let current = actual; current; current = typeParents.get(current) ?? undefined) if (current === expected) return true;
   return false;
@@ -49,12 +53,22 @@ export class DependencyParser {
     const isFinite = (index: number) => verbal.has(pos(index)) && feat(index, 'VerbForm') !== 'Inf' && feat(index, 'VerbForm') !== 'Ger' && feat(index, 'VerbForm') !== 'Part';
     const comma = words.findIndex((word) => word.form === ',');
     const finite = words.map((_, index) => index).filter(isFinite);
-    const copula = finite.find((index) => copulas.has(words[index].selected.lemma));
+    const copularPredicates = finite.filter((index) => copulas.has(words[index].selected.lemma)).map((index) => ({
+      copula: index,
+      predicate: words.findIndex((word, candidate) => candidate > index &&
+        (word.selected.upos === 'ADJ' || word.selected.upos === 'NOUN') &&
+        !words.slice(index + 1, candidate).some((between) =>
+          verbal.has(between.selected.upos) || between.selected.upos === 'PUNCT' || between.selected.upos === 'SCONJ'))
+    })).filter((entry) => entry.predicate >= 0);
+    const copula = copularPredicates[0]?.copula;
     let root = finite[0] ?? words.findIndex((word) => word.selected.upos !== 'PUNCT');
-    if (copula !== undefined) {
-      const predicative = words.findIndex((word, index) => index > copula && (word.selected.upos === 'ADJ' || word.selected.upos === 'NOUN'));
-      if (predicative >= 0) root = predicative;
-    }
+    const mainCopula = copularPredicates.find((entry) => {
+      const precedingFinite = finite.reduce((last, index) => index < entry.copula ? index : last, -1);
+      const latestMarker = words.slice(0, entry.copula).reduce((last, word, index) =>
+        word.selected.upos === 'SCONJ' ? index : last, -1);
+      return latestMarker <= precedingFinite;
+    });
+    if (mainCopula) root = mainCopula.predicate;
     if (comma > 0 && (pos(0) === 'SCONJ' || pos(0) === 'ADV')) {
       const main = finite.find((index) => index > comma);
       if (main !== undefined) root = main;
@@ -104,7 +118,8 @@ export class DependencyParser {
 
     for (let i = 0; i < words.length; i++) {
       if (pos(i) === 'PUNCT') set(i, root, 'punct', 'UD_PUNCT_ROOT');
-      if (i === copula && root !== copula) set(i, root, 'cop', 'UD_COP_PREDICATE');
+      const copular = copularPredicates.find((entry) => entry.copula === i);
+      if (copular) set(i, copular.predicate, 'cop', 'UD_COP_PREDICATE');
     }
 
     for (let i = 0; i < words.length; i++) {
@@ -126,7 +141,7 @@ export class DependencyParser {
     }
 
     for (let i = 0; i < words.length; i++) {
-      if (pos(i) !== 'ADJ' || i === root || assigned(i)) continue;
+      if (pos(i) !== 'ADJ' || i === root || assigned(i) || copularPredicates.some((entry) => entry.predicate === i)) continue;
       const nominalLeft = nearestLeft(i, (candidate) => nominals.has(pos(candidate)));
       const nominalRight = nearestRight(i, (candidate) => nominals.has(pos(candidate)));
       const head = nominalLeft === i - 1 ? nominalLeft : nominalRight === i + 1 ? nominalRight : -1;
@@ -175,6 +190,17 @@ export class DependencyParser {
       if (pos(i) !== 'SCONJ' || assigned(i)) continue;
       const next = nearestRight(i, (candidate) => verbal.has(pos(candidate)), i + 4);
       if (next >= 0) set(i, next, 'mark', 'UD_MARK');
+    }
+
+    for (const entry of copularPredicates) {
+      if (entry.predicate === root) continue;
+      const marker = nearestLeft(entry.copula, (candidate) => pos(candidate) === 'SCONJ');
+      const rule = copularClauseRules.find((candidate) => marker >= 0 &&
+        candidate.markerForms.includes(words[marker].selected.lemma) &&
+        candidate.predicateUpos.includes(pos(entry.predicate)));
+      if (!rule) continue;
+      set(entry.predicate, root, rule.relation, rule.id);
+      set(marker, entry.predicate, 'mark', `${rule.id}_MARK`);
     }
 
     for (let i = 0; i < words.length; i++) {
