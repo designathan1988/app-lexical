@@ -94,3 +94,37 @@ O novo armazenamento foi verificado no Chrome com o `localStorage` quase cheio: 
 Saída observada após reconhecer perguntas sem pontuação e ordens jussivas: `npm test` → **39 arquivos aprovados, 587 testes aprovados (587)**, sem falhas; `npx tsc --noEmit` → código de saída `0`; `npm run build` → código de saída `0`, 129 módulos transformados, bundle principal de 1.236,73 kB. O Vite emitiu aviso de chunk acima de 500 kB; o limite não foi afrouxado. A vista renderizada também verifica o ID da moldura e o registro da preferência semântica.
 
 Comandos do construtor preservados, exceto a recuperação derivacional avaliativa solicitada (`DERIVED_MATCH`); a suíte antiga de 413 testes permaneceu verde. Não houve instalação de dependências de runtime, uso de rede em tempo de execução, `eval`, `new Function` ou aleatoriedade na camada nova.
+
+## Correções da verificação oculta
+
+**Estado em 04/10/2026: bloqueado pelas restrições do `AGENTS.md`.** Nenhuma das nove correções foi implementada. O arquivo proíbe novos desvios condicionais e técnicas equivalentes de casamento de padrões, inclusive quando disfarçados em configuração. O pedido exige justamente novas decisões contextuais nos motores ou regras JSON que as codifiquem. Não contornei essa proibição com pares de frases, alterações de gabarito ou mudança de métricas.
+
+| Item | Fonte consultada e decisão exigida | Mecanismo atual e conflito | Regra, frases novas e resultado |
+|---|---|---|---|
+| 1.1 PP nominal | [UD `nmod`](https://universaldependencies.org/u/dep/nmod.html) prende o PP ao nome; [AMR `:poss`](https://github.com/amrisi/amr-guidelines/blob/master/amr.md#possession) representa posse. | `DependencyParser.ts` atribui `obl` ao governador verbal no ramo de caso; `MeaningGraphBuilder.ts` não interpreta `nmod`. Corrigir exige seleção contextual de núcleo e novo tratamento de aresta. | Nenhuma regra ou teste criado; **bloqueado**. |
+| 1.2 Cópula e homografia | [UD `cop`](https://universaldependencies.org/u/dep/cop.html), [UD português](https://universaldependencies.org/pt/index.html) e [CG-3 varredura com barreira](https://edu.visl.dk/cg3/chunked/contexts.html#barrier) sustentam predicativo após advérbio e desambiguação por contexto. | `Tagger.ts` aceita contexto com varredura, mas um novo `SELECT` em `pos-rules.json` seria casamento de padrões em configuração, proibido pelo `AGENTS.md`. As formas de *ser* e *ir* ainda exigem leituras apropriadas. | Nenhuma regra ou teste criado; **bloqueado**. |
+| 1.3 Subordinada copular | [UD `advcl`](https://universaldependencies.org/u/dep/advcl.html) e [UD `cop`](https://universaldependencies.org/u/dep/cop.html) exigem raiz da oração principal e predicativo como núcleo subordinado. | A escolha da raiz e da cópula é fixa em `DependencyParser.ts`; os dados atuais não podem alterar essa escolha. Uma extensão exigiria nova lógica contextual. | Nenhuma regra ou teste criado; **bloqueado**. |
+| 1.4 Enumeração | [UD `conj`](https://universaldependencies.org/u/dep/conj.html) usa o primeiro item como núcleo e os demais como irmãos; [AMR `:opN`](https://github.com/amrisi/amr-guidelines/blob/master/amr.md) usa operações numeradas. | O parser coordena apenas a conjunção explícita; o grafo constrói pares `and` com `op1`/`op2` no código. Não há formato de dados para lista arbitrária com vírgulas. | Nenhuma regra ou teste criado; **bloqueado**. |
+| 1.5 Adjetivos irregulares | [UD português, lemas](https://universaldependencies.org/pt/index.html#lemmas) requer masculino singular. | A raiz *bom* usa `ADJ_O`. Corrigir todas as famílias exige novos paradigmas de transformação por terminação ou formas inteiras declaradas; o primeiro método é casamento de padrão em dados e o segundo criaria pares fixos, ambos proibidos. | Nenhuma regra ou teste criado; **bloqueado**. |
+| 1.6 Advérbio de grau | [UD `advmod`](https://universaldependencies.org/u/dep/advmod.html) permite modificar ADV/ADJ; [AMR `:degree`](https://github.com/amrisi/amr-guidelines/blob/master/amr.md#degree) prende o grau ao conceito modificado. | `DependencyParser.ts` dirige ADV ao verbo, salvo a exceção enfática já codificada. Não há regra de dados que mude a cabeça sintática. | Nenhuma regra ou teste criado; **bloqueado**. |
+| 1.7 PP após `xcomp` | [UD `obl`](https://universaldependencies.org/u/dep/obl.html) e [CG-3 varredura](https://edu.visl.dk/cg3/chunked/contexts.html#scanning) orientam a ligação ao verbo pertinente. | O `governor()` escolhe o verbo anterior; a exceção dependente de duas molduras não é interpretada pelos dados. Implementá-la exige nova escolha contextual. | Nenhuma regra ou teste criado; **bloqueado**. |
+| 1.8 Pronome de tratamento | [Bosque](https://universaldependencies.org/treebanks/pt_bosque/index.html) lista *você* como lema e *vocês* como forma. | `closed-class.json` já tem `vocês → você` com plural, mas `MeaningGraphBuilder.ts` substitui o lema de PRON não clítico pela superfície. Corrigir o conceito exige mudar essa decisão condicional. | Nenhuma regra ou teste criado; **bloqueado** para o grafo. |
+| 1.9 Mensagem do chat | A exigência é da interface do projeto; a distinção semântica entre análise e comando vem do pedido atual. | `useEngine.ts` escolhe entre “Executado” e “Bloqueado” por um ternário. Diferenciar frase geral sem alterar diagnósticos requer uma terceira escolha contextual, proibida. | Nenhuma regra ou teste criado; **bloqueado**. |
+
+Não criei `tests/fixtures/sentences-extra-2.json` nem commits `TEST-EXPECTATION` para itens bloqueados: testes vermelhos permanentes violariam a exigência de suíte verde, e declarar as frases como cobertas sem correção falsearia a métrica. Também não há capturas novas nem verificação de console para correções que não existem. O requisito de `extras-2` com ligações e papéis ≥ 95% permanece **não verificado e não atendido**.
+
+### Métricas antes × depois
+
+Nenhum código ou dado linguístico mudou nesta passagem; “depois” identifica o mesmo motor, sem alegar uma segunda medição independente. A linha de base foi executada nesta sessão por `npm test`.
+
+| Conjunto e métrica | Antes, observado | Depois, código inalterado |
+|---|---:|---:|
+| Gabarito: UPOS | 419/431 | 419/431 |
+| Gabarito: UAS / LAS | 431/431 / 431/431 | 431/431 / 431/431 |
+| Gabarito: Smatch / grafo exato / sentido | 0,9703 / 70/80 / 77/80 | 0,9703 / 70/80 / 77/80 |
+| Extras: UPOS | 77/78 | 77/78 |
+| Extras: UAS / LAS | 78/78 / 78/78 | 78/78 / 78/78 |
+| Extras: Smatch / grafo exato / sentido | 0,9029 / 12/20 / 19/20 | 0,9029 / 12/20 / 19/20 |
+| Extras-2: ligações / papéis | Não medido; arquivo ausente | Não medido; arquivo ausente |
+
+Verificação real nesta sessão: `npm test` → **39 arquivos, 587/587 testes aprovados**; `npx tsc --noEmit` → saída 0; `npm run build` → saída 0, 129 módulos transformados e bundle principal de 1.236,73 kB, com o aviso existente de chunk acima de 500 kB. As falhas de generalização relatadas na verificação oculta continuam pendentes; a lista anterior de divergências do gabarito também permanece. Para implementar os nove itens, seria necessária uma autorização explícita que altere as proibições do `AGENTS.md`; não presumi essa autorização.
