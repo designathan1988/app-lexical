@@ -13,6 +13,7 @@ type Sentence = {
   tokens: Array<{ form: string; lemma: string; pos: string; feats?: string }>;
   dependencies: Array<{ rel: string; head: number; dep: number }>;
   meaningGraph: string;
+  degree?: { modifier: number; head: number };
 };
 
 const sentences = (fixture as { sentences: Sentence[] }).sentences;
@@ -22,6 +23,7 @@ const movementSentences = sentences.filter((sentence) => sentence.id.startsWith(
 const subordinateCopulas = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.3-'));
 const enumerations = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.4-'));
 const adjectiveSentences = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.5-'));
+const degreeSentences = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.6-'));
 
 describe('correções da verificação oculta — sintagmas nominais', () => {
   it.each(nominalPhrases)('$id: liga o PP ao nome e preserva a posse no grafo', (sentence) => {
@@ -123,6 +125,20 @@ describe('correções da verificação oculta — paradigmas adjetivais', () => 
       expectedFeatures.every(([key, value]) => reading.feats[key] === value)), sentence.id).toBe(true);
     expect(analysis.meaningGraph.nodes.find((node) => node.id === analysis.meaningGraph.root)?.concept, sentence.id)
       .toBe(adjective.lemma);
+  });
+});
+
+describe('correções da verificação oculta — advérbios de grau', () => {
+  it.each(degreeSentences)('$id: liga o grau ao modificador e não ao verbo', (sentence) => {
+    const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence(sentence.text);
+    const degree = sentence.degree!;
+    expect(analysis.dependencies[degree.modifier - 1], sentence.id)
+      .toMatchObject({ head: degree.head, deprel: 'advmod' });
+    const modified = analysis.meaningGraph.nodes.find((node) => node.token === degree.head);
+    expect(modified, sentence.id).toBeDefined();
+    expect(analysis.meaningGraph.attributes, sentence.id).toContainEqual(expect.objectContaining({
+      from: modified!.id, role: 'degree', value: sentence.tokens[degree.modifier - 1].lemma
+    }));
   });
 });
 
