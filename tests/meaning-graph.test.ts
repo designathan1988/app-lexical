@@ -185,9 +185,11 @@ describe('grafo de significado', () => {
   it('atribui o papel de complemento aberto pela sintaxe da moldura', () => {
     const graph = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('O professor fez o menino correr.').meaningGraph;
     const action = graph.nodes.find((node) => node.concept.startsWith('correr.'));
+    const boy = graph.nodes.find((node) => node.concept === 'menino');
     expect(graph.nodes.find((node) => node.id === graph.root)?.concept).toBe('fazer.CAUSAR');
     expect(action).toBeDefined();
     expect(graph.edges).toContainEqual(expect.objectContaining({ from: graph.root, role: 'ARG2', to: action!.id }));
+    expect(graph.edges).toContainEqual(expect.objectContaining({ from: action!.id, role: 'ARG0', to: boy!.id }));
   });
 
   it('atinge F1 médio, grafos exatos e sentidos no gabarito', () => {

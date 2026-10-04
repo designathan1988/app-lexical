@@ -141,7 +141,8 @@ export class MeaningGraphBuilder {
           if (!['nsubj', 'obj', 'obl', 'xcomp', 'ccomp'].includes(arc.deprel)) continue;
           const role = arc.deprel === 'nsubj' ? preferredRole(frame, arc.deprel, 'ARG0')
             : arc.deprel === 'obj' ? preferredRole(frame, arc.deprel, 'ARG1')
-              : arc.deprel === 'obl' ? preferredRole(frame, arc.deprel, 'ARG2') : 'ARG1';
+              : arc.deprel === 'obl' ? preferredRole(frame, arc.deprel, 'ARG2')
+                : preferredRole(frame, arc.deprel, 'ARG1');
           const argumentType = arc.deprel === 'xcomp' ? 'ACAO' : arc.deprel === 'ccomp' ? 'INFORMACAO' : typeOf(arc.id - 1);
           const prefers = frame.roles?.[role]?.prefers ?? [];
           const coercedType = coercions.find((item) => isSubtype(argumentType, item.from) && interrogativeRoles.includes(item.contextRole) && prefers.some((type) => isSubtype(item.to, type)));
@@ -242,7 +243,9 @@ export class MeaningGraphBuilder {
         edge(head, assignment.role, content(index), assignment.rule);
       } else if (relation === 'xcomp' || relation === 'ccomp') {
         const child = content(index);
-        edge(head, 'ARG1', child, `SEM_${relation.toUpperCase()}`);
+        const frame = selectedFrames.get(headIndex);
+        const role = preferredRole(frame, relation, 'ARG1');
+        edge(head, role, child, frame ? `FRAME:${frame.id}:${role}` : `SEM_${relation.toUpperCase()}`);
         if (relation === 'xcomp' && !childIndices(index, 'nsubj').length) {
           const control = selectedFrames.get(headIndex)?.control;
           const controller = childIndices(headIndex, control === 'OBJECT' ? 'obj' : 'nsubj')[0];

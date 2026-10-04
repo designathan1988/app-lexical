@@ -1215,7 +1215,9 @@
       ],
       "examples": [
         "A notícia fez a menina chorar."
-      ]
+      ],
+      "control": "OBJECT",
+      "complement": "xcomp"
     },
     {
       "id": "fazer.TEMPO",
