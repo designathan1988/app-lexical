@@ -1,9 +1,9 @@
 {
   "entries": [
     { "frame": "precisar.PRECISAR", "role": "ARG1", "preposition": "de" },
-    { "frame": "gostar.GOSTAR", "role": "ARG1", "preposition": "de" },
+    { "id": "FRAME_GOSTAR_DE_NOMINAL", "frame": "gostar.GOSTAR", "role": "ARG1", "semanticRole": "ARG1", "preposition": "de", "source": "https://dicionario.priberam.org/gostar", "note": "O complemento nominal introduzido por de é o tema apreciado, inclusive quando seu tipo semântico é lugar.", "example": "Ela gosta do jardim do professor." },
     { "frame": "gostar.GOSTAR_DE_INF", "role": "ARG1", "preposition": "de" },
     { "frame": "morar.MORAR", "role": "ARG1", "preposition": "em" },
-    { "id": "FRAME_ENSINAR_PARA", "frame": "ensinar.ENSINAR", "role": "ARG2", "preposition": "para", "source": "https://universaldependencies.org/u/dep/obl.html", "note": "o destinatário do ensino é argumento oblíquo da matriz", "example": "A professora ensina a ler para o aluno." }
+    { "id": "FRAME_ENSINAR_PARA", "frame": "ensinar.ENSINAR", "role": "ARG2", "semanticRole": "ARG2", "preposition": "para", "source": "https://universaldependencies.org/u/dep/obl.html; https://dicionario.priberam.org/ensinar", "note": "O destinatário do ensino é argumento oblíquo da matriz mesmo quando o objeto ensinado é um xcomp.", "example": "A professora ensina a ler para o aluno." }
   ]
 }

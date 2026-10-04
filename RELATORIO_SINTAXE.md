@@ -138,12 +138,14 @@ A linha de base anterior é a saída registrada antes das correções. O extras-
 | Extras: sujeito / predicado | 20/20 / 20/20 | 20/20 / 20/20 |
 | Extras: Smatch médio / exatos / sentidos | 0,9029 / 12/20 / 19/20 | 0,9029 / 12/20 / 19/20 |
 | Extras-2: ligações (LAS) | Inexistente | 346/346 (100%) |
-| Extras-2: papéis esperados | Inexistente | 130/136 (95,59%) |
+| Extras-2: papéis esperados | Inexistente | 134/136 (98,53%) |
 
-A saída final observada foi: `npm test` → **41 arquivos e 669/669 testes aprovados**; `npx tsc --noEmit` → **código 0, sem erros**; `npm run build` → **código 0, 136 módulos transformados**, com aviso de chunk acima de 500 kB. O teste de métricas imprime as 346 ligações e os 136 papéis, inclusive as divergências.
+A saída final observada foi: `npm test` → **42 arquivos e 679/679 testes aprovados**; `npx tsc --noEmit` → **código 0, sem erros**; `npm run build` → **código 0, 136 módulos transformados**, com aviso de chunk acima de 500 kB. O teste de métricas imprime as 346 ligações e os 136 papéis, inclusive as divergências.
 
 ### Verificação no navegador e pendências
 
 Em `npm run dev`, Chrome headless em `http://127.0.0.1:5173/` (1440×900) mostrou uma frase de cada item, as abas da análise, e zero erros no console. A frase 1.9 exibiu **“Frase analisada (não é um comando do construtor)”**, o link **“Classes / Sintaxe / Significado”**, a aba Classes e o preview vazio. As nove capturas estão em `research/morfologia/capturas/correcao-1.1.png` até `correcao-1.9.png`. O servidor temporário foi encerrado.
 
-Nenhum item ficou bloqueado pelo `AGENTS.md` atualizado. Persistem as divergências antigas já descritas na seção “Falhas restantes e causas”. No extras-2, seis papéis divergem: `extra2-1.1-04`, `1.1-06`, `1.7-03` (dois papéis), `1.7-04`, `1.7-06`; o limiar requerido ainda é atendido. A verificação oculta continua indisponível neste repositório e deverá ser executada pelo avaliador.
+Nenhum item ficou bloqueado pelo `AGENTS.md` atualizado. Persistem as divergências antigas já descritas na seção “Falhas restantes e causas”. Quatro divergências adicionais do extras-2 foram corrigidas: chegada de informação escrita como `chegar.CHEGAR` ([Priberam](https://dicionario.priberam.org/chegar)); complemento nominal de `gostar de` como `ARG1` ([Priberam](https://dicionario.priberam.org/gostar)); instituição como destino locativo de `para` ([UD obl](https://universaldependencies.org/u/dep/obl.html)); destinatário de `ensinar para` como `ARG2` ([Priberam](https://dicionario.priberam.org/ensinar)). As regras `FRAME_GOSTAR_DE_NOMINAL`, `ADJ_PARA_INSTITUICAO`, `FRAME_ENSINAR_PARA` e a moldura `chegar.CHEGAR` trazem fonte, justificativa e exemplo. Cinco frases independentes testam a generalização e a distinção entre `chegar.CHEGAR` e `chegar.BASTAR`.
+
+As duas triplas ainda divergentes em `extra2-1.7-03` têm papéis `ARG0` e `ARG1` corretos, mas a anotação local escreve `começar.COMEÇAR`; a moldura existente e `sent-018` do gabarito usam `começar.INICIAR`. Trata-se de divergência no **nome do sentido**, não no papel. A anotação não foi alterada para fazer o teste passar nem o código recebeu uma exceção por frase. A verificação oculta não tem arquivo, comando ou acesso disponibilizado neste repositório; deverá ser executada pelo avaliador ou fornecida para que eu possa executá-la.

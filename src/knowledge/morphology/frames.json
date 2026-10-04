@@ -2626,11 +2626,13 @@
     },
     {
       "id": "chegar.CHEGAR",
+      "source": "https://dicionario.priberam.org/chegar",
       "roles": {
         "ARG0": {
           "label": "quem chega",
           "prefers": [
-            "SER_VIVO"
+            "SER_VIVO",
+            "INFORMACAO"
           ]
         },
         "ARG1": {
@@ -2649,7 +2651,8 @@
         }
       ],
       "examples": [
-        "Quando ele chega?"
+        "Quando ele chega?",
+        "A notícia chegou."
       ]
     },
     {

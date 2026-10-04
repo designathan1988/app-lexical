@@ -11,6 +11,7 @@ import coordinationData from '../../knowledge/language/coordination-rules.json';
 import degreeData from '../../knowledge/language/degree-modifier-rules.json';
 import pronounConceptData from '../../knowledge/language/pronoun-concept-rules.json';
 import copularClauseData from '../../knowledge/language/copular-clause-rules.json';
+import frameObliqueData from '../../knowledge/language/frame-oblique-cases.json';
 import type { DependencyArc } from './DependencyParser';
 import type { ClauseAnalysis } from './ClauseAnalyzer';
 import type { TaggedWord } from './Tagger';
@@ -44,7 +45,7 @@ const supplements = (supplementData as { entries: Array<{ lemma: string; semanti
 const frames = (frameData as unknown as { frames: Frame[] }).frames;
 const typeParents = new Map((semanticTypes as { types: Array<{ id: string; isA: string | null }> }).types.map((item) => [item.id, item.isA]));
 const adjuncts = adjunctData as {
-  prepositions: Array<{ id: string; form: string; semanticType: string; role: string }>;
+  prepositions: Array<{ id: string; form: string; semanticType: string; role: string; priority?: string }>;
   markers: Array<{ id: string; form: string; role: string; feats?: Record<string, string> }>;
   interrogatives: Array<{ id: string; form: string; role: string; semanticType: string }>;
   adverbs: Array<{ id: string; form?: string; semanticType?: string; role: string; polarity?: string }>;
@@ -62,6 +63,9 @@ const pronounConceptRules = (pronounConceptData as { rules: Array<{
 const copularClauseRules = (copularClauseData as { rules: Array<{
   id: string; predicateUpos: string[]; relation: string; semanticSubjectRole?: string
 }> }).rules;
+const frameObliqueCases = (frameObliqueData as { entries: Array<{
+  id?: string; frame: string; preposition: string; semanticRole?: string
+}> }).entries;
 
 function isSubtype(actual: string | undefined, expected: string): boolean {
   for (let cursor = actual; cursor; cursor = typeParents.get(cursor) ?? undefined) if (cursor === expected) return true;
@@ -228,6 +232,11 @@ export class MeaningGraphBuilder {
       const preposition = childIndices(target, 'case').map((index) => words[index].selected.lemma)[0];
       const frame = selectedFrames.get(head);
       const hasObject = childIndices(head, 'obj').length > 0;
+      const frameCase = frameObliqueCases.find((entry) => entry.frame === frame?.id && entry.preposition === preposition && entry.semanticRole);
+      if (frameCase?.semanticRole) return { role: frameCase.semanticRole, rule: frameCase.id ?? `FRAME:${frame?.id}:${frameCase.semanticRole}` };
+      const directionalAdjunct = adjuncts.prepositions.find((item) => item.priority === 'BEFORE_FRAME'
+        && item.form === preposition && isSubtype(type, item.semanticType));
+      if (directionalAdjunct) return { role: directionalAdjunct.role, rule: directionalAdjunct.id };
       if (frame?.roles?.ARG2 && hasObject && isSubtype(type, frame.roles.ARG2.prefers?.[0] ?? '_')) return { role: 'ARG2', rule: `FRAME:${frame.id}:ARG2` };
       if (frame?.roles?.ARG1 && !hasObject && frame.roles.ARG1.prefers?.some((pref) => isSubtype(type, pref)) && !isSubtype(type, 'TEMPO') && !isSubtype(type, 'LUGAR')) return { role: 'ARG1', rule: `FRAME:${frame.id}:ARG1` };
       const rule = adjuncts.prepositions.find((item) => item.form === preposition && isSubtype(type, item.semanticType));

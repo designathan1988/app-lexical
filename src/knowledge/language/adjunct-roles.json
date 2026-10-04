@@ -8,7 +8,8 @@
     {"id":"ADJ_COM_SER_VIVO","form":"com","semanticType":"SER_VIVO","role":"COM","note":"companhia"},
     {"id":"ADJ_EM_TEMPO","form":"em","semanticType":"TEMPO","role":"TIME","note":"localização temporal"},
     {"id":"ADJ_EM_ENTIDADE","form":"em","semanticType":"ENTIDADE","role":"LOC","note":"localização com referente concreto ou institucional"},
-    {"id":"ADJ_A_ENTIDADE","form":"a","semanticType":"ENTIDADE","role":"LOC","note":"direção ou localização com referente"}
+    {"id":"ADJ_A_ENTIDADE","form":"a","semanticType":"ENTIDADE","role":"LOC","note":"direção ou localização com referente"},
+    {"id":"ADJ_PARA_INSTITUICAO","form":"para","semanticType":"INSTITUICAO","role":"LOC","priority":"BEFORE_FRAME","source":"https://universaldependencies.org/u/dep/obl.html","note":"Instituições podem funcionar como destino locativo após preposição direcional, mesmo quando a moldura prevê um argumento de lugar.","example":"Nós voltamos para o hospital."}
   ],
   "markers": [
     {"id":"MARK_CONDITION","form":"se","role":"condition","note":"oração condicional"},
