@@ -1,0 +1,12 @@
+{
+  "rules": [
+    {
+      "id": "SEM_TREATMENT_CANONICAL_LEMMA",
+      "lemmas": ["você"],
+      "conceptSource": "lemma",
+      "source": "https://universaldependencies.org/treebanks/pt_bosque/index.html; https://universaldependencies.org/pt/index.html",
+      "note": "o tratamento flexionado em número mantém o lema singular como conceito, sem perder Number=Plur na leitura",
+      "example": "Vocês caminham."
+    }
+  ]
+}

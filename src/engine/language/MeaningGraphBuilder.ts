@@ -9,6 +9,7 @@ import coercionData from '../../knowledge/language/semantic-coercions.json';
 import nominalPpData from '../../knowledge/language/nominal-pp-rules.json';
 import coordinationData from '../../knowledge/language/coordination-rules.json';
 import degreeData from '../../knowledge/language/degree-modifier-rules.json';
+import pronounConceptData from '../../knowledge/language/pronoun-concept-rules.json';
 import type { DependencyArc } from './DependencyParser';
 import type { ClauseAnalysis } from './ClauseAnalyzer';
 import type { TaggedWord } from './Tagger';
@@ -54,6 +55,9 @@ const nominalPpRules = (nominalPpData as { rules: Array<{ id: string; semanticRo
 const coordination = coordinationData as { operators: Array<{ id: string; form: string; concept: string }>; defaultOperator: string };
 const degreeRules = degreeData as { classes: Array<{ class: string; lemmas: string[] }>;
   rules: Array<{ id: string; class: string; headUpos: string[]; semanticRole: string }> };
+const pronounConceptRules = (pronounConceptData as { rules: Array<{
+  id: string; lemmas: string[]; conceptSource: string
+}> }).rules;
 
 function isSubtype(actual: string | undefined, expected: string): boolean {
   for (let cursor = actual; cursor; cursor = typeParents.get(cursor) ?? undefined) if (cursor === expected) return true;
@@ -195,7 +199,11 @@ export class MeaningGraphBuilder {
       }
       if (reading.feats.PronType === 'Int' && (reading.upos === 'PRON' || reading.upos === 'DET')) concept = pronouns.unknownConcept;
       if (arcs[index].deprel === 'obj' && childIndices(index, 'fixed').some((child) => words[child].selected.feats.PronType === 'Int')) concept = pronouns.unknownConcept;
-      if (reading.upos === 'PRON' && reading.feats.Clitic !== 'Yes') concept = words[index].form.normalize('NFC').toLocaleLowerCase('pt-BR');
+      if (reading.upos === 'PRON' && reading.feats.Clitic !== 'Yes') {
+        const rule = pronounConceptRules.find((entry) => entry.lemmas.includes(reading.lemma));
+        concept = rule?.conceptSource === 'lemma' ? reading.lemma : words[index].form.normalize('NFC').toLocaleLowerCase('pt-BR');
+        if (rule) trace.push({ rule: rule.id, token: index + 1, detail: `${words[index].form}→${concept}` });
+      }
       if (reading.feats.PronType === 'Int') concept = pronouns.unknownConcept;
       if (reading.upos === 'VERB' || reading.upos === 'AUX') {
         const frame = chooseFrame(index);
