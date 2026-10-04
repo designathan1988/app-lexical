@@ -5,8 +5,9 @@
       "markerForms": ["porque", "quando", "se"],
       "predicateUpos": ["ADJ", "NOUN"],
       "relation": "advcl",
+      "semanticSubjectRole": "ARG1",
       "source": "https://universaldependencies.org/u/dep/advcl.html; https://universaldependencies.org/u/dep/cop.html",
-      "note": "O predicativo é o núcleo da subordinada copular e depende do predicado da oração principal; a cópula e o marcador dependem dele.",
+      "note": "O predicativo é o núcleo da subordinada copular e depende do predicado da oração principal; a cópula e o marcador dependem dele. Sem sujeito explícito na subordinada, o predicativo retoma o sujeito da principal como ARG1.",
       "example": "Eu corri porque estava cansado."
     }
   ]

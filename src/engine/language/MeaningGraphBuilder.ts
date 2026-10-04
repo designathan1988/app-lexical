@@ -10,6 +10,7 @@ import nominalPpData from '../../knowledge/language/nominal-pp-rules.json';
 import coordinationData from '../../knowledge/language/coordination-rules.json';
 import degreeData from '../../knowledge/language/degree-modifier-rules.json';
 import pronounConceptData from '../../knowledge/language/pronoun-concept-rules.json';
+import copularClauseData from '../../knowledge/language/copular-clause-rules.json';
 import type { DependencyArc } from './DependencyParser';
 import type { ClauseAnalysis } from './ClauseAnalyzer';
 import type { TaggedWord } from './Tagger';
@@ -57,6 +58,9 @@ const degreeRules = degreeData as { classes: Array<{ class: string; lemmas: stri
   rules: Array<{ id: string; class: string; headUpos: string[]; semanticRole: string }> };
 const pronounConceptRules = (pronounConceptData as { rules: Array<{
   id: string; lemmas: string[]; conceptSource: string
+}> }).rules;
+const copularClauseRules = (copularClauseData as { rules: Array<{
+  id: string; predicateUpos: string[]; relation: string; semanticSubjectRole?: string
 }> }).rules;
 
 function isSubtype(actual: string | undefined, expected: string): boolean {
@@ -325,6 +329,14 @@ export class MeaningGraphBuilder {
     for (let index = 0; index < words.length; index++) {
       if (!['advcl', 'acl:relcl', 'ccomp'].includes(arcs[index].deprel)) continue;
       if (childIndices(index, 'nsubj').length) continue;
+      const copularRule = copularClauseRules.find((rule) => rule.relation === arcs[index].deprel
+        && rule.predicateUpos.includes(words[index].selected.upos)
+        && childIndices(index, 'cop').length > 0);
+      const matrixSubject = childIndices(arcs[index].head - 1, 'nsubj')[0];
+      if (copularRule?.semanticSubjectRole && matrixSubject !== undefined) {
+        edge(content(index), copularRule.semanticSubjectRole, content(matrixSubject), copularRule.id);
+        continue;
+      }
       const feats = words[index].selected.feats;
       if (feats.Person !== '1' && feats.Person !== '2') continue;
       const predicate = content(index);
