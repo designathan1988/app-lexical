@@ -45,4 +45,15 @@ describe('vistas da análise geral', () => {
     expect(html).toContain('Analisar frase');
     expect(html).toContain('Gabarito');
   });
+
+  it('exibe as 80 frases com todas as métricas e detalhes das falhas', () => {
+    const html = renderToStaticMarkup(React.createElement(SentenceAnalysisSection, { engine, initialShowGold: true }));
+    expect((html.match(/class="row-(?:selected|fail)"/g) ?? [])).toHaveLength(80);
+    for (const label of ['Lema', 'Traços', 'UPOS', 'UAS', 'LAS', 'Sujeito', 'Predicado', 'Smatch', 'Sentido']) {
+      expect(html).toContain(label);
+    }
+    expect(html).toContain('Lema esperado');
+    expect(html).toContain('Traços esperados');
+    expect(html).toContain('Sentido esperado');
+  });
 });
