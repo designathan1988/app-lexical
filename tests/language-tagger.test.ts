@@ -63,4 +63,9 @@ describe('desambiguação de classe por regras', () => {
     const ambiguous = tagger.tagForms(['a']);
     expect(ambiguous.trace.some((event) => event.rule === 'CG_DEFAULT_ORDER' && event.removed.length > 0)).toBe(true);
   });
+
+  it('escolhe futuro do subjuntivo depois de conjunção e sujeito', () => {
+    const word = tagger.tagForms(['Quando', 'ele', 'chegar', ',', 'nós', 'jantamos', '.']).words[2];
+    expect(word.selected.feats).toEqual(expect.objectContaining({ Mood: 'Sub', Tense: 'Fut', VerbForm: 'Fin' }));
+  });
 });
