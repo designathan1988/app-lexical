@@ -54,6 +54,7 @@ describe('dependências UD e estrutura da oração', () => {
   it('reconhece modo interrogativo e negação pelos traços mesmo sem pontuação', () => {
     const engine = new SemanticEngine(createInitialKnowledgeBase());
     expect(engine.analyzeSentence('Quem chegou').clause.mode).toBe('interrogative');
+    expect(engine.analyzeSentence('Onde mora João').clause.subject).toEqual([3]);
     expect(engine.analyzeSentence('Ninguém chegou.').clause.polarity).toBe('negative');
     expect(engine.analyzeSentence('Nem eu canto.').clause.polarity).toBe('negative');
   });
