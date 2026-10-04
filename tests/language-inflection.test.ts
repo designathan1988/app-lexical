@@ -4,6 +4,8 @@ import sentences from '../research/morfologia/tests-sentences.json';
 import extraSentences from './fixtures/sentences-extra.json';
 import { LanguageInflector } from '../src/engine/language/LanguageInflector';
 import { LexicalAnalyzer } from '../src/engine/language/LexicalAnalyzer';
+import seedRoots from '../src/knowledge/morphology/seed-roots.json';
+import { closedClassReadings } from '../src/engine/language/ClosedClassLexicon';
 
 type InflectionCase = {
   id: string;
@@ -19,6 +21,17 @@ const cases = (gold as { tests: InflectionCase[] }).tests;
 
 describe('flexão e índice inverso', () => {
   const inflector = new LanguageInflector();
+
+  it('indexa todas as raízes iniciais pela forma do lema', () => {
+    const entries = (seedRoots as { entries: Array<{ lemma: string; pos: string }> }).entries;
+    const missing = entries.filter((entry) =>
+      !inflector.lemmatize(entry.lemma).some((reading) => reading.lemma === entry.lemma) &&
+      !closedClassReadings(entry.lemma).length
+    );
+    console.info('Raízes indexadas', entries.length - missing.length, '/', entries.length,
+      'ausentes:', missing.map((entry) => `${entry.lemma}/${entry.pos}`).join(', '));
+    expect(missing.map((entry) => `${entry.lemma}/${entry.pos}`)).toEqual([]);
+  });
 
   it('acerta os 258 casos de flexão do projeto', () => {
     let hits = 0;
