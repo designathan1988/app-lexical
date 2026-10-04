@@ -2,11 +2,15 @@ import { describe, expect, it } from 'vitest';
 import fixture from './fixtures/sentences-extra-3.json';
 import { SemanticEngine } from '../src/engine/SemanticEngine';
 import { createInitialKnowledgeBase } from '../src/knowledge/knowledgeBase';
+import { LexicalAnalyzer } from '../src/engine/language/LexicalAnalyzer';
 
 const engine = new SemanticEngine(createInitialKnowledgeBase());
 const participles = fixture.sentences.filter((sentence) => sentence.id.startsWith('extra3-2.1-'));
 const degreePhrases = fixture.sentences.filter((sentence) => sentence.id.startsWith('extra3-2.2-')) as Array<{
   id: string; text: string; degree: { modifier: number; head: number };
+}>;
+const quantifierPhrases = fixture.sentences.filter((sentence) => sentence.id.startsWith('extra3-2.3-')) as Array<{
+  id: string; text: string; target: { token: number; upos: string };
 }>;
 
 describe('correção final — particípios predicativos e passiva', () => {
@@ -22,6 +26,27 @@ describe('correção final — particípios predicativos e passiva', () => {
     expect(analysis.words[participle]?.selected.feats.VerbForm, sentence.id).toBe('Part');
     expect(analysis.dependencies.map((arc) => ({ rel: arc.deprel, head: arc.head, dep: arc.id })), sentence.id)
       .toEqual(sentence.dependencies);
+  });
+});
+
+describe('correção final — advérbios e quantificadores de grau', () => {
+  it('cobre seis frases com usos adverbiais e determinantes', () => {
+    expect(quantifierPhrases).toHaveLength(6);
+  });
+
+  it.each(quantifierPhrases)('$id: escolhe a classe pela função no sintagma', (sentence) => {
+    const analysis = engine.analyzeSentence(sentence.text);
+    expect(analysis.words[sentence.target.token - 1]?.selected.upos, sentence.id).toBe(sentence.target.upos);
+  });
+
+  it('oferece leitura adverbial às nove formas de grau e determinante aos quantificadores nominais', () => {
+    const lexical = new LexicalAnalyzer();
+    for (const form of ['bastante', 'demais', 'tão', 'tanto', 'meio', 'bem', 'quase', 'pouco', 'mais', 'menos']) {
+      expect(lexical.analyzeSurface(form).some((reading) => reading.upos === 'ADV'), form).toBe(true);
+    }
+    for (const form of ['bastante', 'tanto', 'pouco', 'mais', 'menos']) {
+      expect(lexical.analyzeSurface(form).some((reading) => reading.upos === 'DET'), form).toBe(true);
+    }
   });
 });
 
