@@ -4,6 +4,14 @@
 
 **Rule zero — research on the internet first, always.** Before implementing anything that is not trivial, search the official documentation. Open and read the relevant pages, understand the documented behavior and the relevant project code, and only then design and implement the change. Do not rely on search snippets, memory, or a passing metric as a substitute for understanding. Record the sources and the decisions they support when the task calls for a report.
 
+## Root-cause discipline
+
+- Trial-and-error implementation is prohibited. Do not make a series of speculative edits and rerun tests to discover which patch happens to pass.
+- Before changing behavior, identify the observed failure, trace it to the responsible data, rule, or control flow, and explain the causal mechanism. Read the relevant project code and research the official documentation on the internet before choosing a solution.
+- Write a short, explicit plan that connects the root cause to a general rule or design change, its expected effects, and the smallest meaningful verification. Then implement that solution.
+- Use tests and measurements to verify the causal hypothesis and guard against regressions. A passing metric alone does not establish that the underlying problem is solved; a failing check is evidence to investigate, not an invitation to add a case-specific exception.
+- If the evidence contradicts the plan, stop modifying code, revise the explanation from the new evidence, and only then continue. Never optimize for individual test sentences or hidden-evaluation scores.
+
 ## Priority
 
 When instructions conflict, apply them in this order:
