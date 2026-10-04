@@ -47,6 +47,13 @@ describe('grafo de significado', () => {
     expect(copular.edges).toContainEqual(expect.objectContaining({ from: copular.root, role: 'ARG1', to: house!.id }));
   });
 
+  it('atribui ARG1 ao sujeito oculto de predicativo copular', () => {
+    const graph = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('É bonita.').meaningGraph;
+    const subject = graph.nodes.find((node) => node.concept === 'ele' || node.concept === 'ela');
+    expect(subject).toBeDefined();
+    expect(graph.edges).toContainEqual(expect.objectContaining({ from: graph.root, role: 'ARG1', to: subject!.id }));
+  });
+
   it('coordena predicados preservando o sujeito compartilhado', () => {
     const graph = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Ela canta e dança.').meaningGraph;
     const conjunction = graph.nodes.find((node) => node.concept === 'and');
