@@ -53,6 +53,14 @@ function isSubtype(actual: string | undefined, expected: string): boolean {
   return false;
 }
 
+function subtypeDistance(actual: string | undefined, expected: string): number | undefined {
+  let distance = 0;
+  for (let cursor = actual; cursor; cursor = typeParents.get(cursor) ?? undefined, distance++) {
+    if (cursor === expected) return distance;
+  }
+  return undefined;
+}
+
 function semanticType(lemma: string, upos: string): string {
   const seed = seeds.find((entry) => entry.lemma === lemma && entry.pos === ({ ADJ: 'ADJECTIVE', ADV: 'ADVERB', PRON: 'PRONOUN' } as Record<string, string>)[upos] || entry.lemma === lemma && entry.pos === upos);
   return seed?.senses?.[0]?.semanticType ?? supplements.find((entry) => entry.lemma === lemma)?.semanticType ?? (upos === 'PRON' ? 'PESSOA' : 'ENTIDADE');
@@ -136,7 +144,15 @@ export class MeaningGraphBuilder {
           const argumentType = arc.deprel === 'xcomp' ? 'ACAO' : arc.deprel === 'ccomp' ? 'INFORMACAO' : typeOf(arc.id - 1);
           const prefers = frame.roles?.[role]?.prefers ?? [];
           const coercedType = coercions.find((item) => isSubtype(argumentType, item.from) && interrogativeRoles.includes(item.contextRole) && prefers.some((type) => isSubtype(item.to, type)));
-          if (prefers.some((type) => isSubtype(argumentType, type)) || coercedType) score += 2;
+          const distances = prefers.map((type) => subtypeDistance(argumentType, type))
+            .filter((distance): distance is number => distance !== undefined);
+          if (distances.length) {
+            score += 2;
+            if ((arc.deprel === 'obj' || arc.deprel === 'obl') && isSubtype(argumentType, 'OBJETO')) {
+              score += 1 / (1 + Math.min(...distances));
+            }
+          }
+          else if (coercedType) score += 2;
           else if (prefers.length) score -= 1;
           if (coercedType) appliedCoercions.push({ rule: coercedType.id, token: arc.id, detail: `${argumentType}→${coercedType.to}` });
           if (frame.syntax?.some((mapping) => Object.values(mapping).includes(arc.deprel))) score += 1;

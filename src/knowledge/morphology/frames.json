@@ -339,7 +339,7 @@
           "ARG0": "nsubj"
         },
         {
-          "ARG1": "obj"
+          "ARG1": "obl"
         }
       ],
       "examples": [
@@ -370,7 +370,7 @@
           "ARG0": "nsubj"
         },
         {
-          "ARG1": "obj"
+          "ARG1": "obl"
         }
       ],
       "examples": [
@@ -398,7 +398,7 @@
           "ARG0": "nsubj"
         },
         {
-          "ARG1": "obj"
+          "ARG1": "obl"
         }
       ],
       "examples": [

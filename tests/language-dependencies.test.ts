@@ -62,12 +62,20 @@ describe('dependências UD e estrutura da oração', () => {
     for (const [text, nominal, rule] of [
       ['Eu gosto de café.', 'café', 'UD_OBL_FRAME_ARGUMENT'],
       ['Ela mora na casa.', 'casa', 'UD_OBL_FRAME_ARGUMENT'],
+      ['Eu gosto na escola.', 'escola', 'UD_OBL_ADJUNCT'],
       ['Eu leio o livro na casa.', 'casa', 'UD_OBL_ADJUNCT']
     ]) {
       const analysis = engine.analyzeSentence(text);
       const index = analysis.words.findIndex((word) => word.form.toLocaleLowerCase('pt-BR') === nominal);
       expect(analysis.dependencies[index], text).toMatchObject({ deprel: 'obl', rule });
     }
+  });
+
+  it('produz a mesma análise e a mesma ordem de trace em execuções independentes', () => {
+    const text = 'Eu quero tomar café.';
+    const first = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence(text);
+    const second = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence(text);
+    expect(second).toEqual(first);
   });
 
   it('liga adjetivos atributivos ao substantivo por amod sem confundir predicativo', () => {

@@ -3,6 +3,10 @@ import adjunctData from '../../knowledge/language/adjunct-roles.json';
 import pragmaticsData from '../../knowledge/language/pragmatics.json';
 import seedData from '../../knowledge/morphology/seed-roots.json';
 import supplementData from '../../knowledge/language/lexical-supplements.json';
+import frameData from '../../knowledge/morphology/frames.json';
+import semanticTypes from '../../knowledge/morphology/semantic-types.json';
+import obliqueCasesData from '../../knowledge/language/frame-oblique-cases.json';
+import type { TeachableRoot } from '../../knowledge/language/teachableRoot';
 import type { TaggedWord } from './Tagger';
 
 export interface DependencyArc {
@@ -19,10 +23,21 @@ const typeByLemma = new Map([
   ...(seedData as { entries: Array<{ lemma: string; senses?: Array<{ semanticType?: string }> }> }).entries.map((entry) => [entry.lemma, entry.senses?.[0]?.semanticType] as const),
   ...(supplementData as { entries: Array<{ lemma: string; semanticType?: string }> }).entries.map((entry) => [entry.lemma, entry.semanticType] as const)
 ]);
+type SyntaxFrame = { id: string; syntax?: Array<Record<string, string>>; roles?: Record<string, { prefers?: string[] }>; defaultTemplate?: boolean };
+const frames = (frameData as unknown as { frames: SyntaxFrame[] }).frames;
+const typeParents = new Map((semanticTypes as { types: Array<{ id: string; isA: string | null }> }).types
+  .map((entry) => [entry.id, entry.isA]));
+const obliqueCases = (obliqueCasesData as { entries: Array<{ frame: string; role: string; preposition: string }> }).entries;
+const isSubtype = (actual: string | undefined, expected: string): boolean => {
+  for (let current = actual; current; current = typeParents.get(current) ?? undefined) if (current === expected) return true;
+  return false;
+};
 const nominals = new Set(['NOUN', 'PROPN', 'PRON']);
 const verbal = new Set(['VERB', 'AUX']);
 
 export class DependencyParser {
+  constructor(private languageRoots: TeachableRoot[] = []) {}
+
   parse(words: TaggedWord[]): DependencyArc[] {
     if (!words.length) return [];
     const pos = (index: number) => words[index]?.selected.upos;
@@ -59,6 +74,28 @@ export class DependencyParser {
     const governor = (index: number): number => {
       const left = nearestLeft(index, (candidate) => verbal.has(pos(candidate)) && arcs[candidate].deprel !== 'cop');
       return left >= 0 ? left : root;
+    };
+    const obliqueRule = (head: number, target: number, marker: number): string => {
+      const lemma = words[head]?.selected.lemma;
+      const type = this.languageRoots.find((entry) => entry.lemma === words[target].selected.lemma)?.sense.semanticType
+        ?? typeByLemma.get(words[target].selected.lemma);
+      const preposition = words[marker].selected.lemma;
+      const candidates = [...frames, ...this.languageRoots.map((entry) => entry.frame)
+        .filter((frame): frame is NonNullable<typeof frame> => Boolean(frame))]
+        .filter((frame) => frame.id.startsWith(`${lemma}.`));
+      for (const frame of candidates) {
+        for (const mapping of frame.syntax ?? []) {
+          for (const [role, relation] of Object.entries(mapping)) {
+            if (relation !== 'obl') continue;
+            const cases = obliqueCases.filter((entry) => entry.frame === frame.id && entry.role === role);
+            if (cases.length && !cases.some((entry) => entry.preposition === preposition)) continue;
+            const prefers = frame.roles?.[role]?.prefers ?? [];
+            if (prefers.length && !prefers.some((expected) => isSubtype(type, expected))) continue;
+            return frame.defaultTemplate ? 'UD_OBL_FRAME_UNCERTAIN' : 'UD_OBL_FRAME_ARGUMENT';
+          }
+        }
+      }
+      return 'UD_OBL_ADJUNCT';
     };
 
     for (let i = 0; i < words.length; i++) {
@@ -189,7 +226,10 @@ export class DependencyParser {
     for (let i = 0; i < words.length; i++) {
       if (!nominals.has(pos(i)) || assigned(i) || i === root) continue;
       const caseMarker = nearestLeft(i, (candidate) => pos(candidate) === 'ADP' && arcs[candidate].head === i + 1);
-      if (caseMarker >= 0) set(i, governor(caseMarker), 'obl', 'UD_OBL_CASE');
+      if (caseMarker >= 0) {
+        const head = governor(caseMarker);
+        set(i, head, 'obl', obliqueRule(head, i, caseMarker));
+      }
       else {
         const followingXcomp = words[i].selected.feats.Clitic === 'Yes' && arcs[i + 1]?.deprel === 'xcomp' ? i + 1 : -1;
         const temporal = typeByLemma.get(words[i].selected.lemma) === 'TEMPO';

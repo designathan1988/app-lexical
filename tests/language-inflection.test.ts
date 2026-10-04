@@ -6,6 +6,7 @@ import { LanguageInflector } from '../src/engine/language/LanguageInflector';
 import { LexicalAnalyzer } from '../src/engine/language/LexicalAnalyzer';
 import seedRoots from '../src/knowledge/morphology/seed-roots.json';
 import { closedClassReadings } from '../src/engine/language/ClosedClassLexicon';
+import { createInitialKnowledgeBase } from '../src/knowledge/knowledgeBase';
 
 type InflectionCase = {
   id: string;
@@ -31,6 +32,16 @@ describe('flexão e índice inverso', () => {
     console.info('Raízes indexadas', entries.length - missing.length, '/', entries.length,
       'ausentes:', missing.map((entry) => `${entry.lemma}/${entry.pos}`).join(', '));
     expect(missing.map((entry) => `${entry.lemma}/${entry.pos}`)).toEqual([]);
+  });
+
+  it('indexa também todos os lexemas do construtor pela forma do lema', () => {
+    const lexemes = Object.values(createInitialKnowledgeBase().lexemes);
+    const domainInflector = new LanguageInflector(createInitialKnowledgeBase().lexemes);
+    const missing = lexemes.filter((entry) => !domainInflector.lemmatize(entry.lemma)
+      .some((reading) => reading.lemma === entry.lemma));
+    console.info('Lexemas do construtor indexados', lexemes.length - missing.length, '/', lexemes.length,
+      'ausentes:', missing.map((entry) => entry.lemma).join(', '));
+    expect(missing.map((entry) => entry.lemma)).toEqual([]);
   });
 
   it('gera leituras com traços para raízes com paradigma declarado', () => {

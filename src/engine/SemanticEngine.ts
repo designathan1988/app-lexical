@@ -117,7 +117,7 @@ export class SemanticEngine {
         if (removed.length) tagged.trace.push({ rule, index, removed });
       }
     }
-    const dependencies = new DependencyParser().parse(tagged.words);
+    const dependencies = new DependencyParser(this.knowledgeBase.languageRoots).parse(tagged.words);
     const clause = new ClauseAnalyzer().analyze(tagged.words, dependencies);
     const meaningGraph = new MeaningGraphBuilder(this.knowledgeBase.languageRoots).build(tagged.words, dependencies, clause);
     return {

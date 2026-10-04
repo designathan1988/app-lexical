@@ -1,0 +1,8 @@
+{
+  "entries": [
+    { "frame": "precisar.PRECISAR", "role": "ARG1", "preposition": "de" },
+    { "frame": "gostar.GOSTAR", "role": "ARG1", "preposition": "de" },
+    { "frame": "gostar.GOSTAR_DE_INF", "role": "ARG1", "preposition": "de" },
+    { "frame": "morar.MORAR", "role": "ARG1", "preposition": "em" }
+  ]
+}
