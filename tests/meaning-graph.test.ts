@@ -27,6 +27,12 @@ describe('comparação de grafos por triplas', () => {
 });
 
 describe('grafo de significado', () => {
+  it('prefere tipo semântico específico sem diagnosticar empate com ancestral genérico', () => {
+    const graph = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Eu tomo café.').meaningGraph;
+    expect(graph.nodes.find((node) => node.id === graph.root)?.concept).toBe('tomar.INGERIR');
+    expect(graph.diagnostics.some((item) => item.code === 'AMBIGUOUS_SENSE')).toBe(false);
+  });
+
   it('mantém nome próprio composto como um lugar na análise geral', () => {
     const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Ela mora em São Paulo.');
     const graph = analysis.meaningGraph;
