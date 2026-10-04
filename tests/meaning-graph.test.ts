@@ -64,6 +64,14 @@ describe('grafo de significado', () => {
     expect(graph.diagnostics.some((item) => item.code === 'AMBIGUOUS_SENSE')).toBe(false);
   });
 
+  it('rastreia a preferência de tipo e a moldura que atribuiu cada papel', () => {
+    const graph = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Eu tomo café.').meaningGraph;
+    expect(graph.trace.some((event) => event.rule === 'SENSE_PREFERENCE' &&
+      event.detail.includes('tomar.INGERIR') && event.detail.includes('ARG1') && event.detail.includes('BEBIDA'))).toBe(true);
+    expect(graph.edges).toContainEqual(expect.objectContaining({ role: 'ARG0', rule: 'FRAME:tomar.INGERIR:ARG0' }));
+    expect(graph.edges).toContainEqual(expect.objectContaining({ role: 'ARG1', rule: 'FRAME:tomar.INGERIR:ARG1' }));
+  });
+
   it('mantém nome próprio composto como um lugar na análise geral', () => {
     const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Ela mora em São Paulo.');
     const graph = analysis.meaningGraph;
