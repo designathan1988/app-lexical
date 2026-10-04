@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { tokenizeSentence } from '../src/engine/language/Tokenizer';
 import { closedClassReadings } from '../src/engine/language/ClosedClassLexicon';
+import { SemanticEngine } from '../src/engine/SemanticEngine';
+import { createInitialKnowledgeBase } from '../src/knowledge/knowledgeBase';
 
 const forms: Array<[string, string, string]> = [
   ['eu', 'eu', 'PRON'], ['tu', 'tu', 'PRON'], ['ele', 'ele', 'PRON'],
@@ -69,5 +71,14 @@ describe('classes fechadas e tokenização', () => {
     expect(enclisis.words.map((w) => w.form)).toEqual(['ajude', 'me']);
     const mesoclisis = tokenizeSentence('dá-lo-ei');
     expect(mesoclisis.words.some((w) => w.form === 'lo')).toBe(true);
+  });
+
+  it('recompõe o verbo flexionado da mesóclise para análise lexical', () => {
+    const tokenization = tokenizeSentence('Dá-lo-ei.');
+    expect(tokenization.words.map((word) => word.form.toLocaleLowerCase('pt-BR'))).toEqual(['darei', 'lo', '.']);
+    expect(tokenization.multiwords).toContainEqual(expect.objectContaining({ form: 'Dá-lo-ei', from: 1, to: 2 }));
+    const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Dá-lo-ei.');
+    expect(analysis.words[0].selected).toMatchObject({ lemma: 'dar', upos: 'VERB' });
+    expect(analysis.words[0].selected.feats).toMatchObject({ Person: '1', Number: 'Sing', Tense: 'Fut' });
   });
 });
