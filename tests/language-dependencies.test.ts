@@ -57,6 +57,19 @@ describe('dependências UD e estrutura da oração', () => {
     expect(engine.analyzeSentence('Ninguém chegou.').clause.polarity).toBe('negative');
   });
 
+  it('registra pela moldura quando o oblíquo é argumento ou adjunto', () => {
+    const engine = new SemanticEngine(createInitialKnowledgeBase());
+    for (const [text, nominal, rule] of [
+      ['Eu gosto de café.', 'café', 'UD_OBL_FRAME_ARGUMENT'],
+      ['Ela mora na casa.', 'casa', 'UD_OBL_FRAME_ARGUMENT'],
+      ['Eu leio o livro na casa.', 'casa', 'UD_OBL_ADJUNCT']
+    ]) {
+      const analysis = engine.analyzeSentence(text);
+      const index = analysis.words.findIndex((word) => word.form.toLocaleLowerCase('pt-BR') === nominal);
+      expect(analysis.dependencies[index], text).toMatchObject({ deprel: 'obl', rule });
+    }
+  });
+
   it('liga adjetivos atributivos ao substantivo por amod sem confundir predicativo', () => {
     const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('A casa azul é grande.');
     const casa = analysis.words.findIndex((word) => word.form.toLocaleLowerCase('pt-BR') === 'casa') + 1;
