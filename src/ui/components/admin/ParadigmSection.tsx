@@ -76,7 +76,8 @@ export function ParadigmSection({ engine, store, onChange }: Props) {
   return (
     <div className="admin-section">
       <header className="section-header">
-        <h3>Paradigmas e léxico gerado</h3>
+        <div><div className="summary-kicker">COMO AS FORMAS SÃO CRIADAS</div><h3>Paradigmas e flexões</h3>
+          <p className="note">Um paradigma é a regra que transforma uma palavra base em suas formas, como singular/plural ou tempos de um verbo.</p></div>
         <div className="entity-switch">
           {(
             [
@@ -92,12 +93,15 @@ export function ParadigmSection({ engine, store, onChange }: Props) {
         </div>
       </header>
 
+      <div className="concept-strip" aria-label="Como ler os paradigmas"><span><strong>Palavra base</strong> Escolha o lema que deseja examinar.</span>
+        <span><strong>Paradigma</strong> Veja a regra usada para gerar formas.</span><span><strong>Prévia</strong> Confira o resultado antes de alterar dados.</span></div>
+
       {message && <p className="details">{message}</p>}
 
       {view === 'lexemes' && (
         <>
           <div className="row">
-            <select value={selectedLexeme} onChange={(e) => setSelectedLexeme(e.target.value)}>
+            <select aria-label="Escolher palavra base" value={selectedLexeme} onChange={(e) => setSelectedLexeme(e.target.value)}>
               {lexemes.map((l) => (
                 <option key={l.id} value={l.id}>
                   {l.id} — {l.lemma} ({l.pos})
@@ -117,6 +121,7 @@ export function ParadigmSection({ engine, store, onChange }: Props) {
                     <th>paradigma</th>
                     <td>
                       <select
+                        aria-label="Paradigma desta palavra"
                         value={lexeme.paradigmId ?? ''}
                         onChange={(e) => setLexemeField({ paradigmId: e.target.value || undefined })}
                       >
@@ -133,6 +138,7 @@ export function ParadigmSection({ engine, store, onChange }: Props) {
                     <th>gênero inerente</th>
                     <td>
                       <select
+                        aria-label="Gênero inerente da palavra"
                         value={lexeme.inherent?.Gender ?? ''}
                         onChange={(e) =>
                           setLexemeField({
@@ -141,8 +147,8 @@ export function ParadigmSection({ engine, store, onChange }: Props) {
                         }
                       >
                         <option value="">(não se aplica)</option>
-                        <option value="Masc">Masc</option>
-                        <option value="Fem">Fem</option>
+                        <option value="Masc">masculino</option>
+                        <option value="Fem">feminino</option>
                       </select>
                     </td>
                   </tr>
@@ -161,6 +167,7 @@ export function ParadigmSection({ engine, store, onChange }: Props) {
                     <th>derivado de</th>
                     <td>
                       <select
+                        aria-label="Palavra de origem da derivação"
                         value={lexeme.derivedFrom ?? ''}
                         onChange={(e) => setLexemeField({ derivedFrom: e.target.value || undefined })}
                       >
@@ -236,6 +243,7 @@ export function ParadigmSection({ engine, store, onChange }: Props) {
               <h4>Validar no chat</h4>
               <div className="row">
                 <input
+                  aria-label="Comando para validar a flexão"
                   value={ruleInput}
                   placeholder="ex.: crie um botãozinho"
                   onChange={(e) => setRuleInput(e.target.value)}
@@ -253,6 +261,7 @@ export function ParadigmSection({ engine, store, onChange }: Props) {
         <>
           <div className="row">
             <select
+              aria-label="Escolher paradigma"
               value={selectedParadigm}
               onChange={(e) => setSelectedParadigm(e.target.value)}
             >
@@ -369,6 +378,7 @@ export function ParadigmSection({ engine, store, onChange }: Props) {
           <h4>Validar no chat</h4>
           <div className="row">
             <input
+              aria-label="Comando para validar o paradigma"
               value={ruleInput}
               placeholder="ex.: crie duas caixas apaguem"
               onChange={(e) => setRuleInput(e.target.value)}
@@ -384,6 +394,7 @@ export function ParadigmSection({ engine, store, onChange }: Props) {
         <>
           <div className="row">
             <input
+              aria-label="Filtrar formas com mais de uma leitura"
               value={query}
               placeholder="filtrar formas…"
               onChange={(e) => setQuery(e.target.value)}

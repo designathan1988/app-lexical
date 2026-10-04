@@ -22,7 +22,7 @@ function Tree({ words, arcs, other }: { words: string[]; arcs: Arc[]; other: Arc
       const peak = base - Math.min(128, 34 + Math.abs(arc.dep - arc.head) * 16);
       const match = other.some((item) => item.dep === arc.dep && item.head === arc.head && item.rel === arc.rel);
       return <g key={arc.dep} className={match ? 'comparison-match' : 'comparison-diff'}>
-        <title>{arc.rel}: {arc.head} → {arc.dep}{match ? '' : ' · divergente'}</title>
+        <title>{`${arc.rel}: ${arc.head} → ${arc.dep}${match ? '' : ' · divergente'}`}</title>
         <path d={arc.head ? `M ${head} ${base - 16} Q ${mid} ${peak} ${child} ${base - 16}` : `M ${child} ${base - 65} L ${child} ${base - 16}`} fill="none" />
         <text x={mid} y={peak - 7} textAnchor="middle">{arc.rel}</text>
       </g>;
@@ -50,7 +50,7 @@ function Graph({ source, other }: { source: string; other: string }) {
       const to = positions.get(edge.to)!;
       const triple = JSON.stringify([concepts.get(edge.from), edge.role, concepts.get(edge.to)]);
       const match = otherTriples.includes(triple);
-      return <g key={index} className={match ? 'comparison-match' : 'comparison-diff'}><title>{edge.role}{match ? '' : ' · divergente'}</title>
+      return <g key={index} className={match ? 'comparison-match' : 'comparison-diff'}><title>{`${edge.role}${match ? '' : ' · divergente'}`}</title>
         <path d={`M ${from.x} ${from.y + 19} L ${to.x} ${to.y - 19}`} fill="none" />
         <text x={(from.x + to.x) / 2} y={(from.y + to.y) / 2 - 5} textAnchor="middle">:{edge.role}</text></g>;
     })}

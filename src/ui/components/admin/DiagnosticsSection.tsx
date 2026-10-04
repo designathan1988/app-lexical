@@ -25,11 +25,13 @@ export function DiagnosticsSection({ engine }: Props) {
   return (
     <div className="admin-section">
       <header className="section-header">
-        <h3>Erros e diagnósticos</h3>
+        <div><div className="summary-kicker">ENTENDA UMA FALHA</div><h3>Por que a frase não funcionou?</h3>
+          <p className="note">Analise um comando do construtor sem executá-lo. Comece pelas mensagens em português; abra o rastreio técnico só se precisar investigar.</p></div>
       </header>
 
       <div className="row">
         <input
+          aria-label="Comando para diagnosticar"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="frase para diagnosticar"
@@ -41,7 +43,11 @@ export function DiagnosticsSection({ engine }: Props) {
 
       {result && (
         <>
-          <h4>Diagnósticos</h4>
+          <div className={`diagnostic-summary ui-card ${result.diagnostics.some((item) => item.severity === 'ERROR') ? 'has-failures' : 'all-pass'}`} role="status">
+            <strong>{result.diagnostics.length ? `${result.diagnostics.length} mensagem(ns) encontrada(s)` : 'Nenhum problema identificado'}</strong>
+            <p>{result.diagnostics.some((item) => item.severity === 'ERROR') ? 'O comando precisa de ajuste. Leia a mensagem e a posição indicadas abaixo.' : 'Não há erro bloqueante nesta análise.'}</p>
+          </div>
+          <h4>Mensagens para corrigir</h4>
           <table className="data-table">
             <thead>
               <tr>
@@ -72,6 +78,7 @@ export function DiagnosticsSection({ engine }: Props) {
             </tbody>
           </table>
 
+          <details className="results-advanced"><summary>Ver rastreio técnico: palavras, candidatos e plano</summary>
           <h4>Tokens e candidatos</h4>
           <table className="data-table">
             <thead>
@@ -106,6 +113,7 @@ export function DiagnosticsSection({ engine }: Props) {
 
           <h4>ExecutionPlan</h4>
           <pre className="code-block">{planSignature(result.plan) || '(vazio)'}</pre>
+          </details>
         </>
       )}
     </div>

@@ -8,6 +8,7 @@ interface Props {
   engine: SemanticEngine;
   store: KnowledgeBaseStore;
   onChange: () => void;
+  onTeachWord?: () => void;
 }
 
 function seedFromCase(c: EvalRecord): string {
@@ -19,7 +20,7 @@ function seedFromCase(c: EvalRecord): string {
  * A frase informada é compilada pelo MOTOR REAL: AST, plano e árvore resultante
  * são capturados como dados de regressão.
  */
-export function TrainingSection({ engine, store, onChange }: Props) {
+export function TrainingSection({ engine, store, onChange, onTeachWord }: Props) {
   const [input, setInput] = useState('');
   const [seedText, setSeedText] = useState('[]');
   const [selection, setSelection] = useState<string>('');
@@ -124,68 +125,73 @@ export function TrainingSection({ engine, store, onChange }: Props) {
   return (
     <div className="admin-section">
       <header className="section-header">
-        <h3>Treinamento e correções</h3>
-        <button onClick={exportTraining}>Exportar dataset ({store.training.length})</button>
+        <div><div className="summary-kicker">ENSINAR E VERIFICAR</div><h3>Como ensinar o motor</h3>
+          <p className="note">Há dois caminhos diferentes. Escolha o que você quer acrescentar à base.</p></div>
+        <button onClick={exportTraining}>Baixar exemplos ({store.training.length})</button>
       </header>
 
-      <div className="form-grid">
+      <div className="training-paths">
+        <div className="training-path ui-card"><span className="summary-kicker">CAMINHO 1 · VOCABULÁRIO</span><h4>Ensinar uma palavra</h4>
+          <p>Inclui lema, classe, formas e significado. Depois você testa essa palavra na Análise de frase.</p>
+          <button className="primary" onClick={onTeachWord} disabled={!onTeachWord}>Abrir assistente de palavras</button></div>
+        <div className="training-path ui-card"><span className="summary-kicker">CAMINHO 2 · EXEMPLOS</span><h4>Guardar uma frase de treino</h4>
+          <p>Registra o resultado atual de um <strong>comando do construtor</strong> como exemplo de regressão. Isso ajuda a detectar mudanças futuras; não reescreve as regras do motor por si só.</p>
+          <a href="#training-form" className="text-link">Ir para o formulário ↓</a></div>
+      </div>
+
+      <div className="training-explainer ui-card"><h4>O caminho da frase</h4>
+        <ol><li>Escreva um comando do construtor.</li><li>Capture a interpretação atual do motor.</li><li>Confira o resultado e os diagnósticos.</li><li>Salve como exemplo de regressão.</li></ol>
+        <p className="note">Para analisar uma frase comum, use “Análise de frase” no menu principal.</p></div>
+
+      <div id="training-form" className="form-grid training-form">
         <label>
-          Frase
+          1. Comando a registrar
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="crie uma caixa azul com um botão vermelho dentro"
           />
         </label>
-        <label>
-          Documento inicial (JSON de seed)
-          <textarea
-            rows={4}
-            value={seedText}
-            onChange={(e) => setSeedText(e.target.value)}
-            placeholder='[{"entityConceptId":"C_ENT_BUTTON"}]'
-          />
-        </label>
-        <label>
-          Seleção (índice do nó semeado, ou "all")
-          <input
-            value={selection}
-            onChange={(e) => setSelection(e.target.value)}
-            placeholder="0"
-          />
-        </label>
+        <details className="import-box training-advanced"><summary>Configuração avançada: documento inicial e seleção</summary>
+          <p className="note">Use apenas quando a frase depende de elementos que já existem na página. Sem isso, deixe o documento como <code>[]</code>.</p>
+          <label>Documento inicial (JSON)<textarea rows={4} value={seedText} onChange={(e) => setSeedText(e.target.value)} placeholder='[{"entityConceptId":"C_ENT_BUTTON"}]' /></label>
+          <label>Seleção inicial (índice ou “all”)<input value={selection} onChange={(e) => setSelection(e.target.value)} placeholder="0" /></label>
+        </details>
       </div>
 
       <div className="row">
         <button className="primary" onClick={captureNow} disabled={!input.trim()}>
-          Capturar interpretação real
+          2. Capturar resultado
         </button>
         <button onClick={saveTraining} disabled={!capture}>
-          Salvar como treino/regressão
-        </button>
-        <button onClick={saveCorrection} disabled={!capture}>
-          Salvar correção manual
+          3. Salvar exemplo
         </button>
       </div>
 
-      {error && <p className="err">{error}</p>}
-      {message && <p className="ok">{message}</p>}
+      <details className="training-correction"><summary>Registrar captura como correção manual</summary>
+        <p className="note">Esta opção marca a captura atual como correção no conjunto de regressão; ela não altera a interpretação do motor automaticamente.</p>
+        <button onClick={saveCorrection} disabled={!capture}>Registrar como correção</button>
+      </details>
+
+      {error && <p className="err" role="alert">{error}</p>}
+      {message && <p className="ok" role="status">{message}</p>}
 
       {capture && (
         <div className="capture">
-          <h4>Interpretação capturada do motor real</h4>
-          <label>AST</label>
-          <pre className="code-block">{capture.ast}</pre>
-          <label>ExecutionPlan</label>
-          <pre className="code-block">{capture.plan}</pre>
-          <label>Árvore resultante</label>
-          <pre className="code-block">{capture.tree || '(vazia)'}</pre>
-          <label>Diagnósticos</label>
-          <pre className="code-block">{capture.diagnostics.join('\n') || '(nenhum)'}</pre>
+          <h4>Resultado capturado</h4>
+          <p><strong>{capture.diagnostics.length ? `${capture.diagnostics.length} diagnóstico(s)` : 'Sem diagnósticos'}</strong> · {capture.tree ? 'Uma árvore de página foi produzida.' : 'Nenhum elemento foi produzido.'}</p>
+          <p className="note">O documento atual da aplicação não foi alterado. Confira o resultado antes de salvar o exemplo.</p>
+          <details><summary>Ver AST, plano, árvore e códigos técnicos</summary>
+            <label>AST</label><pre className="code-block">{capture.ast}</pre>
+            <label>Plano de execução</label><pre className="code-block">{capture.plan}</pre>
+            <label>Árvore resultante</label><pre className="code-block">{capture.tree || '(vazia)'}</pre>
+            <label>Diagnósticos</label><pre className="code-block">{capture.diagnostics.join('\n') || '(nenhum)'}</pre>
+          </details>
         </div>
       )}
 
-      <h4>Frases cadastradas</h4>
+      <h4>Exemplos cadastrados ({store.training.length})</h4>
+      <p className="note">Eles são comparados com o comportamento atual em “Testes → Treinamento”.</p>
       <table className="data-table">
         <thead>
           <tr>
@@ -201,20 +207,20 @@ export function TrainingSection({ engine, store, onChange }: Props) {
             <tr key={t.id}>
               <td><code>{t.id}</code></td>
               <td>{t.input}</td>
-              <td>{t.source}</td>
+              <td>{t.source === 'correction' ? 'correção registrada' : 'exemplo manual'}</td>
               <td className="details">
                 <pre>{t.expectedTree || '(vazia)'}</pre>
               </td>
               <td>
-                <button className="danger" onClick={() => { store.removeTrainingRecord(t.id); onChange(); }}>
-                  remover
+                <button className="danger" aria-label={`Remover exemplo ${t.id}`} onClick={() => { store.removeTrainingRecord(t.id); onChange(); }}>
+                  Remover
                 </button>
               </td>
             </tr>
           ))}
           {store.training.length === 0 && (
             <tr>
-              <td colSpan={5}>Nenhuma frase cadastrada ainda.</td>
+              <td colSpan={5}>Nenhum exemplo salvo ainda. Capture um comando acima para começar.</td>
             </tr>
           )}
         </tbody>
@@ -223,6 +229,7 @@ export function TrainingSection({ engine, store, onChange }: Props) {
       <details className="import-box">
         <summary>Importar dataset de treino (JSON)</summary>
         <textarea
+          aria-label="JSON do conjunto de treino a importar"
           rows={5}
           id="training-import"
           placeholder='[ { "id": "train_1", "input": "crie um botão", ... } ]'

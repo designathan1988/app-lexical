@@ -23,13 +23,11 @@ export function MorphologySection({ engine }: Props) {
   const analyses = useMemo(() => (word.trim() ? engine.analyzeWord(word.trim()) : []), [engine, word]);
 
   return (
-    <section>
-      <h3>Morfologia derivacional</h3>
-      <p>
-        Decomposição por regra: raiz + prefixos/sufixos, com a semântica composta e a glosa.
-        "Atestada" = registrada nos dados; "hipótese" = gerada pelas regras; "bloqueada" = forma que
-        a língua evita (há outra palavra para o mesmo sentido).
-      </p>
+    <section className="admin-section">
+      <div className="summary-kicker">DE ONDE VEM A PALAVRA</div><h3>Formação das palavras</h3>
+      <p className="note">Digite uma forma para ver a raiz e as regras de formação. Uma hipótese é uma possibilidade gerada, não uma palavra confirmada.</p>
+      <div className="concept-strip"><span><strong>Raiz</strong> Palavra de partida.</span><span><strong>Formação</strong> Prefixos, sufixos e flexões aplicados.</span>
+        <span><strong>Status</strong> Atestada = registrada; hipótese = prevista; bloqueada = evitada pela regra.</span></div>
       <input
         value={word}
         onChange={(e) => setWord(e.target.value)}
@@ -50,12 +48,12 @@ export function MorphologySection({ engine }: Props) {
           <thead>
             <tr>
               <th>raiz</th>
-              <th>cadeia</th>
+              <th>formação</th>
               <th>classe</th>
-              <th>semântica</th>
-              <th>glosa</th>
+              <th>significado formal</th>
+              <th>explicação</th>
               <th>status</th>
-              <th>score</th>
+              <th title="Pontuação interna usada para ordenar análises, não uma probabilidade">prioridade</th>
             </tr>
           </thead>
           <tbody>

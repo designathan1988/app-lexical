@@ -48,44 +48,52 @@ export function AdminPanel({ engine, store, onChange, onAnalyze }: Props) {
     onChange();
   };
 
-  const tabs: Array<{ id: AdminTab; label: string }> = [
-    { id: 'dados', label: 'Dados' },
-    { id: 'paradigmas', label: 'Paradigmas' },
-    { id: 'morfologia', label: 'Morfologia' },
-    { id: 'frase', label: 'Análise de frase' },
-    { id: 'rede', label: 'Rede ensinável' },
-    { id: 'treinamento', label: 'Treinamento' },
-    { id: 'testes', label: 'Testes' },
-    { id: 'metricas', label: 'Métricas' },
-    { id: 'diagnosticos', label: 'Erros / Diagnósticos' },
-    { id: 'configuracoes', label: 'Configurações' },
-    { id: 'historico', label: 'Histórico' }
+  const tabs: Array<{ id: AdminTab; label: string; group: string }> = [
+    { id: 'dados', label: 'Dados', group: 'Explorar' },
+    { id: 'paradigmas', label: 'Paradigmas', group: 'Explorar' },
+    { id: 'morfologia', label: 'Morfologia', group: 'Explorar' },
+    { id: 'frase', label: 'Análise de frase', group: 'Explorar' },
+    { id: 'rede', label: 'Rede ensinável', group: 'Ensinar' },
+    { id: 'treinamento', label: 'Treinamento', group: 'Ensinar' },
+    { id: 'testes', label: 'Testes', group: 'Verificar' },
+    { id: 'metricas', label: 'Métricas', group: 'Verificar' },
+    { id: 'diagnosticos', label: 'Erros / Diagnósticos', group: 'Verificar' },
+    { id: 'configuracoes', label: 'Configurações', group: 'Sistema' },
+    { id: 'historico', label: 'Histórico', group: 'Sistema' }
   ];
 
   return (
     <div className="admin-layout">
+      <div className="admin-mobile-nav"><label>Área do painel
+        <select aria-label="Escolher área do painel" value={tab} onChange={(event) => setTab(event.target.value as AdminTab)}>
+          {['Explorar', 'Ensinar', 'Verificar', 'Sistema'].map((group) => <optgroup key={group} label={group}>
+            {tabs.filter((item) => item.group === group).map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
+          </optgroup>)}
+        </select>
+      </label></div>
       <aside className="admin-nav">
-        {tabs.map((t) => (
+        {tabs.map((t, index) => <React.Fragment key={t.id}>
+          {(index === 0 || tabs[index - 1].group !== t.group) && <div className="admin-nav-heading">{t.group}</div>}
           <button
-            key={t.id}
             className={tab === t.id ? 'active' : ''}
+            aria-current={tab === t.id ? 'page' : undefined}
             onClick={() => setTab(t.id)}
           >
             {t.label}
           </button>
-        ))}
+        </React.Fragment>)}
       </aside>
 
       <main className="admin-body">
         {store.migrationNotice && <p className="ok">{store.migrationNotice}</p>}
         {store.lastPersistError && <p className="err" role="alert">{store.lastPersistError}</p>}
-        {tab === 'dados' && <DataSection engine={engine} store={store} onChange={bump} />}
+        {tab === 'dados' && <DataSection engine={engine} store={store} onChange={bump} onTeachWord={() => setTab('rede')} />}
         {tab === 'paradigmas' && <ParadigmSection engine={engine} store={store} onChange={bump} />}
         {tab === 'morfologia' && <MorphologySection engine={engine} />}
         {tab === 'frase' && <SentenceAnalysisSection engine={engine} />}
         {tab === 'rede' && <TeachableNetworkSection engine={engine} store={store} onChange={bump} onAnalyze={onAnalyze} />}
         {tab === 'treinamento' && (
-          <TrainingSection engine={engine} store={store} onChange={bump} />
+          <TrainingSection engine={engine} store={store} onChange={bump} onTeachWord={() => setTab('rede')} />
         )}
         {tab === 'testes' && <TestSection engine={engine} store={store} />}
         {tab === 'metricas' && <MetricsSection engine={engine} />}

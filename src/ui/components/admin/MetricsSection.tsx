@@ -41,36 +41,48 @@ export function MetricsSection({ engine }: Props) {
     setLayers(Array.from(byLayer.values()));
   }, [engine]);
 
-  if (!reports) return <div className="admin-section">Calculando métricas…</div>;
+  if (!reports) return <div className="admin-section ui-loading" role="status">Calculando os resultados dos conjuntos de avaliação…</div>;
 
   const metricRows: Array<[string, (r: SetReport) => MetricValue, boolean, string]> = [
-    ['Lexical resolution accuracy', (r) => r.metrics.lexicalAccuracy, false, 'tokens de conteúdo resolvidos'],
-    ['Concept/sense accuracy', (r) => r.metrics.senseAccuracy, false, 'conceito correto por token'],
-    ['Morphological accuracy', (r) => r.metrics.morphologicalAccuracy, false, 'lema + traços por token após desambiguação'],
-    ['Entity attachment accuracy', (r) => r.metrics.attachmentAccuracy, false, 'pares (fonte, relação, alvo)'],
-    ['Property/value binding accuracy', (r) => r.metrics.bindingAccuracy, false, 'triplas (entidade, propriedade, valor)'],
-    ['Reference resolution accuracy', (r) => r.metrics.referenceAccuracy, false, 'nós resolvidos por referência'],
-    ['AST exact match', (r) => r.metrics.astExactMatch, false, 'assinatura canônica da AST'],
-    ['Execution-plan exact match', (r) => r.metrics.planExactMatch, false, 'assinatura do plano com IDs normalizados'],
-    ['End-to-end command success', (r) => r.metrics.endToEnd, false, 'todas as asserções'],
-    ['False-positive rate', (r) => r.metrics.falsePositiveRate, true, 'casos que deviam falhar e mutaram'],
-    ['Ambiguity detection rate', (r) => r.metrics.ambiguityDetectionRate, false, 'casos realmente ambíguos detectados']
+    ['Palavra reconhecida', (r) => r.metrics.lexicalAccuracy, false, 'quantas palavras de conteúdo foram identificadas'],
+    ['Sentido escolhido', (r) => r.metrics.senseAccuracy, false, 'quantas palavras receberam o conceito esperado'],
+    ['Forma e flexão', (r) => r.metrics.morphologicalAccuracy, false, 'lema e traços morfológicos após a desambiguação'],
+    ['Ligação entre elementos', (r) => r.metrics.attachmentAccuracy, false, 'relações entre fonte, tipo e alvo'],
+    ['Propriedade e valor', (r) => r.metrics.bindingAccuracy, false, 'associação da propriedade ao valor correto'],
+    ['Referência resolvida', (r) => r.metrics.referenceAccuracy, false, 'qual elemento do documento a frase mencionou'],
+    ['Estrutura do comando (AST)', (r) => r.metrics.astExactMatch, false, 'comando interpretado exatamente como esperado'],
+    ['Plano de ações', (r) => r.metrics.planExactMatch, false, 'sequência de ações planejada corretamente'],
+    ['Resultado completo', (r) => r.metrics.endToEnd, false, 'todos os critérios da frase passaram'],
+    ['Falso positivo', (r) => r.metrics.falsePositiveRate, true, 'frases que deveriam falhar mas causaram alteração; aqui 0% é bom'],
+    ['Ambiguidade percebida', (r) => r.metrics.ambiguityDetectionRate, false, 'casos realmente ambíguos identificados']
   ];
+  const datasetNames: Record<string, string> = { dev: 'Desenvolvimento', regression: 'Regressão', [COMPROMISED_LABEL]: 'Final v1 · histórico' };
+  const datasetDescriptions: Record<string, string> = {
+    dev: 'Exemplos usados ao construir as regras.',
+    regression: 'Casos conhecidos que não podem voltar a falhar.',
+    [COMPROMISED_LABEL]: 'Conjunto antigo e já conhecido; não é uma avaliação oculta.'
+  };
 
   return (
     <div className="admin-section">
       <header className="section-header">
-        <h3>Métricas semânticas por conjunto</h3>
-        <span className={reports.every((r) => r.failed === 0) ? 'ok' : 'err'}>
-          {reports.map((r) => `${r.name}: ${r.passed}/${r.total}`).join(' · ')}
-        </span>
+        <div><div className="summary-kicker">ENTENDA OS RESULTADOS</div><h3>O que o motor acertou?</h3>
+          <p className="note">Cada conjunto compara o resultado real com exemplos que têm uma resposta esperada.</p></div>
       </header>
-      <p className="details">
-        Cada métrica é medida apenas sobre os registros que declaram aquela expectativa; a
-        cobertura aparece entre parênteses. Sem registros com expectativa, o valor é <code>n/a</code> —
-        nunca 100%.
-      </p>
 
+      <div className="results-overview">{reports.map((report) => <div className="results-set-card ui-card" key={report.name}>
+        <span className="summary-kicker">{datasetNames[report.name] ?? report.name}</span>
+        <strong>{report.passed} de {report.total}</strong><span>frases aprovadas</span>
+        <p>{report.failed === 0 ? 'Nenhuma divergência neste conjunto.' : `${report.failed} frase(s) precisam de inspeção abaixo.`}</p>
+        <small>{datasetDescriptions[report.name] ?? 'Conjunto de avaliação salvo.'}</small>
+      </div>)}</div>
+      <div className="results-explainer ui-card"><h4>Como ler esta tela</h4>
+        <p><strong>Frases aprovadas</strong> mostra o resultado completo. As métricas detalhadas explicam <em>em qual etapa</em> ocorreu uma diferença.</p>
+        <p><strong>n/a</strong> significa que não há expectativas anotadas para aquela métrica naquele conjunto — não significa 100%.</p>
+        <p><strong>Falso positivo:</strong> quanto mais perto de 0%, melhor; é uma frase que deveria ser bloqueada mas causou alteração.</p>
+      </div>
+
+      <details className="results-advanced"><summary>Ver métricas detalhadas por etapa</summary>
       <table className="metrics-table">
         <thead>
           <tr>
@@ -115,6 +127,7 @@ export function MetricsSection({ engine }: Props) {
           ))}
         </tbody>
       </table>
+      </details>
 
       <h4>Onde o motor erra</h4>
       {reports.every((r) => r.failures.length === 0) ? (
@@ -144,6 +157,7 @@ export function MetricsSection({ engine }: Props) {
         </table>
       )}
 
+      <details className="results-advanced"><summary>Ver diagnósticos por camada</summary>
       <h4>Diagnósticos por camada</h4>
       <p className="details">
         Camadas válidas do pipeline: {VALID_LAYERS.join(', ')}. Camada fora dessa lista é
@@ -184,7 +198,9 @@ export function MetricsSection({ engine }: Props) {
           )}
         </tbody>
       </table>
+      </details>
 
+      <details className="results-advanced"><summary>Ver composição dos conjuntos</summary>
       <h4>Composição dos conjuntos</h4>
       <table className="data-table">
         <thead>
@@ -210,6 +226,7 @@ export function MetricsSection({ engine }: Props) {
           ))}
         </tbody>
       </table>
+      </details>
     </div>
   );
 }

@@ -8,11 +8,24 @@ interface Props {
   engine: SemanticEngine;
   store: KnowledgeBaseStore;
   onChange: () => void;
+  onTeachWord?: () => void;
 }
 
 type Entity = 'surface' | 'lexeme' | 'concept' | 'mwe';
 
-export function DataSection({ engine, store, onChange }: Props) {
+const groupInfo: Record<Entity, { title: string; stage: string; technical: string; description: string; example: string; next: string }> = {
+  surface: { title: 'Formas', stage: 'o que você digita', technical: 'surface forms', description: 'As grafias que o motor reconhece quando você escreve. Uma palavra pode ter várias formas flexionadas.', example: 'botão → botões', next: 'Abra uma linha para ver as formas geradas e as exceções.' },
+  lexeme: { title: 'Palavras', stage: 'entrada de dicionário', technical: 'lexemas', description: 'A entrada de dicionário: lema, classe e paradigma. É a base usada para gerar e reconhecer formas.', example: 'botão · substantivo · N_AO_OES', next: 'Para ensinar uma palavra nova, use o assistente de ensino.' },
+  concept: { title: 'Significados', stage: 'a ideia reconhecida', technical: 'conceitos', description: 'A ideia ou ação associada às palavras. Um mesmo lema pode apontar para sentidos diferentes.', example: 'botão → elemento de interface', next: 'Veja aqui o que cada palavra pode representar no construtor.' },
+  mwe: { title: 'Expressões', stage: 'palavras em conjunto', technical: 'multiwords', description: 'Grupos de palavras que funcionam como uma unidade de sentido.', example: 'ao lado de → relação espacial', next: 'Use esta lista para entender frases que dependem de mais de uma palavra.' }
+};
+const posNames: Record<string, string> = { VERB: 'verbo', NOUN: 'substantivo', ADJECTIVE: 'adjetivo', ADVERB: 'advérbio',
+  DETERMINER: 'determinante', PRONOUN: 'pronome', PREPOSITION: 'preposição', NUMERAL: 'numeral', CONJUNCTION: 'conjunção' };
+const conceptKinds: Record<string, string> = { ENTITY: 'elemento', PROPERTY: 'propriedade', VALUE: 'valor', ACTION: 'ação', RELATION: 'relação' };
+const formTypeNames: Record<string, string> = { MISSPELLING: 'grafia alternativa', COLLOQUIAL: 'forma coloquial', ABBREVIATION: 'abreviação', INFLECTION: 'flexão excepcional' };
+const valueCategoryNames: Record<string, string> = { COLOR: 'cor', SIZE: 'tamanho', NUMBER: 'número', TEXT: 'texto', BOOLEAN: 'sim/não', ALIGNMENT: 'alinhamento', WEIGHT: 'peso', DISPLAY: 'exibição', ENUM: 'opção' };
+
+export function DataSection({ engine, store, onChange, onTeachWord }: Props) {
   const [entity, setEntity] = useState<Entity>('surface');
   const [query, setQuery] = useState('');
   const [importText, setImportText] = useState('');
@@ -20,6 +33,7 @@ export function DataSection({ engine, store, onChange }: Props) {
 
   const concepts = store.kb.concepts;
   const lexemes = store.kb.lexemes;
+  const group = groupInfo[entity];
 
   const surfaceList = useMemo(
     () => store.searchSurfaceForms(query),
@@ -49,6 +63,8 @@ export function DataSection({ engine, store, onChange }: Props) {
       (m) => m.phrase.toLowerCase().includes(q) || m.conceptId.toLowerCase().includes(q)
     );
   }, [store.kb.multiwords, query]);
+  const visibleCount = entity === 'surface' ? surfaceList.length : entity === 'lexeme' ? lexemeList.length
+    : entity === 'concept' ? conceptList.length : mweList.length;
 
   const notify = (m: string) => {
     setMessage(m);
@@ -78,10 +94,12 @@ export function DataSection({ engine, store, onChange }: Props) {
   return (
     <div className="admin-section">
       <header className="section-header">
-        <h3>Dados da base de conhecimento</h3>
+        <div><div className="summary-kicker">EXPLORE OS DADOS</div><h3>Como o motor entende as palavras</h3>
+          <p className="note">A base liga o que você digita ao lema e, depois, ao significado. Escolha um grupo para explorar.</p></div>
         <div className="row">
           <input
-            placeholder="pesquisar…"
+            aria-label={`Pesquisar ${group.title.toLowerCase()}`}
+            placeholder={`Buscar em ${group.title.toLowerCase()}…`}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -89,23 +107,27 @@ export function DataSection({ engine, store, onChange }: Props) {
         </div>
       </header>
 
-      <div className="entity-switch">
-        {(
-          [
-            ['surface', `Lemas e formas (${Object.keys(lexemes).length})`],
-            ['lexeme', `Lexemas (${Object.keys(lexemes).length})`],
-            ['concept', `Conceitos (${Object.keys(concepts).length})`],
-            ['mwe', `Multiwords (${store.kb.multiwords.length})`]
-          ] as Array<[Entity, string]>
-        ).map(([id, label]) => (
-          <button key={id} className={entity === id ? 'active' : ''} onClick={() => setEntity(id)}>
-            {label}
-          </button>
-        ))}
+      <div className="data-groups" aria-label="Grupos de dados">
+        {([
+          ['surface', store.kb.surfaceForms.length], ['lexeme', Object.keys(lexemes).length],
+          ['concept', Object.keys(concepts).length], ['mwe', store.kb.multiwords.length]
+        ] as Array<[Entity, number]>).map(([id, count], index) => (
+          <button key={id} className={`data-group ${entity === id ? 'active' : ''}`} aria-pressed={entity === id}
+            onClick={() => { setEntity(id); setQuery(''); }}>
+            <small>0{index + 1} · {groupInfo[id].stage}</small><strong>{groupInfo[id].title}</strong>
+            <span>{groupInfo[id].description}</span><em>{count} registros</em>
+          </button>))}
       </div>
 
-      {message && <p className="ok">{message}</p>}
+      <div className="data-explainer ui-card" role="status"><div><div className="summary-kicker">GRUPO SELECIONADO</div><h4>{group.title}</h4><p>{group.description}</p>
+        <p><strong>Exemplo:</strong> {group.example}</p><p className="note">{group.next} <small>Nome técnico: {group.technical}.</small></p></div>
+        {onTeachWord && <button className="primary" onClick={onTeachWord}>Ensinar palavra nova</button>}
+      </div>
 
+      {message && <p className="ok" role="status">{message}</p>}
+
+      <div className="data-records"><h4>Registros: {group.title.toLowerCase()}</h4>
+      {query.trim() && <p className="note" role="status">{visibleCount ? `${visibleCount} registro(s) encontrado(s).` : 'Nenhum registro encontrado. Tente outra palavra ou limpe a busca.'}</p>}
       {entity === 'surface' && (
         <SurfaceTable
           list={surfaceList}
@@ -168,10 +190,12 @@ export function DataSection({ engine, store, onChange }: Props) {
           }}
         />
       )}
+      </div>
 
       <details className="import-box">
         <summary>Importar backup / dataset (JSON)</summary>
         <textarea
+          aria-label="Conteúdo JSON do backup a importar"
           value={importText}
           onChange={(e) => setImportText(e.target.value)}
           placeholder='{"knowledgeBase": {...}}'
@@ -220,21 +244,20 @@ function SurfaceTable({
   return (
     <>
       <h4>
-        Lemas e suas formas ({byLexeme.length} lemas · {list.length} formas)
+        Palavras e suas formas ({byLexeme.length} palavras base · {list.length} formas)
       </h4>
       <p className="details">
-        Cada lema tem um único identificador; as derivações (flexões, diminutivos) são geradas
-        pelo paradigma. Para incluir uma palavra nova, cadastre o <strong>lema</strong> na aba
-        Lexemas.
+        O <strong>lema</strong> é a forma de dicionário. Flexões como plural e tempo verbal são geradas
+        pelo paradigma. Para uma palavra nova, use <strong>Ensinar palavra nova</strong> acima.
       </p>
       <table className="data-table">
         <thead>
           <tr>
-            <th>ID do lema</th>
-            <th>lema</th>
+            <th>palavra base</th>
             <th>classe</th>
+            <th>formas reconhecidas</th>
             <th>paradigma</th>
-            <th>formas</th>
+            <th>ID técnico</th>
           </tr>
         </thead>
         <tbody>
@@ -243,10 +266,8 @@ function SurfaceTable({
             const surfaces = [...new Set(forms.map((f) => f.rawText))];
             return (
               <tr key={lexemeId}>
-                <td><code>{lexemeId}</code></td>
-                <td>{lexeme?.lemma ?? '—'}</td>
-                <td className="details">{lexeme?.pos ?? '—'}</td>
-                <td className="details"><code>{lexeme?.paradigmId ?? 'invariável'}</code></td>
+                <td><strong>{lexeme?.lemma ?? '—'}</strong></td>
+                <td className="details">{posNames[lexeme?.pos ?? ''] ?? lexeme?.pos ?? '—'}</td>
                 <td>
                   <details>
                     <summary>
@@ -267,6 +288,8 @@ function SurfaceTable({
                     </table>
                   </details>
                 </td>
+                <td className="details"><code>{lexeme?.paradigmId ?? 'invariável'}</code></td>
+                <td className="details"><code>{lexemeId}</code></td>
               </tr>
             );
           })}
@@ -281,11 +304,12 @@ function SurfaceTable({
       <h4>Exceções fora do paradigma ({exceptions.length})</h4>
       <div className="add-row">
         <input
+          aria-label="Forma escrita excepcional"
           placeholder="forma escrita (ex.: erro comum)"
           value={newText}
           onChange={(e) => setNewText(e.target.value)}
         />
-        <select value={newLexeme} onChange={(e) => setNewLexeme(e.target.value)}>
+        <select aria-label="Palavra base da exceção" value={newLexeme} onChange={(e) => setNewLexeme(e.target.value)}>
           {lexemeIds.map((id) => (
             <option key={id} value={id}>
               {id}
@@ -293,12 +317,13 @@ function SurfaceTable({
           ))}
         </select>
         <select
+          aria-label="Tipo de exceção"
           value={newType}
           onChange={(e) => setNewType(e.target.value as SurfaceForm['formType'])}
         >
           {['MISSPELLING', 'COLLOQUIAL', 'ABBREVIATION', 'INFLECTION'].map((t) => (
             <option key={t} value={t}>
-              {t === 'INFLECTION' ? 'INFLECTION (supletiva)' : t}
+              {formTypeNames[t] ?? t}
             </option>
           ))}
         </select>
@@ -333,7 +358,7 @@ function SurfaceTable({
             <tr key={sf.id}>
               <td>{sf.rawText}</td>
               <td><code>{sf.lexemeId}</code></td>
-              <td className="details">{sf.formType}</td>
+              <td className="details">{formTypeNames[sf.formType] ?? sf.formType}</td>
               <td>
                 <button className="danger" onClick={() => onRemove(sf.id)}>
                   remover
@@ -368,9 +393,9 @@ function LexemeTable({
   return (
     <>
       <div className="add-row">
-        <input placeholder="ID" value={newId} onChange={(e) => setNewId(e.target.value)} />
-        <input placeholder="lema" value={newLemma} onChange={(e) => setNewLemma(e.target.value)} />
-        <select value={newPos} onChange={(e) => setNewPos(e.target.value as PartOfSpeech)}>
+        <input aria-label="ID técnico da palavra" placeholder="ID" value={newId} onChange={(e) => setNewId(e.target.value)} />
+        <input aria-label="Palavra base ou lema" placeholder="lema" value={newLemma} onChange={(e) => setNewLemma(e.target.value)} />
+        <select aria-label="Classe da palavra" value={newPos} onChange={(e) => setNewPos(e.target.value as PartOfSpeech)}>
           {[
             'NOUN',
             'VERB',
@@ -383,11 +408,11 @@ function LexemeTable({
             'DETERMINER'
           ].map((p) => (
             <option key={p} value={p}>
-              {p}
+              {posNames[p] ?? p}
             </option>
           ))}
         </select>
-        <select value={newSense} onChange={(e) => setNewSense(e.target.value)}>
+        <select aria-label="Significado associado" value={newSense} onChange={(e) => setNewSense(e.target.value)}>
           {conceptIds.map((id) => (
             <option key={id} value={id}>
               {id}
@@ -409,20 +434,20 @@ function LexemeTable({
       <table className="data-table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>lema</th>
-            <th>POS</th>
-            <th>sentidos</th>
+            <th>palavra base</th>
+            <th>classe</th>
+            <th>significados ligados</th>
+            <th>ID técnico</th>
             <th>ações</th>
           </tr>
         </thead>
         <tbody>
           {list.map((l) => (
             <tr key={l.id}>
-              <td><code>{l.id}</code></td>
-              <td>{l.lemma}</td>
-              <td>{l.pos}</td>
+              <td><strong>{l.lemma}</strong></td>
+              <td>{posNames[l.pos] ?? l.pos}</td>
               <td>{l.senseConceptIds.join(', ')}</td>
+              <td className="details"><code>{l.id}</code></td>
               <td>
                 <button className="danger" onClick={() => onRemove(l.id)}>
                   remover
@@ -453,20 +478,22 @@ function ConceptTable({
     <>
       <div className="add-row">
         <input
+          aria-label="ID técnico do valor"
           placeholder="ID do valor (ex.: C_VAL_PINK)"
           value={newId}
           onChange={(e) => setNewId(e.target.value)}
         />
-        <select value={category} onChange={(e) => setCategory(e.target.value as ValueCategory)}>
+        <select aria-label="Categoria do valor" value={category} onChange={(e) => setCategory(e.target.value as ValueCategory)}>
           {['COLOR', 'SIZE', 'NUMBER', 'TEXT', 'BOOLEAN', 'ALIGNMENT', 'WEIGHT', 'DISPLAY', 'ENUM'].map(
             (c) => (
               <option key={c} value={c}>
-                {c}
+                {valueCategoryNames[c] ?? c}
               </option>
             )
           )}
         </select>
         <input
+          aria-label="Valor literal"
           placeholder="literal (ex.: #ec4899)"
           value={literal}
           onChange={(e) => setLiteral(e.target.value)}
@@ -486,8 +513,8 @@ function ConceptTable({
       <table className="data-table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>tipo</th>
+            <th>significado / ID</th>
+            <th>tipo de dado</th>
             <th>detalhes</th>
             <th>ações</th>
           </tr>
@@ -496,7 +523,7 @@ function ConceptTable({
           {list.map((c) => (
             <tr key={c.id}>
               <td><code>{c.id}</code></td>
-              <td>{c.kind}</td>
+              <td>{conceptKinds[c.kind] ?? c.kind}</td>
               <td className="details">
                 {c.kind === 'PROPERTY' && `${c.runtimeProperty} · ${c.valueCategories.join('/')}`}
                 {c.kind === 'VALUE' && `${c.valueCategory} · ${String(c.literal)}`}
@@ -539,13 +566,14 @@ function MweTable({
   return (
     <>
       <div className="add-row">
-        <input placeholder="ID" value={newId} onChange={(e) => setNewId(e.target.value)} />
+        <input aria-label="ID técnico da expressão" placeholder="ID" value={newId} onChange={(e) => setNewId(e.target.value)} />
         <input
+          aria-label="Texto da expressão"
           placeholder="expressão (ex.: ao lado de)"
           value={phrase}
           onChange={(e) => setPhrase(e.target.value)}
         />
-        <select value={conceptId} onChange={(e) => setConceptId(e.target.value)}>
+        <select aria-label="Significado da expressão" value={conceptId} onChange={(e) => setConceptId(e.target.value)}>
           {conceptIds.map((id) => (
             <option key={id} value={id}>
               {id}
@@ -567,18 +595,18 @@ function MweTable({
       <table className="data-table">
         <thead>
           <tr>
-            <th>ID</th>
             <th>expressão</th>
-            <th>conceito</th>
+            <th>significado ligado</th>
+            <th>ID técnico</th>
             <th>ações</th>
           </tr>
         </thead>
         <tbody>
           {list.map((m) => (
             <tr key={m.id}>
-              <td><code>{m.id}</code></td>
-              <td>{m.phrase}</td>
+              <td><strong>{m.phrase}</strong></td>
               <td>{m.conceptId}</td>
+              <td className="details"><code>{m.id}</code></td>
               <td>
                 <button className="danger" onClick={() => onRemove(m.id)}>
                   remover

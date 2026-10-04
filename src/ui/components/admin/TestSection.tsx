@@ -87,31 +87,44 @@ export function TestSection({ engine, store }: Props) {
 
   const suites: Array<[Suite, string]> = [
     ['regressao', `Regressão (${REGRESSION_DATASET.records.length})`],
-    ['dev', `Dev (${DEV_DATASET.records.length})`],
-    ['final', `Final-v1 comprometido (${FINAL_V1_DATASET.records.length})`],
-    ['negativos', `Negativos (${REGRESSION_DATASET.records.filter((r) => r.expectError).length})`],
-    ['ambiguos', `Ambíguos (${REGRESSION_DATASET.records.filter((r) => r.expected.ambiguous).length})`],
-    ['treinamento', `Treinamento (${store.training.length})`],
-    ['benchmark', 'Benchmark']
+    ['dev', `Desenvolvimento (${DEV_DATASET.records.length})`],
+    ['final', `Final v1 · histórico (${FINAL_V1_DATASET.records.length})`],
+    ['negativos', `Comandos inválidos (${REGRESSION_DATASET.records.filter((r) => r.expectError).length})`],
+    ['ambiguos', `Frases ambíguas (${REGRESSION_DATASET.records.filter((r) => r.expected.ambiguous).length})`],
+    ['treinamento', `Meus exemplos (${store.training.length})`],
+    ['benchmark', 'Velocidade']
   ];
+  const suiteInfo: Record<Suite, string> = {
+    regressao: 'Confere se comportamentos que já funcionavam continuam corretos após mudanças.',
+    dev: 'Exemplos de desenvolvimento usados para verificar o comportamento esperado.',
+    final: 'Conjunto histórico conhecido; útil para comparação, não é uma avaliação oculta.',
+    negativos: 'Frases que devem ser bloqueadas sem alterar o documento.',
+    ambiguos: 'Frases em que o motor precisa identificar mais de uma interpretação possível.',
+    treinamento: 'Exemplos que você salvou na tela Treinamento.',
+    benchmark: 'Mede o tempo das etapas do motor; não mede acerto linguístico.'
+  };
 
   return (
     <div className="admin-section">
       <header className="section-header">
-        <h3>Execução de testes</h3>
+        <div><div className="summary-kicker">VERIFIQUE O MOTOR</div><h3>Testar e entender os resultados</h3>
+          <p className="note">Escolha um grupo de frases, execute e veja o que passou ou precisa de atenção. Nada nesta tela altera a página.</p></div>
       </header>
 
       <div className="entity-switch">
         {suites.map(([id, label]) => (
-          <button key={id} className={suite === id ? 'active' : ''} onClick={() => setSuite(id)}>
+          <button key={id} className={suite === id ? 'active' : ''} onClick={() => { setSuite(id); setReport(null); setBench(null); }}>
             {label}
           </button>
         ))}
       </div>
 
+      <div className="test-suite-intro ui-card"><strong>{suites.find(([id]) => id === suite)?.[1]}</strong>
+        <p>{suiteInfo[suite]}</p><small>Passo 1: escolha o grupo · Passo 2: execute · Passo 3: abra as divergências, se houver.</small></div>
+
       <div className="row">
         <button className="primary" onClick={run} disabled={running}>
-          {running ? 'Executando…' : 'Executar suíte'}
+          {running ? 'Comparando frases…' : 'Executar este grupo'}
         </button>
         {report && (
           <span className={report.failed === 0 ? 'ok' : 'err'}>
@@ -120,21 +133,30 @@ export function TestSection({ engine, store }: Props) {
         )}
       </div>
 
+      {!report && !bench && <p className="ui-empty">O resultado aparecerá aqui depois da execução.</p>}
+
       {report && (
         <>
+          <div className={`test-result-summary ui-card ${report.failed ? 'has-failures' : 'all-pass'}`} role="status">
+            <strong>{report.passed} de {report.total} frases aprovadas</strong>
+            <p>{report.failed ? `${report.failed} divergência(s) abaixo precisam de inspeção.` : 'O motor correspondeu às expectativas anotadas neste grupo.'}</p>
+          </div>
+          <details className="results-advanced"><summary>Ver pontuações por etapa</summary>
           <div className="metric-cards">
-            <MetricCard label="Sucesso end-to-end" metric={report.metrics.endToEnd} />
-            <MetricCard label="Lexical" metric={report.metrics.lexicalAccuracy} />
+            <MetricCard label="Resultado completo" metric={report.metrics.endToEnd} />
+            <MetricCard label="Palavras" metric={report.metrics.lexicalAccuracy} />
             <MetricCard label="Sentido" metric={report.metrics.senseAccuracy} />
-            <MetricCard label="Morfologia" metric={report.metrics.morphologicalAccuracy} />
-            <MetricCard label="AST exata" metric={report.metrics.astExactMatch} />
-            <MetricCard label="Plano exato" metric={report.metrics.planExactMatch} />
-            <MetricCard label="Attachments" metric={report.metrics.attachmentAccuracy} />
-            <MetricCard label="Bindings" metric={report.metrics.bindingAccuracy} />
+            <MetricCard label="Forma e flexão" metric={report.metrics.morphologicalAccuracy} />
+            <MetricCard label="Estrutura do comando" metric={report.metrics.astExactMatch} />
+            <MetricCard label="Plano de ações" metric={report.metrics.planExactMatch} />
+            <MetricCard label="Ligações" metric={report.metrics.attachmentAccuracy} />
+            <MetricCard label="Propriedades" metric={report.metrics.bindingAccuracy} />
             <MetricCard label="Referências" metric={report.metrics.referenceAccuracy} />
             <MetricCard label="Falsos positivos" metric={report.metrics.falsePositiveRate} invert />
           </div>
+          </details>
 
+          <details className="results-advanced"><summary>Ver resultado de cada frase</summary>
           <table className="data-table">
             <thead>
               <tr>
@@ -161,6 +183,7 @@ export function TestSection({ engine, store }: Props) {
               ))}
             </tbody>
           </table>
+          </details>
 
           {report.failures.length > 0 && (
             <>

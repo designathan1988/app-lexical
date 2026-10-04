@@ -27,6 +27,9 @@ const roleNames: Record<string, string> = {
   LOC: 'onde', TIME: 'quando', MANNER: 'como', cause: 'causa', condition: 'condição',
   poss: 'posse', mod: 'modificador', degree: 'grau'
 };
+const classNames: Record<string, string> = { NOUN: 'substantivo', VERB: 'verbo', AUX: 'auxiliar', ADJ: 'adjetivo',
+  ADV: 'advérbio', PRON: 'pronome', DET: 'determinante', ADP: 'preposição', SCONJ: 'conjunção',
+  CCONJ: 'conjunção', PROPN: 'nome próprio', NUM: 'numeral', PUNCT: 'pontuação' };
 
 function downloadSvg(svg: SVGSVGElement | null, filename: string) {
   if (!svg) return;
@@ -79,7 +82,7 @@ function DependencyDiagram({ analysis, highlightedToken, onHighlight, onSelectTo
               onMouseEnter={() => onHighlight?.(arc.id)} onMouseLeave={() => onHighlight?.(null)}
               onClick={() => { onSelectArc(arc.id); onSelectToken?.(arc.id); }}
               onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onSelectArc(arc.id); onSelectToken?.(arc.id); } }}>
-              <title>{arc.deprel} = {relationNames[arc.deprel] ?? relationNames[arc.deprel.split(':')[0]] ?? 'relação sintática'}</title>
+              <title>{`${arc.deprel} = ${relationNames[arc.deprel] ?? relationNames[arc.deprel.split(':')[0]] ?? 'relação sintática'}`}</title>
               <path d={arc.head ? `M ${head} ${baseline - 17} Q ${mid} ${peak} ${child} ${baseline - 17}` : `M ${child} ${baseline - 70} L ${child} ${baseline - 18}`} fill="none" markerEnd="url(#syntax-arrow)" />
               <text x={mid} y={peak - 7} textAnchor="middle">{arc.deprel}</text>
             </g>
@@ -181,7 +184,7 @@ function MeaningDiagram({ analysis, highlightedToken, onHighlight, onSelectToken
             ? `M ${start.x} ${start.y} Q ${mid.x} ${start.y + 85} ${end.x} ${end.y}`
             : `M ${start.x} ${start.y} Q ${mid.x} ${mid.y} ${end.x} ${end.y}`;
           return <g key={`${edge.from}-${edge.role}-${edge.to}-${index}`} className={`meaning-edge role-${edge.role.toLowerCase()}`}>
-            <title>{edge.role} = {roleNames[edge.role] ?? 'papel semântico'}</title>
+            <title>{`${edge.role} = ${roleNames[edge.role] ?? 'papel semântico'}`}</title>
             <path d={path} fill="none" markerEnd="url(#meaning-arrow)" />
             <text x={mid.x} y={mid.y} textAnchor="middle">:{edge.role}</text>
           </g>;
@@ -202,7 +205,7 @@ function MeaningDiagram({ analysis, highlightedToken, onHighlight, onSelectToken
               const delta: Record<string, [number, number]> = { ArrowLeft: [-12, 0], ArrowRight: [12, 0], ArrowUp: [0, -12], ArrowDown: [0, 12] };
               if (delta[event.key]) { event.preventDefault(); event.stopPropagation(); setOverrides((current) => ({ ...current, [node.id]: { x: p.x + delta[event.key][0], y: p.y + delta[event.key][1] } })); }
             }}>
-            <title>{node.concept}{indegree.get(node.id)! > 1 ? ' · usado por mais de um predicado' : ''}</title>
+            <title>{`${node.concept}${indegree.get(node.id)! > 1 ? ' · usado por mais de um predicado' : ''}`}</title>
             <rect x={p.x - 88} y={p.y - 22} width="176" height="44" rx="10" />
             <text x={p.x} y={p.y + 4} textAnchor="middle">{node.concept.length > 24 ? `${node.concept.slice(0, 23)}…` : node.concept}</text>
           </g>;
@@ -230,43 +233,52 @@ export function SentenceAnalysisViews({ analysis, view, highlightedToken, onHigh
   };
   if (view === 'classes') return (
     <div className="sentence-analysis-view">
-      <h4>Classes e leituras selecionadas</h4>
+      <h4>1 · O papel de cada palavra</h4>
+      <p className="note">A classe diz <strong>que tipo de palavra</strong> é; o lema é sua forma de dicionário. Clique em uma palavra para ver os traços explicados e outras leituras possíveis.</p>
       <table className="data-table">
-        <thead><tr><th>Token</th><th>Lema</th><th>UPOS</th><th>Traços</th><th>Origem</th><th>Regra</th></tr></thead>
+        <thead><tr><th>Palavra</th><th>Forma base (lema)</th><th>Classe (UPOS)</th><th>Traços</th><th>Origem</th><th>Regra</th></tr></thead>
         <tbody>{analysis.words.map((word, index) => <tr key={index} data-token-id={index + 1}
           className={highlightedToken === index + 1 ? 'is-highlighted' : ''}
           onMouseEnter={() => onHighlight?.(index + 1)} onMouseLeave={() => onHighlight?.(null)}>
           <td><button className="token-cell-button" onFocus={() => onHighlight?.(index + 1)} onBlur={() => onHighlight?.(null)}
-            onClick={() => onSelectToken?.(index + 1)}>{word.form}</button></td><td>{word.selected.lemma}</td><td><code>{word.selected.upos}</code></td>
+            onClick={() => onSelectToken?.(index + 1)}>{word.form}</button></td><td>{word.selected.lemma}</td><td>{classNames[word.selected.upos] ?? word.selected.upos} <code>({word.selected.upos})</code></td>
           <td>{featureText(word.selected.feats)}</td><td>{word.selected.origin}</td><td><code>{word.selected.rule}</code></td>
         </tr>)}</tbody>
       </table>
-      <h4>Desambiguação</h4>
-      {analysis.trace.tagging.length ? <pre className="code-block">{analysis.trace.tagging.map((event) => `${event.index + 1}: ${event.rule} → removeu ${event.removed.map((reading) => reading.upos).join(', ')}`).join('\n')}</pre> : <p className="note">Nenhuma leitura foi eliminada por contexto.</p>}
+      <details className="results-advanced"><summary>Ver como o motor escolheu cada leitura (desambiguação)</summary>
+        {analysis.trace.tagging.length ? <pre className="code-block">{analysis.trace.tagging.map((event) => `${event.index + 1}: ${event.rule} → removeu ${event.removed.map((reading) => reading.upos).join(', ')}`).join('\n')}</pre> : <p className="note">Nenhuma leitura foi eliminada por contexto.</p>}
+      </details>
     </div>
   );
   if (view === 'syntax') return (
     <div className="sentence-analysis-view">
-      <h4>Árvore de dependências UD</h4>
+      <h4>2 · Quem se liga a quem</h4>
+      <p className="note">Cada arco liga uma palavra dependente ao seu núcleo. Cores separam sujeitos e objetos, orações e modificadores. Clique no arco para ver o vínculo.</p>
       <div className="diagram-legend"><span className="rel-core">Sujeito e objeto</span><span className="rel-clause">Orações</span><span className="rel-mod">Modificadores</span></div>
       <div className="diagram-toolbar"><button onClick={() => setCompact((value) => !value)} aria-pressed={compact}>{compact ? 'Modo expandido' : 'Modo compacto'}</button><button onClick={() => downloadSvg(syntaxSvg.current, 'sintaxe.svg')}>Baixar SVG</button><button onClick={() => copy(analysis.conllu)}>Copiar CoNLL-U</button></div>
       {feedback && <p role="status" className="note">{feedback}</p>}
       <DependencyDiagram analysis={analysis} highlightedToken={highlightedToken} onHighlight={onHighlight} onSelectToken={onSelectToken} compact={compact} selectedArc={selectedArc} onSelectArc={setSelectedArc} svgRef={syntaxSvg} />
       {selectedArc && <p className="note">Relação selecionada: {analysis.dependencies[selectedArc - 1]?.deprel} — núcleo {analysis.words[(analysis.dependencies[selectedArc - 1]?.head ?? 0) - 1]?.form ?? 'raiz'}, dependente {analysis.words[selectedArc - 1]?.form}.</p>}
       <div className="sentence-summary"><span>Sujeito: <strong>{analysis.clause.subject.map((id) => analysis.words[id - 1]?.form).join(' ') || 'oculto'}</strong></span><span>Predicado (núcleo): <strong>{analysis.clause.predicate.map((id) => analysis.words[id - 1]?.form).join(' ')}</strong></span><span>Predicado completo: <strong>{analysis.clause.completePredicate.map((id) => analysis.words[id - 1]?.form).join(' ')}</strong></span><span>Modo: {modeLabel[analysis.clause.mode]}</span><span>Polaridade: {polarityLabel[analysis.clause.polarity]}</span></div>
-      <h4>CoNLL-U</h4><pre className="code-block">{analysis.conllu}</pre>
-      <h4>Regras dos arcos</h4><pre className="code-block">{analysis.dependencies.map((arc) => `${arc.id} ← ${arc.head} ${arc.deprel} · ${arc.rule}`).join('\n')}</pre>
+      <details className="results-advanced"><summary>Ver nomes das relações e dados técnicos (CoNLL-U)</summary>
+        <div className="relation-glossary">{[...new Set(analysis.dependencies.map((arc) => arc.deprel))].map((relation) => <span key={relation}><code>{relation}</code> = {relationNames[relation] ?? relationNames[relation.split(':')[0]] ?? 'relação sintática'}</span>)}</div>
+        <h4>CoNLL-U</h4><pre className="code-block">{analysis.conllu}</pre>
+        <h4>Regras dos arcos</h4><pre className="code-block">{analysis.dependencies.map((arc) => `${arc.id} ← ${arc.head} ${arc.deprel} · ${arc.rule}`).join('\n')}</pre>
+      </details>
     </div>
   );
   return (
     <div className="sentence-analysis-view">
-      <h4>Grafo de significado</h4>
+      <h4>3 · Quem faz o quê</h4>
+      <p className="note">Cada caixa é um conceito; as setas mostram seu papel na frase. Um mesmo nó com contorno especial pode participar de dois verbos.</p>
       <div className="diagram-legend"><span className="role-arg0">ARG0 · quem faz</span><span className="role-arg1">ARG1 · o quê</span><span className="role-loc">LOC · onde</span><span className="role-time">TIME · quando</span></div>
       <div className="diagram-toolbar"><button onClick={() => downloadSvg(meaningSvg.current, 'significado.svg')}>Baixar SVG</button><button onClick={() => copy(analysis.meaningGraph.penman)}>Copiar PENMAN</button></div>
       {feedback && <p role="status" className="note">{feedback}</p>}
       <MeaningDiagram analysis={analysis} highlightedToken={highlightedToken} onHighlight={onHighlight} onSelectToken={onSelectToken} svgRef={meaningSvg} />
-      <h4>PENMAN</h4><pre className="code-block">{analysis.meaningGraph.penman}</pre>
-      <h4>Trace semântico</h4><pre className="code-block">{analysis.meaningGraph.trace.map((event) => `${event.token ?? '—'} · ${event.rule}: ${event.detail}`).join('\n')}</pre>
+      <details className="results-advanced"><summary>Ver grafo em PENMAN e decisões semânticas</summary>
+        <h4>PENMAN</h4><pre className="code-block">{analysis.meaningGraph.penman}</pre>
+        <h4>Trace semântico</h4><pre className="code-block">{analysis.meaningGraph.trace.map((event) => `${event.token ?? '—'} · ${event.rule}: ${event.detail}`).join('\n')}</pre>
+      </details>
       {analysis.meaningGraph.diagnostics.map((diagnostic, index) => <p key={index} className="note">{diagnosticLabel[diagnostic.code] ?? diagnostic.code}: {diagnostic.alternatives.join(', ')}</p>)}
     </div>
   );
