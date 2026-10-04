@@ -12,6 +12,9 @@ const degreePhrases = fixture.sentences.filter((sentence) => sentence.id.startsW
 const quantifierPhrases = fixture.sentences.filter((sentence) => sentence.id.startsWith('extra3-2.3-')) as Array<{
   id: string; text: string; target: { token: number; upos: string };
 }>;
+const nominalizedAdjectives = fixture.sentences.filter((sentence) => sentence.id.startsWith('extra3-2.4-')) as Array<{
+  id: string; text: string; nominal: { token: number; relation: string };
+}>;
 
 describe('correção final — particípios predicativos e passiva', () => {
   it('cobre seis frases inéditas com classes, subordinação e passiva', () => {
@@ -21,11 +24,27 @@ describe('correção final — particípios predicativos e passiva', () => {
   it.each(participles)('$id: mantém particípio como núcleo e distingue cópula de passiva', (sentence) => {
     const analysis = engine.analyzeSentence(sentence.text);
     expect(analysis.words.map((word) => word.form), sentence.id).toEqual(sentence.tokens.map((token) => token.form));
-    const participle = sentence.tokens.findIndex((token) => token.feats === 'VerbForm=Part');
+    const participle = sentence.tokens.findIndex((token) => 'feats' in token && token.feats === 'VerbForm=Part');
     expect(analysis.words[participle]?.selected.upos, sentence.id).toBe('VERB');
     expect(analysis.words[participle]?.selected.feats.VerbForm, sentence.id).toBe('Part');
     expect(analysis.dependencies.map((arc) => ({ rel: arc.deprel, head: arc.head, dep: arc.id })), sentence.id)
       .toEqual(sentence.dependencies);
+  });
+});
+
+describe('correção final — adjetivo como núcleo nominal', () => {
+  it('cobre seis frases com sujeito, objeto e oblíquo', () => {
+    expect(nominalizedAdjectives).toHaveLength(6);
+  });
+
+  it.each(nominalizedAdjectives)('$id: conserva ADJ e atribui relação de argumento', (sentence) => {
+    const analysis = engine.analyzeSentence(sentence.text);
+    const index = sentence.nominal.token - 1;
+    expect(analysis.words[index]?.selected.upos, sentence.id).toBe('ADJ');
+    expect(analysis.dependencies[index]?.deprel, sentence.id).toBe(sentence.nominal.relation);
+    const node = analysis.meaningGraph.nodes.find((item) => item.token === sentence.nominal.token);
+    expect(node, sentence.id).toBeDefined();
+    expect(analysis.meaningGraph.edges.some((edge) => edge.to === node!.id), sentence.id).toBe(true);
   });
 });
 
