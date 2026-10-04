@@ -15,6 +15,7 @@ type Sentence = {
   meaningGraph: string;
   degree?: { modifier: number; head: number };
   ppFrame?: string;
+  canonicalPronoun?: { token: number; concept: string };
 };
 
 const sentences = (fixture as { sentences: Sentence[] }).sentences;
@@ -26,6 +27,7 @@ const enumerations = sentences.filter((sentence) => sentence.id.startsWith('extr
 const adjectiveSentences = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.5-'));
 const degreeSentences = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.6-'));
 const postInfinitivePps = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.7-'));
+const treatmentPronouns = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.8-'));
 
 describe('correções da verificação oculta — sintagmas nominais', () => {
   it.each(nominalPhrases)('$id: liga o PP ao nome e preserva a posse no grafo', (sentence) => {
@@ -153,6 +155,18 @@ describe('correções da verificação oculta — PP após complemento infinitiv
     expect(analysis.dependencies[expected.dep - 1].rule, sentence.id).toBeTruthy();
     expect(analysis.trace.dependencies[expected.dep - 1].rule, sentence.id)
       .toContain(sentence.ppFrame ?? analysis.dependencies[expected.dep - 1].rule);
+  });
+});
+
+describe('correções da verificação oculta — pronome de tratamento', () => {
+  it.each(treatmentPronouns)('$id: mantém lema, plural e conceito canônico', (sentence) => {
+    const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence(sentence.text);
+    const pronoun = sentence.canonicalPronoun!;
+    const reading = analysis.words[pronoun.token - 1].selected;
+    expect(reading.lemma, sentence.id).toBe(pronoun.concept);
+    expect(reading.feats.Number, sentence.id).toBe('Plur');
+    expect(analysis.meaningGraph.nodes.find((node) => node.token === pronoun.token)?.concept, sentence.id)
+      .toBe(pronoun.concept);
   });
 });
 
