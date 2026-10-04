@@ -1380,6 +1380,7 @@
     },
     {
       "id": "ver.VER",
+      "source": "https://universaldependencies.org/u/dep/ccomp.html",
       "roles": {
         "ARG0": {
           "label": "quem vê",
@@ -1400,10 +1401,14 @@
         },
         {
           "ARG1": "obj"
+        },
+        {
+          "ARG1": "ccomp"
         }
       ],
       "examples": [
-        "Eu vejo o pássaro no telhado."
+        "Eu vejo o pássaro no telhado.",
+        "Eu vejo como funciona."
       ]
     },
     {
@@ -1697,6 +1702,7 @@
     },
     {
       "id": "perguntar.PERGUNTAR",
+      "source": "https://universaldependencies.org/u/dep/ccomp.html",
       "roles": {
         "ARG0": {
           "label": "quem pergunta",
@@ -1717,10 +1723,14 @@
         },
         {
           "ARG1": "obj"
+        },
+        {
+          "ARG1": "ccomp"
         }
       ],
       "examples": [
-        "Eu pergunto a hora."
+        "Eu pergunto a hora.",
+        "Ele perguntou quem chegou."
       ]
     },
     {
@@ -3734,6 +3744,7 @@
     },
     {
       "id": "lembrar.LEMBRAR",
+      "source": "https://universaldependencies.org/u/dep/ccomp.html",
       "roles": {
         "ARG0": {
           "label": "quem lembra",
@@ -3755,10 +3766,14 @@
         },
         {
           "ARG1": "obj"
+        },
+        {
+          "ARG1": "ccomp"
         }
       ],
       "examples": [
-        "Eu lembro do seu nome."
+        "Eu lembro do seu nome.",
+        "Não lembro onde deixei a chave."
       ]
     },
     {

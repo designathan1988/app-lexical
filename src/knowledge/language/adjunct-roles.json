@@ -27,6 +27,7 @@
     {"id":"ADV_NEG_FREQ","form":"nunca","role":"freq","polarity":"negative","note":"frequência negativa"},
     {"id":"ADV_MUITO","form":"muito","role":"degree","note":"grau"},
     {"id":"ADV_TIME","semanticType":"TEMPO","role":"TIME","note":"adjunto temporal"},
+    {"id":"ADV_LOCATIVE","semanticType":"LUGAR","role":"LOC","source":"https://universaldependencies.org/pt/pos/ADV.html; https://universaldependencies.org/u/dep/advmod.html","note":"advérbios de lugar realizam localização do evento","example":"Ela caminhou pouco aqui."},
     {"id":"ADV_MANNER","semanticType":"QUALIDADE","role":"MANNER","note":"adjunto de modo"},
     {"id":"ADV_DEGREE","semanticType":"QUANTIDADE","role":"degree","note":"adjunto de grau"}
   ]

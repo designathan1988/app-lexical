@@ -37,7 +37,17 @@ export class ClauseAnalyzer {
     const finite = words[(copula ?? passiveAuxiliary ?? root) - 1]?.selected.feats ?? {};
     const initialClitic = words[0]?.selected.feats.Clitic === 'Yes' && arcs[0]?.head === root && arcs[0]?.deprel === 'obj';
     const jussive = finite.Mood === 'Sub' && words[0]?.selected.upos === 'SCONJ' && words.some((word) => word.form === '!');
-    const mode = words.some((word) => word.form === '?' || word.selected.feats.PronType === 'Int') ? 'interrogative'
+    const inMainClause = (token: number): boolean => {
+      const visited = new Set<number>();
+      for (let current = token; current > 0 && !visited.has(current); current = arcs[current - 1]?.head ?? 0) {
+        if (current === root) return true;
+        visited.add(current);
+        if (['ccomp', 'advcl', 'acl:relcl'].includes(arcs[current - 1]?.deprel)) return false;
+      }
+      return false;
+    };
+    const mode = words.some((word, index) => word.form === '?' ||
+      word.selected.feats.PronType === 'Int' && inMainClause(index + 1)) ? 'interrogative'
       : (finite.Mood === 'Imp' || initialClitic || jussive) && !subject.length ? 'imperative'
         : 'declarative';
     const polarity = words.some((word) => word.selected.feats.Polarity === 'Neg' || word.selected.feats.PronType === 'Neg') ? 'negative' : 'positive';

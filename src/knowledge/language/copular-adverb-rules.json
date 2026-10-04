@@ -1,0 +1,14 @@
+{
+  "rules": [
+    {
+      "id": "UD_COPULAR_ADVERB_PREDICATE",
+      "copulaLemmas": ["estar", "ficar"],
+      "predicateUpos": "ADV",
+      "predicateLemmas": ["bem", "mal", "assim", "longe", "perto"],
+      "relation": "cop",
+      "source": "https://universaldependencies.org/u/dep/cop.html; https://universaldependencies.org/u/dep/advmod.html",
+      "note": "Advérbios de estado, modo e localização podem funcionar como predicativo principal após verbo de ligação; a relativa do sujeito continua subordinada ao nome.",
+      "example": "A senhora que tropeçou está bem."
+    }
+  ]
+}

@@ -12,6 +12,8 @@ import coordinationData from '../../knowledge/language/coordination-rules.json';
 import degreeData from '../../knowledge/language/degree-modifier-rules.json';
 import participialData from '../../knowledge/language/participial-predication-rules.json';
 import nominalizedAdjectiveData from '../../knowledge/language/nominalized-adjective-rules.json';
+import copularAdverbData from '../../knowledge/language/copular-adverb-rules.json';
+import embeddedInterrogativeData from '../../knowledge/language/embedded-interrogative-rules.json';
 import type { TeachableRoot } from '../../knowledge/language/teachableRoot';
 import type { TaggedWord } from './Tagger';
 
@@ -53,6 +55,14 @@ const participialRules = (participialData as { rules: Array<{
 const nominalizedAdjectiveRules = (nominalizedAdjectiveData as { rules: Array<{
   id: string; headUpos: string; precededBy: string[]; excludedFollowerUpos: string[]
 }> }).rules;
+const copularAdverbRules = (copularAdverbData as { rules: Array<{
+  id: string; copulaLemmas: string[]; predicateUpos: string; predicateLemmas: string[]; relation: string
+}> }).rules;
+const embeddedInterrogativeRules = (embeddedInterrogativeData as { rules: Array<{
+  id: string; markerFeature: Record<string, string>; markerUpos: string[]; relation: string;
+  requiresMatrixRelation: string;
+  adverbRelation: string; nominalSubjectRelation: string; nominalObjectRelation: string
+}> }).rules;
 const isSubtype = (actual: string | undefined, expected: string): boolean => {
   for (let current = actual; current; current = typeParents.get(current) ?? undefined) if (current === expected) return true;
   return false;
@@ -78,6 +88,8 @@ export class DependencyParser {
       const lemma = words[index].selected.lemma;
       const predicate = words.findIndex((word, candidate) => candidate > index &&
         ((copulas.has(lemma) && (word.selected.upos === 'ADJ' || word.selected.upos === 'NOUN')) ||
+          copularAdverbRules.some((rule) => rule.copulaLemmas.includes(lemma) &&
+            word.selected.upos === rule.predicateUpos && rule.predicateLemmas.includes(word.selected.lemma)) ||
           participialRules.some((rule) => rule.copulaLemmas.includes(lemma) && word.selected.upos === rule.predicateUpos &&
             Object.entries(rule.predicateFeatures).every(([key, value]) => word.selected.feats[key] === value))) &&
         !words.slice(index + 1, candidate).some((between) =>
@@ -85,8 +97,10 @@ export class DependencyParser {
       const partRule = predicate >= 0 ? participialRules.find((rule) => rule.copulaLemmas.includes(lemma) &&
         words[predicate].selected.upos === rule.predicateUpos &&
         Object.entries(rule.predicateFeatures).every(([key, value]) => words[predicate].selected.feats[key] === value)) : undefined;
-      return { copula: index, predicate, relation: partRule?.relation ?? 'cop', subjectRelation: partRule?.subjectRelation ?? 'nsubj',
-        rule: partRule?.id ?? 'UD_COP_PREDICATE' };
+      const adverbRule = predicate >= 0 ? copularAdverbRules.find((rule) => rule.copulaLemmas.includes(lemma) &&
+        words[predicate].selected.upos === rule.predicateUpos && rule.predicateLemmas.includes(words[predicate].selected.lemma)) : undefined;
+      return { copula: index, predicate, relation: partRule?.relation ?? adverbRule?.relation ?? 'cop',
+        subjectRelation: partRule?.subjectRelation ?? 'nsubj', rule: partRule?.id ?? adverbRule?.id ?? 'UD_COP_PREDICATE' };
     }).filter((entry) => entry.predicate >= 0);
     const copula = copularPredicates[0]?.copula;
     let root = finite[0] ?? words.findIndex((word) => word.selected.upos !== 'PUNCT');
@@ -216,14 +230,29 @@ export class DependencyParser {
       }
     }
 
+    const embeddedInterrogatives: Array<{ marker: number; clause: number; rule: typeof embeddedInterrogativeRules[number] }> = [];
     for (let i = 0; i < words.length; i++) {
       if (!verbal.has(pos(i)) || i === root || i === copula || assigned(i)) continue;
-      const marker = nearestLeft(i, (candidate) => pos(candidate) === 'SCONJ' || (pos(candidate) === 'PRON' && feat(candidate, 'PronType') === 'Rel') || (pos(candidate) === 'ADV' && feat(candidate, 'PronType') === 'Rel'));
+      const marker = nearestLeft(i, (candidate) => pos(candidate) === 'SCONJ' ||
+        (pos(candidate) === 'PRON' && feat(candidate, 'PronType') === 'Rel') ||
+        (pos(candidate) === 'ADV' && feat(candidate, 'PronType') === 'Rel') ||
+        embeddedInterrogativeRules.some((rule) => rule.markerUpos.includes(pos(candidate)) &&
+          Object.entries(rule.markerFeature).every(([key, value]) => feat(candidate, key) === value)));
       const precedingVerb = nearestLeft(i, (candidate) => verbal.has(pos(candidate)) && candidate !== i);
       if (marker >= 0 && (precedingVerb < 0 || marker > precedingVerb)) {
-        const relative = pos(marker) === 'PRON' || pos(marker) === 'ADV';
+        const relative = feat(marker, 'PronType') === 'Rel';
+        const interrogativeRule = embeddedInterrogativeRules.find((rule) => rule.markerUpos.includes(pos(marker)) &&
+          Object.entries(rule.markerFeature).every(([key, value]) => feat(marker, key) === value));
+        const matrixLemma = words[precedingVerb]?.selected.lemma;
+        const matrixAcceptsClause = interrogativeRule && [...frames, ...this.languageRoots.map((entry) => entry.frame)
+          .filter((frame): frame is NonNullable<typeof frame> => Boolean(frame))].some((frame) =>
+          frame.id.startsWith(`${matrixLemma}.`) && frame.syntax?.some((mapping) =>
+            Object.values(mapping).includes(interrogativeRule.requiresMatrixRelation)));
         const antecedent = relative ? nearestLeft(marker, (candidate) => pos(candidate) === 'NOUN') : -1;
-        if (relative && antecedent >= 0) set(i, antecedent, 'acl:relcl', 'UD_RELATIVE');
+        if (interrogativeRule && precedingVerb >= 0 && matrixAcceptsClause) {
+          set(i, precedingVerb, interrogativeRule.relation, interrogativeRule.id);
+          embeddedInterrogatives.push({ marker, clause: i, rule: interrogativeRule });
+        } else if (relative && antecedent >= 0) set(i, antecedent, 'acl:relcl', 'UD_RELATIVE');
         else if (comma >= 0 && i < comma || (marker === 0 && comma >= 0)) set(i, root, 'advcl', 'UD_ADVCL_INITIAL');
         else if (marker > root && pos(marker) === 'SCONJ') {
           const adjunctMarker = markers.some((entry) => entry.form === words[marker].selected.lemma);
@@ -268,6 +297,7 @@ export class DependencyParser {
       const head = clause;
       const markerForClause = nearestLeft(clause, (candidate) =>
         arcs[candidate].head === clause + 1 && arcs[candidate].deprel === 'mark' ||
+        embeddedInterrogatives.some((entry) => entry.clause === clause && entry.marker === candidate) ||
         arcs[clause].deprel === 'acl:relcl' && feat(candidate, 'PronType') === 'Rel'
       );
       const initialSubordinate = comma > 0 && (pos(0) === 'SCONJ' || pos(0) === 'ADV');
@@ -288,7 +318,8 @@ export class DependencyParser {
         return (finiteFeats.Person && person ? (finiteFeats.Person === person ? 2 : -2) : 0) +
           (finiteFeats.Number && number ? (finiteFeats.Number === number ? 1 : -1) : 0);
       };
-      const question = words.some((word) => word.form === '?' || word.selected.feats.PronType === 'Int');
+      const question = words.some((word, index) => word.form === '?' ||
+        word.selected.feats.PronType === 'Int' && !embeddedInterrogatives.some((entry) => entry.marker === index));
       const subject = before.length ? [...before].sort((a, b) => agreement(b) - agreement(a) || b - a)[0]
         : question && clause === root ? nearestRight(head, (candidate) => candidate < end && isNominal(candidate) && !assigned(candidate))
           : -1;
@@ -302,6 +333,15 @@ export class DependencyParser {
           if (pos(relative) === 'ADV') set(relative, clause, 'advmod', 'UD_RELATIVE_ADVERB');
           else set(relative, clause, subject >= 0 ? 'obj' : 'nsubj', subject >= 0 ? 'UD_RELATIVE_OBJECT' : 'UD_RELATIVE_SUBJECT');
         }
+      }
+    }
+
+    for (const entry of embeddedInterrogatives) {
+      if (pos(entry.marker) === 'ADV') {
+        set(entry.marker, entry.clause, entry.rule.adverbRelation, entry.rule.id);
+      } else {
+        const overtSubject = arcs.some((arc) => arc.head === entry.clause + 1 && arc.deprel === 'nsubj');
+        set(entry.marker, entry.clause, overtSubject ? entry.rule.nominalObjectRelation : entry.rule.nominalSubjectRelation, entry.rule.id);
       }
     }
 

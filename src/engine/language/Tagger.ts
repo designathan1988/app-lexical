@@ -2,6 +2,7 @@ import rulesData from '../../knowledge/language/pos-rules.json';
 import copulaData from '../../knowledge/language/copulas.json';
 import verbClassData from '../../knowledge/language/verb-classes.json';
 import degreeData from '../../knowledge/language/degree-modifier-rules.json';
+import frameData from '../../knowledge/morphology/frames.json';
 import { LexicalAnalyzer, type LexicalReading } from './LexicalAnalyzer';
 
 interface Constraint {
@@ -15,6 +16,7 @@ interface Constraint {
   barrier?: string[];
   maxDistance?: number;
   capitalized?: boolean;
+  frameRelation?: string;
 }
 
 interface Rule {
@@ -46,6 +48,7 @@ export interface TaggingResult {
 
 const rules = (rulesData as unknown as { rules: Rule[] }).rules;
 const fallbackRuleId = (rulesData as { fallbackRuleId?: string }).fallbackRuleId ?? 'CG_DEFAULT_ORDER';
+const frames = (frameData as { frames: Array<{ id: string; syntax?: Array<Record<string, string>> }> }).frames;
 const lemmaClasses = new Map([
   copulaData as { class: string; lemmas: string[] },
   ...(verbClassData as { classes: Array<{ class: string; lemmas: string[] }> }).classes,
@@ -73,6 +76,8 @@ function contextMatches(words: TaggedWord[], index: number, condition: Constrain
     if (condition.barrier?.some((upos) => neighbor.readings.some((reading) => reading.upos === upos))) return false;
     if (neighbor.readings.some((reading) =>
       (!condition.upos || condition.upos.includes(reading.upos)) &&
+      (!condition.frameRelation || frames.some((frame) => frame.id.startsWith(`${reading.lemma}.`) &&
+        frame.syntax?.some((mapping) => Object.values(mapping).includes(condition.frameRelation!)))) &&
       Object.entries(condition.feats ?? {}).every(([key, value]) => reading.feats[key] === value)
     )) return true;
   }

@@ -1,0 +1,17 @@
+{
+  "rules": [
+    {
+      "id": "UD_EMBEDDED_INTERROGATIVE_CCOMP",
+      "markerFeature": { "PronType": "Int" },
+      "markerUpos": ["ADV", "PRON", "DET"],
+      "requiresMatrixRelation": "ccomp",
+      "relation": "ccomp",
+      "adverbRelation": "advmod",
+      "nominalSubjectRelation": "nsubj",
+      "nominalObjectRelation": "obj",
+      "source": "https://universaldependencies.org/u/dep/ccomp.html; https://universaldependencies.org/u/dep/nsubj.html; https://github.com/amrisi/amr-guidelines/blob/master/amr.md#questions",
+      "note": "Interrogativo encaixado pertence à oração complemento; sua função interna é escolhida pela presença de sujeito expresso. O projeto usa amr-unknown dentro dessa oração como representação composicional da variável perguntada.",
+      "example": "Ele perguntou quem chegou."
+    }
+  ]
+}
