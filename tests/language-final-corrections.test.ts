@@ -3,6 +3,7 @@ import fixture from './fixtures/sentences-extra-3.json';
 import { SemanticEngine } from '../src/engine/SemanticEngine';
 import { createInitialKnowledgeBase } from '../src/knowledge/knowledgeBase';
 import { LexicalAnalyzer } from '../src/engine/language/LexicalAnalyzer';
+import seedRoots from '../src/knowledge/morphology/seed-roots.json';
 
 const engine = new SemanticEngine(createInitialKnowledgeBase());
 const participles = fixture.sentences.filter((sentence) => sentence.id.startsWith('extra3-2.1-'));
@@ -14,6 +15,9 @@ const quantifierPhrases = fixture.sentences.filter((sentence) => sentence.id.sta
 }>;
 const nominalizedAdjectives = fixture.sentences.filter((sentence) => sentence.id.startsWith('extra3-2.4-')) as Array<{
   id: string; text: string; nominal: { token: number; relation: string };
+}>;
+const guessedVerbs = fixture.sentences.filter((sentence) => sentence.id.startsWith('extra3-2.5-')) as Array<{
+  id: string; text: string; guessedVerb: { token: number; lemma: string };
 }>;
 
 describe('correção final — particípios predicativos e passiva', () => {
@@ -29,6 +33,28 @@ describe('correção final — particípios predicativos e passiva', () => {
     expect(analysis.words[participle]?.selected.feats.VerbForm, sentence.id).toBe('Part');
     expect(analysis.dependencies.map((arc) => ({ rel: arc.deprel, head: arc.head, dep: arc.id })), sentence.id)
       .toEqual(sentence.dependencies);
+  });
+});
+
+describe('correção final — verbo regular fora da semente', () => {
+  it('cobre seis verbos realmente ausentes das raízes iniciais', () => {
+    expect(guessedVerbs).toHaveLength(6);
+    for (const sentence of guessedVerbs) {
+      expect(seedRoots.entries.some((root) => root.lemma === sentence.guessedVerb.lemma), sentence.id).toBe(false);
+    }
+  });
+
+  it.each(guessedVerbs)('$id: reconstrói infinitivo e moldura incerta com dois argumentos', (sentence) => {
+    const analysis = engine.analyzeSentence(sentence.text);
+    const word = analysis.words[sentence.guessedVerb.token - 1];
+    expect(word.selected.upos, sentence.id).toBe('VERB');
+    expect(word.selected.origin, sentence.id).toBe('GUESS');
+    expect(word.selected.lemma, sentence.id).toBe(sentence.guessedVerb.lemma);
+    const graph = analysis.meaningGraph;
+    expect(graph.nodes.find((node) => node.id === graph.root)?.concept, sentence.id).toBe(sentence.guessedVerb.lemma);
+    expect(graph.edges.some((edge) => edge.from === graph.root && edge.role === 'ARG0'), sentence.id).toBe(true);
+    expect(graph.edges.some((edge) => edge.from === graph.root && edge.role === 'ARG1'), sentence.id).toBe(true);
+    expect(graph.diagnostics.some((diagnostic) => diagnostic.code === 'UNCERTAIN_FRAME'), sentence.id).toBe(true);
   });
 });
 
