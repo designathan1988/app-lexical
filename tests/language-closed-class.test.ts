@@ -80,5 +80,8 @@ describe('classes fechadas e tokenização', () => {
     const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Dá-lo-ei.');
     expect(analysis.words[0].selected).toMatchObject({ lemma: 'dar', upos: 'VERB' });
     expect(analysis.words[0].selected.feats).toMatchObject({ Person: '1', Number: 'Sing', Tense: 'Fut' });
+    const second = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Vê-lo-ei.');
+    expect(second.words[0].selected).toMatchObject({ lemma: 'ver', upos: 'VERB' });
+    expect(second.words[0].form.toLocaleLowerCase('pt-BR')).toBe('verei');
   });
 });
