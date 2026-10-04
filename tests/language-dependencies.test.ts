@@ -63,6 +63,9 @@ describe('dependências UD e estrutura da oração', () => {
     const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Que venha!');
     expect(analysis.clause.subject, JSON.stringify({ words: analysis.words.map((word) => [word.form, word.selected]), dependencies: analysis.dependencies })).toEqual([]);
     expect(analysis.clause.mode).toBe('imperative');
+    expect(analysis.meaningGraph.attributes).toContainEqual(expect.objectContaining({ role: 'mode', value: 'imperative' }));
+    expect(analysis.meaningGraph.edges.some((edge) => edge.role === 'ARG0' &&
+      analysis.meaningGraph.nodes.find((node) => node.id === edge.to)?.concept === 'você')).toBe(true);
   });
 
   it('registra pela moldura quando o oblíquo é argumento ou adjunto', () => {

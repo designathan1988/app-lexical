@@ -209,7 +209,7 @@ export class DependencyParser {
         return (finiteFeats.Person && person ? (finiteFeats.Person === person ? 2 : -2) : 0) +
           (finiteFeats.Number && number ? (finiteFeats.Number === number ? 1 : -1) : 0);
       };
-      const question = words.some((word) => word.form === '?');
+      const question = words.some((word) => word.form === '?' || word.selected.feats.PronType === 'Int');
       const subject = before.length ? [...before].sort((a, b) => agreement(b) - agreement(a) || b - a)[0]
         : question && clause === root ? nearestRight(head, (candidate) => candidate < end && nominals.has(pos(candidate)) && !assigned(candidate))
           : -1;
