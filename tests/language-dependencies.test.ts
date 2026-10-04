@@ -59,6 +59,12 @@ describe('dependências UD e estrutura da oração', () => {
     expect(engine.analyzeSentence('Nem eu canto.').clause.polarity).toBe('negative');
   });
 
+  it('reconhece subjuntivo de ordem sem sujeito como imperativo', () => {
+    const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Que venha!');
+    expect(analysis.clause.subject, JSON.stringify({ words: analysis.words.map((word) => [word.form, word.selected]), dependencies: analysis.dependencies })).toEqual([]);
+    expect(analysis.clause.mode).toBe('imperative');
+  });
+
   it('registra pela moldura quando o oblíquo é argumento ou adjunto', () => {
     const engine = new SemanticEngine(createInitialKnowledgeBase());
     for (const [text, nominal, rule] of [
