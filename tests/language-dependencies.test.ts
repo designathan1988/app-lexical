@@ -51,6 +51,12 @@ function measure(sentences: Sentence[]) {
 }
 
 describe('dependências UD e estrutura da oração', () => {
+  it('reconhece modo interrogativo e negação pelos traços mesmo sem pontuação', () => {
+    const engine = new SemanticEngine(createInitialKnowledgeBase());
+    expect(engine.analyzeSentence('Quem chegou').clause.mode).toBe('interrogative');
+    expect(engine.analyzeSentence('Ninguém chegou.').clause.polarity).toBe('negative');
+  });
+
   it('liga adjetivos atributivos ao substantivo por amod sem confundir predicativo', () => {
     const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('A casa azul é grande.');
     const casa = analysis.words.findIndex((word) => word.form.toLocaleLowerCase('pt-BR') === 'casa') + 1;
