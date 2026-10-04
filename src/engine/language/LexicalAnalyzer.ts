@@ -84,7 +84,11 @@ export class LexicalAnalyzer {
         }];
       }
     }
-    return this.analyze(form).words[0]?.readings ?? [];
+    const readings = this.analyze(form).words[0]?.readings ?? [];
+    if (/^\p{Lu}\p{L}+$/u.test(form) && !readings.some((reading) => reading.upos === 'PROPN')) {
+      return [...readings, { lemma: form, upos: 'PROPN', feats: {}, origin: 'GUESS', rule: 'GUESS_CAPITALIZED_NAME' }];
+    }
+    return readings;
   }
 
   analyze(text: string): LexicalAnalysis {

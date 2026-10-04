@@ -12,13 +12,14 @@ interface Constraint {
   feats?: Record<string, string>;
   barrier?: string[];
   maxDistance?: number;
+  capitalized?: boolean;
 }
 
 interface Rule {
   id: string;
   action: 'SELECT' | 'REMOVE';
   form?: string;
-  target: { upos: string; feats?: Record<string, string>; lemmaClass?: string };
+  target: { upos: string; feats?: Record<string, string>; lemmaClass?: string; excludeIfAnyUpos?: string[] };
   context: Constraint[];
   note: string;
   example: string;
@@ -62,6 +63,7 @@ function contextMatches(words: TaggedWord[], index: number, condition: Constrain
   for (let distance = Math.abs(offset); distance <= maxDistance; distance++) {
     const neighbor = words[index + direction * distance];
     if (!neighbor) return false;
+    if (condition.capitalized && !/^\p{Lu}\p{L}+$/u.test(neighbor.form)) continue;
     if (condition.barrier?.some((upos) => neighbor.readings.some((reading) => reading.upos === upos))) return false;
     if (neighbor.readings.some((reading) =>
       (!condition.upos || condition.upos.includes(reading.upos)) &&
@@ -84,6 +86,7 @@ export class LanguageTagger {
       for (let index = 0; index < words.length; index++) {
         const word = words[index];
         if (rule.form && word.form.normalize('NFC').toLocaleLowerCase('pt-BR') !== rule.form) continue;
+        if (rule.target.excludeIfAnyUpos?.some((upos) => word.readings.some((reading) => reading.upos === upos))) continue;
         const targets = word.readings.filter((reading) => readingMatches(reading, rule.target));
         if (!targets.length || !rule.context.every((condition) => contextMatches(words, index, condition))) continue;
         const kept = rule.action === 'SELECT'

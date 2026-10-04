@@ -17,6 +17,7 @@ export function parseGraph(source: string): ParsedGraph {
   const attributes: GraphAttribute[] = [];
   const variables = new Map<string, string>();
   const leaves = new Map<string, string>();
+  const ancestors: Array<{ concept: string; id: string }> = [];
   let cursor = 0;
   let nextId = 1;
   const addNode = (concept: string, variable?: string, leaf = false): string => {
@@ -44,7 +45,10 @@ export function parseGraph(source: string): ParsedGraph {
         concept += ` ${tokens[cursor++]}`;
       }
     }
-    const id = addNode(concept, variable, !variable && (tokens[cursor] === ')' || !wrapped));
+    const leaf = tokens[cursor] === ')' || !wrapped;
+    const ancestor = leaf && !variable ? [...ancestors].reverse().find((item) => item.concept === concept) : undefined;
+    const id = ancestor?.id ?? addNode(concept, variable, !wrapped && !variable);
+    if (!leaf) ancestors.push({ concept, id });
     let implicit = 1;
     while (cursor < tokens.length && (!wrapped || tokens[cursor] !== ')')) {
       let role: string;
@@ -63,6 +67,7 @@ export function parseGraph(source: string): ParsedGraph {
       }
     }
     if (wrapped && tokens[cursor] === ')') cursor++;
+    if (!leaf) ancestors.pop();
     return id;
   };
   const root = parseNode();

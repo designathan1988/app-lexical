@@ -1,0 +1,5 @@
+{
+  "rules": [
+    {"id":"TYPE_INSTITUTION_AS_PLACE","from":"INSTITUICAO","to":"LUGAR","contextRole":"LOC","note":"uma instituição pode designar seu local físico em contexto locativo"}
+  ]
+}

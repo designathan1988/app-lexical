@@ -5,6 +5,7 @@ import supplementData from '../../knowledge/language/lexical-supplements.json';
 import adjunctData from '../../knowledge/language/adjunct-roles.json';
 import pronounData from '../../knowledge/language/implicit-pronouns.json';
 import pragmaticsData from '../../knowledge/language/pragmatics.json';
+import coercionData from '../../knowledge/language/semantic-coercions.json';
 import type { DependencyArc } from './DependencyParser';
 import type { ClauseAnalysis } from './ClauseAnalyzer';
 import type { TaggedWord } from './Tagger';
@@ -39,12 +40,13 @@ const frames = (frameData as unknown as { frames: Frame[] }).frames;
 const typeParents = new Map((semanticTypes as { types: Array<{ id: string; isA: string | null }> }).types.map((item) => [item.id, item.isA]));
 const adjuncts = adjunctData as {
   prepositions: Array<{ id: string; form: string; semanticType: string; role: string }>;
-  markers: Array<{ id: string; form: string; role: string }>;
+  markers: Array<{ id: string; form: string; role: string; feats?: Record<string, string> }>;
   interrogatives: Array<{ id: string; form: string; role: string; semanticType: string }>;
   adverbs: Array<{ id: string; form?: string; semanticType?: string; role: string; polarity?: string }>;
 };
 const pronouns = pronounData as { entries: Array<{ person: string; number: string; form: string }>; imperativeSubject: string; unknownConcept: string };
 const pragmaticExpressions = (pragmaticsData as { expressions: Array<{ id: string; form: string; attribute: { role: string; value: string } }> }).expressions;
+const coercions = (coercionData as { rules: Array<{ id: string; from: string; to: string; contextRole: string }> }).rules;
 
 function isSubtype(actual: string | undefined, expected: string): boolean {
   for (let cursor = actual; cursor; cursor = typeParents.get(cursor) ?? undefined) if (cursor === expected) return true;
@@ -110,14 +112,22 @@ export class MeaningGraphBuilder {
     const typeOf = (index: number): string => this.languageRoots.find((root) => root.lemma === words[index].selected.lemma)?.sense.semanticType
       ?? semanticType(words[index].selected.lemma, words[index].selected.upos);
     const childIndices = (head: number, relation?: string) => arcs.filter((arc) => arc.head === head + 1 && (!relation || arc.deprel === relation)).map((arc) => arc.id - 1);
+    const relativeAntecedent = (index: number, headIndex: number): number =>
+      words[index].selected.feats.PronType === 'Rel' && arcs[headIndex]?.deprel === 'acl:relcl'
+        ? arcs[headIndex].head - 1
+        : -1;
     const chooseFrame = (index: number): Frame | undefined => {
       const lemma = words[index].selected.lemma;
       const candidates = [...frames, ...this.languageRoots.map((root) => root.frame).filter((frame): frame is NonNullable<typeof frame> => Boolean(frame))]
         .filter((frame) => frame.id.startsWith(`${lemma}.`));
       if (!candidates.length) return undefined;
       const seedOrder = seeds.find((entry) => entry.lemma === lemma && entry.pos === 'VERB')?.senses?.map((sense) => sense.id) ?? [];
+      const interrogativeRoles = arcs.filter((item) => item.head === index + 1 && item.deprel === 'advmod')
+        .map((arc) => adjuncts.interrogatives.find((item) => item.form === words[arc.id - 1].selected.lemma)?.role)
+        .filter((role): role is string => Boolean(role));
       const scored = candidates.map((frame, order) => {
         let score = 0;
+        const appliedCoercions: Array<{ rule: string; token: number; detail: string }> = [];
         for (const arc of arcs.filter((item) => item.head === index + 1)) {
           if (!['nsubj', 'obj', 'obl', 'xcomp', 'ccomp'].includes(arc.deprel)) continue;
           const role = arc.deprel === 'nsubj' ? preferredRole(frame, arc.deprel, 'ARG0')
@@ -125,21 +135,24 @@ export class MeaningGraphBuilder {
               : arc.deprel === 'obl' ? preferredRole(frame, arc.deprel, 'ARG2') : 'ARG1';
           const argumentType = arc.deprel === 'xcomp' ? 'ACAO' : arc.deprel === 'ccomp' ? 'INFORMACAO' : typeOf(arc.id - 1);
           const prefers = frame.roles?.[role]?.prefers ?? [];
-          if (prefers.some((type) => isSubtype(argumentType, type))) score += 2;
+          const coercedType = coercions.find((item) => isSubtype(argumentType, item.from) && interrogativeRoles.includes(item.contextRole) && prefers.some((type) => isSubtype(item.to, type)));
+          if (prefers.some((type) => isSubtype(argumentType, type)) || coercedType) score += 2;
           else if (prefers.length) score -= 1;
+          if (coercedType) appliedCoercions.push({ rule: coercedType.id, token: arc.id, detail: `${argumentType}→${coercedType.to}` });
           if (frame.syntax?.some((mapping) => Object.values(mapping).includes(arc.deprel))) score += 1;
           if (frame.complement === arc.deprel) score += 1;
         }
         if (frame.defaultTemplate) score -= 0.25;
         for (const arc of arcs.filter((item) => item.head === index + 1 && item.deprel === 'advmod')) {
           const interrogative = adjuncts.interrogatives.find((item) => item.form === words[arc.id - 1].selected.lemma);
-          if (interrogative && Object.values(frame.roles ?? {}).some((role) => role.prefers?.some((pref) => isSubtype(interrogative.semanticType, pref)))) score += 2;
+          if (interrogative && Object.values(frame.roles ?? {}).some((role) => role.prefers?.includes(interrogative.semanticType))) score += 2;
         }
-        return { frame, score, order: seedOrder.indexOf(frame.id) >= 0 ? seedOrder.indexOf(frame.id) : order + seedOrder.length };
+        return { frame, score, order: seedOrder.indexOf(frame.id) >= 0 ? seedOrder.indexOf(frame.id) : order + seedOrder.length, appliedCoercions };
       }).sort((a, b) => b.score - a.score || a.order - b.order);
       if (scored.length > 1 && scored[0].score === scored[1].score) diagnostics.push({ code: 'AMBIGUOUS_SENSE', alternatives: scored.filter((item) => item.score === scored[0].score).map((item) => item.frame.id) });
       if (scored[0].frame.defaultTemplate) diagnostics.push({ code: 'UNCERTAIN_FRAME', alternatives: [scored[0].frame.id] });
-      trace.push({ rule: 'SENSE_FRAME_PREF', token: index + 1, detail: `${scored[0].frame.id} (${scored[0].score})` });
+      trace.push(...scored[0].appliedCoercions);
+      trace.push({ rule: 'SENSE_FRAME_PREF', token: index + 1, detail: scored.map((item) => `${item.frame.id} (${item.score})`).join(' > ') });
       return scored[0].frame;
     };
     const content = (index: number): string => {
@@ -147,6 +160,10 @@ export class MeaningGraphBuilder {
       if (existing) return existing;
       const reading = words[index].selected;
       let concept = reading.lemma;
+      if (reading.upos === 'PROPN') {
+        const continuation = childIndices(index, 'flat:name');
+        if (continuation.length) concept = [words[index].form, ...continuation.map((child) => words[child].form)].join(' ');
+      }
       if (reading.feats.PronType === 'Int' && (reading.upos === 'PRON' || reading.upos === 'DET')) concept = pronouns.unknownConcept;
       if (arcs[index].deprel === 'obj' && childIndices(index, 'fixed').some((child) => words[child].selected.feats.PronType === 'Int')) concept = pronouns.unknownConcept;
       if (reading.upos === 'PRON' && reading.feats.Clitic !== 'Yes') concept = words[index].form.normalize('NFC').toLocaleLowerCase('pt-BR');
@@ -190,9 +207,11 @@ export class MeaningGraphBuilder {
       const head = content(headIndex);
       if (relation === 'nsubj') {
         const copularPredicate = words[headIndex].selected.upos === 'ADJ' || arcs.some((arc) => arc.head === headIndex + 1 && arc.deprel === 'cop');
-        edge(head, preferredRole(selectedFrames.get(headIndex), 'nsubj', copularPredicate ? 'ARG1' : 'ARG0'), content(index), 'SEM_SUBJECT_FRAME');
+        const antecedent = relativeAntecedent(index, headIndex);
+        edge(head, preferredRole(selectedFrames.get(headIndex), 'nsubj', copularPredicate ? 'ARG1' : 'ARG0'), content(antecedent >= 0 ? antecedent : index), antecedent >= 0 ? 'SEM_RELATIVE_SUBJECT' : 'SEM_SUBJECT_FRAME');
       } else if (relation === 'obj') {
-        edge(head, preferredRole(selectedFrames.get(headIndex), 'obj', 'ARG1'), content(index), 'SEM_OBJECT_FRAME');
+        const antecedent = relativeAntecedent(index, headIndex);
+        edge(head, preferredRole(selectedFrames.get(headIndex), 'obj', 'ARG1'), content(antecedent >= 0 ? antecedent : index), antecedent >= 0 ? 'SEM_RELATIVE_OBJECT' : 'SEM_OBJECT_FRAME');
       } else if (relation === 'obl') {
         const assignment = roleForOblique(headIndex, index);
         edge(head, assignment.role, content(index), assignment.rule);
@@ -209,7 +228,8 @@ export class MeaningGraphBuilder {
         }
       } else if (relation === 'advcl') {
         const marker = childIndices(index, 'mark').map((item) => words[item].selected.lemma)[0];
-        const markerRule = adjuncts.markers.find((item) => item.form === marker);
+        const markerRule = adjuncts.markers.find((item) => item.form === marker &&
+          Object.entries(item.feats ?? {}).every(([key, value]) => words[index].selected.feats[key] === value));
         edge(head, markerRule?.role ?? 'cause', content(index), markerRule?.id ?? 'SEM_ADVCL_FALLBACK');
       } else if (relation === 'acl:relcl') {
         edge(head, 'mod', content(index), 'SEM_RELATIVE_MOD');
@@ -228,6 +248,12 @@ export class MeaningGraphBuilder {
       const headIndex = arc.head - 1;
       if (headIndex < 0) continue;
       const reading = words[index].selected;
+      const antecedent = relativeAntecedent(index, headIndex);
+      if (antecedent >= 0) {
+        const role = adjuncts.interrogatives.find((item) => item.form === reading.lemma)?.role ?? 'LOC';
+        edge(content(headIndex), role, content(antecedent), 'SEM_RELATIVE_ADVERB');
+        continue;
+      }
       if (reading.feats.Polarity === 'Neg' && reading.feats.PronType !== 'Int') {
         attr(content(headIndex), 'polarity', '-', 'SEM_NEGATION');
       }
@@ -243,6 +269,15 @@ export class MeaningGraphBuilder {
       if (!rule) continue;
       if (['degree', 'emph'].includes(rule.role)) attr(content(headIndex), rule.role, reading.lemma, rule.id);
       else edge(content(headIndex), rule.role, content(index), rule.id);
+    }
+    for (let index = 0; index < words.length; index++) {
+      if (!['advcl', 'acl:relcl', 'ccomp'].includes(arcs[index].deprel)) continue;
+      if (childIndices(index, 'nsubj').length) continue;
+      const feats = words[index].selected.feats;
+      if (feats.Person !== '1' && feats.Person !== '2') continue;
+      const predicate = content(index);
+      const role = preferredRole(selectedFrames.get(index), 'nsubj', 'ARG0');
+      edge(predicate, role, implicit(feats.Person, feats.Number ?? 'Sing'), 'SEM_SUBORDINATE_PRO_DROP');
     }
     for (let index = 0; index < words.length; index++) {
       if (arcs[index].deprel !== 'nsubj' || (words[index].selected.feats.Polarity !== 'Neg' && words[index].selected.feats.PronType !== 'Neg')) continue;
@@ -269,6 +304,22 @@ export class MeaningGraphBuilder {
     if (clause.mode === 'declarative' && !clause.subject.length && words[rootIndex]?.selected.feats.Person === '1' && words[rootIndex]?.selected.feats.Number === 'Plur' && childIndices(rootIndex, 'xcomp').length) {
       attr(root, 'mode', 'hortative', 'SEM_HORTATIVE');
     }
+    for (const earlier of [...edges].filter((item) => item.role === 'TIME')) {
+      const earlierNode = nodes.find((item) => item.id === earlier.to);
+      const earlierIndex = earlierNode?.token ? earlierNode.token - 1 : -1;
+      if (earlierIndex < 0 || words[earlierIndex].selected.upos !== 'ADV' || !isSubtype(typeOf(earlierIndex), 'TEMPO')) continue;
+      const later = edges.find((item) => item.from === earlier.from && item.role === 'TIME' && item.to !== earlier.to &&
+        nodes.some((candidate) => candidate.id === item.to && candidate.token && candidate.token - 1 > earlierIndex && words[candidate.token - 1].selected.upos === 'NOUN'));
+      const laterNode = later && nodes.find((item) => item.id === later.to);
+      const laterIndex = laterNode?.token ? laterNode.token - 1 : -1;
+      if (!later || !laterNode || laterIndex < 0 || !isSubtype(typeOf(laterIndex), 'TEMPO')) continue;
+      const between = words.slice(earlierIndex + 1, laterIndex);
+      if (!between.some((word) => word.selected.upos === 'ADP') ||
+          !between.every((word) => word.selected.upos === 'ADP' || word.selected.upos === 'DET')) continue;
+      earlierNode!.concept = `${earlierNode!.concept} ${laterNode.concept}`;
+      edges.splice(edges.indexOf(later), 1);
+      trace.push({ rule: 'SEM_COMPOUND_TIME', token: earlierIndex + 1, detail: `${earlierNode!.id}:${earlierNode!.concept}` });
+    }
     for (const arc of arcs.filter((item) => item.deprel === 'conj')) {
       const headIndex = arc.head - 1;
       const conjIndex = arc.id - 1;
@@ -284,6 +335,18 @@ export class MeaningGraphBuilder {
       const shared = edges.find((item) => item.from === headNode && (item.role === 'ARG0' || item.role === 'ARG1'));
       if (shared && !edges.some((item) => item.from === conjNode && item.role === shared.role)) edge(conjNode, shared.role, shared.to, 'SEM_COORDINATION_SHARED_ARGUMENT');
     }
-    return { root, nodes, edges, attributes, penman: serialize(root, nodes, edges, attributes), diagnostics, trace };
+    const reachable = new Set<string>([root]);
+    for (let changed = true; changed;) {
+      changed = false;
+      for (const item of edges) {
+        if (reachable.has(item.from) && !reachable.has(item.to)) {
+          reachable.add(item.to);
+          changed = true;
+        }
+      }
+    }
+    const visibleNodes = nodes.filter((item) => reachable.has(item.id));
+    const visibleAttributes = attributes.filter((item) => reachable.has(item.from));
+    return { root, nodes: visibleNodes, edges, attributes: visibleAttributes, penman: serialize(root, visibleNodes, edges, visibleAttributes), diagnostics, trace };
   }
 }

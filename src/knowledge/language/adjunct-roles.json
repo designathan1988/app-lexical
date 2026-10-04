@@ -13,6 +13,7 @@
   "markers": [
     {"id":"MARK_CONDITION","form":"se","role":"condition","note":"oração condicional"},
     {"id":"MARK_CAUSE","form":"porque","role":"cause","note":"oração causal"},
+    {"id":"MARK_FUTURE_CONDITION","form":"quando","feats":{"Mood":"Sub","Tense":"Fut"},"role":"condition","note":"oração eventual no futuro do subjuntivo"},
     {"id":"MARK_TIME","form":"quando","role":"TIME","note":"oração temporal"}
   ],
   "interrogatives": [

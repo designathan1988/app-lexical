@@ -80,6 +80,10 @@ export class DependencyParser {
       }
     }
 
+    for (let i = 0; i < words.length - 1; i++) {
+      if (pos(i) === 'PROPN' && pos(i + 1) === 'PROPN') set(i + 1, i, 'flat:name', 'UD_PROPER_NAME');
+    }
+
     for (let i = 0; i < words.length; i++) {
       if (pos(i) !== 'ADP') continue;
       const nextVerb = nearestRight(i, (candidate) => verbal.has(pos(candidate)), i + 3);
