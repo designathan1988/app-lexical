@@ -182,6 +182,14 @@ describe('grafo de significado', () => {
     expect(sending.edges).toContainEqual(expect.objectContaining({ from: sending.root, role: 'ARG1', to: flowers!.id }));
   });
 
+  it('atribui o papel de complemento aberto pela sintaxe da moldura', () => {
+    const graph = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('O professor fez o menino correr.').meaningGraph;
+    const action = graph.nodes.find((node) => node.concept.startsWith('correr.'));
+    expect(graph.nodes.find((node) => node.id === graph.root)?.concept).toBe('fazer.CAUSAR');
+    expect(action).toBeDefined();
+    expect(graph.edges).toContainEqual(expect.objectContaining({ from: graph.root, role: 'ARG2', to: action!.id }));
+  });
+
   it('atinge F1 médio, grafos exatos e sentidos no gabarito', () => {
     const engine = new SemanticEngine(createInitialKnowledgeBase());
     let sum = 0;
