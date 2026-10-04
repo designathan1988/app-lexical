@@ -10,7 +10,7 @@ import seedRoots from '../src/knowledge/morphology/seed-roots.json';
 type Sentence = {
   id: string;
   text: string;
-  tokens: Array<{ form: string }>;
+  tokens: Array<{ form: string; lemma: string; pos: string; feats?: string }>;
   dependencies: Array<{ rel: string; head: number; dep: number }>;
   meaningGraph: string;
 };
@@ -115,8 +115,7 @@ describe('correções da verificação oculta — paradigmas adjetivais', () => 
 
   it.each(adjectiveSentences)('$id: mantém lema, traços e conceito no predicativo', (sentence) => {
     const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence(sentence.text);
-    const adjective = (sentence as Sentence & { tokens: Array<{ form: string; lemma: string; pos: string; feats?: string }> }).tokens
-      .find((token) => token.pos === 'ADJECTIVE')!;
+    const adjective = sentence.tokens.find((token) => token.pos === 'ADJECTIVE')!;
     const index = sentence.tokens.findIndex((token) => token.form === adjective.form);
     expect(analysis.words[index].selected.lemma, sentence.id).toBe(adjective.lemma);
     const expectedFeatures = Object.entries(Object.fromEntries(adjective.feats!.split('|').map((feature) => feature.split('='))));

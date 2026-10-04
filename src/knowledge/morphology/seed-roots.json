@@ -14857,7 +14857,7 @@
       "lemma": "bom",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "ADJ_BOM"
       },
       "senses": [
         {
@@ -14897,7 +14897,7 @@
       "lemma": "capaz",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_Z_ES"
       },
       "senses": [
         {
@@ -15031,7 +15031,7 @@
       "lemma": "feliz",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_Z_ES"
       },
       "senses": [
         {
@@ -15218,7 +15218,7 @@
       "lemma": "jovem",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_M_NS"
       },
       "senses": [
         {
@@ -15281,7 +15281,7 @@
       "lemma": "leal",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_L_IS"
       },
       "senses": [
         {
@@ -15305,7 +15305,7 @@
       "lemma": "legal",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_L_IS"
       },
       "senses": [
         {
@@ -15422,7 +15422,7 @@
       "lemma": "moral",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_L_IS"
       },
       "senses": [
         {
@@ -15438,7 +15438,7 @@
       "lemma": "normal",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_L_IS"
       },
       "senses": [
         {
@@ -15511,7 +15511,7 @@
       "lemma": "popular",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_R_ES"
       },
       "senses": [
         {
@@ -15636,7 +15636,7 @@
       "lemma": "real",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_L_IS"
       },
       "senses": [
         {
@@ -15686,7 +15686,7 @@
       "lemma": "simples",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_INVARIANT"
+        "paradigmId": "ADJ_S_INV"
       },
       "senses": [
         {
@@ -15710,7 +15710,7 @@
       "lemma": "social",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_L_IS"
       },
       "senses": [
         {
@@ -16052,14 +16052,14 @@
     },
     {
       "id": "LEX_VIVA",
-      "lemma": "viva",
+      "lemma": "vivo",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_O"
       },
       "senses": [
         {
-          "id": "viva.S",
+          "id": "vivo.S",
           "gloss": "que tem vida",
           "semanticType": "ESTADO"
         }
@@ -16391,7 +16391,7 @@
       "lemma": "especial",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_L_IS"
       },
       "senses": [
         {
@@ -16488,7 +16488,7 @@
       "lemma": "gentil",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_IL_IS"
       },
       "senses": [
         {
@@ -16521,7 +16521,7 @@
       "lemma": "igual",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_L_IS"
       },
       "senses": [
         {
@@ -16683,7 +16683,7 @@
       "lemma": "melhor",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_R_ES"
       },
       "senses": [
         {
@@ -16797,7 +16797,7 @@
       "lemma": "pior",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_R_ES"
       },
       "senses": [
         {
@@ -16894,7 +16894,7 @@
       "lemma": "ruim",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_M_NS"
       },
       "senses": [
         {
@@ -17952,7 +17952,7 @@
       "lemma": "comum",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_M_NS"
       },
       "senses": [
         {
@@ -17969,7 +17969,7 @@
       "lemma": "cruel",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_EL_EIS_ACUTE"
       },
       "senses": [
         {
@@ -18210,7 +18210,7 @@
       "lemma": "veloz",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_UNIFORM"
+        "paradigmId": "ADJ_Z_ES"
       },
       "senses": [
         {

@@ -1,6 +1,85 @@
 {
   "paradigms": [
     {
+      "id": "ADJ_BOM", "pos": "ADJECTIVE", "strip": "", "fullForm": true,
+      "cells": [
+        { "feats": { "Gender": "Masc", "Number": "Sing" }, "suffix": "bom" },
+        { "feats": { "Gender": "Fem", "Number": "Sing" }, "suffix": "boa" },
+        { "feats": { "Gender": "Masc", "Number": "Plur" }, "suffix": "bons" },
+        { "feats": { "Gender": "Fem", "Number": "Plur" }, "suffix": "boas" }
+      ],
+      "source": "https://dicionario.priberam.org/bom",
+      "note": "flexão irregular em gênero e número do adjetivo bom",
+      "example": "A casa está boa."
+    },
+    {
+      "id": "ADJ_M_NS", "pos": "ADJECTIVE", "strip": "m",
+      "cells": [
+        { "feats": { "Number": "Sing" }, "suffix": "m" },
+        { "feats": { "Number": "Plur" }, "suffix": "ns" }
+      ],
+      "note": "adjetivos uniformes terminados em -m trocam -m por -ns no plural",
+      "example": "Os jardins são comuns."
+    },
+    {
+      "id": "ADJ_Z_ES", "pos": "ADJECTIVE", "strip": "z",
+      "cells": [
+        { "feats": { "Number": "Sing" }, "suffix": "z" },
+        { "feats": { "Number": "Plur" }, "suffix": "zes" }
+      ],
+      "source": "https://ciberduvidas.iscte-iul.pt/consultorio/perguntas/o-plural-de-nomes-terminados--r--z-e--l/35737",
+      "note": "adjetivos uniformes terminados em -z recebem -es no plural",
+      "example": "Os médicos são felizes."
+    },
+    {
+      "id": "ADJ_R_ES", "pos": "ADJECTIVE", "strip": "r",
+      "cells": [
+        { "feats": { "Number": "Sing" }, "suffix": "r" },
+        { "feats": { "Number": "Plur" }, "suffix": "res" }
+      ],
+      "source": "https://ciberduvidas.iscte-iul.pt/consultorio/perguntas/o-plural-de-nomes-terminados--r--z-e--l/35737",
+      "note": "adjetivos uniformes terminados em -r recebem -es no plural",
+      "example": "Os médicos são melhores."
+    },
+    {
+      "id": "ADJ_L_IS", "pos": "ADJECTIVE", "strip": "l",
+      "cells": [
+        { "feats": { "Number": "Sing" }, "suffix": "l" },
+        { "feats": { "Number": "Plur" }, "suffix": "is" }
+      ],
+      "source": "https://ciberduvidas.iscte-iul.pt/consultorio/perguntas/neuronais/2940",
+      "note": "adjetivos uniformes terminados em -l substituem a consoante por -is no plural",
+      "example": "Os parques são reais."
+    },
+    {
+      "id": "ADJ_IL_IS", "pos": "ADJECTIVE", "strip": "il",
+      "cells": [
+        { "feats": { "Number": "Sing" }, "suffix": "il" },
+        { "feats": { "Number": "Plur" }, "suffix": "is" }
+      ],
+      "source": "https://ciberduvidas.iscte-iul.pt/consultorio/perguntas/plural-de-vigil/31997",
+      "note": "adjetivo oxítono terminado em -il substitui essa terminação por -is no plural",
+      "example": "Os professores são gentis."
+    },
+    {
+      "id": "ADJ_EL_EIS_ACUTE", "pos": "ADJECTIVE", "strip": "el",
+      "cells": [
+        { "feats": { "Number": "Sing" }, "suffix": "el" },
+        { "feats": { "Number": "Plur" }, "suffix": "éis" }
+      ],
+      "note": "adjetivo oxítono em -el mantém a tonicidade na terminação plural -éis",
+      "example": "Os homens são cruéis."
+    },
+    {
+      "id": "ADJ_S_INV", "pos": "ADJECTIVE", "strip": "",
+      "cells": [
+        { "feats": { "Number": "Sing" }, "suffix": "" },
+        { "feats": { "Number": "Plur" }, "suffix": "" }
+      ],
+      "note": "adjetivo paroxítono terminado em -s permanece igual no singular e no plural",
+      "example": "Os livros são simples."
+    },
+    {
       "id": "ADJ_AU", "pos": "ADJECTIVE", "strip": "au",
       "cells": [
         { "feats": { "Gender": "Masc", "Number": "Sing" }, "suffix": "au" },
