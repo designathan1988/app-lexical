@@ -2,12 +2,38 @@ import { useSyncExternalStore, useCallback, useState } from 'react';
 import { SemanticEngine, type CommandResult } from '../engine/SemanticEngine';
 import { KnowledgeBaseStore } from '../knowledge/KnowledgeBaseStore';
 import { IndexedDbKnowledgeBaseBackend } from '../knowledge/IndexedDbKnowledgeBaseBackend';
+import type { SentenceAnalysis } from '../engine/language/SentenceAnalysis';
 
 export interface ChatEntry {
   id: number;
   role: 'user' | 'system';
   text: string;
   result?: CommandResult;
+  analysisOnly?: boolean;
+}
+
+/** Classifica a resposta visível sem alterar o compilador nem seus diagnósticos. */
+export function summarizeChatResult(result: CommandResult, analysis: SentenceAnalysis | null): { text: string; analysisOnly: boolean } {
+  const errors = result.compile.diagnostics.filter((diagnostic) => diagnostic.severity === 'ERROR');
+  const warnings = result.compile.diagnostics.filter((diagnostic) => diagnostic.severity === 'WARNING');
+  const generalSentence = !result.success
+    && result.compile.plan.steps.length === 0
+    && result.compile.ast.commands.every((command) => command.kind === 'NO_OP' && command.reason === 'UNKNOWN_COMMAND')
+    && analysis !== null
+    && analysis.words.some((word) => word.selected.upos === 'VERB' && word.selected.feats.VerbForm === 'Fin')
+    && analysis.words.every((word) => word.selected.upos === 'PUNCT' || word.selected.origin !== 'GUESS')
+    && analysis.dependencies.length === analysis.words.length
+    && analysis.meaningGraph.nodes.some((node) => node.id === analysis.meaningGraph.root)
+    && analysis.meaningGraph.diagnostics.length === 0;
+  if (generalSentence) return { text: 'Frase analisada (não é um comando do construtor)', analysisOnly: true };
+  return {
+    text: result.success
+      ? `Executado: ${result.execution.mutations.length} mutação(ões).` +
+        (errors.length ? ` ${errors.length} erro(s).` : '') +
+        (warnings.length ? ` ${warnings.length} aviso(s).` : '')
+      : `Bloqueado: ${errors.length} erro(s) — o documento não foi alterado.`,
+    analysisOnly: false
+  };
 }
 
 /**
@@ -112,19 +138,12 @@ export function useChat(engine: SemanticEngine) {
       }
 
       const result = engine.execute(trimmed);
-      const errors = result.compile.diagnostics.filter((d) => d.severity === 'ERROR');
-      const warnings = result.compile.diagnostics.filter((d) => d.severity === 'WARNING');
-
-      const summary = result.success
-        ? `Executado: ${result.execution.mutations.length} mutação(ões).` +
-          (errors.length ? ` ${errors.length} erro(s).` : '') +
-          (warnings.length ? ` ${warnings.length} aviso(s).` : '')
-        : `Bloqueado: ${errors.length} erro(s) — o documento não foi alterado.`;
+      const summary = summarizeChatResult(result, result.success ? null : engine.analyzeSentence(trimmed));
 
       setEntries((prev) => [
         ...prev,
         userEntry,
-        { id: userId + 1, role: 'system', text: summary, result }
+        { id: userId + 1, role: 'system', text: summary.text, analysisOnly: summary.analysisOnly, result }
       ]);
     },
     [engine]

@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { DocumentRenderer } from './components/DocumentRenderer';
 import { PipelineInspector } from './components/PipelineInspector';
+import { ChatResultAction } from './components/ChatResultAction';
 import { AdminPanel } from './components/AdminPanel';
 import { getContext, useChat, useDocument, applyKnowledgeBase } from './useEngine';
 import type { CommandResult } from '../engine/SemanticEngine';
@@ -99,11 +100,7 @@ export function App() {
                 <div key={e.id} className={`bubble ${e.role}`}>
                   <div className="bubble-text">{e.text}</div>
                   {e.result && (
-                    <div className="bubble-actions">
-                      <button className="link" onClick={() => setSelected(e.result!)}>
-                        inspecionar pipeline
-                      </button>
-                    </div>
+                    <ChatResultAction result={e.result} analysisOnly={e.analysisOnly} onInspect={setSelected} />
                   )}
                 </div>
               ))}
