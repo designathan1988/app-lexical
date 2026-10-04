@@ -130,6 +130,14 @@ describe('grafo de significado', () => {
     expect(graph.penman).toContain(':ARG0');
   });
 
+  it('reutiliza o nó do objeto quando a moldura declara controle OBJECT', () => {
+    const graph = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('Eu mandei o menino cantar.').meaningGraph;
+    const singer = graph.nodes.find((node) => node.concept.startsWith('cantar.'));
+    const boy = graph.nodes.find((node) => node.concept === 'menino');
+    expect(singer && boy).toBeTruthy();
+    expect(graph.edges).toContainEqual(expect.objectContaining({ from: singer!.id, role: 'ARG0', to: boy!.id }));
+  });
+
   it('atinge F1 médio, grafos exatos e sentidos no gabarito', () => {
     const engine = new SemanticEngine(createInitialKnowledgeBase());
     let sum = 0;
