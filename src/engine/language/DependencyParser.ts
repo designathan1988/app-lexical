@@ -85,6 +85,14 @@ export class DependencyParser {
     }
 
     for (let i = 0; i < words.length; i++) {
+      if (pos(i) !== 'ADJ' || i === root || assigned(i)) continue;
+      const nominalLeft = nearestLeft(i, (candidate) => nominals.has(pos(candidate)));
+      const nominalRight = nearestRight(i, (candidate) => nominals.has(pos(candidate)));
+      const head = nominalLeft === i - 1 ? nominalLeft : nominalRight === i + 1 ? nominalRight : -1;
+      if (head >= 0) set(i, head, 'amod', 'UD_AMOD_ADJACENT_NOMINAL');
+    }
+
+    for (let i = 0; i < words.length; i++) {
       if (pos(i) !== 'ADP') continue;
       const nextVerb = nearestRight(i, (candidate) => verbal.has(pos(candidate)), i + 3);
       const nextNominal = nearestRight(i, (candidate) => nominals.has(pos(candidate)), i + 4);
