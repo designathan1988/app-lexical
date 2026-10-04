@@ -30,10 +30,11 @@ interface Props {
   engine: SemanticEngine;
   store: KnowledgeBaseStore;
   onChange: () => void;
+  onAnalyze?: (sentence: string) => void;
 }
 
 /** Painel administrativo: usa os mesmos dados e o mesmo motor da aplicação real. */
-export function AdminPanel({ engine, store, onChange }: Props) {
+export function AdminPanel({ engine, store, onChange, onAnalyze }: Props) {
   const [tab, setTab] = useState<AdminTab>('dados');
   const [revision, setRevision] = useState(0);
 
@@ -82,7 +83,7 @@ export function AdminPanel({ engine, store, onChange }: Props) {
         {tab === 'paradigmas' && <ParadigmSection engine={engine} store={store} onChange={bump} />}
         {tab === 'morfologia' && <MorphologySection engine={engine} />}
         {tab === 'frase' && <SentenceAnalysisSection engine={engine} />}
-        {tab === 'rede' && <TeachableNetworkSection engine={engine} store={store} onChange={bump} />}
+        {tab === 'rede' && <TeachableNetworkSection engine={engine} store={store} onChange={bump} onAnalyze={onAnalyze} />}
         {tab === 'treinamento' && (
           <TrainingSection engine={engine} store={store} onChange={bump} />
         )}

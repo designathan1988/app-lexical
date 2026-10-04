@@ -1,8 +1,9 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { DocumentRenderer } from './components/DocumentRenderer';
 import { PipelineInspector } from './components/PipelineInspector';
 import { ChatResultAction } from './components/ChatResultAction';
 import { AdminPanel } from './components/AdminPanel';
+import { SentenceAnalysisSection } from './components/admin/SentenceAnalysisSection';
 import { getContext, useChat, useDocument, applyKnowledgeBase } from './useEngine';
 import type { CommandResult } from '../engine/SemanticEngine';
 
@@ -29,7 +30,14 @@ export function App() {
   const document = useDocument(engine);
   const { entries, send, clear } = useChat(engine);
   const [input, setInput] = useState('');
-  const [view, setView] = useState<'chat' | 'admin'>('chat');
+  const [view, setView] = useState<'analysis' | 'chat' | 'admin'>('analysis');
+  const [theme, setTheme] = useState<'dark' | 'light'>(() =>
+    typeof window !== 'undefined' && window.localStorage.getItem('lexical-theme') === 'light' ? 'light' : 'dark');
+  const [analysisSeed, setAnalysisSeed] = useState('');
+  useEffect(() => {
+    window.document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem('lexical-theme', theme);
+  }, [theme]);
   const [selected, setSelected] = useState<CommandResult | null>(null);
   const [, forceRender] = useState(0);
 
@@ -66,6 +74,9 @@ export function App() {
           <span>compilador de domínio PT-BR → pagebuilder</span>
         </div>
         <nav className="view-switch">
+          <button className={view === 'analysis' ? 'active' : ''} onClick={() => setView('analysis')}>
+            Análise de frase
+          </button>
           <button className={view === 'chat' ? 'active' : ''} onClick={() => setView('chat')}>
             Chat + Preview
           </button>
@@ -73,9 +84,15 @@ export function App() {
             Painel Administrativo
           </button>
         </nav>
+        <button className="theme-toggle" aria-label={theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'}
+          aria-pressed={theme === 'light'} onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
+          {theme === 'dark' ? '☀ Tema claro' : '◐ Tema escuro'}
+        </button>
       </header>
 
-      {view === 'chat' ? (
+      {view === 'analysis' ? (
+        <main className="analysis-main"><SentenceAnalysisSection key={analysisSeed} engine={engine} initialText={analysisSeed || undefined} /></main>
+      ) : view === 'chat' ? (
         <div className="chat-layout">
           <section className="chat-pane">
             <div className="chat-log">
@@ -100,7 +117,9 @@ export function App() {
                 <div key={e.id} className={`bubble ${e.role}`}>
                   <div className="bubble-text">{e.text}</div>
                   {e.result && (
-                    <ChatResultAction result={e.result} analysisOnly={e.analysisOnly} onInspect={setSelected} />
+                    <ChatResultAction result={e.result} analysisOnly={e.analysisOnly} onInspect={setSelected}
+                      analysis={e.analysisOnly ? engine.analyzeSentence(e.result.input) : undefined}
+                      onOpenAnalysis={() => { setAnalysisSeed(e.result!.input); setView('analysis'); }} />
                   )}
                 </div>
               ))}
@@ -109,6 +128,7 @@ export function App() {
             <div className="chat-input">
               <input
                 value={input}
+                aria-label="Frase ou comando do construtor"
                 placeholder="ex.: crie uma caixa azul com um botão vermelho dentro"
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -170,7 +190,10 @@ export function App() {
           </section>
         </div>
       ) : (
-        <AdminPanel engine={engine} store={ctx.store} onChange={refresh} />
+        <AdminPanel engine={engine} store={ctx.store} onChange={refresh} onAnalyze={(sentence) => {
+          setAnalysisSeed(sentence);
+          setView('analysis');
+        }} />
       )}
 
       {view === 'chat' && (
