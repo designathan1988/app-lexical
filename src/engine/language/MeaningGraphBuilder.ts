@@ -7,6 +7,7 @@ import pronounData from '../../knowledge/language/implicit-pronouns.json';
 import pragmaticsData from '../../knowledge/language/pragmatics.json';
 import coercionData from '../../knowledge/language/semantic-coercions.json';
 import nominalPpData from '../../knowledge/language/nominal-pp-rules.json';
+import coordinationData from '../../knowledge/language/coordination-rules.json';
 import type { DependencyArc } from './DependencyParser';
 import type { ClauseAnalysis } from './ClauseAnalyzer';
 import type { TaggedWord } from './Tagger';
@@ -49,6 +50,7 @@ const pronouns = pronounData as { entries: Array<{ person: string; number: strin
 const pragmaticExpressions = (pragmaticsData as { expressions: Array<{ id: string; form: string; attribute: { role: string; value: string } }> }).expressions;
 const coercions = (coercionData as { rules: Array<{ id: string; from: string; to: string; contextRole: string }> }).rules;
 const nominalPpRules = (nominalPpData as { rules: Array<{ id: string; semanticRole: string }> }).rules;
+const coordination = coordinationData as { operators: Array<{ id: string; form: string; concept: string }>; defaultOperator: string };
 
 function isSubtype(actual: string | undefined, expected: string): boolean {
   for (let cursor = actual; cursor; cursor = typeParents.get(cursor) ?? undefined) if (cursor === expected) return true;
@@ -355,20 +357,29 @@ export class MeaningGraphBuilder {
       edges.splice(edges.indexOf(later), 1);
       trace.push({ rule: 'SEM_COMPOUND_TIME', token: earlierIndex + 1, detail: `${earlierNode!.id}:${earlierNode!.concept}` });
     }
+    const coordinated = new Map<number, number[]>();
     for (const arc of arcs.filter((item) => item.deprel === 'conj')) {
-      const headIndex = arc.head - 1;
-      const conjIndex = arc.id - 1;
+      coordinated.set(arc.head, [...(coordinated.get(arc.head) ?? []), arc.id - 1]);
+    }
+    for (const [headId, conjuncts] of coordinated) {
+      const headIndex = headId - 1;
       if (headIndex < 0) continue;
-      const headNode = content(headIndex);
-      const conjNode = content(conjIndex);
-      const conjunction = node('and');
-      const incoming = edges.filter((item) => item.to === headNode && item.from !== conjNode);
+      const members = [headIndex, ...conjuncts];
+      const memberNodes = members.map(content);
+      const last = conjuncts[conjuncts.length - 1];
+      const coordinatorIndex = childIndices(last, 'cc')[0];
+      const coordinator = coordination.operators.find((entry) => entry.form === words[coordinatorIndex]?.selected.lemma);
+      const conjunction = node(coordinator?.concept ?? coordination.defaultOperator);
+      const incoming = edges.filter((item) => item.to === memberNodes[0] && !memberNodes.includes(item.from));
       for (const item of incoming) item.to = conjunction;
-      edge(conjunction, 'op1', headNode, 'SEM_COORDINATION_FIRST');
-      edge(conjunction, 'op2', conjNode, 'SEM_COORDINATION_SECOND');
-      if (root === headNode) root = conjunction;
-      const shared = edges.find((item) => item.from === headNode && (item.role === 'ARG0' || item.role === 'ARG1'));
-      if (shared && !edges.some((item) => item.from === conjNode && item.role === shared.role)) edge(conjNode, shared.role, shared.to, 'SEM_COORDINATION_SHARED_ARGUMENT');
+      memberNodes.forEach((member, index) => edge(conjunction, `op${index + 1}`, member, coordinator?.id ?? 'SEM_COORDINATION_DEFAULT'));
+      if (root === memberNodes[0]) root = conjunction;
+      const shared = edges.find((item) => item.from === memberNodes[0] && (item.role === 'ARG0' || item.role === 'ARG1'));
+      for (const conjunct of memberNodes.slice(1)) {
+        if (shared && !edges.some((item) => item.from === conjunct && item.role === shared.role)) {
+          edge(conjunct, shared.role, shared.to, 'SEM_COORDINATION_SHARED_ARGUMENT');
+        }
+      }
     }
     const reachable = new Set<string>([root]);
     for (let changed = true; changed;) {

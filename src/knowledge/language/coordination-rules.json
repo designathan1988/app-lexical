@@ -1,0 +1,19 @@
+{
+  "lists": [
+    {
+      "id": "UD_LIST_COORDINATION",
+      "separator": ",",
+      "memberUpos": ["NOUN", "PROPN", "PRON", "ADJ", "VERB", "AUX"],
+      "relation": "conj",
+      "punctuationRelation": "punct",
+      "source": "https://universaldependencies.org/u/dep/conj.html",
+      "note": "O primeiro item é o núcleo técnico; cada item seguinte depende dele e a vírgula depende do item à direita.",
+      "example": "Ela leu jornais, cartas e livros."
+    }
+  ],
+  "operators": [
+    {"id":"AMR_COORD_AND","form":"e","concept":"and","source":"https://github.com/amrisi/amr-guidelines/blob/master/amr.md","note":"coordenação aditiva com operações numeradas","example":"Ela leu jornais, cartas e livros."},
+    {"id":"AMR_COORD_OR","form":"ou","concept":"or","source":"https://github.com/amrisi/amr-guidelines/blob/master/amr.md","note":"coordenação alternativa com operações numeradas","example":"Eu comprei pão, queijo ou fruta."}
+  ],
+  "defaultOperator": "and"
+}

@@ -8,6 +8,7 @@ import semanticTypes from '../../knowledge/morphology/semantic-types.json';
 import obliqueCasesData from '../../knowledge/language/frame-oblique-cases.json';
 import nominalPpData from '../../knowledge/language/nominal-pp-rules.json';
 import copularClauseData from '../../knowledge/language/copular-clause-rules.json';
+import coordinationData from '../../knowledge/language/coordination-rules.json';
 import type { TeachableRoot } from '../../knowledge/language/teachableRoot';
 import type { TaggedWord } from './Tagger';
 
@@ -36,6 +37,9 @@ const nominalPpRules = (nominalPpData as { rules: Array<{
 const copularClauseRules = (copularClauseData as { rules: Array<{
   id: string; markerForms: string[]; predicateUpos: string[]; relation: string
 }> }).rules;
+const coordinationLists = (coordinationData as { lists: Array<{
+  id: string; separator: string; memberUpos: string[]; relation: string; punctuationRelation: string
+}> }).lists;
 const isSubtype = (actual: string | undefined, expected: string): boolean => {
   for (let current = actual; current; current = typeParents.get(current) ?? undefined) if (current === expected) return true;
   return false;
@@ -164,6 +168,25 @@ export class DependencyParser {
       if (prior >= 0) {
         set(i, target, 'cc', 'UD_CC');
         set(target, prior, 'conj', 'UD_CONJ');
+      }
+    }
+
+    for (const rule of coordinationLists) {
+      for (let i = 0; i < words.length; i++) {
+        if (pos(i) !== 'CCONJ') continue;
+        const last = arcs[i].head - 1;
+        if (last < 0 || !rule.memberUpos.includes(pos(last))) continue;
+        const prior = nearestLeft(i, (candidate) => pos(candidate) === pos(last));
+        if (prior < 0) continue;
+        const members = [prior, last];
+        let cursor = prior;
+        while (cursor >= 2 && words[cursor - 1].form === rule.separator && pos(cursor - 2) === pos(last)) {
+          set(cursor - 1, cursor, rule.punctuationRelation, `${rule.id}_PUNCT`);
+          members.unshift(cursor - 2);
+          cursor -= 2;
+        }
+        if (members.length < 3) continue;
+        for (const member of members.slice(1)) set(member, members[0], rule.relation, rule.id);
       }
     }
 
