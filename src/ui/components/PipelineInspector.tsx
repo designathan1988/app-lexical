@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { CompileResult } from '../../engine/SemanticCompiler';
 import type { ExecutionResult } from '../../engine/runtime/ExecutionEngine';
 import { planSignature, astSignature } from '../../eval/signatures';
+import type { SentenceAnalysis } from '../../engine/language/SentenceAnalysis';
+import { SentenceAnalysisViews } from './SentenceAnalysisViews';
 
 interface Props {
   compile: CompileResult | null;
   execution: ExecutionResult | null;
   mutations: string[];
+  sentenceAnalysis: SentenceAnalysis | null;
 }
 
 type Tab =
@@ -16,15 +19,21 @@ type Tab =
   | 'ast'
   | 'plan'
   | 'diagnostics'
-  | 'result';
+  | 'result'
+  | 'classes'
+  | 'syntax'
+  | 'meaning';
 
 /**
  * Observabilidade completa do pipeline:
  * entrada → raw tokens → tokens normalizados → MWEs → candidatos lexicais →
  * conceitos candidatos → AST → ExecutionPlan → validação → mutações executadas.
  */
-export function PipelineInspector({ compile, execution, mutations }: Props) {
+export function PipelineInspector({ compile, execution, mutations, sentenceAnalysis }: Props) {
   const [tab, setTab] = useState<Tab>('ast');
+  useEffect(() => {
+    if (compile && !compile.plan.steps.length && sentenceAnalysis) setTab('classes');
+  }, [compile, sentenceAnalysis]);
 
   if (!compile) {
     return <div className="inspector-empty">Envie um comando para inspecionar o pipeline.</div>;
@@ -34,6 +43,9 @@ export function PipelineInspector({ compile, execution, mutations }: Props) {
 
   const tabs: Array<{ id: Tab; label: string; badge?: number }> = [
     { id: 'tokens', label: 'Tokens', badge: trace.rawTokens.length },
+    { id: 'classes', label: 'Classes', badge: sentenceAnalysis?.words.length },
+    { id: 'syntax', label: 'Sintaxe' },
+    { id: 'meaning', label: 'Significado' },
     { id: 'mwe', label: 'MWEs' },
     { id: 'candidates', label: 'Candidatos', badge: trace.semanticTokens.length },
     { id: 'ast', label: 'AST' },
@@ -62,6 +74,9 @@ export function PipelineInspector({ compile, execution, mutations }: Props) {
       </div>
 
       <div className="inspector-body">
+        {tab === 'classes' && sentenceAnalysis && <SentenceAnalysisViews analysis={sentenceAnalysis} view="classes" />}
+        {tab === 'syntax' && sentenceAnalysis && <SentenceAnalysisViews analysis={sentenceAnalysis} view="syntax" />}
+        {tab === 'meaning' && sentenceAnalysis && <SentenceAnalysisViews analysis={sentenceAnalysis} view="meaning" />}
         {tab === 'tokens' && (
           <>
             <h4>Tokens brutos (não destrutivos)</h4>

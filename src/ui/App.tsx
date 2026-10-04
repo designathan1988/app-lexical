@@ -40,6 +40,7 @@ export function App() {
   }, [entries]);
 
   const active = selected ?? lastResult;
+  const sentenceAnalysis = useMemo(() => active ? engine.analyzeSentence(active.input) : null, [engine, active?.input]);
 
   const submit = useCallback(
     (mode: 'execute' | 'analyze') => {
@@ -181,6 +182,7 @@ export function App() {
             compile={active?.compile ?? null}
             execution={active?.execution ?? null}
             mutations={active?.execution.mutations ?? []}
+            sentenceAnalysis={sentenceAnalysis}
           />
         </section>
       )}

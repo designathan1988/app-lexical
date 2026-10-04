@@ -10,11 +10,13 @@ import { DiagnosticsSection } from './admin/DiagnosticsSection';
 import { SettingsSection } from './admin/SettingsSection';
 import { HistorySection } from './admin/HistorySection';
 import { MorphologySection } from './admin/MorphologySection';
+import { SentenceAnalysisSection } from './admin/SentenceAnalysisSection';
 
 export type AdminTab =
   | 'dados'
   | 'paradigmas'
   | 'morfologia'
+  | 'frase'
   | 'treinamento'
   | 'testes'
   | 'metricas'
@@ -47,6 +49,7 @@ export function AdminPanel({ engine, store, onChange }: Props) {
     { id: 'dados', label: 'Dados' },
     { id: 'paradigmas', label: 'Paradigmas' },
     { id: 'morfologia', label: 'Morfologia' },
+    { id: 'frase', label: 'Análise de frase' },
     { id: 'treinamento', label: 'Treinamento' },
     { id: 'testes', label: 'Testes' },
     { id: 'metricas', label: 'Métricas' },
@@ -74,6 +77,7 @@ export function AdminPanel({ engine, store, onChange }: Props) {
         {tab === 'dados' && <DataSection engine={engine} store={store} onChange={bump} />}
         {tab === 'paradigmas' && <ParadigmSection engine={engine} store={store} onChange={bump} />}
         {tab === 'morfologia' && <MorphologySection engine={engine} />}
+        {tab === 'frase' && <SentenceAnalysisSection engine={engine} />}
         {tab === 'treinamento' && (
           <TrainingSection engine={engine} store={store} onChange={bump} />
         )}
