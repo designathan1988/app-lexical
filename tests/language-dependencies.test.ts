@@ -51,6 +51,15 @@ function measure(sentences: Sentence[]) {
 }
 
 describe('dependências UD e estrutura da oração', () => {
+  it('liga adjetivos atributivos ao substantivo por amod sem confundir predicativo', () => {
+    const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence('A casa azul é grande.');
+    const casa = analysis.words.findIndex((word) => word.form.toLocaleLowerCase('pt-BR') === 'casa') + 1;
+    const azul = analysis.words.findIndex((word) => word.form.toLocaleLowerCase('pt-BR') === 'azul') + 1;
+    const grande = analysis.words.findIndex((word) => word.form.toLocaleLowerCase('pt-BR') === 'grande') + 1;
+    expect(analysis.dependencies[azul - 1]).toMatchObject({ head: casa, deprel: 'amod' });
+    expect(analysis.dependencies[grande - 1]).toMatchObject({ head: 0, deprel: 'root' });
+  });
+
   it('marca causal, relativo locativo, tempo sem preposição e cortesia por função', () => {
     const ids = ['sent-066', 'sent-069', 'sent-073', 'sent-079'];
     const expected = new Map([['sent-066', [4, 'advcl']], ['sent-069', [3, 'advmod']],
