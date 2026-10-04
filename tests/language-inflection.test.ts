@@ -33,6 +33,22 @@ describe('flexão e índice inverso', () => {
     expect(missing.map((entry) => `${entry.lemma}/${entry.pos}`)).toEqual([]);
   });
 
+  it('gera leituras com traços para raízes com paradigma declarado', () => {
+    const entries = (seedRoots as { entries: Array<{ lemma: string; pos: string; inflection?: { paradigmId: string } }> }).entries;
+    const missing = entries.filter((entry) => entry.inflection && !inflector.lemmatize(entry.lemma)
+      .some((reading) => reading.lemma === entry.lemma && reading.pos === entry.pos && reading.features));
+    console.info('Paradigmas declarados sem leitura flexional:', missing.map((entry) => `${entry.lemma}/${entry.inflection?.paradigmId}`).join(', '));
+    expect(missing.map((entry) => `${entry.lemma}/${entry.inflection?.paradigmId}`)).toEqual([]);
+  });
+
+  it.each([
+    ['exponho', 'expor'], ['percebo', 'perceber'], ['avôs', 'avô'],
+    ['más', 'mau'], ['minhas', 'meu'], ['tuas', 'teu'], ['suas', 'seu'],
+    ['várias', 'vários'], ['duas', 'dois'], ['duzentas', 'duzentos']
+  ])('gera a família flexional de %s', (form, lemma) => {
+    expect(inflector.lemmatize(form).some((reading) => reading.lemma === lemma && reading.features)).toBe(true);
+  });
+
   it('acerta os 258 casos de flexão do projeto', () => {
     let hits = 0;
     const failures: string[] = [];

@@ -5,6 +5,7 @@ import supplementData from '../../knowledge/language/lexical-supplements.json';
 import futureSubjunctiveData from '../../knowledge/language/future-subjunctive.json';
 import guessData from '../../knowledge/language/guess-rules.json';
 import irregularSupplementsData from '../../knowledge/language/irregular-supplements.json';
+import seedParadigmsData from '../../knowledge/language/seed-paradigms.json';
 import { PARADIGMS, generateForms, type Paradigm, type ParadigmId } from '../../knowledge/paradigms';
 import { parseFeatureKey, type FeatureBundle } from '../../knowledge/features';
 import type { Lexeme } from '../types';
@@ -23,6 +24,7 @@ type Irregular = { id: string; lemma: string; forms: Record<string, string> };
 type Supplement = { id: string; lemma: string; variants: Record<string, string[]> };
 
 const proposals = (proposedData as unknown as { paradigms: Paradigm[] }).paradigms;
+const seedParadigms = (seedParadigmsData as unknown as { paradigms: Paradigm[] }).paradigms;
 const irregular = (irregularData as { verbs: Irregular[]; supplementaryParticiples: Supplement[] });
 const seeds = (seedData as { entries: Seed[] }).entries;
 const lexicalSupplements = (supplementData as { entries: Array<Seed & { paradigmId: string }> }).entries;
@@ -42,6 +44,7 @@ export const LANGUAGE_PARADIGMS: Record<ParadigmId, Paradigm> = {
   ...PARADIGMS,
   ...extendedRegularParadigms,
   ...Object.fromEntries(proposals.map((paradigm) => [paradigm.id, paradigm])),
+  ...Object.fromEntries(seedParadigms.map((paradigm) => [paradigm.id, paradigm])),
   ...Object.fromEntries(irregular.verbs.map((verb) => [verb.id, {
     id: verb.id,
     pos: 'VERB',
@@ -91,18 +94,21 @@ export class LanguageInflector {
       const id = entry.inflection?.paradigmId ?? suggestParadigm(entry.lemma, entry.pos)?.id;
       const paradigm = id ? LANGUAGE_PARADIGMS[id] : undefined;
       if (!paradigm) continue;
-      const key = `${entry.lemma}|${paradigm.id}`;
+      const key = `${entry.lemma}|${entry.pos}|${paradigm.id}`;
       if (seen.has(key)) continue;
       seen.add(key);
       const baseInfinitive = paradigm.fullForm
         ? paradigm.cells.find((cell) => cell.feats.VerbForm === 'Inf')?.suffix
         : undefined;
-      const prefix = baseInfinitive && entry.lemma !== baseInfinitive && entry.lemma.endsWith(baseInfinitive)
+      const deaccent = (form: string) => form.normalize('NFD').replace(/\p{M}/gu, '');
+      const prefixed = baseInfinitive && entry.lemma !== baseInfinitive &&
+        deaccent(entry.lemma).endsWith(deaccent(baseInfinitive));
+      const prefix = prefixed && baseInfinitive
         ? entry.lemma.slice(0, -baseInfinitive.length)
         : '';
       const forms = generateForms(key, entry.lemma, paradigm).map((form) => ({
         ...form,
-        surface: prefix ? prefix + form.surface : form.surface
+        surface: prefix ? prefix + (form.feats.VerbForm === 'Inf' ? deaccent(form.surface) : form.surface) : form.surface
       }));
       const supplements = irregular.supplementaryParticiples.find((item) => item.lemma === entry.lemma);
       for (const form of forms) {
@@ -116,6 +122,11 @@ export class LanguageInflector {
       for (const variant of irregularSupplements.filter((item) => item.lemma === entry.lemma)) {
         this.add(variant.form, { lemma: entry.lemma, pos: entry.pos, features: variant.features, paradigm: paradigm.id, rule: `IRREGULAR:${paradigm.id}` });
       }
+    }
+    for (const entry of lemmas) {
+      if (this.lemmatize(entry.lemma).some((reading) => reading.lemma === entry.lemma && reading.pos === entry.pos)) continue;
+      this.add(entry.lemma, { lemma: entry.lemma, pos: entry.pos, features: '',
+        paradigm: entry.inflection?.paradigmId ?? 'INVARIANT', rule: 'SEED_LEMMA_FALLBACK' });
     }
   }
 

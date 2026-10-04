@@ -1,0 +1,52 @@
+{
+  "paradigms": [
+    {
+      "id": "ADJ_AU", "pos": "ADJECTIVE", "strip": "au",
+      "cells": [
+        { "feats": { "Gender": "Masc", "Number": "Sing" }, "suffix": "au" },
+        { "feats": { "Gender": "Fem", "Number": "Sing" }, "suffix": "á" },
+        { "feats": { "Gender": "Masc", "Number": "Plur" }, "suffix": "aus" },
+        { "feats": { "Gender": "Fem", "Number": "Plur" }, "suffix": "ás" }
+      ]
+    },
+    {
+      "id": "DET_MEU", "pos": "DETERMINER", "strip": "", "fullForm": true,
+      "cells": [
+        { "feats": { "Gender": "Masc", "Number": "Sing" }, "suffix": "meu" },
+        { "feats": { "Gender": "Fem", "Number": "Sing" }, "suffix": "minha" },
+        { "feats": { "Gender": "Masc", "Number": "Plur" }, "suffix": "meus" },
+        { "feats": { "Gender": "Fem", "Number": "Plur" }, "suffix": "minhas" }
+      ]
+    },
+    {
+      "id": "DET_EU_UA", "pos": "DETERMINER", "strip": "eu",
+      "cells": [
+        { "feats": { "Gender": "Masc", "Number": "Sing" }, "suffix": "eu" },
+        { "feats": { "Gender": "Fem", "Number": "Sing" }, "suffix": "ua" },
+        { "feats": { "Gender": "Masc", "Number": "Plur" }, "suffix": "eus" },
+        { "feats": { "Gender": "Fem", "Number": "Plur" }, "suffix": "uas" }
+      ]
+    },
+    {
+      "id": "DET_PLURAL_OS_AS", "pos": "DETERMINER", "strip": "os",
+      "cells": [
+        { "feats": { "Gender": "Masc", "Number": "Plur" }, "suffix": "os" },
+        { "feats": { "Gender": "Fem", "Number": "Plur" }, "suffix": "as" }
+      ]
+    },
+    {
+      "id": "NUM_DOIS", "pos": "NUMERAL", "strip": "", "fullForm": true,
+      "cells": [
+        { "feats": { "Gender": "Masc", "Number": "Plur" }, "suffix": "dois" },
+        { "feats": { "Gender": "Fem", "Number": "Plur" }, "suffix": "duas" }
+      ]
+    },
+    {
+      "id": "NUM_CENTENAS_OS_AS", "pos": "NUMERAL", "strip": "os",
+      "cells": [
+        { "feats": { "Gender": "Masc", "Number": "Plur" }, "suffix": "os" },
+        { "feats": { "Gender": "Fem", "Number": "Plur" }, "suffix": "as" }
+      ]
+    }
+  ]
+}

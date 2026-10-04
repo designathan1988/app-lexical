@@ -4845,7 +4845,7 @@
       "lemma": "perceber",
       "pos": "VERB",
       "inflection": {
-        "paradigmId": "V_CER"
+        "paradigmId": "V_ER"
       },
       "senses": [
         {
@@ -7833,7 +7833,7 @@
       "pos": "NOUN",
       "gender": "Masc",
       "inflection": {
-        "paradigmId": "N_AO_AOS"
+        "paradigmId": "N_S"
       },
       "senses": [
         {
@@ -15376,7 +15376,7 @@
       "lemma": "mau",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "ADJ_AU"
       },
       "senses": [
         {
@@ -16049,7 +16049,7 @@
       "lemma": "viva",
       "pos": "ADJECTIVE",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "ADJ_UNIFORM"
       },
       "senses": [
         {
@@ -18492,7 +18492,7 @@
       "lemma": "meu",
       "pos": "DETERMINER",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "DET_MEU"
       },
       "senses": [
         {
@@ -18508,7 +18508,7 @@
       "lemma": "teu",
       "pos": "DETERMINER",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "DET_EU_UA"
       },
       "senses": [
         {
@@ -18524,7 +18524,7 @@
       "lemma": "seu",
       "pos": "DETERMINER",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "DET_EU_UA"
       },
       "senses": [
         {
@@ -18755,7 +18755,7 @@
       "lemma": "vários",
       "pos": "DETERMINER",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "DET_PLURAL_OS_AS"
       },
       "senses": [
         {
@@ -19932,7 +19932,7 @@
       "lemma": "dois",
       "pos": "NUMERAL",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "NUM_DOIS"
       },
       "senses": [
         {
@@ -20300,7 +20300,7 @@
       "lemma": "duzentos",
       "pos": "NUMERAL",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "NUM_CENTENAS_OS_AS"
       },
       "senses": [
         {
@@ -20317,7 +20317,7 @@
       "lemma": "trezentos",
       "pos": "NUMERAL",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "NUM_CENTENAS_OS_AS"
       },
       "senses": [
         {
@@ -20333,7 +20333,7 @@
       "lemma": "quatrocentos",
       "pos": "NUMERAL",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "NUM_CENTENAS_OS_AS"
       },
       "senses": [
         {
@@ -20349,7 +20349,7 @@
       "lemma": "quinhentos",
       "pos": "NUMERAL",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "NUM_CENTENAS_OS_AS"
       },
       "senses": [
         {
@@ -20365,7 +20365,7 @@
       "lemma": "seiscentos",
       "pos": "NUMERAL",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "NUM_CENTENAS_OS_AS"
       },
       "senses": [
         {
@@ -20381,7 +20381,7 @@
       "lemma": "setecentos",
       "pos": "NUMERAL",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "NUM_CENTENAS_OS_AS"
       },
       "senses": [
         {
@@ -20397,7 +20397,7 @@
       "lemma": "oitocentos",
       "pos": "NUMERAL",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "NUM_CENTENAS_OS_AS"
       },
       "senses": [
         {
@@ -20413,7 +20413,7 @@
       "lemma": "novecentos",
       "pos": "NUMERAL",
       "inflection": {
-        "paradigmId": "ADJ_O"
+        "paradigmId": "NUM_CENTENAS_OS_AS"
       },
       "senses": [
         {
