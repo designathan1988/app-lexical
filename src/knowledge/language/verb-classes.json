@@ -1,0 +1,12 @@
+{
+  "classes": [
+    {
+      "id": "LEX_MOTION_VERBS",
+      "class": "MOTION",
+      "lemmas": ["ir"],
+      "source": "https://universaldependencies.org/pt/index.html; https://universaldependencies.org/u/dep/cop.html",
+      "note": "formas de movimento contrastam com a cópula em contextos direcionais e antes de infinitivo no passado",
+      "example": "Eles foram trabalhar cedo."
+    }
+  ]
+}

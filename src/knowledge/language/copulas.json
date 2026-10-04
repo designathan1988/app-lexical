@@ -1,4 +1,9 @@
 {
+  "id": "LEX_COPULA_AUX",
+  "class": "COPULA",
   "lemmas": ["ser", "estar"],
+  "upos": "AUX",
+  "source": "https://universaldependencies.org/pt/index.html; https://universaldependencies.org/u/dep/cop.html",
+  "example": "A casa foi muito bonita.",
   "note": "verbos copulares nas orações predicativas do português; a raiz UD é o predicativo"
 }

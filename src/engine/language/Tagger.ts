@@ -1,5 +1,6 @@
 import rulesData from '../../knowledge/language/pos-rules.json';
 import copulaData from '../../knowledge/language/copulas.json';
+import verbClassData from '../../knowledge/language/verb-classes.json';
 import { LexicalAnalyzer, type LexicalReading } from './LexicalAnalyzer';
 
 interface Constraint {
@@ -44,11 +45,14 @@ export interface TaggingResult {
 
 const rules = (rulesData as unknown as { rules: Rule[] }).rules;
 const fallbackRuleId = (rulesData as { fallbackRuleId?: string }).fallbackRuleId ?? 'CG_DEFAULT_ORDER';
-const copulas = new Set((copulaData as { lemmas: string[] }).lemmas);
+const lemmaClasses = new Map([
+  copulaData as { class: string; lemmas: string[] },
+  ...(verbClassData as { classes: Array<{ class: string; lemmas: string[] }> }).classes
+].map((entry) => [entry.class, new Set(entry.lemmas)]));
 
 function readingMatches(reading: LexicalReading, target: { upos: string; feats?: Record<string, string>; lemmaClass?: string }): boolean {
   return reading.upos === target.upos &&
-    (!target.lemmaClass || target.lemmaClass === 'COPULA' && copulas.has(reading.lemma)) &&
+    (!target.lemmaClass || Boolean(lemmaClasses.get(target.lemmaClass)?.has(reading.lemma))) &&
     Object.entries(target.feats ?? {}).every(([key, value]) => reading.feats[key] === value);
 }
 

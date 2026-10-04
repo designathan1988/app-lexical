@@ -2,6 +2,7 @@ import guessData from '../../knowledge/language/guess-rules.json';
 import contractionsData from '../../knowledge/language/contractions.json';
 import seedData from '../../knowledge/morphology/seed-roots.json';
 import supplementData from '../../knowledge/language/lexical-supplements.json';
+import copulaData from '../../knowledge/language/copulas.json';
 import { createDerivationalAnalyzer } from '../../knowledge/morphology';
 import type { Lexeme } from '../types';
 import type { TeachableRoot } from '../../knowledge/language/teachableRoot';
@@ -34,6 +35,7 @@ const seeds = [...(seedData as { entries: Array<{ lemma: string; gender?: string
 const genderByLemma = new Map(seeds.filter((entry) => entry.gender).map((entry) => [entry.lemma, entry.gender!]));
 const guessRules = (guessData as unknown as { rules: Array<{ id: string; suffix: string; upos: string; feats: Record<string, string> }> }).rules;
 const contractions = new Map((contractionsData as { entries: Array<{ form: string; parts: string[] }> }).entries.map((entry) => [entry.form, entry.parts] as const));
+const copulaClass = copulaData as { id: string; lemmas: string[]; upos: string };
 
 const uposByProjectPos: Record<string, string> = {
   ADJECTIVE: 'ADJ', ADVERB: 'ADV', CONJUNCTION: 'CCONJ', DETERMINER: 'DET',
@@ -103,6 +105,9 @@ export class LexicalAnalyzer {
         const gender = genderByLemma.get(entry.lemma);
         if (gender && !feats.Gender) feats.Gender = gender;
         readings.push({ lemma: entry.lemma, upos: posToUpos(entry.pos), feats, origin: 'INFLECTION', rule: entry.rule });
+        if (entry.pos === 'VERB' && copulaClass.lemmas.includes(entry.lemma)) {
+          readings.push({ lemma: entry.lemma, upos: copulaClass.upos, feats, origin: 'INFLECTION', rule: copulaClass.id });
+        }
       }
       if (!readings.length && /\p{L}/u.test(word.form)) {
         for (const entry of this.derivations.analyze(word.form)) {
