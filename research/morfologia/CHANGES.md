@@ -87,3 +87,7 @@ Registradas por transparência, porque mudaram o comportamento do analisador:
 - **`anti-` dobra o `s`** (`social → antissocial`) e **`des-` elide o `e-`**
   (`escrever → descrever`); **`in-`** trata `estável → instável` e
   `móvel → imóvel` como pares declarados (alternâncias reais, não regra geral).
+
+## GOLD-FIX: sentido de começar no extras-2
+
+- Em `extra2-1.7-03`, a anotação dizia `começar.COMEÇAR`, mas a moldura declarada em `frames.json` e o gabarito antigo `sent-018` usam `começar.INICIAR` para a construção `começar a + infinitivo`. A autorização explícita no prompt de correção final permite alinhar esse único nome de sentido. Os papéis `ARG0` e `ARG1`, a frase e as dependências não mudaram.
