@@ -3,6 +3,9 @@ import fixture from './fixtures/sentences-extra-2.json';
 import { SemanticEngine } from '../src/engine/SemanticEngine';
 import { createInitialKnowledgeBase } from '../src/knowledge/knowledgeBase';
 import { parseGraph } from '../src/eval/graphMatch';
+import { LanguageInflector } from '../src/engine/language/LanguageInflector';
+import { LexicalAnalyzer } from '../src/engine/language/LexicalAnalyzer';
+import seedRoots from '../src/knowledge/morphology/seed-roots.json';
 
 type Sentence = {
   id: string;
@@ -18,6 +21,7 @@ const copularSentences = sentences.filter((sentence) => sentence.id.startsWith('
 const movementSentences = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.2-')).slice(3);
 const subordinateCopulas = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.3-'));
 const enumerations = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.4-'));
+const adjectiveSentences = sentences.filter((sentence) => sentence.id.startsWith('extra2-1.5-'));
 
 describe('correções da verificação oculta — sintagmas nominais', () => {
   it.each(nominalPhrases)('$id: liga o PP ao nome e preserva a posse no grafo', (sentence) => {
@@ -71,6 +75,55 @@ describe('correções da verificação oculta — enumerações', () => {
     expect(actualCoordination[0].concept, sentence.id).toBe(expectedCoordination.concept);
     expect(analysis.meaningGraph.edges.filter((edge) => edge.from === actualCoordination[0].id && edge.role.startsWith('op')), sentence.id)
       .toHaveLength(expectedGraph.edges.filter((edge) => edge.from === expectedCoordination.id && edge.role.startsWith('op')).length);
+  });
+});
+
+describe('correções da verificação oculta — paradigmas adjetivais', () => {
+  const inflector = new LanguageInflector();
+  const lexical = new LexicalAnalyzer();
+  const pluralCases: Array<[string, string, string]> = [
+    ['bom', 'bons', 'Gender=Masc|Number=Plur'], ['mau', 'maus', 'Gender=Masc|Number=Plur'],
+    ['leal', 'leais', 'Number=Plur'], ['legal', 'legais', 'Number=Plur'],
+    ['moral', 'morais', 'Number=Plur'], ['normal', 'normais', 'Number=Plur'],
+    ['real', 'reais', 'Number=Plur'], ['social', 'sociais', 'Number=Plur'],
+    ['especial', 'especiais', 'Number=Plur'], ['gentil', 'gentis', 'Number=Plur'],
+    ['igual', 'iguais', 'Number=Plur'], ['cruel', 'cruéis', 'Number=Plur'],
+    ['popular', 'populares', 'Number=Plur'], ['melhor', 'melhores', 'Number=Plur'],
+    ['pior', 'piores', 'Number=Plur'], ['jovem', 'jovens', 'Number=Plur'],
+    ['comum', 'comuns', 'Number=Plur'], ['ruim', 'ruins', 'Number=Plur'],
+    ['capaz', 'capazes', 'Number=Plur'], ['feliz', 'felizes', 'Number=Plur'],
+    ['veloz', 'velozes', 'Number=Plur'], ['simples', 'simples', 'Number=Plur']
+  ];
+
+  it.each(pluralCases)('gera %s → %s e recupera o lema', (lemma, form, features) => {
+    const root = (seedRoots as { entries: Array<{ lemma: string; pos: string; inflection?: { paradigmId: string } }> }).entries
+      .find((entry) => entry.lemma === lemma && entry.pos === 'ADJECTIVE')!;
+    expect(inflector.inflect(lemma, root.inflection!.paradigmId, features), lemma).toContain(form);
+    expect(inflector.lemmatize(form), form).toContainEqual(expect.objectContaining({ lemma, features }));
+  });
+
+  it('gera as quatro formas de bom e mau a partir dos respectivos paradigmas', () => {
+    expect(inflector.inflect('bom', 'ADJ_BOM', 'Gender=Masc|Number=Sing')).toContain('bom');
+    expect(inflector.inflect('bom', 'ADJ_BOM', 'Gender=Fem|Number=Sing')).toContain('boa');
+    expect(inflector.inflect('bom', 'ADJ_BOM', 'Gender=Masc|Number=Plur')).toContain('bons');
+    expect(inflector.inflect('bom', 'ADJ_BOM', 'Gender=Fem|Number=Plur')).toContain('boas');
+    expect(inflector.inflect('mau', 'ADJ_AU', 'Gender=Masc|Number=Sing')).toContain('mau');
+    expect(inflector.inflect('mau', 'ADJ_AU', 'Gender=Fem|Number=Sing')).toContain('má');
+    expect(inflector.inflect('mau', 'ADJ_AU', 'Gender=Masc|Number=Plur')).toContain('maus');
+    expect(inflector.inflect('mau', 'ADJ_AU', 'Gender=Fem|Number=Plur')).toContain('más');
+  });
+
+  it.each(adjectiveSentences)('$id: mantém lema, traços e conceito no predicativo', (sentence) => {
+    const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence(sentence.text);
+    const adjective = (sentence as Sentence & { tokens: Array<{ form: string; lemma: string; pos: string; feats?: string }> }).tokens
+      .find((token) => token.pos === 'ADJECTIVE')!;
+    const index = sentence.tokens.findIndex((token) => token.form === adjective.form);
+    expect(analysis.words[index].selected.lemma, sentence.id).toBe(adjective.lemma);
+    const expectedFeatures = Object.entries(Object.fromEntries(adjective.feats!.split('|').map((feature) => feature.split('='))));
+    expect(lexical.analyzeSurface(adjective.form).some((reading) => reading.lemma === adjective.lemma &&
+      expectedFeatures.every(([key, value]) => reading.feats[key] === value)), sentence.id).toBe(true);
+    expect(analysis.meaningGraph.nodes.find((node) => node.id === analysis.meaningGraph.root)?.concept, sentence.id)
+      .toBe(adjective.lemma);
   });
 });
 
