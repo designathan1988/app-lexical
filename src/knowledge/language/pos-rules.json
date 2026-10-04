@@ -15,8 +15,10 @@
     {"id":"CG_NOUN_AFTER_ADP","action":"SELECT","target":{"upos":"NOUN"},"context":[{"offset":-1,"upos":["ADP"]}],"note":"núcleo nominal depois de preposição","example":"de ajuda"},
     {"id":"CG_NOUN_OBJECT_FINAL","action":"SELECT","target":{"upos":"NOUN"},"context":[{"offset":-1,"upos":["VERB","ADV"]},{"offset":1,"upos":["PUNCT"]}],"note":"nome no fim da oração após verbo ou advérbio","example":"ensina português"},
     {"id":"CG_ADV_AFTER_VERB","action":"SELECT","target":{"upos":"ADV"},"context":[{"offset":-1,"upos":["VERB","AUX"]}],"note":"advérbio após verbo finito","example":"anda devagar"},
+    {"id":"CG_COP_PREDICATIVE","action":"SELECT","target":{"upos":"AUX","lemmaClass":"COPULA"},"context":[{"offset":1,"upos":["ADJ","NOUN"]}],"note":"cópula diante de predicativo não verbal","example":"a casa é grande"},
+    {"id":"CG_COP_NOMINAL","action":"SELECT","target":{"upos":"AUX","lemmaClass":"COPULA"},"context":[{"offset":1,"upos":["DET"]},{"offset":2,"upos":["NOUN"]}],"note":"cópula diante de predicativo nominal com determinante","example":"ele é um professor"},
+    {"id":"CG_AUX_INFINITIVE","action":"SELECT","target":{"upos":"AUX"},"context":[{"offset":1,"upos":["VERB"],"feats":{"VerbForm":"Inf"}}],"note":"auxiliar diante de infinitivo","example":"vamos estudar"},
     {"id":"CG_VERB_AFTER_SUBJECT","action":"SELECT","target":{"upos":"VERB"},"context":[{"offset":-1,"upos":["PRON","NOUN","PROPN"]}],"note":"verbo finito depois de sujeito","example":"ela ajuda"},
-    {"id":"CG_VERB_BEFORE_OBJECT","action":"SELECT","target":{"upos":"VERB"},"context":[{"offset":1,"upos":["DET","NOUN","PRON"]}],"note":"verbo antes de complemento nominal","example":"ajuda crianças"},
-    {"id":"CG_AUX_INFINITIVE","action":"SELECT","target":{"upos":"AUX"},"context":[{"offset":1,"upos":["VERB"],"feats":{"VerbForm":"Inf"}}],"note":"auxiliar diante de infinitivo","example":"vamos estudar"}
+    {"id":"CG_VERB_BEFORE_OBJECT","action":"SELECT","target":{"upos":"VERB"},"context":[{"offset":1,"upos":["DET","NOUN","PRON"]}],"note":"verbo antes de complemento nominal","example":"ajuda crianças"}
   ]
 }

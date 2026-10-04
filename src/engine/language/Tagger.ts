@@ -1,4 +1,5 @@
 import rulesData from '../../knowledge/language/pos-rules.json';
+import copulaData from '../../knowledge/language/copulas.json';
 import { LexicalAnalyzer, type LexicalReading } from './LexicalAnalyzer';
 
 interface Constraint {
@@ -17,7 +18,7 @@ interface Rule {
   id: string;
   action: 'SELECT' | 'REMOVE';
   form?: string;
-  target: { upos: string; feats?: Record<string, string> };
+  target: { upos: string; feats?: Record<string, string>; lemmaClass?: string };
   context: Constraint[];
   note: string;
   example: string;
@@ -41,9 +42,12 @@ export interface TaggingResult {
 }
 
 const rules = (rulesData as unknown as { rules: Rule[] }).rules;
+const copulas = new Set((copulaData as { lemmas: string[] }).lemmas);
 
-function readingMatches(reading: LexicalReading, target: { upos: string; feats?: Record<string, string> }): boolean {
-  return reading.upos === target.upos && Object.entries(target.feats ?? {}).every(([key, value]) => reading.feats[key] === value);
+function readingMatches(reading: LexicalReading, target: { upos: string; feats?: Record<string, string>; lemmaClass?: string }): boolean {
+  return reading.upos === target.upos &&
+    (!target.lemmaClass || target.lemmaClass === 'COPULA' && copulas.has(reading.lemma)) &&
+    Object.entries(target.feats ?? {}).every(([key, value]) => reading.feats[key] === value);
 }
 
 function contextMatches(words: TaggedWord[], index: number, condition: Constraint): boolean {

@@ -63,6 +63,13 @@ describe('dependências UD e estrutura da oração', () => {
     }
   });
 
+  it('usa concordância para escolher sujeito em objeto anteposto', () => {
+    const sentence = 'Eu, a casa comprei.';
+    const analysis = new SemanticEngine(createInitialKnowledgeBase()).analyzeSentence(sentence);
+    expect(analysis.clause.subject).toEqual([1]);
+    expect(analysis.dependencies[3].deprel).toBe('obj');
+  });
+
   it('atinge UAS, LAS, sujeito e predicado no gabarito', () => {
     const m = measure((gold as { sentences: Sentence[] }).sentences);
     expect(m.uas).toBeGreaterThanOrEqual(0.90);

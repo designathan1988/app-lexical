@@ -33,6 +33,11 @@ function measure(tagger: LanguageTagger, sentences: Sentence[]) {
 describe('desambiguação de classe por regras', () => {
   const tagger = new LanguageTagger();
 
+  it('seleciona AUX para cópula e auxiliar diante de infinitivo', () => {
+    expect(tagger.tagForms(['A', 'casa', 'é', 'grande', '.']).words[2].selected.upos).toBe('AUX');
+    expect(tagger.tagForms(['Nós', 'vamos', 'viajar', '.']).words[1].selected.upos).toBe('AUX');
+  });
+
   it('atinge 97% de UPOS nas 80 frases do projeto', () => {
     const result = measure(tagger, goldSentences);
     console.info('UPOS gabarito', result.hits, '/', result.total, 'falhas:', result.failures.join(', '));

@@ -5,6 +5,7 @@ export type SentenceView = 'classes' | 'syntax' | 'meaning';
 
 const modeLabel = { declarative: 'declarativa', interrogative: 'interrogativa', imperative: 'imperativa' };
 const polarityLabel = { positive: 'positiva', negative: 'negativa' };
+const diagnosticLabel: Record<string, string> = { AMBIGUOUS_SENSE: 'Sentido ambíguo', UNCERTAIN_FRAME: 'Moldura genérica, análise incerta' };
 
 interface Props {
   analysis: SentenceAnalysis;
@@ -139,7 +140,7 @@ export function SentenceAnalysisViews({ analysis, view }: Props) {
       <MeaningDiagram analysis={analysis} />
       <h4>PENMAN</h4><pre className="code-block">{analysis.meaningGraph.penman}</pre>
       <h4>Trace semântico</h4><pre className="code-block">{analysis.meaningGraph.trace.map((event) => `${event.token ?? '—'} · ${event.rule}: ${event.detail}`).join('\n')}</pre>
-      {analysis.meaningGraph.diagnostics.map((diagnostic, index) => <p key={index} className="note">{diagnostic.code}: {diagnostic.alternatives.join(', ')}</p>)}
+      {analysis.meaningGraph.diagnostics.map((diagnostic, index) => <p key={index} className="note">{diagnosticLabel[diagnostic.code] ?? diagnostic.code}: {diagnostic.alternatives.join(', ')}</p>)}
     </div>
   );
 }

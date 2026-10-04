@@ -142,7 +142,8 @@ export class DependencyParser {
         arcs[candidate].head === clause + 1 && arcs[candidate].deprel === 'mark' ||
         arcs[clause].deprel === 'acl:relcl' && feat(candidate, 'PronType') === 'Rel'
       );
-      const start = clause === root && comma >= 0 && root > comma ? comma + 1 : clause === root ? 0 : markerForClause >= 0 ? markerForClause + 1 : 0;
+      const initialSubordinate = comma > 0 && (pos(0) === 'SCONJ' || pos(0) === 'ADV');
+      const start = clause === root && initialSubordinate && root > comma ? comma + 1 : clause === root ? 0 : markerForClause >= 0 ? markerForClause + 1 : 0;
       const end = clause === root && comma < 0 ? words.length : clause === root ? words.length : Math.min(words.length, nearestRight(clause, (candidate) => pos(candidate) === 'PUNCT') + 1 || words.length);
       const before = [] as number[];
       for (let i = start; i < head; i++) {
@@ -150,8 +151,17 @@ export class DependencyParser {
         if (nearestLeft(i, (candidate) => pos(candidate) === 'ADP' && arcs[candidate].head === i + 1) >= 0) continue;
         before.push(i);
       }
+      const agreementHead = isFinite(head) ? head : copula ?? head;
+      const finiteFeats = words[agreementHead]?.selected.feats ?? {};
+      const agreement = (candidate: number): number => {
+        const candidateFeats = words[candidate].selected.feats;
+        const person = candidateFeats.Person ?? (nominals.has(pos(candidate)) ? '3' : undefined);
+        const number = candidateFeats.Number;
+        return (finiteFeats.Person && person ? (finiteFeats.Person === person ? 2 : -2) : 0) +
+          (finiteFeats.Number && number ? (finiteFeats.Number === number ? 1 : -1) : 0);
+      };
       const question = words.some((word) => word.form === '?');
-      const subject = before.length ? before[before.length - 1]
+      const subject = before.length ? [...before].sort((a, b) => agreement(b) - agreement(a) || b - a)[0]
         : question && clause === root ? nearestRight(head, (candidate) => candidate < end && nominals.has(pos(candidate)) && !assigned(candidate))
           : -1;
       if (subject !== undefined && subject >= 0 && subject < end && subject !== root) set(subject, head, 'nsubj', 'UD_NSUBJ_AGREEMENT');

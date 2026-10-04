@@ -138,6 +138,7 @@ export class MeaningGraphBuilder {
         return { frame, score, order: seedOrder.indexOf(frame.id) >= 0 ? seedOrder.indexOf(frame.id) : order + seedOrder.length };
       }).sort((a, b) => b.score - a.score || a.order - b.order);
       if (scored.length > 1 && scored[0].score === scored[1].score) diagnostics.push({ code: 'AMBIGUOUS_SENSE', alternatives: scored.filter((item) => item.score === scored[0].score).map((item) => item.frame.id) });
+      if (scored[0].frame.defaultTemplate) diagnostics.push({ code: 'UNCERTAIN_FRAME', alternatives: [scored[0].frame.id] });
       trace.push({ rule: 'SENSE_FRAME_PREF', token: index + 1, detail: `${scored[0].frame.id} (${scored[0].score})` });
       return scored[0].frame;
     };
