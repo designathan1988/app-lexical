@@ -4,6 +4,7 @@ import { closedClassReadings } from '../src/engine/language/ClosedClassLexicon';
 import { SemanticEngine } from '../src/engine/SemanticEngine';
 import { createInitialKnowledgeBase } from '../src/knowledge/knowledgeBase';
 import seedRoots from '../src/knowledge/morphology/seed-roots.json';
+import contractions from '../src/knowledge/language/contractions.json';
 
 const forms: Array<[string, string, string]> = [
   ['eu', 'eu', 'PRON'], ['tu', 'tu', 'PRON'], ['ele', 'ele', 'PRON'],
@@ -25,6 +26,21 @@ const forms: Array<[string, string, string]> = [
 ];
 
 describe('classes fechadas e tokenização', () => {
+  it('cobre as classes fechadas de palavra única já presentes nas raízes', () => {
+    const classes: Record<string, string[]> = {
+      ADVERB: ['ADV'], PRONOUN: ['PRON'], DETERMINER: ['DET'],
+      PREPOSITION: ['ADP'], CONJUNCTION: ['CCONJ', 'SCONJ']
+    };
+    const contractionsSet = new Set((contractions as { entries: Array<{ form: string }> }).entries.map((entry) => entry.form));
+    const entries = (seedRoots as { entries: Array<{ lemma: string; pos: string }> }).entries
+      .filter((entry) => classes[entry.pos] && !entry.lemma.includes(' ') && !contractionsSet.has(entry.lemma));
+    const missing = entries.filter((entry) => !closedClassReadings(entry.lemma)
+      .some((reading) => classes[entry.pos].includes(reading.upos)));
+    console.info('Raízes de classe fechada', entries.length - missing.length, '/', entries.length,
+      'ausentes:', missing.map((entry) => `${entry.lemma}/${entry.pos}`).join(', '));
+    expect(missing.map((entry) => `${entry.lemma}/${entry.pos}`)).toEqual([]);
+  });
+
   it('cobre no léxico fechado os numerais por extenso das raízes do projeto', () => {
     const numerals = (seedRoots as { entries: Array<{ id: string; lemma: string; pos: string }> }).entries
       .filter((entry) => entry.pos === 'NUMERAL');
