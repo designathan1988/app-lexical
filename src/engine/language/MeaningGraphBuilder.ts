@@ -6,6 +6,7 @@ import adjunctData from '../../knowledge/language/adjunct-roles.json';
 import pronounData from '../../knowledge/language/implicit-pronouns.json';
 import pragmaticsData from '../../knowledge/language/pragmatics.json';
 import coercionData from '../../knowledge/language/semantic-coercions.json';
+import nominalPpData from '../../knowledge/language/nominal-pp-rules.json';
 import type { DependencyArc } from './DependencyParser';
 import type { ClauseAnalysis } from './ClauseAnalyzer';
 import type { TaggedWord } from './Tagger';
@@ -47,6 +48,7 @@ const adjuncts = adjunctData as {
 const pronouns = pronounData as { entries: Array<{ person: string; number: string; form: string }>; imperativeSubject: string; unknownConcept: string };
 const pragmaticExpressions = (pragmaticsData as { expressions: Array<{ id: string; form: string; attribute: { role: string; value: string } }> }).expressions;
 const coercions = (coercionData as { rules: Array<{ id: string; from: string; to: string; contextRole: string }> }).rules;
+const nominalPpRules = (nominalPpData as { rules: Array<{ id: string; semanticRole: string }> }).rules;
 
 function isSubtype(actual: string | undefined, expected: string): boolean {
   for (let cursor = actual; cursor; cursor = typeParents.get(cursor) ?? undefined) if (cursor === expected) return true;
@@ -222,7 +224,7 @@ export class MeaningGraphBuilder {
     let root = content(Math.max(rootIndex, 0));
     for (let index = 0; index < words.length; index++) {
       const relation = arcs[index].deprel;
-      if (!['root', 'nsubj', 'obj', 'obl', 'xcomp', 'ccomp', 'advcl', 'acl:relcl', 'conj'].includes(relation)) continue;
+      if (!['root', 'nsubj', 'obj', 'obl', 'nmod', 'xcomp', 'ccomp', 'advcl', 'acl:relcl', 'conj'].includes(relation)) continue;
       if (relation === 'root') continue;
       const headIndex = arcs[index].head - 1;
       if (headIndex < 0) continue;
@@ -241,6 +243,9 @@ export class MeaningGraphBuilder {
       } else if (relation === 'obl') {
         const assignment = roleForOblique(headIndex, index);
         edge(head, assignment.role, content(index), assignment.rule);
+      } else if (relation === 'nmod') {
+        const rule = nominalPpRules.find((entry) => entry.id === arcs[index].rule);
+        edge(head, rule?.semanticRole ?? 'mod', content(index), arcs[index].rule);
       } else if (relation === 'xcomp' || relation === 'ccomp') {
         const child = content(index);
         const frame = selectedFrames.get(headIndex);

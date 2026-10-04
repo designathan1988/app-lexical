@@ -6,6 +6,7 @@ import supplementData from '../../knowledge/language/lexical-supplements.json';
 import frameData from '../../knowledge/morphology/frames.json';
 import semanticTypes from '../../knowledge/morphology/semantic-types.json';
 import obliqueCasesData from '../../knowledge/language/frame-oblique-cases.json';
+import nominalPpData from '../../knowledge/language/nominal-pp-rules.json';
 import type { TeachableRoot } from '../../knowledge/language/teachableRoot';
 import type { TaggedWord } from './Tagger';
 
@@ -28,6 +29,9 @@ const frames = (frameData as unknown as { frames: SyntaxFrame[] }).frames;
 const typeParents = new Map((semanticTypes as { types: Array<{ id: string; isA: string | null }> }).types
   .map((entry) => [entry.id, entry.isA]));
 const obliqueCases = (obliqueCasesData as { entries: Array<{ frame: string; role: string; preposition: string }> }).entries;
+const nominalPpRules = (nominalPpData as { rules: Array<{
+  id: string; prepositions: string[]; scope: string; barrierUpos: string[]; relation: string
+}> }).rules;
 const isSubtype = (actual: string | undefined, expected: string): boolean => {
   for (let current = actual; current; current = typeParents.get(current) ?? undefined) if (current === expected) return true;
   return false;
@@ -227,8 +231,19 @@ export class DependencyParser {
       if (!nominals.has(pos(i)) || assigned(i) || i === root) continue;
       const caseMarker = nearestLeft(i, (candidate) => pos(candidate) === 'ADP' && arcs[candidate].head === i + 1);
       if (caseMarker >= 0) {
-        const head = governor(caseMarker);
-        set(i, head, 'obl', obliqueRule(head, i, caseMarker));
+        const nominalHead = nearestLeft(caseMarker, (candidate) => pos(candidate) === 'NOUN' || pos(candidate) === 'PROPN');
+        const preposition = words[caseMarker].selected.lemma;
+        const nominalRule = nominalPpRules.find((rule) =>
+          nominalHead >= 0 && rule.prepositions.includes(preposition) &&
+          !words.slice(nominalHead + 1, caseMarker).some((word) => rule.barrierUpos.includes(word.selected.upos)) &&
+          (rule.scope === 'adjacent-nominal' || rule.scope === 'before-finite-verb' &&
+            nearestLeft(caseMarker, isFinite) < 0 && nearestRight(caseMarker, isFinite) >= 0)
+        );
+        if (nominalRule) set(i, nominalHead, nominalRule.relation, nominalRule.id);
+        else {
+          const head = governor(caseMarker);
+          set(i, head, 'obl', obliqueRule(head, i, caseMarker));
+        }
       }
       else {
         const followingXcomp = words[i].selected.feats.Clitic === 'Yes' && arcs[i + 1]?.deprel === 'xcomp' ? i + 1 : -1;

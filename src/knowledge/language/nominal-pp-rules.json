@@ -1,0 +1,26 @@
+{
+  "rules": [
+    {
+      "id": "UD_NMOD_GENITIVE",
+      "prepositions": ["de"],
+      "scope": "adjacent-nominal",
+      "barrierUpos": ["VERB", "AUX", "PUNCT", "CCONJ", "SCONJ"],
+      "relation": "nmod",
+      "semanticRole": "poss",
+      "source": "https://universaldependencies.org/u/dep/nmod.html; https://github.com/amrisi/amr-guidelines/blob/master/amr.md#possession",
+      "note": "O genitivo preposicionado modifica o nome adjacente; a preposição é case do dependente.",
+      "example": "O médico do hospital chegou."
+    },
+    {
+      "id": "UD_NMOD_PREVERBAL_PP",
+      "prepositions": ["em", "por"],
+      "scope": "before-finite-verb",
+      "barrierUpos": ["VERB", "AUX", "PUNCT", "CCONJ", "SCONJ"],
+      "relation": "nmod",
+      "semanticRole": "mod",
+      "source": "https://universaldependencies.org/u/dep/nmod.html",
+      "note": "Um PP adjacente dentro do sintagma nominal antes do predicado modifica o nome, sem virar adjunto do verbo.",
+      "example": "O pássaro no jardim canta."
+    }
+  ]
+}
