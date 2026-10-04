@@ -100,7 +100,7 @@ export class DependencyParser {
       const left = nearestLeft(index, (candidate) => verbal.has(pos(candidate)) && arcs[candidate].deprel !== 'cop');
       return left >= 0 ? left : root;
     };
-    const obliqueRule = (head: number, target: number, marker: number): string => {
+    const obliqueRule = (head: number, target: number, marker: number): { rule: string; frameId?: string; argument: boolean } => {
       const lemma = words[head]?.selected.lemma;
       const type = this.languageRoots.find((entry) => entry.lemma === words[target].selected.lemma)?.sense.semanticType
         ?? typeByLemma.get(words[target].selected.lemma);
@@ -116,11 +116,12 @@ export class DependencyParser {
             if (cases.length && !cases.some((entry) => entry.preposition === preposition)) continue;
             const prefers = frame.roles?.[role]?.prefers ?? [];
             if (prefers.length && !prefers.some((expected) => isSubtype(type, expected))) continue;
-            return frame.defaultTemplate ? 'UD_OBL_FRAME_UNCERTAIN' : 'UD_OBL_FRAME_ARGUMENT';
+            return { rule: frame.defaultTemplate ? 'UD_OBL_FRAME_UNCERTAIN' : 'UD_OBL_FRAME_ARGUMENT',
+              frameId: frame.id, argument: !frame.defaultTemplate };
           }
         }
       }
-      return 'UD_OBL_ADJUNCT';
+      return { rule: 'UD_OBL_ADJUNCT', argument: false };
     };
 
     for (let i = 0; i < words.length; i++) {
@@ -294,7 +295,13 @@ export class DependencyParser {
         if (nominalRule) set(i, nominalHead, nominalRule.relation, nominalRule.id);
         else {
           const head = governor(caseMarker);
-          set(i, head, 'obl', obliqueRule(head, i, caseMarker));
+          const nearestChoice = obliqueRule(head, i, caseMarker);
+          const matrix = arcs[head]?.deprel === 'xcomp' ? arcs[head].head - 1 : -1;
+          const matrixChoice = matrix >= 0 ? obliqueRule(matrix, i, caseMarker) : undefined;
+          const matrixArgument = matrixChoice?.argument && !nearestChoice.argument;
+          const selectedHead = matrixArgument ? matrix : head;
+          const selectedRule = matrixArgument ? `${matrixChoice.rule}:${matrixChoice.frameId}` : nearestChoice.rule;
+          set(i, selectedHead, 'obl', selectedRule);
         }
       }
       else {
