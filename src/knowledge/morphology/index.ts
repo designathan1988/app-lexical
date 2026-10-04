@@ -3,6 +3,7 @@ import seedRoots from './seed-roots.json';
 import semanticFunctions from './semantic-functions.json';
 import stemRules from './stem-rules.json';
 import type { Lexeme, LexemeId } from '../../engine/types';
+import type { TeachableRoot } from '../language/teachableRoot';
 import {
   DerivationalAnalyzer,
   type AffixRule,
@@ -23,7 +24,7 @@ interface SeedEntry {
  * Dados da rede gerativa (pesquisa em research/morfologia, integrados aqui):
  * regras de formação + regras de radical + léxico-semente + lemas do domínio.
  */
-export function buildMorphologyData(domainLexemes: Record<LexemeId, Lexeme> = {}): MorphologyData {
+export function buildMorphologyData(domainLexemes: Record<LexemeId, Lexeme> = {}, languageRoots: TeachableRoot[] = []): MorphologyData {
   const seeds = (seedRoots as { entries: SeedEntry[] }).entries;
   const lexicon: LexiconEntry[] = seeds.map((e) => ({
     id: e.id,
@@ -33,6 +34,9 @@ export function buildMorphologyData(domainLexemes: Record<LexemeId, Lexeme> = {}
   }));
   for (const lexeme of Object.values(domainLexemes)) {
     lexicon.push({ id: lexeme.id, lemma: lexeme.lemma, pos: lexeme.pos, domain: true });
+  }
+  for (const root of languageRoots) {
+    lexicon.push({ id: root.id, lemma: root.lemma, pos: root.pos, gloss: root.sense.gloss });
   }
   const attested = seeds.flatMap((e) => [
     ...(e.attestedDerivations ?? []).map((d) => d.word),
@@ -57,6 +61,6 @@ export function buildMorphologyData(domainLexemes: Record<LexemeId, Lexeme> = {}
   };
 }
 
-export function createDerivationalAnalyzer(domainLexemes?: Record<LexemeId, Lexeme>): DerivationalAnalyzer {
-  return new DerivationalAnalyzer(buildMorphologyData(domainLexemes));
+export function createDerivationalAnalyzer(domainLexemes?: Record<LexemeId, Lexeme>, languageRoots?: TeachableRoot[]): DerivationalAnalyzer {
+  return new DerivationalAnalyzer(buildMorphologyData(domainLexemes, languageRoots));
 }

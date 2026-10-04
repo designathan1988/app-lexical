@@ -7,6 +7,7 @@ import pronounData from '../../knowledge/language/implicit-pronouns.json';
 import type { DependencyArc } from './DependencyParser';
 import type { ClauseAnalysis } from './ClauseAnalyzer';
 import type { TaggedWord } from './Tagger';
+import type { TeachableRoot } from '../../knowledge/language/teachableRoot';
 
 export interface MeaningNode { id: string; concept: string; token?: number }
 export interface MeaningEdge { from: string; role: string; to: string; rule: string }
@@ -78,6 +79,8 @@ function serialize(root: string, nodes: MeaningNode[], edges: MeaningEdge[], att
 }
 
 export class MeaningGraphBuilder {
+  constructor(private languageRoots: TeachableRoot[] = []) {}
+
   build(words: TaggedWord[], arcs: DependencyArc[], clause: ClauseAnalysis): MeaningGraph {
     const nodes: MeaningNode[] = [];
     const edges: MeaningEdge[] = [];
@@ -102,11 +105,13 @@ export class MeaningGraphBuilder {
       if (!attributes.some((item) => item.from === from && item.role === role && item.value === value)) attributes.push({ from, role, value, rule });
       trace.push({ rule, detail: `${from}:${role}:${value}` });
     };
-    const typeOf = (index: number): string => semanticType(words[index].selected.lemma, words[index].selected.upos);
+    const typeOf = (index: number): string => this.languageRoots.find((root) => root.lemma === words[index].selected.lemma)?.sense.semanticType
+      ?? semanticType(words[index].selected.lemma, words[index].selected.upos);
     const childIndices = (head: number, relation?: string) => arcs.filter((arc) => arc.head === head + 1 && (!relation || arc.deprel === relation)).map((arc) => arc.id - 1);
     const chooseFrame = (index: number): Frame | undefined => {
       const lemma = words[index].selected.lemma;
-      const candidates = frames.filter((frame) => frame.id.startsWith(`${lemma}.`));
+      const candidates = [...frames, ...this.languageRoots.map((root) => root.frame).filter((frame): frame is NonNullable<typeof frame> => Boolean(frame))]
+        .filter((frame) => frame.id.startsWith(`${lemma}.`));
       if (!candidates.length) return undefined;
       const seedOrder = seeds.find((entry) => entry.lemma === lemma && entry.pos === 'VERB')?.senses?.map((sense) => sense.id) ?? [];
       const scored = candidates.map((frame, order) => {
@@ -146,7 +151,8 @@ export class MeaningGraphBuilder {
       if (reading.upos === 'VERB' || reading.upos === 'AUX') {
         const frame = chooseFrame(index);
         selectedFrames.set(index, frame);
-        concept = frame?.id ?? supplements.find((entry) => entry.lemma === reading.lemma)?.sense
+        concept = frame?.id ?? this.languageRoots.find((root) => root.lemma === reading.lemma)?.sense.id
+          ?? supplements.find((entry) => entry.lemma === reading.lemma)?.sense
           ?? seeds.find((entry) => entry.lemma === reading.lemma && entry.pos === 'VERB')?.senses?.[0]?.id ?? reading.lemma;
       }
       return node(concept, index + 1);

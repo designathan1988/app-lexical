@@ -12,6 +12,7 @@ import { PARADIGMS, generateForms, generateDiminutives } from './paradigms';
 import { featureKey, featuresToMorphology } from './features';
 import type { Paradigm, OrthographyRule } from './paradigms';
 import type { DisambiguationRule } from '../engine/syntax/Disambiguator';
+import type { TeachableRoot } from './language/teachableRoot';
 
 /** Override persistido de um paradigma (F2.5): substitui células/regras. */
 export interface ParadigmOverride {
@@ -50,6 +51,7 @@ export function effectiveParadigm(
  * dados — o parser consulta conceitos e classes gramaticais, nunca palavras.
  */
 export interface KnowledgeBase {
+  languageRoots: TeachableRoot[];
   surfaceForms: SurfaceForm[];
   lexemes: Record<LexemeId, Lexeme>;
   concepts: Record<ConceptId, ConceptNode>;
@@ -783,6 +785,7 @@ export const INITIAL_DISAMBIGUATION_RULES: DisambiguationRule[] = [
 
 export function createInitialKnowledgeBase(): KnowledgeBase {
   return {
+    languageRoots: [],
     // Formas geradas do paradigma precedem as manuais (exceções e
     // sinônimos) na ordem de candidatos: "texto" tem a leitura de entidade
     // (LEX_TEXTO) antes da de propriedade (LEX_CONTEUDO, sinônimo manual).
@@ -803,6 +806,7 @@ export function createInitialKnowledgeBase(): KnowledgeBase {
 
 export function cloneKnowledgeBase(kb: KnowledgeBase): KnowledgeBase {
   const clone: KnowledgeBase = {
+    languageRoots: structuredClone(kb.languageRoots ?? []),
     surfaceForms: kb.surfaceForms.map((s) => ({ ...s })),
     lexemes: Object.fromEntries(Object.entries(kb.lexemes).map(([id, l]) => [id, { ...l }])),
     concepts: structuredClone(kb.concepts),

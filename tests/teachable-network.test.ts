@@ -3,6 +3,10 @@ import { KnowledgeBaseStore } from '../src/knowledge/KnowledgeBaseStore';
 import { SemanticEngine } from '../src/engine/SemanticEngine';
 import { KB_DATA_VERSION } from '../src/knowledge/migrateKnowledgeBase';
 import { createInitialKnowledgeBase } from '../src/knowledge/knowledgeBase';
+import { buildNetworkView } from '../src/engine/language/NetworkView';
+import { TeachableNetworkSection } from '../src/ui/components/admin/TeachableNetworkSection';
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 
 const taught = {
   lemma: 'surfar', pos: 'VERB' as const,
@@ -52,5 +56,45 @@ describe('rede ensinável', () => {
     const old = new KnowledgeBaseStore(undefined, { persist: false });
     old.importJSON(JSON.stringify({ dataVersion: 2, knowledgeBase: createInitialKnowledgeBase() }));
     expect(old.kb.languageRoots).toEqual([]);
+  });
+
+  it('mostra formas, derivados, sentido, moldura e tipo na vista de rede', () => {
+    const store = new KnowledgeBaseStore(undefined, { persist: false });
+    const root = store.teachRoot(taught);
+    const network = buildNetworkView(root, store.kb);
+    expect(network.forms.some((form) => form.surface === 'surfamos')).toBe(true);
+    expect(network.derivatives.some((derivative) => derivative.form === 'surfista' && derivative.status === 'HYPOTHESIS')).toBe(true);
+    expect(network.sense).toBe('surfar.SURFAR');
+    expect(network.frame).toBe('surfar.SURFAR');
+    expect(network.semanticType).toBe('ACAO');
+    const html = renderToStaticMarkup(React.createElement(TeachableNetworkSection, {
+      engine: new SemanticEngine(store.kb), store, onChange: () => undefined
+    }));
+    expect(html).toContain('Ensinar palavra');
+    expect(html).toContain('Rede');
+  });
+
+  it('restaura raiz ensinada quando snapshots completos excedem a cota local', () => {
+    const initial = new KnowledgeBaseStore(undefined, { persist: false }).exportJSON();
+    const saved = new Map<string, string>([['lexical.knowledgeBase.v2', initial]]);
+    const storage = {
+      getItem: (key: string) => saved.get(key) ?? null,
+      setItem: (key: string, value: string) => {
+        if (key === 'lexical.knowledgeBase.v2' && value.length > initial.length + 200) throw new Error('QuotaExceededError');
+        saved.set(key, value);
+      },
+      removeItem: (key: string) => { saved.delete(key); }
+    };
+    const previous = (globalThis as { localStorage?: unknown }).localStorage;
+    (globalThis as { localStorage?: unknown }).localStorage = storage;
+    try {
+      const store = new KnowledgeBaseStore();
+      store.teachRoot(taught);
+      expect(store.lastPersistError).toMatch(/QuotaExceededError/);
+      const restored = new KnowledgeBaseStore();
+      expect(restored.kb.languageRoots.some((root) => root.lemma === 'surfar')).toBe(true);
+    } finally {
+      (globalThis as { localStorage?: unknown }).localStorage = previous;
+    }
   });
 });

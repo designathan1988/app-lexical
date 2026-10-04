@@ -239,6 +239,11 @@ textarea { font-family: var(--mono); font-size: 12px; width: 100%; }
 .sentence-gold-header h3 { margin: 0; font-size: 15px; }
 .sentence-gold-list { overflow-x: auto; }
 .sentence-gold-list .data-table { min-width: 800px; }
+.network-form { max-width: 650px; padding: 16px 0; }
+.network-form small { color: var(--muted); }
+.network-form button { justify-self: start; }
+.network-select { display: flex; gap: 10px; align-items: center; margin: 14px 0; }
+.network-svg { min-width: 850px; }
 @media (max-width: 700px) {
   .admin-layout { display: block; overflow-y: auto; }
   .admin-nav { flex-direction: row; overflow-x: auto; border-right: 0; border-bottom: 1px solid var(--border); white-space: nowrap; }

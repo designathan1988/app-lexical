@@ -7,7 +7,7 @@ import { HISTORICAL_FACTORY_IDS } from './legacyIds';
  * modo que uma base salva antiga deixe de ser válida (ex.: formas manuais
  * substituídas por geração a partir do lema).
  */
-export const KB_DATA_VERSION = 2;
+export const KB_DATA_VERSION = 3;
 
 export interface MigrationReport {
   fromVersion: number | null;
@@ -15,6 +15,7 @@ export interface MigrationReport {
   keptUserConcepts: string[];
   keptUserMultiwords: string[];
   keptUserForms: string[];
+  keptUserLanguageRoots: string[];
   droppedFactoryForms: number;
   droppedSupersededForms: number;
 }
@@ -39,6 +40,7 @@ export function migrateKnowledgeBase(
     keptUserConcepts: [],
     keptUserMultiwords: [],
     keptUserForms: [],
+    keptUserLanguageRoots: [],
     droppedFactoryForms: 0,
     droppedSupersededForms: 0
   };
@@ -93,6 +95,11 @@ export function migrateKnowledgeBase(
   }
 
   if (old.paradigmOverrides) kb.paradigmOverrides = old.paradigmOverrides;
+  for (const root of old.languageRoots ?? []) {
+    if (kb.languageRoots.some((entry) => entry.id === root.id)) continue;
+    kb.languageRoots.push(root);
+    report.keptUserLanguageRoots.push(root.id);
+  }
 
   return { kb, report };
 }
@@ -102,7 +109,8 @@ export function describeMigration(report: MigrationReport): string {
     report.keptUserLexemes.length +
     report.keptUserConcepts.length +
     report.keptUserMultiwords.length +
-    report.keptUserForms.length;
+    report.keptUserForms.length +
+    report.keptUserLanguageRoots.length;
   return (
     `Base salva migrada da versão ${report.fromVersion ?? 1} para ${KB_DATA_VERSION}: ` +
     `as formas agora são geradas a partir de cada lema. ` +

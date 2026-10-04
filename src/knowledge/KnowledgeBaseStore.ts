@@ -12,6 +12,10 @@ import {
   type EngineSettings
 } from '../engine/EngineSettings';
 import { migrateKnowledgeBase, describeMigration, KB_DATA_VERSION } from './migrateKnowledgeBase';
+import { LANGUAGE_PARADIGMS, suggestParadigm } from '../engine/language/LanguageInflector';
+import type { TeachableRoot, TeachRootInput } from './language/teachableRoot';
+import frameData from './morphology/frames.json';
+import semanticTypes from './morphology/semantic-types.json';
 
 export type { EngineSettings };
 export const DEFAULT_SETTINGS: EngineSettings = DEFAULT_ENGINE_SETTINGS;
@@ -39,6 +43,7 @@ export interface TrainingRecord {
 }
 
 const STORAGE_KEY = 'lexical.knowledgeBase.v2';
+const LANGUAGE_ROOTS_KEY = 'lexical.languageRoots.v3';
 /** Chaves de versões anteriores, migradas na primeira abertura. */
 const LEGACY_STORAGE_KEYS = ['lexical.knowledgeBase.v1'];
 
@@ -158,7 +163,14 @@ export class KnowledgeBaseStore {
         }
       }
     }
-    if (!raw) return false;
+    if (!raw) {
+      const rootsOnly = this.readSavedLanguageRoots();
+      if (!rootsOnly.length) return false;
+      this.kb = createInitialKnowledgeBase();
+      this.kb.languageRoots = rootsOnly;
+      this.migrationNotice = 'Raízes ensinadas restauradas do registro separado.';
+      return true;
+    }
     try {
       const parsed = JSON.parse(raw) as {
         dataVersion?: number;
@@ -170,6 +182,9 @@ export class KnowledgeBaseStore {
       if (!parsed.knowledgeBase) return false;
 
       this.kb = this.adoptKnowledgeBase(parsed.knowledgeBase, parsed.dataVersion);
+      for (const root of this.readSavedLanguageRoots()) {
+        if (!this.kb.languageRoots.some((item) => item.id === root.id)) this.kb.languageRoots.push(root);
+      }
       this.settings = { ...DEFAULT_SETTINGS, ...(parsed.settings ?? {}) };
       this.versions = parsed.versions ?? [];
       this.training = parsed.training ?? [];
@@ -195,6 +210,10 @@ export class KnowledgeBaseStore {
 
   private persist(): void {
     if (!this.persistEnabled) return;
+    const rootResult = safeSetItem(LANGUAGE_ROOTS_KEY, JSON.stringify({
+      dataVersion: KB_DATA_VERSION,
+      roots: this.kb.languageRoots
+    }));
     const payload = JSON.stringify({
       dataVersion: KB_DATA_VERSION,
       knowledgeBase: this.kb,
@@ -203,7 +222,21 @@ export class KnowledgeBaseStore {
       training: this.training
     });
     const result = safeSetItem(STORAGE_KEY, payload);
-    this.lastPersistError = result.ok ? null : `Falha ao salvar: ${result.reason}`;
+    this.lastPersistError = !rootResult.ok
+      ? `Falha ao salvar raízes ensinadas: ${rootResult.reason}`
+      : result.ok ? null : `Falha ao salvar histórico completo: ${result.reason} Raízes ensinadas salvas separadamente.`;
+  }
+
+  private readSavedLanguageRoots(): TeachableRoot[] {
+    const raw = safeGetItem(LANGUAGE_ROOTS_KEY);
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw) as { roots?: TeachableRoot[] };
+      return Array.isArray(parsed.roots) ? parsed.roots : [];
+    } catch (error) {
+      this.lastRestoreError = `Falha ao restaurar raízes ensinadas: ${(error as Error).message}`;
+      return [];
+    }
   }
 
   /** Restaura a base de fábrica, descartando o estado persistido. */
@@ -215,6 +248,7 @@ export class KnowledgeBaseStore {
     this.versionCounter = 0;
     this.trainingCounter = 0;
     safeRemoveItem(STORAGE_KEY);
+    safeRemoveItem(LANGUAGE_ROOTS_KEY);
     for (const key of LEGACY_STORAGE_KEYS) safeRemoveItem(key);
     this.migrationNotice = null;
     this.snapshotVersion('Base de fábrica');
@@ -449,6 +483,47 @@ export class KnowledgeBaseStore {
   }
 
   // ---- Lexemes ---------------------------------------------------------------
+
+  /** Acrescenta uma raiz ao léxico geral, registra uma versão e persiste. */
+  teachRoot(input: TeachRootInput): TeachableRoot {
+    const lemma = input.lemma.trim().normalize('NFC').toLocaleLowerCase('pt-BR');
+    const gloss = input.gloss.trim();
+    if (!lemma || !/^\p{L}+(?:-\p{L}+)*$/u.test(lemma)) throw new Error('Informe um lema válido.');
+    if (!gloss) throw new Error('Informe uma glosa para o sentido.');
+    if (this.kb.languageRoots.some((root) => root.lemma === lemma && root.pos === input.pos)) throw new Error('Esta raiz já foi ensinada.');
+    const types = (semanticTypes as { types: Array<{ id: string }> }).types;
+    if (!types.some((type) => type.id === input.semanticType)) throw new Error('Tipo semântico desconhecido.');
+    const suggestion = suggestParadigm(lemma, input.pos);
+    const paradigmId = input.paradigmId ?? suggestion?.id;
+    const paradigm = paradigmId ? LANGUAGE_PARADIGMS[paradigmId] : undefined;
+    if (!paradigmId || !paradigm || paradigm.pos !== input.pos) throw new Error('Paradigma incompatível com a classe.');
+    const normalizedId = lemma.normalize('NFD').replace(/\p{M}/gu, '').replace(/[^\p{L}\p{N}]+/gu, '_').toUpperCase();
+    const senseId = `${lemma}.${normalizedId}`;
+    const root: TeachableRoot = {
+      id: `USR_${normalizedId}`,
+      lemma,
+      pos: input.pos,
+      paradigmId,
+      paradigmRule: input.paradigmId && input.paradigmId !== suggestion?.id ? 'USER_CHOICE' : suggestion?.rule ?? 'USER_CHOICE',
+      sense: { id: senseId, gloss, semanticType: input.semanticType }
+    };
+    if (input.pos === 'VERB') {
+      const template = (frameData as unknown as { frames: Array<TeachableRoot['frame'] & { id: string }> }).frames
+        .find((frame) => frame.id === input.frameTemplateId);
+      if (!template) throw new Error('Escolha uma moldura verbal existente.');
+      root.frame = {
+        id: senseId,
+        sourceTemplateId: template.id,
+        roles: structuredClone(template.roles),
+        syntax: structuredClone(template.syntax),
+        ...(template.control ? { control: template.control } : {}),
+        ...(template.complement ? { complement: template.complement } : {})
+      };
+    }
+    this.kb.languageRoots.push(root);
+    this.snapshotVersion(`Raiz ensinada: ${lemma}`);
+    return root;
+  }
 
   addLexeme(lexeme: Lexeme): void {
     this.kb.lexemes[lexeme.id] = lexeme;

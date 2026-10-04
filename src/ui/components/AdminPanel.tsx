@@ -11,12 +11,14 @@ import { SettingsSection } from './admin/SettingsSection';
 import { HistorySection } from './admin/HistorySection';
 import { MorphologySection } from './admin/MorphologySection';
 import { SentenceAnalysisSection } from './admin/SentenceAnalysisSection';
+import { TeachableNetworkSection } from './admin/TeachableNetworkSection';
 
 export type AdminTab =
   | 'dados'
   | 'paradigmas'
   | 'morfologia'
   | 'frase'
+  | 'rede'
   | 'treinamento'
   | 'testes'
   | 'metricas'
@@ -50,6 +52,7 @@ export function AdminPanel({ engine, store, onChange }: Props) {
     { id: 'paradigmas', label: 'Paradigmas' },
     { id: 'morfologia', label: 'Morfologia' },
     { id: 'frase', label: 'Análise de frase' },
+    { id: 'rede', label: 'Rede ensinável' },
     { id: 'treinamento', label: 'Treinamento' },
     { id: 'testes', label: 'Testes' },
     { id: 'metricas', label: 'Métricas' },
@@ -78,6 +81,7 @@ export function AdminPanel({ engine, store, onChange }: Props) {
         {tab === 'paradigmas' && <ParadigmSection engine={engine} store={store} onChange={bump} />}
         {tab === 'morfologia' && <MorphologySection engine={engine} />}
         {tab === 'frase' && <SentenceAnalysisSection engine={engine} />}
+        {tab === 'rede' && <TeachableNetworkSection engine={engine} store={store} onChange={bump} />}
         {tab === 'treinamento' && (
           <TrainingSection engine={engine} store={store} onChange={bump} />
         )}

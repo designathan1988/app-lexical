@@ -7,6 +7,7 @@ import guessData from '../../knowledge/language/guess-rules.json';
 import { PARADIGMS, generateForms, type Paradigm, type ParadigmId } from '../../knowledge/paradigms';
 import { parseFeatureKey, type FeatureBundle } from '../../knowledge/features';
 import type { Lexeme } from '../types';
+import type { TeachableRoot } from '../../knowledge/language/teachableRoot';
 
 export interface InflectionReading {
   lemma: string;
@@ -71,8 +72,8 @@ export function suggestParadigm(lemma: string, pos: string): { id: string; rule:
 export class LanguageInflector {
   readonly reverse = new Map<string, InflectionReading[]>();
 
-  constructor(domainLexemes: Record<string, Lexeme> = {}) {
-    const lemmas: Seed[] = [...seeds, ...lexicalSupplements.map((entry) => ({ ...entry, inflection: { paradigmId: entry.paradigmId } })), ...Object.values(domainLexemes).map((lexeme) => ({
+  constructor(domainLexemes: Record<string, Lexeme> = {}, languageRoots: TeachableRoot[] = []) {
+    const lemmas: Seed[] = [...seeds, ...lexicalSupplements.map((entry) => ({ ...entry, inflection: { paradigmId: entry.paradigmId } })), ...languageRoots.map((root) => ({ lemma: root.lemma, pos: root.pos, inflection: { paradigmId: root.paradigmId } })), ...Object.values(domainLexemes).map((lexeme) => ({
       lemma: lexeme.lemma,
       pos: lexeme.pos,
       inflection: lexeme.paradigmId ? { paradigmId: lexeme.paradigmId } : undefined

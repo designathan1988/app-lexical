@@ -82,7 +82,7 @@ export class SemanticEngine {
       kb.disambiguationRules ?? []
     );
     compiler.simulator = this.simulate;
-    this.derivations = createDerivationalAnalyzer(kb.lexemes);
+    this.derivations = createDerivationalAnalyzer(kb.lexemes, kb.languageRoots);
     compiler.morphology = this.derivations;
     return compiler;
   }
@@ -91,14 +91,14 @@ export class SemanticEngine {
 
   /** Decomposição derivacional de uma palavra (raiz + regras + glosa). */
   analyzeWord(word: string): DerivationAnalysis[] {
-    this.derivations ??= createDerivationalAnalyzer(this.knowledgeBase.lexemes);
+    this.derivations ??= createDerivationalAnalyzer(this.knowledgeBase.lexemes, this.knowledgeBase.languageRoots);
     return this.derivations.analyze(word);
   }
 
   /** Analisa uma frase do português sem executar operações no documento. */
   analyzeSentence(text: string): SentenceAnalysis {
     const tokenization = tokenizeSentence(text);
-    const tagger = new LanguageTagger(new LexicalAnalyzer(this.knowledgeBase.lexemes));
+    const tagger = new LanguageTagger(new LexicalAnalyzer(this.knowledgeBase.lexemes, this.knowledgeBase.languageRoots));
     const tagged = tagger.tagForms(tokenization.words.map((word) => word.form));
     for (const multiword of tokenization.multiwords) {
       const first = tagged.words[multiword.from - 1];
@@ -118,7 +118,7 @@ export class SemanticEngine {
     }
     const dependencies = new DependencyParser().parse(tagged.words);
     const clause = new ClauseAnalyzer().analyze(tagged.words, dependencies);
-    const meaningGraph = new MeaningGraphBuilder().build(tagged.words, dependencies, clause);
+    const meaningGraph = new MeaningGraphBuilder(this.knowledgeBase.languageRoots).build(tagged.words, dependencies, clause);
     return {
       text,
       words: tagged.words,

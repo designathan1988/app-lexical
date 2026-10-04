@@ -4,6 +4,7 @@ import seedData from '../../knowledge/morphology/seed-roots.json';
 import supplementData from '../../knowledge/language/lexical-supplements.json';
 import { createDerivationalAnalyzer } from '../../knowledge/morphology';
 import type { Lexeme } from '../types';
+import type { TeachableRoot } from '../../knowledge/language/teachableRoot';
 import { LanguageInflector } from './LanguageInflector';
 import { closedClassReadings } from './ClosedClassLexicon';
 import { tokenizeSentence, type LanguageWord, type MultiwordToken } from './Tokenizer';
@@ -51,9 +52,9 @@ export class LexicalAnalyzer {
   private inflector: LanguageInflector;
   private derivations;
 
-  constructor(domainLexemes: Record<string, Lexeme> = {}) {
-    this.inflector = new LanguageInflector(domainLexemes);
-    this.derivations = createDerivationalAnalyzer(domainLexemes);
+  constructor(domainLexemes: Record<string, Lexeme> = {}, languageRoots: TeachableRoot[] = []) {
+    this.inflector = new LanguageInflector(domainLexemes, languageRoots);
+    this.derivations = createDerivationalAnalyzer(domainLexemes, languageRoots);
   }
 
   analyzeSurface(form: string): LexicalReading[] {
