@@ -1,6 +1,7 @@
 import rulesData from '../../knowledge/language/pos-rules.json';
 import copulaData from '../../knowledge/language/copulas.json';
 import verbClassData from '../../knowledge/language/verb-classes.json';
+import degreeData from '../../knowledge/language/degree-modifier-rules.json';
 import { LexicalAnalyzer, type LexicalReading } from './LexicalAnalyzer';
 
 interface Constraint {
@@ -47,7 +48,8 @@ const rules = (rulesData as unknown as { rules: Rule[] }).rules;
 const fallbackRuleId = (rulesData as { fallbackRuleId?: string }).fallbackRuleId ?? 'CG_DEFAULT_ORDER';
 const lemmaClasses = new Map([
   copulaData as { class: string; lemmas: string[] },
-  ...(verbClassData as { classes: Array<{ class: string; lemmas: string[] }> }).classes
+  ...(verbClassData as { classes: Array<{ class: string; lemmas: string[] }> }).classes,
+  ...(degreeData as { classes: Array<{ class: string; lemmas: string[] }> }).classes
 ].map((entry) => [entry.class, new Set(entry.lemmas)]));
 
 function readingMatches(reading: LexicalReading, target: { upos: string; feats?: Record<string, string>; lemmaClass?: string }): boolean {

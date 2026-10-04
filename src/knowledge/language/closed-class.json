@@ -198,6 +198,7 @@
     {"form":"longe","lemma":"longe","upos":"ADV","feats":{},"note":"advérbio locativo"},
     {"form":"perto","lemma":"perto","upos":"ADV","feats":{},"note":"advérbio locativo"},
     {"form":"pouco","lemma":"pouco","upos":"ADV","feats":{},"note":"advérbio de grau"},
+    {"form":"tão","lemma":"tão","upos":"ADV","feats":{},"note":"advérbio intensificador de grau; ex.: tão cedo"},
     {"form":"sim","lemma":"sim","upos":"ADV","feats":{},"note":"advérbio afirmativo"},
     {"form":"abaixo","lemma":"abaixo","upos":"ADV","feats":{},"note":"advérbio locativo"},
     {"form":"acima","lemma":"acima","upos":"ADV","feats":{},"note":"advérbio locativo"},

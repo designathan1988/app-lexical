@@ -1,0 +1,24 @@
+{
+  "classes": [
+    {
+      "id": "LEX_DEGREE_ADVERBS",
+      "class": "DEGREE",
+      "lemmas": ["muito", "bem", "tão", "pouco"],
+      "source": "https://universaldependencies.org/u/dep/advmod.html; https://github.com/amrisi/amr-guidelines/blob/master/amr.md#degree",
+      "note": "intensificadores e atenuadores podem modificar um adjetivo ou outro advérbio",
+      "example": "Ele corre muito bem."
+    }
+  ],
+  "rules": [
+    {
+      "id": "UD_DEGREE_MODIFIER",
+      "class": "DEGREE",
+      "headUpos": ["ADV", "ADJ"],
+      "relation": "advmod",
+      "semanticRole": "degree",
+      "source": "https://universaldependencies.org/u/dep/advmod.html; https://github.com/amrisi/amr-guidelines/blob/master/amr.md#degree",
+      "note": "o advérbio de grau depende do modificador adjacente e o grau modifica esse conceito no grafo",
+      "example": "Nós saímos tão cedo."
+    }
+  ]
+}

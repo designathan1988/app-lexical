@@ -9,6 +9,7 @@ import obliqueCasesData from '../../knowledge/language/frame-oblique-cases.json'
 import nominalPpData from '../../knowledge/language/nominal-pp-rules.json';
 import copularClauseData from '../../knowledge/language/copular-clause-rules.json';
 import coordinationData from '../../knowledge/language/coordination-rules.json';
+import degreeData from '../../knowledge/language/degree-modifier-rules.json';
 import type { TeachableRoot } from '../../knowledge/language/teachableRoot';
 import type { TaggedWord } from './Tagger';
 
@@ -40,6 +41,8 @@ const copularClauseRules = (copularClauseData as { rules: Array<{
 const coordinationLists = (coordinationData as { lists: Array<{
   id: string; separator: string; memberUpos: string[]; relation: string; punctuationRelation: string
 }> }).lists;
+const degreeRules = (degreeData as { classes: Array<{ class: string; lemmas: string[] }>;
+  rules: Array<{ id: string; class: string; headUpos: string[]; relation: string }> });
 const isSubtype = (actual: string | undefined, expected: string): boolean => {
   for (let current = actual; current; current = typeParents.get(current) ?? undefined) if (current === expected) return true;
   return false;
@@ -302,6 +305,9 @@ export class DependencyParser {
     }
     for (let i = 0; i < words.length; i++) {
       if (pos(i) !== 'ADV' || assigned(i)) continue;
+      const degreeRule = degreeRules.rules.find((rule) => rule.headUpos.includes(pos(i + 1)) &&
+        degreeRules.classes.some((entry) => entry.class === rule.class && entry.lemmas.includes(words[i].selected.lemma)));
+      if (degreeRule) { set(i, i + 1, degreeRule.relation, degreeRule.id); continue; }
       const emphatic = (adjunctData as { adverbs: Array<{ form?: string; role: string }> }).adverbs.some((entry) => entry.form === words[i].selected.lemma && entry.role === 'emph');
       if (emphatic) {
         const target = nearestRight(i, (candidate) => nominals.has(pos(candidate)), i + 3);

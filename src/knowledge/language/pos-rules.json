@@ -1,6 +1,7 @@
 {
   "fallbackRuleId": "CG_DEFAULT_ORDER",
   "rules": [
+    {"id":"CG_DEGREE_BEFORE_MODIFIER","action":"SELECT","target":{"upos":"ADV","lemmaClass":"DEGREE"},"context":[{"offset":1,"upos":["ADV","ADJ"]}],"source":"https://edu.visl.dk/cg3/chunked/contexts.html; https://universaldependencies.org/u/dep/advmod.html","note":"advérbio de grau antes de outro modificador mantém leitura adverbial","example":"As flores são pouco bonitas."},
     {"id":"CG_JUSSIVE_MARK","action":"SELECT","form":"que","target":{"upos":"SCONJ"},"context":[{"atStart":true},{"finalForm":"!"},{"offset":1,"upos":["VERB"],"feats":{"Mood":"Sub"}}],"note":"marcador de ordem jussiva antes de subjuntivo sem sujeito expresso","example":"Que venha!"},
     {"id":"CG_JUSSIVE_VERB","action":"SELECT","target":{"upos":"VERB","feats":{"Mood":"Sub"}},"context":[{"offset":-1,"upos":["SCONJ"]},{"finalForm":"!"}],"note":"subjuntivo em oração jussiva marcada","example":"Que venha!"},
     {"id":"CG_NAME_SEQUENCE","action":"SELECT","target":{"upos":"PROPN","excludeIfAnyUpos":["PRON","DET"]},"context":[{"offset":1,"upos":["PROPN"],"capitalized":true}],"note":"duas palavras com inicial maiúscula podem formar um nome próprio","example":"São Paulo"},

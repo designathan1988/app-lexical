@@ -8,6 +8,7 @@ import pragmaticsData from '../../knowledge/language/pragmatics.json';
 import coercionData from '../../knowledge/language/semantic-coercions.json';
 import nominalPpData from '../../knowledge/language/nominal-pp-rules.json';
 import coordinationData from '../../knowledge/language/coordination-rules.json';
+import degreeData from '../../knowledge/language/degree-modifier-rules.json';
 import type { DependencyArc } from './DependencyParser';
 import type { ClauseAnalysis } from './ClauseAnalyzer';
 import type { TaggedWord } from './Tagger';
@@ -51,6 +52,8 @@ const pragmaticExpressions = (pragmaticsData as { expressions: Array<{ id: strin
 const coercions = (coercionData as { rules: Array<{ id: string; from: string; to: string; contextRole: string }> }).rules;
 const nominalPpRules = (nominalPpData as { rules: Array<{ id: string; semanticRole: string }> }).rules;
 const coordination = coordinationData as { operators: Array<{ id: string; form: string; concept: string }>; defaultOperator: string };
+const degreeRules = degreeData as { classes: Array<{ class: string; lemmas: string[] }>;
+  rules: Array<{ id: string; class: string; headUpos: string[]; semanticRole: string }> };
 
 function isSubtype(actual: string | undefined, expected: string): boolean {
   for (let cursor = actual; cursor; cursor = typeParents.get(cursor) ?? undefined) if (cursor === expected) return true;
@@ -283,6 +286,12 @@ export class MeaningGraphBuilder {
       const headIndex = arc.head - 1;
       if (headIndex < 0) continue;
       const reading = words[index].selected;
+      const degreeRule = degreeRules.rules.find((rule) => rule.headUpos.includes(words[headIndex].selected.upos) &&
+        degreeRules.classes.some((entry) => entry.class === rule.class && entry.lemmas.includes(reading.lemma)));
+      if (degreeRule) {
+        attr(content(headIndex), degreeRule.semanticRole, reading.lemma, degreeRule.id);
+        continue;
+      }
       const antecedent = relativeAntecedent(index, headIndex);
       if (antecedent >= 0) {
         const role = adjuncts.interrogatives.find((item) => item.form === reading.lemma)?.role ?? 'LOC';
